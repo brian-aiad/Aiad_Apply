@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aiadapplyv2"
+version = "0.1.0"
+description = "Evidence-based resume transformation engine."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.7",
+  "typer>=0.12",
+  "rich>=13.7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.6",
+]
+semantic = [
+  "qdrant-client>=1.11",
+  "numpy>=1.26",
+]
+docs = [
+  "mkdocs>=1.6",
+]
+
+[project.scripts]
+aiadapplyv2 = "aiadapply_v2.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["packages/resume-engine/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["packages/resume-engine/tests"]
+pythonpath = ["packages/resume-engine/src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
