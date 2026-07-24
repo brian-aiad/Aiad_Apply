@@ -1,46 +1,115 @@
-# Open Source and Product References
+# Open-Source Research
 
-These projects are references, not direct blueprints.
+No external resume application was copied into this repository. Their useful
+design patterns were evaluated and reimplemented against the stricter
+existing-DOCX requirement.
 
 ## Resume Matcher
 
-Repository: https://github.com/srbhr/resume-matcher
+Repository: https://github.com/srbhr/Resume-Matcher
 
-Useful for ATS-style resume/job comparison, keyword highlighting, and user-facing match reports.
+Adopted concepts:
+
+- allowlisted structured changes
+- content-hash guards
+- prompt-injection isolation
+- structured-output retry behavior
+- deterministic post-generation checks
+
+Deferred:
+
+- its web UI, database, provider abstraction, and browser test stack
+- template generation, because this project mutates a finalized DOCX
+
+## resuml
+
+Repository: https://github.com/phoinixi/resuml
+
+Adopted concepts:
+
+- requirement-region weighting
+- positive skill taxonomy matching
+- longest-first phrase matching and acronym awareness
+- separate parsing, match, and recruiter concerns
+
+Deferred:
+
+- JSON Resume rendering and theme infrastructure
+
+## resume-tailoring-skill
+
+Repository: https://github.com/varunr89/resume-tailoring-skill
+
+Adopted concepts:
+
+- direct, transferable, adjacent, and gap classifications
+- explicit semantic bridges
+- impact and placement reasoning
+
+Changed:
+
+- unsupported terms remain exportable under this product's configured policy,
+  but they receive explicit risk records
 
 ## Resume AI
 
 Repository: https://github.com/resume-llm/resume-ai
 
-Useful reference for local-first resume versions, job tracking, provider abstraction, and generated documents.
+Adopted concept:
 
-## Reactive Resume
+- strict structured LLM boundary before document generation
 
-Repository: https://github.com/amruthpillai/reactive-resume
+Deferred:
 
-Useful reference for structured resume data, self-hosted resume editing, and PDF export.
+- Ollama, MLflow, PostgreSQL, Kanban UI, and Pandoc because none solves the
+  current milestone's preservation or validation requirements
 
-## OpenResume
+## Runtime Technologies
 
-Repository: https://github.com/xitanggg/open-resume
+### Pydantic v2
 
-Useful reference for parser/builder UX and ATS-readable resumes.
+Problem solved: strict schemas at every LLM and pipeline boundary.
 
-## JSON Resume
+Milestone one: required. Low runtime and maintenance cost.
 
-Schema: https://jsonresume.org/schema
+### python-docx and lxml
 
-Useful as a reminder to separate semantic resume content from rendering, though V2 needs richer evidence and risk metadata.
+Problem solved: semantic inspection and surgical mutation of existing OOXML.
 
-## Pydantic
+Milestone one: required. Moderate maintenance because DOCX structure must remain
+covered by golden tests.
 
-Docs: https://pydantic.dev/
+### sentence-transformers with BGE
 
-Used for schema-first engine objects.
+Problem solved: cross-domain evidence retrieval beyond exact strings.
 
-## Qdrant
+Milestone one: required. Moderate install/model cost; no service maintenance.
 
-Site: https://qdrant.tech/
+### LibreOffice
 
-Candidate vector database for semantic matching between target job concepts and resume evidence.
+Problem solved: reproducible Windows/macOS DOCX-to-PDF rendering.
 
+Milestone one: required. External desktop dependency, low application
+maintenance.
+
+### PyMuPDF and NumPy
+
+Problem solved: page, line, text, link, coordinate, and visual-baseline
+inspection.
+
+Milestone one: required. Low maintenance.
+
+### uv
+
+Problem solved: reproducible Python dependency resolution across Windows and
+macOS through `uv.lock`.
+
+Milestone one: required. Low maintenance.
+
+### Codex CLI
+
+Problem solved: mandatory contextual role interpretation and structured rewrite
+reasoning using the user's existing Codex authentication.
+
+Milestone one: required. Moderate operational cost; deterministic validation
+contains its output.

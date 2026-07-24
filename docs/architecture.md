@@ -1,82 +1,85 @@
 # aiadapplyV2 Architecture
 
-## Mission
+## Boundaries
 
-V2 is a role-transformation resume engine. It should decide what Brian's resume should become for a job, not merely whether a keyword can fit into the current resume.
+Codex interprets the role, explains transferability, and generates coherent
+section rewrites. Python owns all enforcement and document operations.
 
-## Operating Modes
+Codex receives an untrusted job description as JSON data in an isolated,
+ephemeral, read-only workspace. It must return a strict Pydantic-generated JSON
+Schema. It never edits the DOCX.
 
-`production`
-: Conservative, application-ready, blocks unsupported hard skills and credentials.
+Python enforces:
 
-`hybrid`
-: Aggressive narrative rewrite while still blocking fake hard tools/certs.
+- protected text and hyperlink equality
+- numerical metric equality by semantic section
+- section, skill-line, entry, project, and bullet counts
+- important accepted keyword coverage
+- exact semantic paragraph IDs
+- one-page PDF output
+- rendered line count and section-anchor drift
+- retry and rollback behavior
 
-`transformation_draft`
-: Maximum role-specific transformation. May include unsupported terms, but must label them as `unsupported` or `human_confirm`.
+## Semantic Document Model
 
-## Core Data Flow
+The finalized DOCX is the source of truth. The parser discovers structure from
+section headings, organization/project headings, bullet formatting, and skill
+labels. Stable IDs such as `skills.apis_identity` and
+`experience.original_insurance.bullet.2` are independent of permanent paragraph
+numbers.
 
-```text
-RawPaste
-  -> ParsedJob
-  -> TargetRoleProfile
-  -> ResumeEvidenceGraph
-  -> TransferabilityMap
-  -> RewritePlan
-  -> RiskReport
-  -> ReviewedResume
-  -> DOCX/PDF
-```
+The writer changes text inside existing paragraphs and runs. It does not rebuild
+the file or globally alter font size, margins, styles, spacing, indentation,
+tabs, hyperlinks, or section geometry.
 
-## Technology Direction
+## Job Intelligence
 
-### Pydantic
+The intake parser:
 
-The engine is schema-first. Every AI-facing object must be strict enough to validate before the next stage runs. Pydantic is used for runtime validation and future structured-output contracts.
+1. normalizes pasted Unicode and line endings
+2. identifies the real job-description region
+3. separates responsibilities, required qualifications, and preferred
+   qualifications
+4. extracts the last Simplify high/low keyword panels
+5. rejects navigation, recommendations, applicant statistics, legal text, and
+   company/footer regions
 
-### Semantic Search
+Keyword grading keeps hiring importance separate from placement utility.
+Required/responsibility/title occurrence, repetition, Simplify priority, and
+tool specificity add weight. Malformed, generic, legal, and company-marketing
+terms receive explainable penalties.
 
-V2 will add vector search after the deterministic baseline works. Candidate technologies:
+## Evidence Retrieval
 
-- Qdrant for a dedicated open-source vector database.
-- PostgreSQL + pgvector if the project wants fewer services.
+Evidence is rebuilt from the base DOCX for every run. Direct terms are tested
+against source text and extracted systems/actions. Transfer bridges are
+represented separately so they can never be mislabeled as direct evidence.
 
-The evidence search task is:
+Milestone one uses `BAAI/bge-small-en-v1.5` through sentence-transformers and an
+in-memory cosine index. Exact direct evidence outranks embedding similarity.
+There is no vector database or service dependency.
 
-```text
-"technical writing" -> incident documentation / KB articles / escalation notes
-"failure analysis" -> root cause analysis / production incident diagnostics
-"systems integration" -> API integration / carrier feeds / webhooks
-"access governance" -> RBAC / SSO / Entra ID / permissions
-```
+## Layout
 
-### LLM Structured Outputs
+LibreOffice is invoked headlessly with an isolated user profile and an argument
+list, not shell-composed input. PyMuPDF measures:
 
-The model should not directly edit a DOCX. It should emit JSON:
+- page count
+- selectable rendered lines
+- the Y position of all five section anchors
+- candidate drift relative to a fresh render of the untouched base
 
-- `TargetRoleProfile`
-- `EvidenceMatch`
-- `RewriteCandidate`
-- `RiskFlag`
+When a candidate wraps, the engine shortens one paragraph at a time. It chooses
+the highest-pressure paragraph before the first shifted section, rerenders, and
+stops as soon as the baseline is restored. It never shrinks the entire resume
+at once.
 
-The renderer consumes approved structured content later.
+## Deferred Infrastructure
 
-## Reused Lessons From aiadapply
-
-Keep:
-
-- messy LinkedIn/Simplify paste parsing
-- coverage scoring
-- DOCX/PDF generation discipline
-- one-page guard
-- changelog/audit model
-- protected facts
-
-Change:
-
-- no hardcoded paragraph numbers as the core abstraction
-- no single Application Support identity guard
-- no silent keyword insertion without risk label
-- no LLM pass-through masquerading as reasoning
-
+- Qdrant and pgvector: the evidence corpus is currently a few dozen paragraphs.
+- Redis: no distributed job queue exists.
+- LangGraph or multiple agents: the workflow is linear and deterministic.
+- FastAPI/Next.js: CLI validation precedes a review UI.
+- Microsoft Word automation: it is Windows-only and PDF export was unreliable
+  on the development machine.
+- Pandoc/template regeneration: it cannot preserve the finalized DOCX.
