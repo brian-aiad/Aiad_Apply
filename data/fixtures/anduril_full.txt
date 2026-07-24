@@ -1,0 +1,100 @@
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Anduril Industries.
+Anduril Industries
+Product Operations Technical Specialist, Ghost
+Costa Mesa, CA · Reposted 1 day ago · Over 100 people clicked apply
+Full-time
+Apply
+Save
+
+29%
+Resume Match
+4 of 14 keywords
+Simplify
+High Priority Keywords
+Linux
+Jira
+Bash
+Grafana
+UNIX
+command line
+Unix
+Fusion
+Low Priority Keywords
+ai
+computer vision
+technical support
+compliance
+intellectual property
+customer needs
+
+About the job
+Anduril Industries is a defense technology company. Lattice OS turns data streams into a realtime command and control center using autonomy, AI, computer vision, sensor fusion, and networking technology.
+
+About The Role
+Ghost is a modular UAS platform. As a Product Operations Specialist, your mission is to support end users and maintain the availability of deployed capabilities. You will support field failure mitigation and resolution, identify and triage incidents across deployed systems, debug failures, resolve issues rapidly, and root cause complex issues.
+
+What You'll Do
+Sustain Ghost deployments by combining an understanding of customer missions with product knowledge.
+Triage, diagnose, and root cause product incidents while driving postmortem actions and status visibility through resolution.
+Conduct log reviews and diagnostics while using Linux and command line tools for system management and issue resolution.
+Improve fleet observability and health telemetry with multiple functions across the Ghost team.
+Collect, organize, and analyze system failure data to define trends, improve sustainment, and support resource allocation.
+Track and manage customer-facing incidents, ensuring timely response, mitigation, and communication of resolution.
+Analyze customer communication and feedback for capability requirements, product performance indicators, and desired functionality.
+Bridge understanding between technical and non-technical stakeholders.
+Coordinate engineering, business, and sustainment functions to maximize capability availability for end users.
+
+Required Qualifications
+Demonstrated experience resolving issues independently.
+Strong problem solving in unstructured situations across hardware, software, and networking.
+Ability to master a technical system and support it in operational environments.
+Excellent written, visual, and verbal communication.
+Eligible to obtain and maintain a U.S. Secret Security clearance.
+
+Preferred Qualifications
+Experience with observability tools such as Grafana and PagerDuty and development tooling such as Jira.
+Experience in a Unix-like shell such as Bash or Zsh.
+Experience with Palantir Foundry for data-driven decision making.
+Experience supporting incident-driven workflows requiring analysis, triage, and prioritization.
+Experience in on-call support operations and limited risk tolerance environments.
+1+ year of customer or technical support focused on final-tier concerns.
+
+US Salary Range
+$98,000-$130,000 USD
+
+Protecting Yourself from Recruitment Scams
+Anduril will never request payment or banking information.
+Data Privacy
+By submitting an application you consent to lawful screening.
+
+Set alert for similar jobs
+Candidates who clicked apply
+214 total
+About
+Accessibility
+LinkedIn Corporation © 2026
+
+Simplify
+High Priority Keywords
+Linux
+Jira
+Bash
+Grafana
+UNIX
+command line
+Unix
+Fusion
+Low Priority Keywords
+ai
+computer vision
+technical support
+compliance
+intellectual property
+customer needs
+Update Job Description

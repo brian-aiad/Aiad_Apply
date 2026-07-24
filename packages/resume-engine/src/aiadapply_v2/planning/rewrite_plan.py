@@ -1,58 +1,27 @@
 from __future__ import annotations
 
-from aiadapply_v2.planning.transferability import build_evidence_matches
-from aiadapply_v2.schemas import (
-    ResumeEvidenceGraph,
-    RewriteAction,
-    RewritePlan,
-    RiskLevel,
-    TailorMode,
-    TargetRoleProfile,
-)
+from collections.abc import Iterable
+
+from aiadapply_v2.schemas import ClaimRisk, RewritePlan
 
 
-def build_rewrite_plan(
-    profile: TargetRoleProfile,
-    graph: ResumeEvidenceGraph,
-    mode: TailorMode = TailorMode.hybrid,
-) -> RewritePlan:
-    matches = build_evidence_matches(profile, graph)
-    actions: list[RewriteAction] = []
-    unsupported: list[str] = []
+def collect_claim_risks(plan: RewritePlan) -> list[ClaimRisk]:
+    risks: list[ClaimRisk] = [*plan.claim_risks]
+    for bullet in plan.bullets:
+        risks.extend(bullet.claim_risks)
+    seen: set[tuple[str, str]] = set()
+    result: list[ClaimRisk] = []
+    for risk in risks:
+        key = (risk.claim.casefold(), risk.selected_placement)
+        if key not in seen:
+            seen.add(key)
+            result.append(risk)
+    return result
 
-    for match in matches:
-        if match.risk in {RiskLevel.unsupported, RiskLevel.human_confirm}:
-            unsupported.append(match.target_keyword)
-            if mode == TailorMode.transformation_draft:
-                actions.append(
-                    RewriteAction(
-                        section="review_queue",
-                        target=match.target_keyword,
-                        intent="Optional draft insertion requires human confirmation.",
-                        keywords=[match.target_keyword],
-                        evidence_block_ids=[],
-                        risk=match.risk,
-                        note=match.semantic_bridge or "No grounded evidence found.",
-                    )
-                )
-            continue
-        actions.append(
-            RewriteAction(
-                section=match.suggested_destination,
-                target=match.target_concept,
-                intent=f"Use {match.target_keyword} where supported by existing evidence.",
-                keywords=[match.target_keyword],
-                evidence_block_ids=[match.evidence_block_id] if match.evidence_block_id else [],
-                risk=match.risk,
-                note=match.semantic_bridge,
-            )
-        )
 
-    return RewritePlan(
-        mode=mode,
-        profile=profile,
-        matches=matches,
-        actions=actions,
-        unsupported_keywords=unsupported,
-    )
-
+def all_proposed_text(plan: RewritePlan) -> Iterable[str]:
+    yield plan.summary.text
+    for line in plan.skills.lines:
+        yield f"{line.category}: {', '.join(line.skills)}"
+    for bullet in plan.bullets:
+        yield bullet.text

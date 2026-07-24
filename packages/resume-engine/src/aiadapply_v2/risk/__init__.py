@@ -1,2 +1,1 @@
 """Risk labeling utilities."""
-

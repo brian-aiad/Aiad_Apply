@@ -1,108 +1,307 @@
 from __future__ import annotations
 
 from enum import StrEnum
+from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class TailorMode(StrEnum):
-    production = "production"
-    hybrid = "hybrid"
-    transformation_draft = "transformation_draft"
+class StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class KeywordPriority(StrEnum):
+    high = "high"
+    low = "low"
+    inferred = "inferred"
+
+
+class KeywordKind(StrEnum):
+    system = "system"
+    action = "action"
+    environment = "environment"
+    qualification = "qualification"
+    outcome = "outcome"
+    vocabulary = "vocabulary"
+    noise = "noise"
+
+
+class EvidenceStrength(StrEnum):
+    direct = "direct"
+    strongly_transferable = "strongly_transferable"
+    weakly_transferable = "weakly_transferable"
+    unsupported = "unsupported"
 
 
 class RiskLevel(StrEnum):
-    grounded = "grounded"
-    transferable = "transferable"
-    stretched = "stretched"
-    unsupported = "unsupported"
-    human_confirm = "human_confirm"
+    low = "low"
+    medium = "medium"
+    high = "high"
 
 
-class ParsedJob(BaseModel):
+class ParagraphKind(StrEnum):
+    name = "name"
+    contact = "contact"
+    spacer = "spacer"
+    summary = "summary"
+    section_heading = "section_heading"
+    skill_line = "skill_line"
+    entry_heading = "entry_heading"
+    bullet = "bullet"
+    protected_body = "protected_body"
+
+
+class ParsedJob(StrictModel):
     company: str = ""
     title: str = ""
     location: str = ""
+    work_arrangement: str = ""
+    compensation: str = ""
     linkedin_url: str | None = None
     job_description: str
-    simplify_keywords: list[str] = Field(default_factory=list)
+    responsibilities: list[str] = Field(default_factory=list)
+    required_qualifications: list[str] = Field(default_factory=list)
+    preferred_qualifications: list[str] = Field(default_factory=list)
     high_priority_keywords: list[str] = Field(default_factory=list)
     low_priority_keywords: list[str] = Field(default_factory=list)
     simplify_score: tuple[int, int] = (0, 0)
-    keyword_source: Literal["simplify", "fallback_jd"] = "fallback_jd"
+    rejected_regions: list[str] = Field(default_factory=list)
+    raw_paste_sha256: str
     raw_paste: str = ""
 
 
-class TargetRoleProfile(BaseModel):
-    target_title: str
+class JobKeyword(StrictModel):
+    term: str
+    normalized: str
+    priority: KeywordPriority = KeywordPriority.inferred
+    kind: KeywordKind
+    occurrences: int = 0
+    source_sections: list[str] = Field(default_factory=list)
+    scoring_factors: dict[str, float] = Field(default_factory=dict)
+    hiring_importance: float = Field(ge=0.0, le=100.0)
+    placement_utility: float = Field(ge=0.0, le=100.0)
+    accepted: bool = True
+    rejection_reason: str = ""
+
+
+class TargetRoleProfile(StrictModel):
     company: str = ""
-    role_family: str
+    title: str
+    normalized_role_family: str
+    professional_identity: str
     seniority: str = "unknown"
-    industry_context: list[str] = Field(default_factory=list)
-    hard_tools: list[str] = Field(default_factory=list)
-    methodologies: list[str] = Field(default_factory=list)
-    responsibilities: list[str] = Field(default_factory=list)
-    action_verbs: list[str] = Field(default_factory=list)
-    must_have_keywords: list[str] = Field(default_factory=list)
-    nice_to_have_keywords: list[str] = Field(default_factory=list)
+    industry: list[str] = Field(default_factory=list)
+    core_systems: list[str] = Field(default_factory=list)
+    core_actions: list[str] = Field(default_factory=list)
+    environment_signals: list[str] = Field(default_factory=list)
+    customer_or_stakeholder_type: list[str] = Field(default_factory=list)
+    primary_responsibilities: list[str] = Field(default_factory=list)
+    required_qualifications: list[str] = Field(default_factory=list)
+    preferred_qualifications: list[str] = Field(default_factory=list)
+    high_priority_keywords: list[str] = Field(default_factory=list)
+    secondary_keywords: list[str] = Field(default_factory=list)
+    noisy_rejected_keywords: list[str] = Field(default_factory=list)
+    expected_outcome_language: list[str] = Field(default_factory=list)
+    expected_metrics: list[str] = Field(default_factory=list)
+    role_specific_vocabulary: list[str] = Field(default_factory=list)
+    role_specific_action_verbs: list[str] = Field(default_factory=list)
 
 
-class ResumeEvidenceBlock(BaseModel):
-    block_id: str
+class TextRun(StrictModel):
+    text: str
+    bold: bool | None = None
+    italic: bool | None = None
+    hyperlink_target: str | None = None
+
+
+class ResumeParagraph(StrictModel):
+    paragraph_id: str
+    index: int
     section: str
-    title: str = ""
+    kind: ParagraphKind
+    text: str
+    runs: list[TextRun] = Field(default_factory=list)
+    editable: bool = False
+    bullet_slot: int | None = None
+    line_budget: int = 1
+    character_budget: int = 0
+
+
+class ResumeSection(StrictModel):
+    section_id: str
+    heading: str
+    paragraph_ids: list[str]
+    editable_paragraph_ids: list[str] = Field(default_factory=list)
+    bullet_count: int = 0
+    line_budget: int = 0
+
+
+class ResumeDocument(StrictModel):
+    source_path: Path
+    source_sha256: str
+    paragraphs: list[ResumeParagraph]
+    sections: list[ResumeSection]
+    protected_strings: list[str]
+    protected_hyperlinks: list[str]
+    protected_metrics_by_section: dict[str, list[str]]
+    editable_paragraph_ids: list[str]
+    page_width_points: float
+    page_height_points: float
+    margins_points: dict[str, float]
+    baseline_page_count: int | None = None
+    baseline_rendered_lines: int | None = None
+
+
+class EvidenceConcept(StrictModel):
+    concept: str
+    kind: KeywordKind
+    direct_terms: list[str] = Field(default_factory=list)
+    transferable_terms: list[str] = Field(default_factory=list)
+
+
+class ResumeEvidence(StrictModel):
+    evidence_id: str
+    paragraph_id: str
+    section: str
     source_text: str
-    facts: list[str] = Field(default_factory=list)
-    tools: list[str] = Field(default_factory=list)
+    concepts: list[EvidenceConcept] = Field(default_factory=list)
+    systems: list[str] = Field(default_factory=list)
+    actions: list[str] = Field(default_factory=list)
+    environment_signals: list[str] = Field(default_factory=list)
+    outcomes: list[str] = Field(default_factory=list)
     metrics: list[str] = Field(default_factory=list)
-    competencies: list[str] = Field(default_factory=list)
-    transferable_to: list[str] = Field(default_factory=list)
-    rewrite_flexibility: Literal["low", "medium", "high"] = "medium"
 
 
-class ResumeEvidenceGraph(BaseModel):
+class ResumeEvidenceGraph(StrictModel):
     candidate_name: str
-    base_identity: str
-    blocks: list[ResumeEvidenceBlock]
+    document_sha256: str
+    evidence: list[ResumeEvidence]
 
 
-class EvidenceMatch(BaseModel):
-    target_keyword: str
-    target_concept: str
-    evidence_block_id: str | None
-    evidence_text: str = ""
-    semantic_bridge: str = ""
-    confidence: float = Field(ge=0.0, le=1.0)
-    risk: RiskLevel
-    suggested_destination: str
+class EvidenceMatch(StrictModel):
+    target_term: str
+    target_requirement: str
+    evidence_id: str | None = None
+    source_text: str = ""
+    semantic_score: float = Field(ge=0.0, le=1.0)
+    action_compatibility: float = Field(ge=0.0, le=1.0)
+    system_compatibility: float = Field(ge=0.0, le=1.0)
+    environment_compatibility: float = Field(ge=0.0, le=1.0)
+    outcome_compatibility: float = Field(ge=0.0, le=1.0)
+    strength: EvidenceStrength
+    reasoning: str
+    suggested_placement: str
 
 
-class RewriteAction(BaseModel):
-    section: str
-    target: str
-    intent: str
-    keywords: list[str] = Field(default_factory=list)
-    evidence_block_ids: list[str] = Field(default_factory=list)
-    risk: RiskLevel
-    note: str = ""
+class TransferabilityMap(StrictModel):
+    matches: list[EvidenceMatch] = Field(default_factory=list)
+    direct_terms: list[str] = Field(default_factory=list)
+    strongly_transferable_terms: list[str] = Field(default_factory=list)
+    weakly_transferable_terms: list[str] = Field(default_factory=list)
+    unsupported_terms: list[str] = Field(default_factory=list)
 
 
-class RewritePlan(BaseModel):
-    mode: TailorMode
-    profile: TargetRoleProfile
-    matches: list[EvidenceMatch]
-    actions: list[RewriteAction]
-    unsupported_keywords: list[str] = Field(default_factory=list)
+class ClaimRisk(StrictModel):
+    claim: str
+    target_requirement: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    strength: EvidenceStrength
+    risk_level: RiskLevel
+    explanation: str
+    selected_placement: str
+    export_allowed: bool = True
 
 
-class RiskFlag(BaseModel):
-    keyword: str
-    risk: RiskLevel
-    reason: str
-    recommended_action: str
+class RewriteIntent(StrictModel):
+    paragraph_id: str
+    purpose: str
+    target_terms: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    recruiter_priority: int = Field(ge=0, le=100)
 
 
-class RiskReport(BaseModel):
-    flags: list[RiskFlag] = Field(default_factory=list)
+class ProposedSummary(StrictModel):
+    text: str
+    shorter_text: str
+    target_terms: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
 
+
+class ProposedSkillLine(StrictModel):
+    paragraph_id: str
+    category: str
+    skills: list[str]
+    shorter_skills: list[str] = Field(default_factory=list)
+
+
+class ProposedSkills(StrictModel):
+    lines: list[ProposedSkillLine]
+
+
+class ProposedBullet(StrictModel):
+    paragraph_id: str
+    source_paragraph_id: str
+    text: str
+    shorter_text: str
+    purpose: str
+    target_terms: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    claim_risks: list[ClaimRisk] = Field(default_factory=list)
+
+
+class RewritePlan(StrictModel):
+    professional_identity: str
+    summary: ProposedSummary
+    skills: ProposedSkills
+    bullets: list[ProposedBullet]
+    intents: list[RewriteIntent] = Field(default_factory=list)
+    claim_risks: list[ClaimRisk] = Field(default_factory=list)
+
+
+class ReasoningResult(StrictModel):
+    role_profile: TargetRoleProfile
+    transferability_map: TransferabilityMap
+    rewrite_plan: RewritePlan
+
+
+class ValidationIssue(StrictModel):
+    code: str
+    message: str
+    paragraph_id: str | None = None
+    severity: Literal["warning", "error"] = "error"
+
+
+class ValidationResult(StrictModel):
+    passed: bool
+    issues: list[ValidationIssue] = Field(default_factory=list)
+    protected_fields_passed: bool = False
+    metrics_passed: bool = False
+    structure_passed: bool = False
+    keyword_coverage: float = Field(default=0.0, ge=0.0, le=100.0)
+
+
+class LayoutResult(StrictModel):
+    passed: bool
+    page_count: int
+    rendered_lines: int
+    section_anchor_deltas: dict[str, float] = Field(default_factory=dict)
+    overflow_paragraph_ids: list[str] = Field(default_factory=list)
+    pdf_path: Path | None = None
+    attempts: int = 1
+
+
+class TransformationReport(StrictModel):
+    job: ParsedJob
+    keywords: list[JobKeyword]
+    role_profile: TargetRoleProfile
+    transferability_map: TransferabilityMap
+    rewrite_plan: RewritePlan
+    claim_risks: list[ClaimRisk]
+    validation: ValidationResult
+    layout: LayoutResult
+    output_docx: Path
+    output_pdf: Path
+    base_sha256: str
+    reasoner: str
+    pipeline_version: str

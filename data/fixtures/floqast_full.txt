@@ -1,0 +1,113 @@
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, FloQast.
+FloQast
+Technical Support Engineer (Integrations)
+Los Angeles, CA · Reposted 1 day ago · Over 100 people clicked apply
+Hybrid
+Full-time
+Apply
+Save
+
+32%
+Resume Match
+7 of 22 keywords
+Simplify
+High Priority Keywords
+Postman
+Jira
+OAuth
+REST APIs
+SQL
+Salesforce
+Slack
+SSO
+Zendesk
+R&
+Low Priority Keywords
+ai
+troubleshooting
+database
+enterprise software
+product features
+fintech
+ticketing
+technical support
+compliance
+API
+SaaS
+technical writing
+
+About the job
+As a Technical Support Engineer (Integrations), you will unblock customers facing technical obstacles across FloQast's Accounting Transformation Platform and ecosystem of integrations. This customer-facing role ensures successful integration outcomes by engaging with IT, Financial System Admins, and end users while collaborating with Technical Support, Professional Services, Partnerships, Customer Success, R&D, Sales, Product, and Engineering.
+
+What You'll Do
+Own support cases from customers, applying proper prioritization and delivering clear and effective solutions through email and screen share.
+Troubleshoot error messages and unexpected behaviors, identifying root causes and sharing technical resolutions.
+Perform technical configuration work to optimize customer environments and align with platform best practices.
+Handle L1, L2, and L3 support cases focused on integrations including ERPs, cloud storage providers, SSO identity providers, subledgers, and banks.
+Use internal admin tools to retrieve and modify account data through CRUD operations.
+Use session replay, log analysis, developer tools, and API clients such as Postman for deep-dive troubleshooting.
+Contribute to Knowledge Base articles with Product and Education teams.
+Participate in standups and Slack discussions while collaborating on complex cases.
+Provide feedback on release previews, roadmap direction, and defect prioritization.
+
+What You'll Bring
+2+ years of experience in Technical Support, IT, or a related technical field.
+Ability to troubleshoot, diagnose, and resolve customer-reported technical issues.
+Strong written and verbal communication with technical and non-technical audiences.
+Experience working cross-functionally with Engineering, Product, and Customer Success.
+
+Nice To Haves/Other
+Experience in a B2B SaaS environment, particularly fintech or enterprise software.
+Experience with ticketing systems such as Zendesk, Salesforce, or Jira for case management.
+Experience troubleshooting cloud-based platforms, enterprise applications, ERPs, or finance tools.
+Familiarity with database querying using SQL, API troubleshooting, and data integration.
+Knowledge of authentication protocols including OAuth, SAML, SSO and file transfer mechanisms including SFTP and REST APIs.
+Familiarity with log analysis and session replay tools.
+Technical writing experience for customer documentation.
+
+The base pay range for this position is $60,000-$90,000.
+
+About FloQast
+FloQast is an AI-powered Accounting Transformation Platform used by accounting teams.
+
+Benefits found in job post
+Disability insurance
+Set alert for similar jobs
+Candidates who clicked apply
+103 total
+About
+Accessibility
+LinkedIn Corporation © 2026
+
+Simplify
+High Priority Keywords
+Postman
+Jira
+OAuth
+REST APIs
+SQL
+Salesforce
+Slack
+SSO
+Zendesk
+R&
+Low Priority Keywords
+ai
+troubleshooting
+database
+enterprise software
+product features
+fintech
+ticketing
+technical support
+compliance
+API
+SaaS
+technical writing
+Update Job Description

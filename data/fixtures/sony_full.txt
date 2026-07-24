@@ -1,0 +1,110 @@
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Sony Interactive Entertainment.
+Sony Interactive Entertainment
+Technical Operations Support Analyst
+Aliso Viejo, CA · 2 days ago · Over 100 people clicked apply
+Hybrid
+Full-time
+Apply
+Save
+
+31%
+Resume Match
+5 of 16 keywords
+Simplify
+High Priority Keywords
+Linux
+Jira
+Python
+Bash
+Confluence
+Google Cloud
+PowerShell
+ServiceNow
+Low Priority Keywords
+troubleshooting
+gaming
+ticketing
+technical support
+business objectives
+cloud computing
+process improvement
+operating systems
+
+About the job
+Sony Interactive Entertainment operates PlayStation. GDFT is helping lead the cloud gaming revolution and delivers console-quality gaming experiences.
+
+Technical Operations Support Analyst
+The Technical Operations Support team provides frontline operational support for infrastructure, services, and internal processes that ensure reliable delivery of a global cloud gaming platform.
+
+Key Responsibilities
+Operational Support:
+Acknowledge, triage, and resolve support requests by following Standard Operating Procedures.
+Perform routine operational tasks and maintenance while meeting service level agreement commitments.
+Escalate incidents and requests outside established procedures.
+Maintain platform stability and service availability.
+Monitor operational queues and ensure timely resolution.
+
+Documentation & Process Management:
+Create and maintain SOPs, knowledge base articles, and operational documentation.
+Contribute to process standardization.
+
+Continuous Improvement:
+Identify recurring issues, repetitive tasks, and operational inefficiencies.
+Recommend automation opportunities and improve workflows and tooling.
+
+Collaboration:
+Work with team leads, engineers, and global operational teams.
+Communicate ticket status, operational risks, and support activities.
+
+Required Technical Experience (MUST)
+1-3 years of Information Technology, Technical Support, or Operations Support experience.
+Foundational understanding of computer systems, operating systems, networking, and troubleshooting.
+Experience with ticketing systems and service request management.
+
+Preferred Qualifications
+Experience with Linux and command-line tools.
+Experience troubleshooting hardware, software, or infrastructure.
+Familiarity with Jira, Confluence, ServiceNow, or similar platforms.
+Exposure to AWS or Google Cloud.
+Experience supporting environments governed by SLAs.
+Basic PowerShell, Bash, or Python scripting.
+Familiarity with monitoring, alerting, or observability tools.
+Experience with process improvement.
+
+Please note Sony conducts background checks.
+Equal Opportunity Statement
+All qualified applicants receive consideration.
+
+Set alert for similar jobs
+Candidates who clicked apply
+233 total
+About
+Accessibility
+LinkedIn Corporation © 2026
+
+Simplify
+High Priority Keywords
+Linux
+Jira
+Python
+Bash
+Confluence
+Google Cloud
+PowerShell
+ServiceNow
+Low Priority Keywords
+troubleshooting
+gaming
+ticketing
+technical support
+business objectives
+cloud computing
+process improvement
+operating systems
+Update Job Description

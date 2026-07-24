@@ -1,0 +1,1 @@
+"""Structured Codex reasoning boundary."""

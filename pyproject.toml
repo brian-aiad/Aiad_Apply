@@ -4,24 +4,27 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiadapplyv2"
-version = "0.1.0"
+version = "0.2.0"
 description = "Evidence-based resume transformation engine."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+  "lxml>=5.3",
+  "numpy>=2.0",
+  "pymupdf>=1.26",
   "pydantic>=2.7",
+  "python-docx>=1.2",
+  "sentence-transformers>=5.0",
   "typer>=0.12",
   "rich>=13.7",
 ]
 
 [project.optional-dependencies]
 dev = [
+  "mypy>=1.17",
   "pytest>=8.0",
+  "pytest-cov>=6.0",
   "ruff>=0.6",
-]
-semantic = [
-  "qdrant-client>=1.11",
-  "numpy>=1.26",
 ]
 docs = [
   "mkdocs>=1.6",
@@ -41,3 +44,22 @@ pythonpath = ["packages/resume-engine/src"]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["aiadapply_v2"]
+mypy_path = "packages/resume-engine/src"
+
+[[tool.mypy.overrides]]
+module = ["fitz"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["aiadapply_v2"]
+
+[tool.coverage.report]
+show_missing = true
