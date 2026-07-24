@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from aiadapply_v2.grading.keywords import accepted_keywords
+from aiadapply_v2.grading.keywords import accepted_keywords, important_keywords
 from aiadapply_v2.schemas import JobKeyword, KeywordKind, ParsedJob, TargetRoleProfile
 from aiadapply_v2.text import contains_term, dedupe
 
@@ -34,6 +34,46 @@ ROLE_FAMILIES: dict[str, tuple[str, ...]] = {
         "end user",
         "microsoft 365",
     ),
+    "application_support_administration": (
+        "application support administrator",
+        "enterprise application support",
+        "production support",
+        "batch processing",
+        "incident management",
+        "core banking",
+    ),
+    "application_systems_engineering": (
+        "application & systems engineer",
+        "application systems engineering",
+        "system validation",
+        "test automation",
+        "partner integrations",
+        "firmware",
+        "sdk",
+    ),
+    "erp_application_support": (
+        "d365 technical analyst",
+        "d365 f&o",
+        "dynamics 365",
+        "erp systems",
+        "sox",
+        "internal controls",
+        "master data",
+    ),
+    "application_support_engineering": (
+        "application support engineer",
+        "application logs",
+        "data synchronization",
+        "platform reliability",
+        "full stack",
+    ),
+    "product_support_engineering": (
+        "product support engineer",
+        "product functionality",
+        "technical partner",
+        "customer inquiries",
+        "support enablement",
+    ),
 }
 
 
@@ -63,8 +103,10 @@ def build_target_role_profile(
         primary_responsibilities=job.responsibilities[:16],
         required_qualifications=job.required_qualifications[:16],
         preferred_qualifications=job.preferred_qualifications[:16],
-        high_priority_keywords=[item.term for item in accepted if item.hiring_importance >= 35],
-        secondary_keywords=[item.term for item in accepted if item.hiring_importance < 35],
+        high_priority_keywords=[item.term for item in important_keywords(keywords)],
+        secondary_keywords=[
+            item.term for item in accepted if item not in important_keywords(keywords)
+        ],
         noisy_rejected_keywords=rejected,
         expected_outcome_language=dedupe([*outcomes, *_outcomes(job.job_description)])[:12],
         expected_metrics=_expected_metrics(job.job_description),
@@ -103,6 +145,31 @@ def _professional_identity(job: ParsedJob, family: str) -> str:
         )
     if family == "it_service_desk":
         return "Technical Analyst focused on service delivery and escalated infrastructure support"
+    if family == "application_support_administration":
+        return (
+            "Application Support Administrator focused on production stability, "
+            "incident resolution, and enterprise systems"
+        )
+    if family == "application_systems_engineering":
+        return (
+            "Application & Systems Engineer focused on integration validation, "
+            "test automation, and interoperability"
+        )
+    if family == "erp_application_support":
+        return (
+            "ERP Technical Analyst focused on D365 operations, incident management, "
+            "and controlled system change"
+        )
+    if family == "application_support_engineering":
+        return (
+            "Application Support Engineer focused on production diagnosis, "
+            "data integrity, and platform reliability"
+        )
+    if family == "product_support_engineering":
+        return (
+            "Product Support Engineer focused on API troubleshooting, "
+            "customer resolution, and product reliability"
+        )
     return f"{job.title} focused on technical problem resolution"
 
 
@@ -126,6 +193,14 @@ def _industry(text: str) -> list[str]:
         "defense_technology": ("defense technology", "military", "uas"),
         "cloud_gaming": ("cloud gaming", "streaming experiences", "playstation"),
         "managed_it_services": ("service desk", "managed it", "client infrastructure"),
+        "banking_financial_services": (
+            "core banking",
+            "financial services",
+            "banking applications",
+        ),
+        "access_control": ("access control", "credential management", "osdp", "wiegand"),
+        "erp_business_systems": ("d365 f&o", "dynamics 365", "erp systems", "sox"),
+        "ai_platform": ("ai platform", "ai tooling", "agentic systems"),
     }
     return [
         name for name, terms in catalog.items() if any(contains_term(text, term) for term in terms)
@@ -144,6 +219,13 @@ def _action_phrases(job: ParsedJob) -> list[str]:
         "process improvement",
         "failure analysis",
         "escalation",
+        "production support",
+        "system validation",
+        "test automation",
+        "regression testing",
+        "change management",
+        "batch monitoring",
+        "data investigation",
     )
     return [term for term in catalog if contains_term(job.job_description, term)]
 
@@ -159,6 +241,11 @@ def _environment_signals(job: ParsedJob) -> list[str]:
         "on-call",
         "after-hours",
         "limited risk tolerance",
+        "regulated",
+        "SOX-controlled",
+        "enterprise applications",
+        "cloud-based",
+        "mission-critical",
     )
     return [term for term in catalog if contains_term(job.job_description, term)]
 
@@ -175,6 +262,10 @@ def _stakeholders(text: str) -> list[str]:
         "non-technical stakeholders",
         "global support teams",
         "client IT personnel",
+        "business stakeholders",
+        "integration partners",
+        "developers",
+        "vendors",
     )
     return [term for term in catalog if contains_term(text, term)]
 
@@ -189,6 +280,10 @@ def _outcomes(text: str) -> list[str]:
         "operational efficiency",
         "SLA commitments",
         "timely response",
+        "system stability",
+        "data integrity",
+        "operational continuity",
+        "interoperability",
     )
     return [term for term in catalog if contains_term(text, term)]
 
@@ -200,6 +295,9 @@ def _expected_metrics(text: str) -> list[str]:
         "availability",
         "incident volume",
         "response time",
+        "system uptime",
+        "batch success rate",
+        "regression coverage",
     )
     return [term for term in catalog if contains_term(text, term)]
 
@@ -220,5 +318,10 @@ def _action_verbs(text: str) -> list[str]:
         "improve",
         "sustain",
         "validate",
+        "test",
+        "administer",
+        "investigate",
+        "reproduce",
+        "deploy",
     )
     return [verb for verb in verbs if re.search(rf"\b{verb}\w*\b", text, re.I)]

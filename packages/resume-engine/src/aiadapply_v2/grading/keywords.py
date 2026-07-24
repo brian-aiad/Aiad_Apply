@@ -13,38 +13,57 @@ from aiadapply_v2.text import contains_term, count_term, dedupe, normalized_term
 
 TERM_CATALOG: dict[str, KeywordKind] = {
     "Active Directory": KeywordKind.system,
+    "account management": KeywordKind.action,
     "AI": KeywordKind.environment,
     "API": KeywordKind.system,
     "APIs": KeywordKind.system,
+    "API security": KeywordKind.system,
     "AWS": KeywordKind.system,
     "Azure": KeywordKind.system,
+    "Azure DevOps": KeywordKind.system,
     "B2B SaaS": KeywordKind.environment,
     "Bash": KeywordKind.system,
     "CAD": KeywordKind.system,
     "case management": KeywordKind.action,
     "change management": KeywordKind.action,
+    "CI/CD": KeywordKind.system,
     "cloud computing": KeywordKind.environment,
     "command line": KeywordKind.system,
+    "communication skills": KeywordKind.qualification,
     "compliance": KeywordKind.environment,
     "Confluence": KeywordKind.system,
     "configuration": KeywordKind.action,
     "CRUD": KeywordKind.action,
     "customer case ownership": KeywordKind.action,
+    "customer needs": KeywordKind.qualification,
     "customer service": KeywordKind.action,
     "data integration": KeywordKind.action,
     "database": KeywordKind.system,
+    "D365 F&O": KeywordKind.system,
+    "DevOps": KeywordKind.environment,
     "diagnostics": KeywordKind.action,
+    "Dynamics 365": KeywordKind.system,
+    "end-to-end": KeywordKind.action,
     "enterprise software": KeywordKind.environment,
+    "ERP": KeywordKind.system,
     "failure analysis": KeywordKind.action,
     "fintech": KeywordKind.environment,
+    "firmware": KeywordKind.system,
     "Google Cloud": KeywordKind.system,
     "Grafana": KeywordKind.system,
     "hosting environment": KeywordKind.environment,
     "incident management": KeywordKind.action,
     "incident response": KeywordKind.action,
     "incident triage": KeywordKind.action,
+    "information security": KeywordKind.environment,
+    "integration testing": KeywordKind.action,
+    "internal controls": KeywordKind.environment,
+    "interpersonal communication": KeywordKind.qualification,
+    "interpersonal skills": KeywordKind.qualification,
+    "IoT": KeywordKind.environment,
     "iOS": KeywordKind.system,
     "Jira": KeywordKind.system,
+    "JSON": KeywordKind.system,
     "knowledge base": KeywordKind.action,
     "LAN/WAN": KeywordKind.system,
     "Linux": KeywordKind.system,
@@ -61,7 +80,10 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "PowerShell": KeywordKind.system,
     "process improvement": KeywordKind.action,
     "product operations": KeywordKind.environment,
+    "production support": KeywordKind.action,
     "Python": KeywordKind.system,
+    "regression": KeywordKind.action,
+    "regression testing": KeywordKind.action,
     "reliability": KeywordKind.outcome,
     "REST APIs": KeywordKind.system,
     "root cause analysis": KeywordKind.action,
@@ -72,20 +94,33 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "service desk": KeywordKind.environment,
     "ServiceNow": KeywordKind.system,
     "SFTP": KeywordKind.system,
+    "SDKs": KeywordKind.system,
     "Slack": KeywordKind.system,
     "SLA": KeywordKind.outcome,
+    "SOX": KeywordKind.environment,
     "SQL": KeywordKind.system,
     "SSO": KeywordKind.system,
+    "system integration": KeywordKind.action,
     "technical support": KeywordKind.environment,
     "technical writing": KeywordKind.action,
+    "test automation": KeywordKind.action,
     "ticketing": KeywordKind.action,
     "troubleshooting": KeywordKind.action,
     "UNIX": KeywordKind.system,
+    "web services": KeywordKind.system,
+    "written and verbal communication skills": KeywordKind.qualification,
     "Zendesk": KeywordKind.system,
 }
 MALFORMED = re.compile(r"^[^A-Za-z0-9]*$|^[A-Za-z]$|[&/]$")
 BOILERPLATE_ONLY = {"intellectual property", "equal opportunity", "artificial intelligence"}
-GENERIC = {"ai", "business objectives", "customer needs", "product features", "gaming"}
+GENERIC = {
+    "ai",
+    "business objectives",
+    "compliance",
+    "customer needs",
+    "product features",
+    "gaming",
+}
 
 
 def grade_job_keywords(job: ParsedJob) -> list[JobKeyword]:
@@ -114,6 +149,15 @@ def accepted_keywords(keywords: list[JobKeyword]) -> list[JobKeyword]:
     return [keyword for keyword in keywords if keyword.accepted]
 
 
+def important_keywords(keywords: list[JobKeyword]) -> list[JobKeyword]:
+    return [
+        keyword
+        for keyword in keywords
+        if keyword.accepted
+        and (keyword.priority == KeywordPriority.high or keyword.hiring_importance >= 35)
+    ]
+
+
 def _grade_one(
     job: ParsedJob,
     term: str,
@@ -132,7 +176,7 @@ def _grade_one(
         sections.append("simplify_high")
     elif normalized in simplify_low:
         priority = KeywordPriority.low
-        factors["simplify_low"] += 4
+        factors["simplify_low"] += 6
         sections.append("simplify_low")
 
     required_occurrences = _count_in_lines(job.required_qualifications, term)
@@ -166,8 +210,10 @@ def _grade_one(
     if normalized in BOILERPLATE_ONLY:
         factors["legal_or_company_boilerplate"] -= 50
         rejection = "Legal or company boilerplate, not a hiring requirement."
-    if normalized in GENERIC and not (
-        required_occurrences or responsibility_occurrences or preferred_occurrences
+    if (
+        normalized in GENERIC
+        and priority != KeywordPriority.high
+        and not (required_occurrences or responsibility_occurrences or preferred_occurrences)
     ):
         factors["generic_outside_requirements"] -= 30
         rejection = "Generic term appears outside the role requirements."

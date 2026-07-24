@@ -155,6 +155,8 @@ def _build_prompt(
             "text": paragraph.text,
             "line_budget": paragraph.line_budget,
             "character_budget": paragraph.character_budget,
+            "rendered_line_widths_points": paragraph.rendered_line_widths_points,
+            "rendered_max_width_points": paragraph.rendered_max_width_points,
         }
         for paragraph in document.paragraphs
         if paragraph.editable
@@ -201,9 +203,10 @@ Non-negotiable output rules:
    evidence strength is unsupported. Such claims are allowed to export, but every
    questionable claim must have a ClaimRisk with export_allowed=true.
 7. Do not use rejected/noisy keywords.
-8. Summary must fit the existing three-line footprint. Each bullet must target its
-   input line budget. Provide a genuinely shorter fallback for every summary/bullet
-   and shorter_skills for every skill line.
+8. line_budget and rendered width values come from the baseline PDF, not estimates.
+   Summary, skills, and bullets must fit those exact line footprints. Provide a
+   genuinely shorter fallback for every summary/bullet and shorter_skills for every
+   skill line.
 9. Open the summary with the closest contextual role identity from the target profile,
    not the legacy base identity and not necessarily the posting's exact title.
 10. Use the best experience for each requirement. Reorder emphasis by assigning

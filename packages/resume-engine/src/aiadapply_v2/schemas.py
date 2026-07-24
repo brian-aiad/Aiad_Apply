@@ -112,7 +112,13 @@ class TextRun(StrictModel):
     text: str
     bold: bool | None = None
     italic: bool | None = None
+    underline: bool | None = None
+    font_name: str | None = None
+    font_size_points: float | None = None
+    color: str | None = None
+    style_id: str = ""
     hyperlink_target: str | None = None
+    format_sha256: str = ""
 
 
 class ResumeParagraph(StrictModel):
@@ -126,6 +132,12 @@ class ResumeParagraph(StrictModel):
     bullet_slot: int | None = None
     line_budget: int = 1
     character_budget: int = 0
+    rendered_line_widths_points: list[float] = Field(default_factory=list)
+    rendered_max_width_points: float = 0.0
+    rendered_top_points: float | None = None
+    rendered_bottom_points: float | None = None
+    paragraph_format_sha256: str = ""
+    run_format_sha256: list[str] = Field(default_factory=list)
 
 
 class ResumeSection(StrictModel):
@@ -149,6 +161,10 @@ class ResumeDocument(StrictModel):
     page_width_points: float
     page_height_points: float
     margins_points: dict[str, float]
+    package_parts: list[str] = Field(default_factory=list)
+    immutable_package_part_sha256: dict[str, str] = Field(default_factory=dict)
+    document_format_skeleton_sha256: str = ""
+    section_properties_sha256: str = ""
     baseline_page_count: int | None = None
     baseline_rendered_lines: int | None = None
 
@@ -287,6 +303,12 @@ class LayoutResult(StrictModel):
     rendered_lines: int
     section_anchor_deltas: dict[str, float] = Field(default_factory=dict)
     overflow_paragraph_ids: list[str] = Field(default_factory=list)
+    paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
+    baseline_paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
+    paragraph_max_width_points: dict[str, float] = Field(default_factory=dict)
+    font_inventory: dict[str, list[float]] = Field(default_factory=dict)
+    out_of_bounds_items: list[str] = Field(default_factory=list)
+    overlap_items: list[str] = Field(default_factory=list)
     pdf_path: Path | None = None
     attempts: int = 1
 

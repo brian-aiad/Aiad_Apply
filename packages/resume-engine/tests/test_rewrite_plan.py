@@ -7,6 +7,7 @@ from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
 from aiadapply_v2.schemas import EvidenceStrength
 from aiadapply_v2.semantic.matcher import LexicalSemanticEncoder, build_transferability_map
+from aiadapply_v2.validation.resume import _claim_numbers
 
 BASE = Path("data/resumes/Brian_Aiad_BASE.docx")
 
@@ -31,3 +32,7 @@ def test_semantic_match_does_not_treat_transferable_labels_as_direct_evidence() 
     assert by_term["jira"].strength == EvidenceStrength.direct
     assert by_term["salesforce"].strength != EvidenceStrength.direct
     assert by_term["zendesk"].strength != EvidenceStrength.direct
+
+
+def test_numeric_claim_scanner_ignores_digits_inside_product_names() -> None:
+    assert _claim_numbers("D365 F&O with OAuth 2.0") == {"2.0"}

@@ -1,0 +1,81 @@
+0 notifications
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, dormakaba Americas.
+dormakaba Americas
+
+Application & Systems Engineer (Remote - San Diego or Los Angeles Area only)
+
+Los Angeles, CA · Reposted 1 day ago · Over 100 people clicked apply
+Remote
+Full-time
+
+39%
+Resume Match
+7 of 18 keywords
+Simplify
+V1
+V2
+
+About the job
+Position Overview
+
+dormakaba is seeking an Application & Systems Engineer for a remote role based in Southern California. This position is responsible for supporting partner integrations, system validation, and test automation across firmware, cloud, and mobile platforms to ensure seamless interoperability within the access control ecosystem.
+
+HIRING SALARY RANGE: Base Salary $110,000 - $150,000.
+
+What You Will Do
+Develop and maintain example code, integration guides, and technical documentation to support APIs, SDKs, and partner onboarding activities.
+Provide technical support for physical access control software customers and integration partners, including assistance with Apple Wallet and Google Wallet testing and certification requirements.
+Validate end-to-end system workflows across reader, cloud, and mobile platforms to ensure reliable integration and performance.
+Design and develop automated regression testing, protocol validation tools, Python-based test harnesses, and other internal software utilities to improve quality and efficiency.
+Leverage Python programming, REST API integration, troubleshooting, and communication skills to support system validation, process automation, and AI-driven workflow improvements.
+
+What we require
+Bachelor's degree in computer science, Engineering, or a related technical field, with three or more years of experience in application systems engineering or a similar role.
+Proficiency in Python development, including experience building automation tools, test frameworks, and software utilities.
+Demonstrated experience integrating, validating, and troubleshooting REST APIs, web services, and connected software platforms.
+Strong system-level troubleshooting and analytical skills across cloud, mobile, firmware, and hardware environments.
+Experience with access control standards and protocols such as OSDP, Wiegand, and credential management systems and with automated test frameworks, regression suites, or CI/CD pipelines.
+
+What we prefer
+Familiarity with authentication protocols, RESTful web services, JSON, OAuth, and API security best practices.
+Familiarity with mobile credential technologies, including Apple Wallet, Google Wallet, NFC, BLE, and digital identity ecosystems.
+Knowledge of cloud-based architectures, IoT-connected devices, and end-to-end system integration testing.
+
+What we offer
+Medical, Dental, Vision, Life and Disability Insurance coverage options.
+
+Benefits found in job post
+401(k), Disability insurance
+
+Simplify
+Keywords Score
+High Priority Keywords
+5/5
+JSON
+OAuth
+REST APIs
+CI/CD
+Python
+Low Priority Keywords
+2/13
+ai
+troubleshooting
+automation tools
+end-to-end
+firmware
+integration testing
+regression
+system integration
+technical support
+IoT
+API
+test automation
+web services
+Update Job Description

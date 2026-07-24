@@ -27,6 +27,10 @@ HEADINGS = {
         "responsibilities",
         "key responsibilities",
         "operational support",
+        "required duties",
+        "functions and duties of this role include, but not limited to",
+        "accountabilities",
+        "your impact",
     ),
     "required": (
         "what you'll bring",
@@ -34,19 +38,32 @@ HEADINGS = {
         "required technical experience (must)",
         "required education/credentials/qualifications",
         "qualifications",
+        "minimum requirements",
+        "what we require",
+        "requirements",
+        "what you bring",
     ),
     "preferred": (
         "preferred qualifications",
         "nice to haves/other",
         "nice to have",
         "preferred technical experience",
+        "what we prefer",
     ),
 }
 RESPONSIBILITY_SUBHEADINGS = {
     "operational support",
     "documentation & process management",
+    "documentation, compliance & collaboration",
     "continuous improvement",
     "collaboration",
+    "application & end user support",
+    "system operations & maintenance",
+    "application & platform support",
+    "systems & data operations",
+    "customer communication & experience",
+    "integration & saas tool support",
+    "tooling & operational excellence",
 }
 NOISE_LINES = {
     "simplify",
@@ -105,10 +122,13 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
         match = re.match(r"^Company (?:logo for,|,)\s*(.+?)\.?$", line, re.IGNORECASE)
         if not match:
             continue
-        company = match.group(1).strip().rstrip(".")
+        company = match.group(1).strip()
         candidates = lines[index + 1 : index + 9]
         for candidate in candidates:
-            if candidate.casefold() == company.casefold() or _is_navigation(candidate):
+            if candidate.casefold().rstrip(".") == company.casefold().rstrip("."):
+                company = candidate
+                continue
+            if _is_navigation(candidate):
                 continue
             if 4 <= len(candidate) <= 140:
                 return _strip_verified_suffix(candidate), company
@@ -192,6 +212,7 @@ def _split_job_sections(job_description: str) -> dict[str, list[str]]:
     all_headers = {header: group for group, values in HEADINGS.items() for header in values}
     for raw_line in job_description.splitlines():
         line = raw_line.strip(" \t-*•")
+        line = re.sub(r"^\d+[.)]\s*", "", line)
         if not line:
             continue
         normalized = line.rstrip(":").casefold()
@@ -211,7 +232,12 @@ def _split_job_sections(job_description: str) -> dict[str, list[str]]:
             destination = (
                 "preferred"
                 if current == "required"
-                and re.search(r"\b(?:is|are|would be)\s+an?\s+asset\b", line, re.I)
+                and re.search(
+                    r"\b(?:(?:is|are|would be)\s+an?\s+asset|"
+                    r"(?:is|are)\s+preferred|is\s+a\s+plus)\b",
+                    line,
+                    re.I,
+                )
                 else current
             )
             result[destination].append(line)
@@ -233,9 +259,12 @@ def _ends_hiring_sections(normalized: str) -> bool:
         "salary",
         "us salary range",
         "why join us",
+        "what we give",
         "success in this role",
         "candidate profile",
         "data privacy",
+        "work environment",
+        "important application information",
     )
     return normalized.startswith(prefixes)
 

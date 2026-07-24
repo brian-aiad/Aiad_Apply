@@ -1,0 +1,39 @@
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Source URL: https://www.linkedin.com/jobs/view/application-support-engineer-at-daybreak-4351888992
+
+Company logo for, Daybreak.
+Daybreak
+
+Application Support Engineer
+
+Los Angeles, CA · 3 weeks ago
+Full-time
+
+About the job
+About the Role
+The Application Support Engineer partners with Product and Engineering to investigate complex application, data, and integration problems in internal and customer-facing systems. The role resolves immediate incidents, identifies systemic root causes, proposes durable fixes, and improves platform reliability and scalability.
+
+What You'll Do
+Investigate customer bugs, outages, employee access, permission, licensing, API integration, event replay, and data synchronization issues.
+Review application logs, alerts, and errors with tools such as Sentry and Salesforce.
+Troubleshoot web applications across frontend, backend, API, and integration layers.
+Correct data-integrity problems, clean records, resolve duplicates, and repair integrations.
+Support business applications including Salesforce with exposure to Shopify and Microsoft 365.
+Create runbooks and operational documentation and improve monitoring and incident response.
+Collaborate with Product, Engineering, and business stakeholders through diagnosis, root cause analysis, resolution, and prevention.
+
+Requirements
+Three or more years of experience in application support, production support, or a similar technical function.
+Experience troubleshooting APIs, integrations, application logs, and data synchronization.
+Ability to diagnose issues across a full software stack and communicate technical findings.
+Familiarity with SQL or other data-querying tools is preferred.
+
+Set alert for similar jobs
+Applicants
+Company insights
+Recommended jobs

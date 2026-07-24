@@ -1,0 +1,2621 @@
+{
+  "document": {
+    "source_path": "data/resumes/Brian_Aiad_BASE.docx",
+    "source_sha256": "7cb556d81f20d884fa31e5fa5351847d6dec109da6e50736a164ca7a2770a07c",
+    "paragraphs": [
+      {
+        "paragraph_id": "identity.name",
+        "index": 0,
+        "section": "header",
+        "kind": "name",
+        "text": "BRIAN AIAD",
+        "runs": [
+          {
+            "text": "BRIAN AIAD",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 18.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "603bed53c3d700cd5556ad0a970011ccaa9d0637e73e6ae42e971605d67f038a"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 10,
+        "rendered_line_widths_points": [
+          89.69400024414062
+        ],
+        "rendered_max_width_points": 89.69400024414062,
+        "rendered_top_points": 18.36400032043457,
+        "rendered_bottom_points": 40.32400131225586,
+        "paragraph_format_sha256": "51677a151d392e1135bdeb040eec3d922682812280e228c2cffcd9d07d33a154",
+        "run_format_sha256": [
+          "603bed53c3d700cd5556ad0a970011ccaa9d0637e73e6ae42e971605d67f038a"
+        ]
+      },
+      {
+        "paragraph_id": "identity.contact",
+        "index": 1,
+        "section": "header",
+        "kind": "contact",
+        "text": "csbrianaiad@gmail.com | 310-625-6844 | linkedin.com/in/brian-aiad | Los Angeles, CA",
+        "runs": [
+          {
+            "text": "csbrianaiad@gmail.com",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "Hyperlink",
+            "hyperlink_target": "mailto:csbrianaiad@gmail.com",
+            "format_sha256": "cccac8b7bd204b9ac5d76f358d987ebf9be53958b9e741af30089e250285a1f2"
+          },
+          {
+            "text": " | 310-625-6844 |",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "c6fd82ec78092f1d2791cfa064f678f9ad69d997787cd484d3d920ccb71ce399"
+          },
+          {
+            "text": "linkedin.com/in/brian-aiad",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "Hyperlink",
+            "hyperlink_target": "https://www.linkedin.com/in/brian-aiad/",
+            "format_sha256": "cccac8b7bd204b9ac5d76f358d987ebf9be53958b9e741af30089e250285a1f2"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa"
+          },
+          {
+            "text": "| ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "c6fd82ec78092f1d2791cfa064f678f9ad69d997787cd484d3d920ccb71ce399"
+          },
+          {
+            "text": "Los Angeles, CA",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 83,
+        "rendered_line_widths_points": [
+          388.8240280151367
+        ],
+        "rendered_max_width_points": 388.8240280151367,
+        "rendered_top_points": 40.22801208496094,
+        "rendered_bottom_points": 53.64801025390625,
+        "paragraph_format_sha256": "5a53da36f59ec3341a94ac9a649407c3202b2aa0a9906aa5b10d0e57b10b2d23",
+        "run_format_sha256": [
+          "cccac8b7bd204b9ac5d76f358d987ebf9be53958b9e741af30089e250285a1f2",
+          "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa",
+          "c6fd82ec78092f1d2791cfa064f678f9ad69d997787cd484d3d920ccb71ce399",
+          "cccac8b7bd204b9ac5d76f358d987ebf9be53958b9e741af30089e250285a1f2",
+          "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa",
+          "c6fd82ec78092f1d2791cfa064f678f9ad69d997787cd484d3d920ccb71ce399",
+          "0f7b45f430e4227a0304eda3393b69c42d427b66fc04f897c18da4e55b667eaa"
+        ]
+      },
+      {
+        "paragraph_id": "header.spacer.2",
+        "index": 2,
+        "section": "header",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "555d621bcd0943f563b182123d70d5f554a55f5a1accd61980ebb665e2c16ef9",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "summary",
+        "index": 3,
+        "section": "summary",
+        "kind": "summary",
+        "text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+        "runs": [
+          {
+            "text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 3,
+        "character_budget": 353,
+        "rendered_line_widths_points": [
+          493.17472076416016,
+          518.0385990142822,
+          480.5011215209961
+        ],
+        "rendered_max_width_points": 518.0385990142822,
+        "rendered_top_points": 65.85397338867188,
+        "rendered_bottom_points": 104.2640151977539,
+        "paragraph_format_sha256": "fce3b5fd4c160a29fc82d6c8bb47e79b5b9a98e77ea3fbb1529e85dc2a0d36c0",
+        "run_format_sha256": [
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.heading",
+        "index": 4,
+        "section": "skills",
+        "kind": "section_heading",
+        "text": "SKILLS",
+        "runs": [
+          {
+            "text": "SKILLS",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 14.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 6,
+        "rendered_line_widths_points": [
+          36.37200355529785
+        ],
+        "rendered_max_width_points": 36.37200355529785,
+        "rendered_top_points": 104.322021484375,
+        "rendered_bottom_points": 121.40202331542969,
+        "paragraph_format_sha256": "0a8c7bb77967159720a34890bbabbe227307a3cfca8d1dcb6a5ff0405a9b2c02",
+        "run_format_sha256": [
+          "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+        ]
+      },
+      {
+        "paragraph_id": "skills.technical_support",
+        "index": 5,
+        "section": "skills",
+        "kind": "skill_line",
+        "text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "runs": [
+          {
+            "text": "Technical Support:       ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 116,
+        "rendered_line_widths_points": [
+          508.788122177124
+        ],
+        "rendered_max_width_points": 508.788122177124,
+        "rendered_top_points": 122.85397338867188,
+        "rendered_bottom_points": 135.66397094726562,
+        "paragraph_format_sha256": "88c84d43f1d162753c65fa98d7b003b20dc8e78c61d2ea038348e52395fb9d1d",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.apis_identity",
+        "index": 6,
+        "section": "skills",
+        "kind": "skill_line",
+        "text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+        "runs": [
+          {
+            "text": "APIs ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "&",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": " ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "Identity",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": ":            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, O",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "A",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "uth",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "2.0",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": ", SAML, Postman",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 135,
+        "rendered_line_widths_points": [
+          577.6549434661865
+        ],
+        "rendered_max_width_points": 577.6549434661865,
+        "rendered_top_points": 135.65402221679688,
+        "rendered_bottom_points": 148.46401977539062,
+        "paragraph_format_sha256": "b49373cb717b307283d0eb41ed104ee3156b56f4961a5c405b4439e22466ee95",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.languages_dbs",
+        "index": 7,
+        "section": "skills",
+        "kind": "skill_line",
+        "text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "runs": [
+          {
+            "text": "Languages & DBs:",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "        ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "Python, SQL, ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "J",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "SON",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": ",",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 121,
+        "rendered_line_widths_points": [
+          519.1344966888428
+        ],
+        "rendered_max_width_points": 519.1344966888428,
+        "rendered_top_points": 148.45401000976562,
+        "rendered_bottom_points": 161.26400756835938,
+        "paragraph_format_sha256": "b49373cb717b307283d0eb41ed104ee3156b56f4961a5c405b4439e22466ee95",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.cloud_systems",
+        "index": 8,
+        "section": "skills",
+        "kind": "skill_line",
+        "text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "runs": [
+          {
+            "text": "Cloud & Systems:         ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "AWS (EC2, S3, IAM), Vercel, Linux,",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " Windows,",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " CI/CD (GitHub Actions)",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 91,
+        "rendered_line_widths_points": [
+          386.1495418548584
+        ],
+        "rendered_max_width_points": 386.1495418548584,
+        "rendered_top_points": 161.25399780273438,
+        "rendered_bottom_points": 174.06399536132812,
+        "paragraph_format_sha256": "b49373cb717b307283d0eb41ed104ee3156b56f4961a5c405b4439e22466ee95",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.tools",
+        "index": 9,
+        "section": "skills",
+        "kind": "skill_line",
+        "text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+        "runs": [
+          {
+            "text": "Tools:",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "                              ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 89,
+        "rendered_line_widths_points": [
+          316.63251304626465
+        ],
+        "rendered_max_width_points": 316.63251304626465,
+        "rendered_top_points": 174.05398559570312,
+        "rendered_bottom_points": 186.86398315429688,
+        "paragraph_format_sha256": "b49373cb717b307283d0eb41ed104ee3156b56f4961a5c405b4439e22466ee95",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      },
+      {
+        "paragraph_id": "skills.spacer.10",
+        "index": 10,
+        "section": "skills",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "b49373cb717b307283d0eb41ed104ee3156b56f4961a5c405b4439e22466ee95",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "experience.heading",
+        "index": 11,
+        "section": "experience",
+        "kind": "section_heading",
+        "text": "EXPERIENCE",
+        "runs": [
+          {
+            "text": "EXPERIENCE",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 14.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 10,
+        "rendered_line_widths_points": [
+          70.61599540710449
+        ],
+        "rendered_max_width_points": 70.61599540710449,
+        "rendered_top_points": 199.72198486328125,
+        "rendered_bottom_points": 216.80198669433594,
+        "paragraph_format_sha256": "0a8c7bb77967159720a34890bbabbe227307a3cfca8d1dcb6a5ff0405a9b2c02",
+        "run_format_sha256": [
+          "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+        ]
+      },
+      {
+        "paragraph_id": "experience.spacer.12",
+        "index": 12,
+        "section": "experience",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "07a71dad732c9d8be48404ccc85daa8e340b2520ad10e4b419595616d7fe4916",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.heading",
+        "index": 13,
+        "section": "experience.original_insurance",
+        "kind": "entry_heading",
+        "text": "ORIGINAL INSURANCE GROUP INC | Application Support Specialist\tJun 2024 - Present | Downey, CA",
+        "runs": [
+          {
+            "text": "ORIGINAL INSURANCE GROUP INC | Application Support",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": " Specialist",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da"
+          },
+          {
+            "text": "\tJun 202",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": "4",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": " - Present | ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": "Downey, CA",
+            "bold": null,
+            "italic": true,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 93,
+        "rendered_line_widths_points": [
+          553.0459957122803
+        ],
+        "rendered_max_width_points": 553.0459957122803,
+        "rendered_top_points": 220.70401000976562,
+        "rendered_bottom_points": 233.51400756835938,
+        "paragraph_format_sha256": "b3ba8d5747b1d9133a0675fcab7d0c31f355c82f83fc91a49a2cdcd5a6fa4a7e",
+        "run_format_sha256": [
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "5054f0c733852a0e5a200ec8bb570411590fd5f351f59e71b9075742b96ae7da",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "index": 14,
+        "section": "experience.original_insurance",
+        "kind": "bullet",
+        "text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "runs": [
+          {
+            "text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 1,
+        "line_budget": 2,
+        "character_budget": 168,
+        "rendered_line_widths_points": [
+          528.664623260498,
+          200.30849838256836
+        ],
+        "rendered_max_width_points": 528.664623260498,
+        "rendered_top_points": 233.50399780273438,
+        "rendered_bottom_points": 259.1139831542969,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "index": 15,
+        "section": "experience.original_insurance",
+        "kind": "bullet",
+        "text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "runs": [
+          {
+            "text": "Investigated",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": " production incidents using log analysis, SQL queries, and API debugging ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "with ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "Postman, isolating root cause and validating fixes in live environments.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 2,
+        "line_budget": 2,
+        "character_budget": 162,
+        "rendered_line_widths_points": [
+          525.7770500183105,
+          154.95901107788086
+        ],
+        "rendered_max_width_points": 525.7770500183105,
+        "rendered_top_points": 259.1039733886719,
+        "rendered_bottom_points": 284.7139892578125,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "index": 16,
+        "section": "experience.original_insurance",
+        "kind": "bullet",
+        "text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "runs": [
+          {
+            "text": "Monitored nightly ETL jobs syncing data from 22 ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "carrier",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "/",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "vendo",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "r",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": " feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "hours to 40 minutes.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 3,
+        "line_budget": 2,
+        "character_budget": 218,
+        "rendered_line_widths_points": [
+          547.4596672058105,
+          379.87946701049805
+        ],
+        "rendered_max_width_points": 547.4596672058105,
+        "rendered_top_points": 284.7040100097656,
+        "rendered_bottom_points": 310.3139953613281,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "index": 17,
+        "section": "experience.original_insurance",
+        "kind": "bullet",
+        "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+        "runs": [
+          {
+            "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          },
+          {
+            "text": "onboarding from 4 hours to 45 minutes.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 4,
+        "line_budget": 2,
+        "character_budget": 231,
+        "rendered_line_widths_points": [
+          531.0271110534668,
+          489.82502365112305
+        ],
+        "rendered_max_width_points": 531.0271110534668,
+        "rendered_top_points": 310.3039855957031,
+        "rendered_bottom_points": 335.91400146484375,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6",
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "index": 18,
+        "section": "experience.original_insurance",
+        "kind": "bullet",
+        "text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+        "runs": [
+          {
+            "text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 5,
+        "line_budget": 2,
+        "character_budget": 178,
+        "rendered_line_widths_points": [
+          560.9626579284668,
+          227.11497116088867
+        ],
+        "rendered_max_width_points": 560.9626579284668,
+        "rendered_top_points": 335.90399169921875,
+        "rendered_bottom_points": 361.5140075683594,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "experience.spacer.19",
+        "index": 19,
+        "section": "experience",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "ea1726318814c838f1f3ee725576975547adb0c3ed94c91fd2dc556cc48e8edb",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "experience.csulb.heading",
+        "index": 20,
+        "section": "experience.csulb",
+        "kind": "entry_heading",
+        "text": "CALIFORNIA STATE UNIVERSITY, LONG BEACH | Building Manager, IT Operations Support\tJan 2024 - Aug 2025 | Long Beach, CA",
+        "runs": [
+          {
+            "text": "CALIFORNIA STATE UNIVERSITY, LONG BEACH | Building Manager",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": ", IT Operations Support",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "\tJan 2024 - Aug 2025 | ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": "Long Beach, CA",
+            "bold": null,
+            "italic": true,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 118,
+        "rendered_line_widths_points": [
+          553.0308589935303
+        ],
+        "rendered_max_width_points": 553.0308589935303,
+        "rendered_top_points": 374.3039855957031,
+        "rendered_bottom_points": 387.1139831542969,
+        "paragraph_format_sha256": "b3ba8d5747b1d9133a0675fcab7d0c31f355c82f83fc91a49a2cdcd5a6fa4a7e",
+        "run_format_sha256": [
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+        ]
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "index": 21,
+        "section": "experience.csulb",
+        "kind": "bullet",
+        "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "runs": [
+          {
+            "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 1,
+        "line_budget": 2,
+        "character_budget": 253,
+        "rendered_line_widths_points": [
+          538.1776237487793,
+          541.7477531433105
+        ],
+        "rendered_max_width_points": 541.7477531433105,
+        "rendered_top_points": 387.10400390625,
+        "rendered_bottom_points": 412.7139892578125,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "index": 22,
+        "section": "experience.csulb",
+        "kind": "bullet",
+        "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+        "runs": [
+          {
+            "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 2,
+        "line_budget": 2,
+        "character_budget": 180,
+        "rendered_line_widths_points": [
+          498.7396354675293,
+          265.9754447937012
+        ],
+        "rendered_max_width_points": 498.7396354675293,
+        "rendered_top_points": 412.7040100097656,
+        "rendered_bottom_points": 438.3139953613281,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "index": 23,
+        "section": "experience.csulb",
+        "kind": "bullet",
+        "text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "runs": [
+          {
+            "text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 3,
+        "line_budget": 2,
+        "character_budget": 140,
+        "rendered_line_widths_points": [
+          544.1206169128418,
+          61.75050735473633
+        ],
+        "rendered_max_width_points": 544.1206169128418,
+        "rendered_top_points": 438.3039855957031,
+        "rendered_bottom_points": 463.91400146484375,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "experience.spacer.24",
+        "index": 24,
+        "section": "experience",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "61811fd9411e10af8ac6d80386d130d0c66397d0a40290389050a2d7302542a7",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.heading",
+        "index": 25,
+        "section": "experience.wehelp",
+        "kind": "entry_heading",
+        "text": "WEHELP, CHRIST THE GOOD SHEPHERD FOOD BANK | Volunteer Application Support Specialist\tApr 2021 - Present | Long Beach, CA",
+        "runs": [
+          {
+            "text": "WEHELP, CHRIST THE GOOD SHEPHERD FOOD BANK | ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "Volunteer ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "Application Support Specialist",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "\t",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "Apr 2021 - Present | ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": "Long Beach, CA",
+            "bold": null,
+            "italic": true,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 121,
+        "rendered_line_widths_points": [
+          566.6308345794678
+        ],
+        "rendered_max_width_points": 566.6308345794678,
+        "rendered_top_points": 476.7040100097656,
+        "rendered_bottom_points": 489.5140075683594,
+        "paragraph_format_sha256": "c666ca49eb62f54374d9e998d6cab9732c8d959bd5528e5f5415a5593928b193",
+        "run_format_sha256": [
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "58e4836592cc00880041c7df93a51577b18141ec25205058e1e18b55ee544124"
+        ]
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "index": 26,
+        "section": "experience.wehelp",
+        "kind": "bullet",
+        "text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+        "runs": [
+          {
+            "text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 1,
+        "line_budget": 2,
+        "character_budget": 190,
+        "rendered_line_widths_points": [
+          557.6444206237793,
+          234.9795036315918
+        ],
+        "rendered_max_width_points": 557.6444206237793,
+        "rendered_top_points": 489.5039978027344,
+        "rendered_bottom_points": 515.114013671875,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "index": 27,
+        "section": "experience.wehelp",
+        "kind": "bullet",
+        "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "runs": [
+          {
+            "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 2,
+        "line_budget": 2,
+        "character_budget": 180,
+        "rendered_line_widths_points": [
+          548.740795135498,
+          224.5319938659668
+        ],
+        "rendered_max_width_points": 548.740795135498,
+        "rendered_top_points": 515.10400390625,
+        "rendered_bottom_points": 540.7140502929688,
+        "paragraph_format_sha256": "3dad5c56e7368386ba51af64596ef2418c2b9af04e9b538c0b3e48a6b83baffb",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "experience.spacer.28",
+        "index": 28,
+        "section": "experience",
+        "kind": "spacer",
+        "text": "\t",
+        "runs": [
+          {
+            "text": "\t",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "30f0b04f952e8a8227de1f37aeae2537b5ea17e7a1cab44382208ca48de8abc9",
+        "run_format_sha256": [
+          "2bfefbf5b43c9868461dc9e84425b13058826ae61413db075577dc0611870ed6"
+        ]
+      },
+      {
+        "paragraph_id": "projects.heading",
+        "index": 29,
+        "section": "projects",
+        "kind": "section_heading",
+        "text": "PROJECTS",
+        "runs": [
+          {
+            "text": "PROJECTS",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 14.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 8,
+        "rendered_line_widths_points": [
+          57.17600059509277
+        ],
+        "rendered_max_width_points": 57.17600059509277,
+        "rendered_top_points": 553.572021484375,
+        "rendered_bottom_points": 570.6520385742188,
+        "paragraph_format_sha256": "0a8c7bb77967159720a34890bbabbe227307a3cfca8d1dcb6a5ff0405a9b2c02",
+        "run_format_sha256": [
+          "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+        ]
+      },
+      {
+        "paragraph_id": "projects.loavenly.heading",
+        "index": 30,
+        "section": "projects.loavenly",
+        "kind": "entry_heading",
+        "text": "LOAVENLY | Multi-Tenant Food Bank Operations Platform | loavenly.com",
+        "runs": [
+          {
+            "text": "LOAVENLY ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "|",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "3c1b91bcae34da19961727caaf01cbd1bb0d658835afb452874b46f71e68966b"
+          },
+          {
+            "text": " Multi-Tenant Food Bank Operations Platform",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": " | ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633"
+          },
+          {
+            "text": "loavenly.com",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "Hyperlink",
+            "hyperlink_target": "https://www.loavenly.com/",
+            "format_sha256": "8a702f171a1482aac1136783fd9ae3deb54d10750633a69f825c002dcc1000da"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 68,
+        "rendered_line_widths_points": [
+          320.3069820404053
+        ],
+        "rendered_max_width_points": 320.3069820404053,
+        "rendered_top_points": 572.10400390625,
+        "rendered_bottom_points": 584.9140014648438,
+        "paragraph_format_sha256": "593f90e4f4cdd75ee22c2d05fb7ba017e198b05a6b85b4b481a460f9484e94e4",
+        "run_format_sha256": [
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "3c1b91bcae34da19961727caaf01cbd1bb0d658835afb452874b46f71e68966b",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "446ce3ab8ae1b5e65ba83fe541454a9708724c6af4c4aa0484ffe9d7c2513633",
+          "8a702f171a1482aac1136783fd9ae3deb54d10750633a69f825c002dcc1000da"
+        ]
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "index": 31,
+        "section": "projects.loavenly",
+        "kind": "bullet",
+        "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "runs": [
+          {
+            "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": "three",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          },
+          {
+            "text": " food bank locations.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 1,
+        "line_budget": 2,
+        "character_budget": 168,
+        "rendered_line_widths_points": [
+          547.1235466003418,
+          166.51945114135742
+        ],
+        "rendered_max_width_points": 547.1235466003418,
+        "rendered_top_points": 584.904052734375,
+        "rendered_bottom_points": 610.5140380859375,
+        "paragraph_format_sha256": "71e46919fde9dc1d98f935752d8bc5a162fe3709d565a22a8176f5399e752855",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82",
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "index": 32,
+        "section": "projects.loavenly",
+        "kind": "bullet",
+        "text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "runs": [
+          {
+            "text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 2,
+        "line_budget": 1,
+        "character_budget": 123,
+        "rendered_line_widths_points": [
+          531.6782341003418
+        ],
+        "rendered_max_width_points": 531.6782341003418,
+        "rendered_top_points": 610.5040283203125,
+        "rendered_bottom_points": 623.3140258789062,
+        "paragraph_format_sha256": "71e46919fde9dc1d98f935752d8bc5a162fe3709d565a22a8176f5399e752855",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "index": 33,
+        "section": "projects.loavenly",
+        "kind": "bullet",
+        "text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "runs": [
+          {
+            "text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+          }
+        ],
+        "editable": true,
+        "bullet_slot": 3,
+        "line_budget": 2,
+        "character_budget": 140,
+        "rendered_line_widths_points": [
+          555.8597526550293,
+          67.39950180053711
+        ],
+        "rendered_max_width_points": 555.8597526550293,
+        "rendered_top_points": 623.3040161132812,
+        "rendered_bottom_points": 648.9140014648438,
+        "paragraph_format_sha256": "71e46919fde9dc1d98f935752d8bc5a162fe3709d565a22a8176f5399e752855",
+        "run_format_sha256": [
+          "0c9ac41bcca6c4fae58cf85a64bfc14df3c4df53a5c595dcd8b6510360308b82"
+        ]
+      },
+      {
+        "paragraph_id": "projects.spacer.34",
+        "index": 34,
+        "section": "projects",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "e93e775e5ab3eac7713854923767dbf7fd3f4529aac020debc49dbda6bd37701",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "education.heading",
+        "index": 35,
+        "section": "education",
+        "kind": "section_heading",
+        "text": "EDUCATION",
+        "runs": [
+          {
+            "text": "EDUCATION",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 14.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 9,
+        "rendered_line_widths_points": [
+          69.95799827575684
+        ],
+        "rendered_max_width_points": 69.95799827575684,
+        "rendered_top_points": 661.77197265625,
+        "rendered_bottom_points": 678.8519897460938,
+        "paragraph_format_sha256": "0a8c7bb77967159720a34890bbabbe227307a3cfca8d1dcb6a5ff0405a9b2c02",
+        "run_format_sha256": [
+          "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+        ]
+      },
+      {
+        "paragraph_id": "education.spacer.36",
+        "index": 36,
+        "section": "education",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "07a71dad732c9d8be48404ccc85daa8e340b2520ad10e4b419595616d7fe4916",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "education.protected_body.37",
+        "index": 37,
+        "section": "education",
+        "kind": "protected_body",
+        "text": "       Bachelor of Science | Computer Science, California State University, Long Beach\tMay 2025",
+        "runs": [
+          {
+            "text": "       Bachelor of Science | Computer Science",
+            "bold": null,
+            "italic": true,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "3b76d98e4a22f40cd1be57313a4c8a457fe2955288568079c2fd39fc8aa83eee"
+          },
+          {
+            "text": ", ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "6428ce434383d58149ad9f3680ca153f3d282128d49188c3cf0e8cac872a52d3"
+          },
+          {
+            "text": "California State University, Long Beach",
+            "bold": null,
+            "italic": null,
+            "underline": true,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "f98e0e44cd51aab6ca5d1181439e32d27d56f14e83b24830c0c390decff82ab6"
+          },
+          {
+            "text": "\tMay 2025",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": null,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "6428ce434383d58149ad9f3680ca153f3d282128d49188c3cf0e8cac872a52d3"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 95,
+        "rendered_line_widths_points": [
+          536.7988052368164
+        ],
+        "rendered_max_width_points": 536.7988052368164,
+        "rendered_top_points": 682.7780151367188,
+        "rendered_bottom_points": 696.197998046875,
+        "paragraph_format_sha256": "29c7a8d8aefea956f859e4add915ab486e2d3c199585374a59c0cd933cce2e53",
+        "run_format_sha256": [
+          "3b76d98e4a22f40cd1be57313a4c8a457fe2955288568079c2fd39fc8aa83eee",
+          "6428ce434383d58149ad9f3680ca153f3d282128d49188c3cf0e8cac872a52d3",
+          "f98e0e44cd51aab6ca5d1181439e32d27d56f14e83b24830c0c390decff82ab6",
+          "6428ce434383d58149ad9f3680ca153f3d282128d49188c3cf0e8cac872a52d3"
+        ]
+      },
+      {
+        "paragraph_id": "education.spacer.38",
+        "index": 38,
+        "section": "education",
+        "kind": "spacer",
+        "text": "",
+        "runs": [],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 1,
+        "rendered_line_widths_points": [],
+        "rendered_max_width_points": 0.0,
+        "rendered_top_points": null,
+        "rendered_bottom_points": null,
+        "paragraph_format_sha256": "909103b8b32167f6cc2b28a47a92e03f8e1bde82ccc56d30e4fd882408adef9c",
+        "run_format_sha256": []
+      },
+      {
+        "paragraph_id": "certifications.heading",
+        "index": 39,
+        "section": "certifications",
+        "kind": "section_heading",
+        "text": "CERTIFICATIONS ",
+        "runs": [
+          {
+            "text": "CERTIFICATIONS ",
+            "bold": true,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 14.0,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 15,
+        "rendered_line_widths_points": [
+          94.66799736022949
+        ],
+        "rendered_max_width_points": 94.66799736022949,
+        "rendered_top_points": 706.02197265625,
+        "rendered_bottom_points": 723.1019897460938,
+        "paragraph_format_sha256": "f6fe6313293d059f426d20d5b6a97175b4834c98f463169f1d77052afd7f6070",
+        "run_format_sha256": [
+          "15f554cc3c1456596fb4604cd5cbe391431215731e00fe36c9c18f6cfbebe781"
+        ]
+      },
+      {
+        "paragraph_id": "certifications.protected_body.40",
+        "index": 40,
+        "section": "certifications",
+        "kind": "protected_body",
+        "text": "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation",
+        "runs": [
+          {
+            "text": "   ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "AWS Certified Cloud Practitioner | CompTIA Network+ | ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "Microsoft Azure Fundamentals",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": " ",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          },
+          {
+            "text": "| ITIL 4 Foundation",
+            "bold": null,
+            "italic": null,
+            "underline": null,
+            "font_name": null,
+            "font_size_points": 10.5,
+            "color": "000000",
+            "style_id": "DefaultParagraphFont",
+            "hyperlink_target": null,
+            "format_sha256": "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+          }
+        ],
+        "editable": false,
+        "bullet_slot": null,
+        "line_budget": 1,
+        "character_budget": 105,
+        "rendered_line_widths_points": [
+          455.46899032592773
+        ],
+        "rendered_max_width_points": 455.46899032592773,
+        "rendered_top_points": 723.5540161132812,
+        "rendered_bottom_points": 736.364013671875,
+        "paragraph_format_sha256": "29e936d8886ff4187fed48ee8f06f43d2301d34de75a4f5f2609f7844037a585",
+        "run_format_sha256": [
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3",
+          "19f8c7e33d9e6e277697aa748bf1308cbff5828302ff6379fa2e84796dd31fc3"
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "section_id": "header",
+        "heading": "header",
+        "paragraph_ids": [
+          "identity.name",
+          "identity.contact",
+          "header.spacer.2"
+        ],
+        "editable_paragraph_ids": [],
+        "bullet_count": 0,
+        "line_budget": 3
+      },
+      {
+        "section_id": "summary",
+        "heading": "summary",
+        "paragraph_ids": [
+          "summary"
+        ],
+        "editable_paragraph_ids": [
+          "summary"
+        ],
+        "bullet_count": 0,
+        "line_budget": 3
+      },
+      {
+        "section_id": "skills",
+        "heading": "SKILLS",
+        "paragraph_ids": [
+          "skills.heading",
+          "skills.technical_support",
+          "skills.apis_identity",
+          "skills.languages_dbs",
+          "skills.cloud_systems",
+          "skills.tools",
+          "skills.spacer.10"
+        ],
+        "editable_paragraph_ids": [
+          "skills.technical_support",
+          "skills.apis_identity",
+          "skills.languages_dbs",
+          "skills.cloud_systems",
+          "skills.tools"
+        ],
+        "bullet_count": 0,
+        "line_budget": 7
+      },
+      {
+        "section_id": "experience",
+        "heading": "EXPERIENCE",
+        "paragraph_ids": [
+          "experience.heading",
+          "experience.spacer.12",
+          "experience.spacer.19",
+          "experience.spacer.24",
+          "experience.spacer.28"
+        ],
+        "editable_paragraph_ids": [],
+        "bullet_count": 0,
+        "line_budget": 5
+      },
+      {
+        "section_id": "experience.original_insurance",
+        "heading": "experience.original_insurance",
+        "paragraph_ids": [
+          "experience.original_insurance.heading",
+          "experience.original_insurance.bullet.1",
+          "experience.original_insurance.bullet.2",
+          "experience.original_insurance.bullet.3",
+          "experience.original_insurance.bullet.4",
+          "experience.original_insurance.bullet.5"
+        ],
+        "editable_paragraph_ids": [
+          "experience.original_insurance.bullet.1",
+          "experience.original_insurance.bullet.2",
+          "experience.original_insurance.bullet.3",
+          "experience.original_insurance.bullet.4",
+          "experience.original_insurance.bullet.5"
+        ],
+        "bullet_count": 5,
+        "line_budget": 11
+      },
+      {
+        "section_id": "experience.csulb",
+        "heading": "experience.csulb",
+        "paragraph_ids": [
+          "experience.csulb.heading",
+          "experience.csulb.bullet.1",
+          "experience.csulb.bullet.2",
+          "experience.csulb.bullet.3"
+        ],
+        "editable_paragraph_ids": [
+          "experience.csulb.bullet.1",
+          "experience.csulb.bullet.2",
+          "experience.csulb.bullet.3"
+        ],
+        "bullet_count": 3,
+        "line_budget": 7
+      },
+      {
+        "section_id": "experience.wehelp",
+        "heading": "experience.wehelp",
+        "paragraph_ids": [
+          "experience.wehelp.heading",
+          "experience.wehelp.bullet.1",
+          "experience.wehelp.bullet.2"
+        ],
+        "editable_paragraph_ids": [
+          "experience.wehelp.bullet.1",
+          "experience.wehelp.bullet.2"
+        ],
+        "bullet_count": 2,
+        "line_budget": 5
+      },
+      {
+        "section_id": "projects",
+        "heading": "PROJECTS",
+        "paragraph_ids": [
+          "projects.heading",
+          "projects.spacer.34"
+        ],
+        "editable_paragraph_ids": [],
+        "bullet_count": 0,
+        "line_budget": 2
+      },
+      {
+        "section_id": "projects.loavenly",
+        "heading": "projects.loavenly",
+        "paragraph_ids": [
+          "projects.loavenly.heading",
+          "projects.loavenly.bullet.1",
+          "projects.loavenly.bullet.2",
+          "projects.loavenly.bullet.3"
+        ],
+        "editable_paragraph_ids": [
+          "projects.loavenly.bullet.1",
+          "projects.loavenly.bullet.2",
+          "projects.loavenly.bullet.3"
+        ],
+        "bullet_count": 3,
+        "line_budget": 6
+      },
+      {
+        "section_id": "education",
+        "heading": "EDUCATION",
+        "paragraph_ids": [
+          "education.heading",
+          "education.spacer.36",
+          "education.protected_body.37",
+          "education.spacer.38"
+        ],
+        "editable_paragraph_ids": [],
+        "bullet_count": 0,
+        "line_budget": 4
+      },
+      {
+        "section_id": "certifications",
+        "heading": "CERTIFICATIONS",
+        "paragraph_ids": [
+          "certifications.heading",
+          "certifications.protected_body.40"
+        ],
+        "editable_paragraph_ids": [],
+        "bullet_count": 0,
+        "line_budget": 2
+      }
+    ],
+    "protected_strings": [
+      "BRIAN AIAD",
+      "csbrianaiad@gmail.com | 310-625-6844 | linkedin.com/in/brian-aiad | Los Angeles, CA",
+      "SKILLS",
+      "EXPERIENCE",
+      "ORIGINAL INSURANCE GROUP INC | Application Support Specialist\tJun 2024 - Present | Downey, CA",
+      "CALIFORNIA STATE UNIVERSITY, LONG BEACH | Building Manager, IT Operations Support\tJan 2024 - Aug 2025 | Long Beach, CA",
+      "WEHELP, CHRIST THE GOOD SHEPHERD FOOD BANK | Volunteer Application Support Specialist\tApr 2021 - Present | Long Beach, CA",
+      "PROJECTS",
+      "LOAVENLY | Multi-Tenant Food Bank Operations Platform | loavenly.com",
+      "EDUCATION",
+      "       Bachelor of Science | Computer Science, California State University, Long Beach\tMay 2025",
+      "CERTIFICATIONS ",
+      "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation"
+    ],
+    "protected_hyperlinks": [
+      "mailto:csbrianaiad@gmail.com",
+      "https://www.linkedin.com/in/brian-aiad/",
+      "https://www.loavenly.com/"
+    ],
+    "protected_metrics_by_section": {
+      "summary": [
+        "3+",
+        "200+",
+        "sub-90-minute"
+      ],
+      "experience.original_insurance": [
+        "200+",
+        "sub-90-minute",
+        "22 carrier/vendor feeds",
+        "5 hours",
+        "40 minutes",
+        "20+",
+        "4 hours",
+        "45 minutes"
+      ],
+      "experience.wehelp": [
+        "three distribution locations"
+      ],
+      "projects.loavenly": [
+        "three food bank locations",
+        "sub-100ms"
+      ]
+    },
+    "editable_paragraph_ids": [
+      "summary",
+      "skills.technical_support",
+      "skills.apis_identity",
+      "skills.languages_dbs",
+      "skills.cloud_systems",
+      "skills.tools",
+      "experience.original_insurance.bullet.1",
+      "experience.original_insurance.bullet.2",
+      "experience.original_insurance.bullet.3",
+      "experience.original_insurance.bullet.4",
+      "experience.original_insurance.bullet.5",
+      "experience.csulb.bullet.1",
+      "experience.csulb.bullet.2",
+      "experience.csulb.bullet.3",
+      "experience.wehelp.bullet.1",
+      "experience.wehelp.bullet.2",
+      "projects.loavenly.bullet.1",
+      "projects.loavenly.bullet.2",
+      "projects.loavenly.bullet.3"
+    ],
+    "page_width_points": 612.0,
+    "page_height_points": 792.0,
+    "margins_points": {
+      "top": 18.0,
+      "right": 72.0,
+      "bottom": 18.0,
+      "left": 72.0
+    },
+    "package_parts": [
+      "[Content_Types].xml",
+      "_rels/.rels",
+      "customXml/_rels/item1.xml.rels",
+      "customXml/item1.xml",
+      "customXml/itemProps1.xml",
+      "docProps/app.xml",
+      "docProps/core.xml",
+      "word/_rels/document.xml.rels",
+      "word/_rels/fontTable.xml.rels",
+      "word/document.xml",
+      "word/endnotes.xml",
+      "word/fontTable.xml",
+      "word/fonts/font1.odttf",
+      "word/fonts/font10.odttf",
+      "word/fonts/font2.odttf",
+      "word/fonts/font3.odttf",
+      "word/fonts/font4.odttf",
+      "word/fonts/font5.odttf",
+      "word/fonts/font6.odttf",
+      "word/fonts/font7.odttf",
+      "word/fonts/font8.odttf",
+      "word/fonts/font9.odttf",
+      "word/footer1.xml",
+      "word/footnotes.xml",
+      "word/header1.xml",
+      "word/numbering.xml",
+      "word/settings.xml",
+      "word/styles.xml",
+      "word/theme/theme1.xml",
+      "word/webSettings.xml"
+    ],
+    "immutable_package_part_sha256": {
+      "[Content_Types].xml": "3096ebc769ba1ac319147cc976af14fac860c9166e9e89068c2e14a46e6c49bf",
+      "_rels/.rels": "e19238d7a71fa7a2490776252686f70e2de6238c87cd509b5e3a3cc07c2ea4df",
+      "customXml/_rels/item1.xml.rels": "80482f86e196171d66001e0e74d1900408a3aaf2463e54005d251b5f2db9a0b0",
+      "customXml/item1.xml": "3957f44dc1243e35f89cb7fbef948490450bd35b7eb646a46ed8ecd3dbdb54a9",
+      "customXml/itemProps1.xml": "7ac2bf4d801bf26c85bc622b599a81e9b46150d276ea38e5ec2fe2547cbb892b",
+      "docProps/app.xml": "9fac6461dc104ae035ee847d8e274031a1862485a0c8ec8e0881e782fef84aff",
+      "docProps/core.xml": "d78089e9f4203e8711d44fded2db9aeeb57ed4387808f160c090772058ee6b53",
+      "word/_rels/document.xml.rels": "74b405772d8ab45900c75239b96702cd63a23011e2e9a45bfa21a5af846e4942",
+      "word/_rels/fontTable.xml.rels": "cf7290ea4526238dbf697e77e0280c6a9bf99a8c9e52543bac0df46940a22226",
+      "word/endnotes.xml": "001f7898a1c47097c274e29eee8a7ae7c53bfa1079cb95fd02bbc89701537e13",
+      "word/fontTable.xml": "4e81d1026a7e9d53622117eeca7d9851b778b81028cf342a34625bf31c02ea73",
+      "word/fonts/font1.odttf": "3b7ecbc775daa0aa53da9f8a998e2e6b1d8bc11ac7da8f0bd21c1ea665a0a22b",
+      "word/fonts/font10.odttf": "550c8d867b69fbf6a993fe7d8094c431130e49e3c495868e69d18a2df8e82014",
+      "word/fonts/font2.odttf": "bb61c067be55076f3e017fe272a81e99ab131ac8eb046cc778fb38bc8e53eb5c",
+      "word/fonts/font3.odttf": "9ccaed230cbd8398f1def7f46a23995da3748eb7caaea79383c88dbe0f628033",
+      "word/fonts/font4.odttf": "750b73ea02c43acc6ead8ce2e02e775860ea6061f9315db49c308a97c617ae1a",
+      "word/fonts/font5.odttf": "d0bc242b86f68d6ec19e435ee0b81d9ae1c280f9bf681a539de07e4a606a983f",
+      "word/fonts/font6.odttf": "62edbea828e5024b46099aef983363fe69e3078b2139637a0a2d752c8d86856f",
+      "word/fonts/font7.odttf": "12278a12ecbd8fb6e69e0c6d2749812f9695fca402b593a7f8c21e38b4a44d7b",
+      "word/fonts/font8.odttf": "e88c10bfd4d149cb7f4102d42e3d0ab15f27456e289684168c2ff044b07a8d69",
+      "word/fonts/font9.odttf": "99dabe94be3fac76e4b9490d0eae65674d854dd354f59b2428858343b38900c1",
+      "word/footer1.xml": "090c1a6b6b7c90c4d58ece01804cb1ee26975963011ece44ab8425ef7ad978b9",
+      "word/footnotes.xml": "c798d191d40db162c53bb4c332436b74805f3a2c716f2f27994e71ac9ad100d4",
+      "word/header1.xml": "0814f68dc771f8c309dfa980ce94d76a20ddb2d446c0095730c20094f4fe1698",
+      "word/numbering.xml": "15044ca41eaebc15d88cdea17757b1822a36402327c23472c5fd27a614d3a40a",
+      "word/settings.xml": "e81eb5b1b0001193c52e1b8880900304e173d1633b1c28ec2215bb8f5c33a843",
+      "word/styles.xml": "dc4d06a6f8be2dbe519c9c9c8895afb9dd8ac5c27c05baaaaf60ff48c3f71789",
+      "word/theme/theme1.xml": "b2295d3198893d2c03f5e584c749a15751b798aefdcd9bee2889f13903d68cb2",
+      "word/webSettings.xml": "695894eeda09834e9656d39c7b0fe7baf1d59178f690a9ac07d41d5b34d11ae9"
+    },
+    "document_format_skeleton_sha256": "fdc1569488a0c95090add507c9824dc9f52a91666bb5311d412e2571312853a8",
+    "section_properties_sha256": "5a7f4f501a71678091d63c293ac104bc6ef7bed0c7bde4ebb75659c2b346c8f7",
+    "baseline_page_count": null,
+    "baseline_rendered_lines": null
+  },
+  "layout": {
+    "passed": true,
+    "page_count": 1,
+    "rendered_lines": 61,
+    "section_anchor_deltas": {
+      "SKILLS": 0.0,
+      "EXPERIENCE": 0.0,
+      "PROJECTS": 0.0,
+      "EDUCATION": 0.0,
+      "CERTIFICATIONS": 0.0
+    },
+    "overflow_paragraph_ids": [],
+    "paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "baseline_paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "paragraph_max_width_points": {
+      "identity.name": 89.69400024414062,
+      "identity.contact": 388.8240280151367,
+      "summary": 518.0385990142822,
+      "skills.heading": 36.37200355529785,
+      "skills.technical_support": 508.788122177124,
+      "skills.apis_identity": 577.6549434661865,
+      "skills.languages_dbs": 519.1344966888428,
+      "skills.cloud_systems": 386.1495418548584,
+      "skills.tools": 316.63251304626465,
+      "experience.heading": 70.61599540710449,
+      "experience.original_insurance.heading": 553.0459957122803,
+      "experience.original_insurance.bullet.1": 528.664623260498,
+      "experience.original_insurance.bullet.2": 525.7770500183105,
+      "experience.original_insurance.bullet.3": 547.4596672058105,
+      "experience.original_insurance.bullet.4": 531.0271110534668,
+      "experience.original_insurance.bullet.5": 560.9626579284668,
+      "experience.csulb.heading": 553.0308589935303,
+      "experience.csulb.bullet.1": 541.7477531433105,
+      "experience.csulb.bullet.2": 498.7396354675293,
+      "experience.csulb.bullet.3": 544.1206169128418,
+      "experience.wehelp.heading": 566.6308345794678,
+      "experience.wehelp.bullet.1": 557.6444206237793,
+      "experience.wehelp.bullet.2": 548.740795135498,
+      "projects.heading": 57.17600059509277,
+      "projects.loavenly.heading": 320.3069820404053,
+      "projects.loavenly.bullet.1": 547.1235466003418,
+      "projects.loavenly.bullet.2": 531.6782341003418,
+      "projects.loavenly.bullet.3": 555.8597526550293,
+      "education.heading": 69.95799827575684,
+      "education.protected_body.37": 536.7988052368164,
+      "certifications.heading": 94.66799736022949,
+      "certifications.protected_body.40": 455.46899032592773
+    },
+    "font_inventory": {
+      "Calibri": [
+        10.5,
+        11.0
+      ],
+      "Calibri-Bold": [
+        10.5,
+        14.0,
+        18.0
+      ],
+      "Calibri-Italic": [
+        10.5,
+        11.0
+      ],
+      "SegoeUI": [
+        8.0
+      ]
+    },
+    "out_of_bounds_items": [],
+    "overlap_items": [],
+    "pdf_path": null,
+    "attempts": 1
+  }
+}

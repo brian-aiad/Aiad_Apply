@@ -1,0 +1,36 @@
+name: quality
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: "3.13"
+
+      - name: Install LibreOffice on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: choco install libreoffice-fresh --no-progress -y
+
+      - name: Install LibreOffice on macOS
+        if: runner.os == 'macOS'
+        run: brew install --cask libreoffice
+
+      - run: uv sync --extra dev --locked
+      - run: uv run ruff format --check .
+      - run: uv run ruff check .
+      - run: uv run mypy packages/resume-engine/src
+      - run: uv run pytest

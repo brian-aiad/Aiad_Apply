@@ -3,7 +3,9 @@ from __future__ import annotations
 import re
 from collections import Counter
 
+from aiadapply_v2.documents.formatting import compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
+from aiadapply_v2.grading.keywords import important_keywords
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text
 from aiadapply_v2.schemas import (
     EvidenceStrength,
@@ -30,6 +32,11 @@ def validate_rewrite_plan(
         if paragraph.kind.value == "skill_line"
     }
     actual_skill_ids = {line.paragraph_id for line in plan.skills.lines}
+    fixed_skill_categories = {
+        paragraph.paragraph_id: paragraph.text.split(":", 1)[0].strip()
+        for paragraph in base.paragraphs
+        if paragraph.kind.value == "skill_line"
+    }
     expected_bullet_ids = {
         paragraph.paragraph_id
         for paragraph in base.paragraphs
@@ -47,6 +54,18 @@ def validate_rewrite_plan(
                 ),
             )
         )
+    for line in plan.skills.lines:
+        if fixed_skill_categories.get(line.paragraph_id) != line.category:
+            issues.append(
+                ValidationIssue(
+                    code="skill_category_changed",
+                    message=(
+                        f"Skill category {line.paragraph_id} must remain "
+                        f"{fixed_skill_categories.get(line.paragraph_id)!r}."
+                    ),
+                    paragraph_id=line.paragraph_id,
+                )
+            )
     if expected_bullet_ids != actual_bullet_ids:
         issues.append(
             ValidationIssue(
@@ -112,6 +131,29 @@ def validate_rewrite_plan(
             "Service Desk Analyst",
             "Technical Support Analyst",
         ),
+        "application_support_administration": (
+            "Application Support Administrator",
+            "Production Support Administrator",
+            "Application Support Analyst",
+        ),
+        "application_systems_engineering": (
+            "Application & Systems Engineer",
+            "Application Systems Engineer",
+            "Systems Integration Engineer",
+        ),
+        "erp_application_support": (
+            "ERP Technical Analyst",
+            "D365 Technical Analyst",
+            "Application Support Analyst",
+        ),
+        "application_support_engineering": (
+            "Application Support Engineer",
+            "Production Support Engineer",
+        ),
+        "product_support_engineering": (
+            "Product Support Engineer",
+            "Technical Product Support Engineer",
+        ),
     }.get(profile.normalized_role_family, ())
     if identity_terms and not any(
         contains_term(plan.summary.text, term) for term in identity_terms
@@ -128,10 +170,7 @@ def validate_rewrite_plan(
         )
 
     proposed = "\n".join(all_proposed_text(plan))
-    important = [
-        keyword for keyword in keywords if keyword.accepted and keyword.hiring_importance >= 35
-    ]
-    for keyword in important:
+    for keyword in important_keywords(keywords):
         if not contains_term(proposed, keyword.term):
             issues.append(
                 ValidationIssue(
@@ -180,7 +219,12 @@ def validate_rewrite_plan(
         metrics_passed=True,
         structure_passed=not any(
             issue.code
-            in {"skill_slots_changed", "bullet_slots_changed", "cross_role_bullet_source"}
+            in {
+                "skill_slots_changed",
+                "skill_category_changed",
+                "bullet_slots_changed",
+                "cross_role_bullet_source",
+            }
             for issue in errors
         ),
         keyword_coverage=coverage,
@@ -195,6 +239,14 @@ def validate_candidate_docx(
     candidate = parse_resume_docx(candidate_path)
     issues: list[ValidationIssue] = []
     candidate_text = "\n".join(paragraph.text for paragraph in candidate.paragraphs)
+
+    issues.extend(
+        ValidationIssue(code=code, message=message)
+        for code, message in compare_format_integrity(
+            base_path=base.source_path,
+            candidate_path=candidate_path,
+        )
+    )
 
     for protected in base.protected_strings:
         if protected not in candidate_text:
@@ -248,7 +300,7 @@ def validate_candidate_docx(
             )
         )
 
-    for keyword in (item for item in keywords if item.accepted and item.hiring_importance >= 35):
+    for keyword in important_keywords(keywords):
         if not contains_term(candidate_text, keyword.term):
             issues.append(
                 ValidationIssue(
@@ -267,7 +319,20 @@ def validate_candidate_docx(
         metrics_passed=not any(
             issue.code in {"protected_metrics_changed", "new_numeric_claim"} for issue in errors
         ),
-        structure_passed=not any(issue.code == "structure_changed" for issue in errors),
+        structure_passed=not any(
+            issue.code
+            in {
+                "structure_changed",
+                "package_parts_changed",
+                "immutable_package_part_changed",
+                "document_format_skeleton_changed",
+                "section_properties_changed",
+                "format_paragraph_count_changed",
+                "paragraph_format_changed",
+                "run_format_changed",
+            }
+            for issue in errors
+        ),
         keyword_coverage=weighted_keyword_coverage(candidate_text, keywords),
     )
 
@@ -308,4 +373,4 @@ def _normalized_metrics(values: dict[str, list[str]]) -> dict[str, Counter[str]]
 
 
 def _claim_numbers(text: str) -> set[str]:
-    return set(re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?\+?", text))
+    return set(re.findall(r"(?<![A-Za-z0-9])\d+(?:\.\d+)?\+?", text))

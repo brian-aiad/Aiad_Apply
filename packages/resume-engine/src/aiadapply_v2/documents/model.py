@@ -8,6 +8,10 @@ from docx import Document
 from docx.document import Document as DocxDocument
 from docx.text.hyperlink import Hyperlink
 
+from aiadapply_v2.documents.formatting import (
+    package_format_metadata,
+    paragraph_format_metadata,
+)
 from aiadapply_v2.schemas import (
     ParagraphKind,
     ResumeDocument,
@@ -47,12 +51,14 @@ def parse_resume_docx(path: str | Path) -> ResumeDocument:
     source = Path(path).resolve()
     raw = source.read_bytes()
     document = Document(str(source))
-    paragraphs = _parse_paragraphs(document)
+    paragraph_formats = paragraph_format_metadata(source)
+    paragraphs = _parse_paragraphs(document, paragraph_formats)
     sections = _build_sections(paragraphs)
     protected_strings = _protected_strings(paragraphs)
     hyperlinks = _hyperlinks(document)
     metrics = _metrics_by_section(paragraphs)
     section = document.sections[0]
+    package_parts, immutable_hashes, skeleton_hash, section_hash = package_format_metadata(source)
     margins = {
         "top": _points(section.top_margin),
         "right": _points(section.right_margin),
@@ -71,6 +77,10 @@ def parse_resume_docx(path: str | Path) -> ResumeDocument:
         page_width_points=_points(section.page_width),
         page_height_points=_points(section.page_height),
         margins_points=margins,
+        package_parts=package_parts,
+        immutable_package_part_sha256=immutable_hashes,
+        document_format_skeleton_sha256=skeleton_hash,
+        section_properties_sha256=section_hash,
     )
 
 
@@ -79,7 +89,10 @@ def _points(value: object) -> float:
     return float(points) if points is not None else 0.0
 
 
-def _parse_paragraphs(document: DocxDocument) -> list[ResumeParagraph]:
+def _parse_paragraphs(
+    document: DocxDocument,
+    paragraph_formats: list[tuple[str, list[str]]],
+) -> list[ResumeParagraph]:
     current_section = "header"
     current_entry = ""
     bullet_slots: dict[str, int] = {}
@@ -119,6 +132,8 @@ def _parse_paragraphs(document: DocxDocument) -> list[ResumeParagraph]:
 
         paragraph_id = _paragraph_id(kind, semantic_section, text, bullet_slot, index)
         run_models: list[TextRun] = []
+        format_digests = paragraph_formats[index][1]
+        format_index = 0
         for item in paragraph.iter_inner_content():
             if isinstance(item, Hyperlink):
                 for run in item.runs:
@@ -127,11 +142,31 @@ def _parse_paragraphs(document: DocxDocument) -> list[ResumeParagraph]:
                             text=run.text,
                             bold=run.bold,
                             italic=run.italic,
+                            underline=_optional_bool(run.underline),
+                            font_name=run.font.name,
+                            font_size_points=_optional_points(run.font.size),
+                            color=_color(run),
+                            style_id=run.style.style_id,
                             hyperlink_target=item.url or None,
+                            format_sha256=format_digests[format_index],
                         )
                     )
+                    format_index += 1
             else:
-                run_models.append(TextRun(text=item.text, bold=item.bold, italic=item.italic))
+                run_models.append(
+                    TextRun(
+                        text=item.text,
+                        bold=item.bold,
+                        italic=item.italic,
+                        underline=_optional_bool(item.underline),
+                        font_name=item.font.name,
+                        font_size_points=_optional_points(item.font.size),
+                        color=_color(item),
+                        style_id=item.style.style_id,
+                        format_sha256=format_digests[format_index],
+                    )
+                )
+                format_index += 1
 
         editable = semantic_section in EDITABLE_SECTIONS and kind in {
             ParagraphKind.summary,
@@ -150,9 +185,26 @@ def _parse_paragraphs(document: DocxDocument) -> list[ResumeParagraph]:
                 bullet_slot=bullet_slot,
                 line_budget=_line_budget(kind, semantic_section, paragraph.text),
                 character_budget=max(len(paragraph.text), 1),
+                paragraph_format_sha256=paragraph_formats[index][0],
+                run_format_sha256=format_digests,
             )
         )
     return parsed
+
+
+def _optional_bool(value: object) -> bool | None:
+    return None if value is None else bool(value)
+
+
+def _optional_points(value: object) -> float | None:
+    points = getattr(value, "pt", None)
+    return float(points) if points is not None else None
+
+
+def _color(run: object) -> str | None:
+    font = getattr(run, "font", None)
+    color = getattr(getattr(font, "color", None), "rgb", None)
+    return str(color) if color is not None else None
 
 
 def _entry_identity(text: str) -> str:

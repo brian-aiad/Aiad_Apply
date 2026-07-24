@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Annotated
 
@@ -11,7 +12,12 @@ from rich import print
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.loaders import build_evidence_graph
 from aiadapply_v2.grading.keywords import grade_job_keywords
-from aiadapply_v2.layout.renderer import find_libreoffice
+from aiadapply_v2.layout.renderer import (
+    apply_pdf_layout_budgets,
+    find_libreoffice,
+    inspect_pdf,
+    render_docx_to_pdf,
+)
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.pipeline import transform_resume
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
@@ -42,6 +48,38 @@ def inspect_base(
     """Parse the final DOCX into the semantic document model."""
     document = parse_resume_docx(base_resume)
     print(json.dumps(document.model_dump(mode="json"), indent=2))
+
+
+@app.command("inspect-format")
+def inspect_format(
+    base_resume: Annotated[Path, typer.Option("--base-resume")] = DEFAULT_BASE,
+    output: Annotated[Path | None, typer.Option("--output")] = None,
+) -> None:
+    """Render and fingerprint every source paragraph, run, package part, and line."""
+    document = parse_resume_docx(base_resume)
+    with tempfile.TemporaryDirectory(prefix="aiadapply-format-") as temp_name:
+        pdf = render_docx_to_pdf(base_resume, temp_name)
+        apply_pdf_layout_budgets(document, pdf)
+        layout = inspect_pdf(pdf, document=document)
+    document_payload = document.model_dump(mode="json")
+    try:
+        document_payload["source_path"] = str(
+            base_resume.resolve().relative_to(REPOSITORY_ROOT)
+        ).replace("\\", "/")
+    except ValueError:
+        document_payload["source_path"] = base_resume.name
+    layout.pdf_path = None
+    payload = json.dumps(
+        {
+            "document": document_payload,
+            "layout": layout.model_dump(mode="json"),
+        },
+        indent=2,
+    )
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(payload + "\n", encoding="utf-8")
+    print(payload)
 
 
 @app.command()

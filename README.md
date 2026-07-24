@@ -28,9 +28,9 @@ Raw LinkedIn/Simplify paste
 -> BGE in-memory semantic retrieval
 -> structured Codex review and rewrite
 -> protected-content and metric validation
--> surgical DOCX text replacement
+-> byte-preserving OOXML text-node replacement
 -> LibreOffice PDF render
--> PyMuPDF page, line, and anchor validation
+-> PyMuPDF paragraph, font, line, width, and anchor validation
 -> targeted paragraph compression if needed
 -> DOCX, PDF, JSON report, and Markdown report
 ```
@@ -58,10 +58,20 @@ macOS renderer path:
 /Applications/LibreOffice.app/Contents/MacOS/soffice
 ```
 
+The same locked environment is tested on `windows-latest` and `macos-latest`.
+On macOS, use forward slashes in the command examples, for example:
+
+```bash
+uv run aiadapplyv2 transform \
+  --paste-file data/fixtures/floqast_full.txt \
+  --output-dir outputs/floqast
+```
+
 ## Commands
 
 ```powershell
 uv run aiadapplyv2 inspect-base
+uv run aiadapplyv2 inspect-format --output data\resumes\Brian_Aiad_BASE.format.json
 uv run aiadapplyv2 parse --paste-file data\fixtures\floqast_full.txt
 uv run aiadapplyv2 profile --paste-file data\fixtures\anduril_full.txt
 uv run aiadapplyv2 transform `
@@ -76,6 +86,7 @@ Brian_Aiad_resume.docx
 Brian_Aiad_resume.pdf
 transformation_report.json
 transformation_report.md
+character_audit.json
 ```
 
 ## Verification

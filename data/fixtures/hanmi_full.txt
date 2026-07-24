@@ -1,0 +1,88 @@
+0 notifications
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Hanmi Bank.
+Hanmi Bank
+
+Application Support Administrator
+
+Los Angeles, CA · 2 days ago · 50 applicants
+On-site
+Full-time
+Easy Apply
+
+25%
+Resume Match
+3 of 12 keywords
+Simplify
+V1
+V2
+
+About the job
+The Application Support Administrator is responsible for installing, configuring, and maintaining end-to-end production support for enterprise applications, including core banking, loan management, and related products and services. They act as the bridge between end-users and IT teams. Key duties include troubleshooting issues, testing software updates, and creating training materials to keep banking applications running smoothly.
+
+Ensures compliance with established Company policies and procedures and demonstrates responsibility for compliance with state and federal banking regulations, including lending, privacy, Bank Secrecy Act, Anti-Money Laundering, and Customer Information Program requirements.
+
+REQUIRED DUTIES
+1. Provides production support for enterprise applications, ensuring stable and reliable operations across all business units.
+2. Helps resolve application and technology issues, including triage, root cause analysis, escalation, resolution, and recovery for application, interface, batch, and integration failures.
+3. Investigates and resolves Severity 1 critical system-down and Severity 2 major service degradation incidents.
+4. Ensures incidents and service requests are resolved within established SLAs, with clear and timely communication to stakeholders.
+5. Oversees break-fix activities, coordinating urgent fixes, patches, and production releases as required.
+6. Proactively monitors system health, transaction volumes, batch processing, interfaces, file transfers, and user activity to identify and address issues before impact.
+7. Performs daily operational hygiene to maintain system stability, including system maintenance, patching, vulnerability remediation, and coordinated application updates.
+8. Creates, documents, and maintains application support procedures, runbooks, and standardized operational processes.
+9. Maintains comprehensive documentation and institutional knowledge to support operational continuity.
+10. Oversees system configuration, maintenance, and implementation of new software releases across multiple platforms.
+11. Participates in support execution, testing, and delivery and collaborates with project teams to meet quality, scope, and timeline objectives.
+12. Oversees troubleshooting and resolution of complex application, infrastructure, and network-related issues.
+13. Keeps current with security and privacy legislation, regulations, advisories, alerts, and vulnerabilities.
+14. Researches technology, customer needs, data administration, information security, related services, and FFIEC Guidelines.
+
+MINIMUM REQUIREMENTS
+Bachelor's degree from an accredited college or university or equivalent technical education and experience related to information systems management, products, services, or the financial industry.
+Minimum of three years of experience in IT and application support, preferably within banking or financial services.
+Experience supporting core banking systems and related products, preferably Fiserv core banking platforms.
+Background working in regulated financial environments.
+Experience with enterprise application support, including SQL and reporting.
+Familiarity with ITSM frameworks and ITIL best practices.
+Windows server and desktop operating systems, client-server, web-based, and cloud-based applications.
+Various database systems management, report writing, application interfaces, and data import and export methodologies.
+Working knowledge of production support processes and incident management.
+Broad technical proficiency across applications, operating systems, networks, and databases.
+Excellent verbal, written, and interpersonal communication skills.
+Ability to deal with complex problems involving multiple facets and variables in non-standardized situations.
+Ability to work with minimal supervision while effectively managing assigned responsibilities.
+
+Pay $68,400 - $95,600 per year.
+
+Benefits found in job post
+Disability insurance
+
+Simplify
+Keywords Score
+Resume
+The filename will always be Brian_Aiad_resume regardless of the selected resume
+
+High Priority Keywords
+3/10
+SQL
+Root Cause Analysis
+troubleshooting
+database
+end-to-end
+information security
+production support
+compliance
+customer needs
+operating systems
+Low Priority Keywords
+0/2
+communication skills
+interpersonal communication
+Update Job Description

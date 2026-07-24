@@ -1,0 +1,92 @@
+0 notifications
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Liquid I.V..
+Liquid I.V.
+
+D365 Technical Analyst
+
+El Segundo, CA · Reposted 1 day ago · Over 100 people clicked apply
+Hybrid
+Full-time
+
+7%
+Resume Match
+1 of 15 keywords
+Simplify
+V1
+V2
+
+About the job
+About Our Team
+
+Liquid I.V. is a team of innovators and change-makers developing transformative hydration solutions in a collaborative environment.
+
+About The Role
+Liquid I.V. is seeking a focused and technically driven IT Technical Analyst with strong communication skills to support end users and maintain the day-to-day operations of Microsoft Dynamics 365 Finance and Operations (D365 F&O). This role is responsible for triaging, troubleshooting, and resolving issues across D365 F&O and integrated systems such as Lifecycle Services and Azure DevOps. The D365 Technical Analyst will manage user access, perform system configuration updates, support reporting activities, and ensure all processes adhere to established SOX compliance requirements.
+
+Functions and duties of this role include, but not limited to:
+
+Application & End User Support
+Provide day-to-day support for Microsoft Dynamics 365 Finance and Operations, assisting end users with application issues, questions, and requests.
+Triage, troubleshoot, and resolve incidents related to D365 F&O and integrated systems in a timely manner.
+Communicate clearly with end users to understand issues, provide status updates, and explain resolutions in non-technical terms.
+Escalate complex or unresolved issues to senior analysts, developers, or vendors as appropriate.
+
+System Operations & Maintenance
+Support daily operational activities within D365 F&O, including monitoring system processes, batch jobs, and integrations.
+Assist with user account management, security roles, and access requests in accordance with internal controls.
+Perform basic system configuration changes, master data maintenance, reporting, and support under established guidelines.
+Assist with testing system updates, patches, and enhancements to ensure stability and functionality.
+
+Documentation, Compliance & Collaboration
+Document incidents, resolutions, and support procedures to maintain accurate system and audit records.
+Follow established IT policies, change management processes, and SOX compliance requirements.
+Collaborate with internal IT teams and business stakeholders to support continuous system improvement.
+Contribute to knowledge base articles and support documentation to improve end-user experience.
+
+Qualifications
+Bachelor's degree in Information Systems, Computer Science, or related field, or equivalent practical experience.
+Minimum two years of experience in a technical capacity in Microsoft Dynamics 365 Finance and Operations or three or more years in IT, application support, or a technology-focused environment.
+Expertise in incident management, ticketing systems, and IT support processes.
+Experience supporting or working with ERP systems, preferably in a Finance, Supply Chain, or Operations context.
+Experience creating and maintaining SOPs, technical documentation, and knowledge base articles.
+Strong analytical and troubleshooting skills with the ability to identify root causes and resolve issues effectively.
+Strong written and verbal communication skills for technical and non-technical audiences.
+Ability to collaborate with cross-functional teams including IT, Finance, and Operations.
+Experience working in a SOX-controlled or regulated environment is preferred.
+Experience in the consumer-packaged goods industry is a plus.
+
+What We Give
+Company-paid medical, dental, and vision insurance.
+
+Benefits found in job post
+Vision insurance, 401(k)
+
+Simplify
+Keywords Score
+High Priority Keywords
+1/10
+troubleshooting
+Azure
+ERP
+SOX
+account management
+ticketing
+compliance
+change management
+DevOps
+internal controls
+Low Priority Keywords
+0/5
+interpersonal skills
+cross-functional
+communication skills
+verbal communication
+written and verbal communication skills
+Update Job Description

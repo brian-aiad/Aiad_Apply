@@ -1,0 +1,41 @@
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Source URL: https://www.linkedin.com/jobs/view/product-support-engineer-at-cartesia-4436176399
+
+Company logo for, Cartesia.
+Cartesia
+
+Product Support Engineer
+
+San Francisco, CA · 2 weeks ago
+Full-time
+
+About the job
+The Product Support Engineer helps customers succeed with a technical platform by diagnosing high-impact issues and providing hands-on support across APIs, SDKs, partner integrations, and deployment workflows.
+
+Your Impact
+Serve as a primary support contact and resolve technical requests through customer communication channels.
+Diagnose API errors, SDK behavior, latency, reliability, integration, and deployment issues.
+Reproduce reported behavior, perform first-pass incident triage, and write actionable bug reports.
+Document solutions in runbooks, customer guides, and internal best-practice material.
+Participate in high-priority incident response and an on-call rotation.
+Collaborate with Product, Engineering, and customer teams to improve support operations.
+
+What You Bring
+Two to eight years in technical support, product support, technical account management, or forward-deployed engineering.
+Strong troubleshooting experience with APIs, SDKs, logs, and integrations.
+Ability to reproduce and debug errors and collaborate with engineers on resolution.
+Clear written and verbal communication for technical and non-technical stakeholders.
+Ownership and prioritization skills in a fast-moving team.
+
+Nice to have
+Python, JavaScript, or TypeScript scripting for reproducing, mocking, or validating issues.
+Familiarity with AI tooling, APIs, or agentic systems.
+
+Set alert for similar jobs
+Applicants
+Company insights
