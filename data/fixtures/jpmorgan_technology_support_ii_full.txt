@@ -1,0 +1,107 @@
+0 notifications
+I'm looking for…
+Home
+My Network
+Jobs
+Messaging
+Notifications
+Me
+For Business
+Learning
+Company logo for, JPMorganChase.
+JPMorganChase
+
+Technology Support II
+
+Irvine, CA · 2 days ago · Over 100 people clicked apply
+Promoted by hirer · Responses managed off LinkedIn
+$85.5K/yr - $130K/yr
+On-site
+Full-time
+Apply
+Save
+
+25%
+Resume Match
+4 of 16 keywords
+Simplify
+Simplify
+V1
+V2
+About the job
+Job Description
+
+Join a dynamic team shaping the tech backbone of our operations, where your expertise fuels seamless system functionality and innovation.
+
+As a Technology Support II team member at JPMorganChase within Healthcare Payments, you will help monitor and support highly available, cloud-hosted software-as-a-service applications that are mission critical. You will help ensure stable transaction processing by investigating exceptions, triaging escalations, and partnering with technology and business teams to restore service quickly and prevent repeat incidents. You will communicate clearly with partners and customers, bring structure to time-sensitive issues, and continuously look for ways to improve monitoring, workflows, and operational processes.
+
+Job Responsibilities
+
+Monitor healthcare transaction processing applications and services to ensure stable, reliable day-to-day performance
+Triage issues escalated by service teams and coordinate timely resolution with appropriate partners
+Research and remediate processing exceptions to reduce operational risk and customer impact
+Use enterprise-authorized AI capabilities to speed incident triage and root-cause hypothesis generation from operational signals while validating outputs and handling operational data according to security requirements
+Monitor production application components to support high availability and meet customer service level expectations
+Follow operational agreements and runbooks to support end-to-end service delivery
+Maintain strong working relationships with key partners and customers through clear, proactive communication
+Identify and implement opportunities to improve processes, systems, monitoring, and operational workflows
+Produce ad hoc reports using Structured Query Language (SQL) and Oracle databases to support operational and business needs
+Apply reuse-first, AI-assisted practices within operational stability routines to identify recurring interruption patterns and support validated remediation actions aligned to resiliency and security expectations
+
+Required Qualifications, Capabilities And Skills
+
+2+ years of applied experience in application operations, production support, or system integration and support
+2+ years of applied experience using Structured Query Language (SQL), including querying and reporting against Oracle databases
+Working knowledge of enterprise-authorized AI capabilities for production support workflows with strong validation habits and awareness of data sensitivity
+Bachelor's degree in Computer Science or equivalent practical experience
+Ability to read, understand, and apply technical specifications and operational procedures
+Ability to review and validate AI-assisted incident recommendations before action, escalating when uncertain and following operational and security expectations
+Experience investigating issues using logs, metrics, and other monitoring signals in production environments
+Working knowledge of service management practices such as Information Technology Infrastructure Library
+Strong written and verbal communication skills, with the ability to collaborate effectively across teams
+Demonstrated problem-solving skills in time-sensitive, production-impacting scenarios
+
+Preferred Qualifications, Capabilities And Skills
+
+Experience supporting healthcare billing or healthcare management applications
+Experience with monitoring and observability tools such as Datadog or Dynatrace
+Experience with Linux or Unix in production environments
+Experience supporting electronic data interchange workflows
+Experience using Jira, ServiceNow, Splunk, or Grafana in an operations context
+
+About Us
+JPMorganChase is one of the oldest and largest financial institutions.
+
+Set alert for similar jobs
+Technology Support Specialist, Irvine, California, United States
+See how you compare to others who clicked apply
+Candidates who clicked apply
+113
+total
+66
+in the past day
+About the company
+JPMorganChase
+Financial Services
+
+Resume Score
+25
+Low Resume Match
+Only Matches 4 out of 16 keywords.
+Linux
+Jira
+SQL
+ai
+Dynatrace
+Grafana
+Splunk
+UNIX
+Datadog
+Oracle
+Unix
+ServiceNow
+end-to-end
+production support
+service delivery
+system integration
+Tailor Resume

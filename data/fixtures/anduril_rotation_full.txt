@@ -1,0 +1,78 @@
+0 notifications
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Anduril Industries.
+Anduril Industries
+
+Early Career Product Operations Rotation Program
+
+Costa Mesa, CA · Reposted 12 hours ago · Over 100 people clicked apply
+Full-time
+Apply
+Save
+
+21%
+Resume Match
+3 of 14 keywords
+Simplify
+High Priority Keywords
+Linux
+AI
+Root Cause Analysis
+command line
+Fusion
+computer vision
+project management
+Low Priority Keywords
+compliance
+intellectual property
+cross-functional
+decision-making
+communication skills
+problem-solving
+verbal communication
+
+About the job
+
+Anduril Industries is a defense technology company with a mission to transform U.S. and allied military capabilities with advanced technology. Lattice OS turns thousands of data streams into a realtime, 3D command and control center using autonomy, AI, computer vision, sensor fusion, and networking technology.
+
+Company Overview
+
+Anduril creates software and hardware solutions using artificial intelligence, computer vision, sensor fusion, optics, and data analysis.
+
+Team Overview
+
+The Air Defense team develops, tests, deploys, and sustains networked sensors and effectors. The team works across product, engineering, business development, logistics, operations, and mission success.
+
+Role Specifics
+
+As a Product Operations Technical Specialist on the Air Defense team, your mission is to maintain the health of deployed Air Defense technology. You will identify, triage, escalate, and manage resolution of incidents across a deployed fleet of systems. Analysis of incident and sustainment data, identification of trends, and recommendations will inform decisions by cross-functional stakeholders across mission operations, program management, engineering, and sustainment.
+
+What You’ll Do
+
+Rotate through three key teams over 24 months.
+Incident Resolution: Identify, triage, troubleshoot, and escalate incidents affecting the health and performance of deployed air defense assets.
+Root Cause Analysis: Initiate root cause analysis of incidents and produce trend analyses of aggregated incident data to facilitate root cause corrective action by product engineering teams.
+Data Analysis and Decision Support: Identify, record, analyze, and communicate data and trends relevant to asset health and performance for cross-functional stakeholders.
+Fleet Sustainment: Collaborate with cross-functional teams to sustain and modernize deployed systems through proactive hardware and software maintenance and upgrades.
+Project Management: Execute project work focused on enhancing the scalability of fleet sustainment processes and infrastructure.
+
+Required Qualifications
+
+Self-starter with a record of high achievement in multiple domains.
+Ability to coordinate technical and non-technical efforts across business, engineering, and sustainment functions, influencing decision-making, resource allocation, and operational planning.
+Excellent written, visual, and verbal communication skills.
+Eligible to obtain and maintain an active U.S. Secret security clearance.
+Willingness to work non-standard hours and weekends as needed.
+Bachelor’s degree in a STEM field and/or previous technical work experience.
+Experience with Linux Command Line Interface (CLI).
+One to two years of experience in government, military, defense, consulting, or manufacturing.
+
+US Salary Range
+
+$68,000-$92,000 USD

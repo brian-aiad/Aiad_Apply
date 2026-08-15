@@ -1,0 +1,103 @@
+0 notifications
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Los Angeles Times.
+Los Angeles Times
+
+Application Support Engineer
+
+El Segundo, CA · 1 day ago · 52 people clicked apply
+Full-time
+Apply
+Save
+
+23%
+Resume Match
+6 of 26 keywords
+Simplify
+High Priority Keywords
+Jira
+REST APIs
+Python
+Bash
+SQL
+troubleshooting
+Tableau
+Looker
+Azure
+Power BI
+Google Cloud
+ERP
+SDLC
+PowerShell
+Service Level Agreements
+ServiceNow
+Low Priority Keywords
+database
+production support
+ticketing
+API
+change management
+CRM
+ETL
+hybrid cloud
+SaaS
+web services
+
+About the job
+
+The Application Support Engineer is responsible for supporting, configuring, maintaining, and optimizing enterprise applications that support critical business operations. This role ensures applications remain reliable, secure, and available by monitoring system performance, troubleshooting technical issues, implementing configuration changes, supporting integrations, and participating in application upgrades and enhancements.
+
+Working closely with business users, software developers, infrastructure teams, cybersecurity, and third-party vendors, the Application Support Engineer provides technical expertise to resolve application issues, improve system performance, automate operational processes, and support continuous improvement initiatives. The role serves as a technical resource for assigned applications while contributing to projects that enhance application stability, scalability, and operational efficiency.
+
+Responsibilities
+
+Support the administration, configuration, maintenance, and optimization of assigned enterprise applications to ensure reliable, secure, and efficient business operations.
+Troubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.
+Monitor application health, availability, performance, and system capacity using enterprise monitoring tools to proactively identify and resolve potential issues.
+Configure application settings, security permissions, user access, workflows, and system integrations in accordance with business requirements and organizational standards.
+Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.
+Support application deployments, upgrades, patches, configuration changes, testing activities, and production releases while following established change management processes.
+Collaborate with software developers, infrastructure, networking, cloud, cybersecurity, database teams, vendors, and business stakeholders to implement enhancements and resolve technical issues.
+Create and maintain technical documentation, system configurations, support procedures, knowledge base articles, and operational documentation.
+Support incident, problem, and service request management activities while meeting established service level agreements and contributing to continuous service improvement.
+Generate reports, dashboards, and application performance metrics to support operational decision-making and identify process improvements.
+Coordinate with software vendors to troubleshoot application issues, support upgrades, and resolve technical problems.
+Participate in disaster recovery testing, system validation, business continuity planning, and production support activities.
+
+Requirements
+
+Bachelor's degree in Computer Science, Information Technology, Information Systems, or Software Engineering and 3+ years supporting enterprise applications, SaaS platforms, cloud applications, or business systems, or 5+ years of equivalent progressive experience.
+Experience supporting enterprise business applications in production environments.
+Experience troubleshooting application issues involving databases, APIs, integrations, and application configurations.
+Working knowledge of REST APIs, web services, integration technologies, and data exchange processes.
+Experience writing SQL queries for troubleshooting, reporting, and data analysis.
+Experience using PowerShell, Python, Bash, or similar scripting languages to automate operational tasks is preferred.
+Working knowledge of software development lifecycle, change management, and IT service management practices.
+Experience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.
+Understanding of application security, authentication, user provisioning, role-based access, and security best practices.
+Experience with application monitoring, logging, and performance monitoring tools.
+Familiarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.
+Strong analytical, troubleshooting, organizational, and problem-solving skills.
+Ability to communicate effectively with technical teams, business users, and third-party vendors.
+Ability to manage multiple priorities while maintaining attention to detail and meeting deadlines.
+
+Preferred Qualifications
+
+Experience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.
+Experience supporting application integrations using REST APIs, middleware, or ETL tools.
+Familiarity with ITIL service management principles.
+Experience participating in application implementations, upgrades, or migration projects.
+Knowledge of relational database design and performance optimization.
+Relevant certifications such as ITIL Foundation, Microsoft Azure Fundamentals, AWS Cloud Practitioner, CompTIA Network+, Security+, or similar technical certifications.
+Experience supporting SaaS and hybrid cloud environments.
+Experience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.
+
+US Salary Range
+
+$95,000-$110,000 USD

@@ -1,0 +1,59 @@
+Company logo for, Kapsch Group.
+Kapsch Group
+Technical Support Engineer
+Remote
+Remote
+Full-time
+$62,000 - $110,000
+Source URL: https://www.linkedin.com/jobs/view/4432540287/
+About the job
+Kapsch is one of Austria's most successful global technology companies. With its comprehensive ITS (Intelligent Transportation Systems) portfolio, Kapsch is actively addressing the challenges of the present and the future with intelligent mobility solutions in a wide range of application areas. As a family-owned company founded in 1892 and headquartered in Vienna, Kapsch can look back on 130 years of experience with the future.
+
+The Technical Support Engineer is responsible for operating and maintaining core production and development applications, ensuring high-quality service delivery to customers and Engineering teams. The role focuses on troubleshooting, continuous improvement, and collaborating with cross-functional teams to enhance processes and product performance, while proactively leading initiatives to strengthen operations and support.
+
+Your Responsibilities
+
+
+Operate, maintain, and support production and development applications, ensuring high service quality while collaborating with Engineering and customer teams.
+Identify opportunities to improve processes and product support, proposing and leading initiatives to enhance operations.
+Perform planned and unplanned maintenance activities, including software upgrades, patches, and cross-region coordination.
+Troubleshoot and resolve issues across development, pre-production, and production environments, including debugging enterprise code (Java, Python, JavaScript, Bash, SQL).
+Act as an escalation point between Technical Operations and Engineering, managing complex issues and coordinating with cross-functional teams.
+Configure and manage alerting tools (e.g., Nagios, Icinga) and support remote maintenance systems.
+Develop and maintain tools for deployment, automation, and monitoring.
+Document solutions and processes in tools such as Jira, Cherwell, and Confluence.
+Evaluate software solutions and provide recommendations for improvement.
+Provide guidance and training to team members, contributing to knowledge sharing and SME development.
+
+
+Your Profile
+
+
+Hands-on experience with scripting (Python, Bash), familiar with databases, and code review.
+Proficiency in Linux environments, networking principles, deployment processes, server configuration, and infrastructure management.
+Strong experience in technology roles, with the ability to manage multiple projects, prioritize tasks, and meet deadlines.
+Solid understanding of application architecture, including components, integrations, databases, and CI/CD processes.
+Proven experience in troubleshooting through log analysis and root cause analysis with a focus on continuous improvement.
+Knowledge of quality assurance methodologies and ability to analyze processes to identify and implement improvements.
+Participation in an on-call rotation is required.
+
+
+Our Offer To You
+
+
+Solving complex problems that improve daily the lives of people around the world.
+Opportunity to work in an international company with cutting edge technologies in a high-growth industry.
+Career growth, stability, and a casual work environment, with a home-based work setup.
+This role offers a competitive salary range of $62,000 – $110,000, based on location, experience, skills, internal equity, and market data. You’ll also receive a full benefits package including unlimited paid time off, 11 paid holidays, 401(k), a no cost medical insurance option for employees and eligible dependents and FSA option.
+
+
+At this time we are unable to provide sponsorship for this role and all applicants must have working rights in the US and pass a background check.
+
+Kapsch is committed to providing reasonable accommodations to qualified individuals with disabilities throughout the recruitment process. If you need assistance or an accommodation due to a disability, please contact our TA team.
+
+Kapsch TrafficCom is an Equal Opportunity Employer and is committed to creating an inclusive workplace. We consider all qualified applicants for employment without regard to any legally protected characteristic under applicable federal, state, or local law. Kapsch TrafficCom is a drug-free workplace.
+… more
+
+Benefits found in job post
+
+401(k), Medical insurance

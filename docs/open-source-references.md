@@ -106,6 +106,46 @@ These are parser and role-intelligence fixtures, not copied resume content.
 
 ## Runtime Technologies
 
+### Next.js App Router and shadcn dashboard patterns
+
+References:
+
+- https://nextjs.org/docs/app
+- https://ui.shadcn.com/blocks
+
+Used for server-rendered route structure, responsive dashboard composition, and
+accessible component patterns. No shadcn theme or generated dashboard block was
+copied; the visual system and components are repository-native.
+
+### openstatus data-table filters
+
+Repository: https://github.com/openstatusHQ/data-table-filters
+
+Its URL-driven filter and compact table patterns informed the application list.
+The dependency was not added because the tracker needs only a small fixed set of
+statuses and filters.
+
+### Supabase platform
+
+References:
+
+- https://supabase.com/docs/guides/database
+- https://supabase.com/docs/guides/storage
+- https://supabase.com/docs/guides/storage/security/access-control
+- https://supabase.com/docs/guides/queues
+
+Postgres and private object storage are used. Supabase Queues was evaluated but
+not added: durable tailoring rows already provide inspectable retry history and
+safe single-worker claiming without another operational abstraction.
+
+### Prisma connection management
+
+Reference: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections
+
+Prisma provides the typed server-side data model. The hosted application uses
+the existing Supabase pooler connection so serverless deployments do not open a
+dedicated database connection per request.
+
 ### Pydantic v2
 
 Problem solved: strict schemas at every LLM and pipeline boundary.

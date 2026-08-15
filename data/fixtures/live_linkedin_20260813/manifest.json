@@ -1,0 +1,203 @@
+{
+  "capturedAt": "2026-08-13T08:15:55.821Z",
+  "source": "LinkedIn visible browser review",
+  "readOnly": true,
+  "jobs": [
+    {
+      "jobId": "4431436073",
+      "url": "https://www.linkedin.com/jobs/view/4431436073/",
+      "title": "Technical Support Engineer, Trilogy (Remote) - $60,000/year USD",
+      "company": "Crossover",
+      "location": "Remote",
+      "salary": "",
+      "posted": "",
+      "applicants": "",
+      "fit": {
+        "score": 69,
+        "qualified": true,
+        "strengths": [
+          "direct support-role title",
+          "SaaS",
+          "API/Postman",
+          "incident troubleshooting",
+          "Jira/ticketing",
+          "Windows/Linux/cloud",
+          "implementation/onboarding",
+          "fintech/financial services"
+        ],
+        "gaps": []
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 5730,
+      "fixture": "linkedin_4431436073_crossover_technical_support_engineer_trilogy_remote_60_000_y.txt"
+    },
+    {
+      "jobId": "4432540287",
+      "url": "https://www.linkedin.com/jobs/view/4432540287/",
+      "title": "Technical Support Engineer",
+      "company": "Kapsch Group",
+      "location": "Remote",
+      "salary": "$62,000 - $110,000",
+      "posted": "",
+      "applicants": "",
+      "fit": {
+        "score": 59,
+        "qualified": true,
+        "strengths": [
+          "direct support-role title",
+          "sql",
+          "incident troubleshooting",
+          "Jira/ticketing",
+          "Windows/Linux/cloud",
+          "Python/PowerShell"
+        ],
+        "gaps": []
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 4192,
+      "fixture": "linkedin_4432540287_kapsch_group_technical_support_engineer.txt"
+    },
+    {
+      "jobId": "4401508206",
+      "url": "https://www.linkedin.com/jobs/view/4401508206/",
+      "title": "Technical Support Engineer",
+      "company": "LiveRamp",
+      "location": "San Francisco, CA",
+      "salary": "$75,000 to $109,000.",
+      "posted": "4 months ago",
+      "applicants": "59 people clicked apply",
+      "fit": {
+        "score": 54,
+        "qualified": true,
+        "strengths": [
+          "direct support-role title",
+          "sql",
+          "SaaS",
+          "incident troubleshooting",
+          "Jira/ticketing"
+        ],
+        "gaps": []
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 7077,
+      "fixture": "linkedin_4401508206_liveramp_technical_support_engineer.txt"
+    },
+    {
+      "jobId": "4369610709",
+      "url": "https://www.linkedin.com/jobs/view/4369610709/",
+      "title": "Client Operations Specialist",
+      "company": "Infinite Giving",
+      "location": "Remote",
+      "salary": "",
+      "posted": "",
+      "applicants": "",
+      "fit": {
+        "score": 50,
+        "qualified": true,
+        "strengths": [
+          "direct client-operations title",
+          "SaaS",
+          "Jira/ticketing",
+          "implementation/onboarding",
+          "fintech/financial services"
+        ],
+        "gaps": []
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 5839,
+      "fixture": "linkedin_4369610709_infinite_giving_client_operations_specialist.txt"
+    },
+    {
+      "jobId": "4453661445",
+      "url": "https://www.linkedin.com/jobs/view/4453661445/",
+      "title": "GIS and System Support Specialist",
+      "company": "Southern California Edison (SCE)",
+      "location": "Rosemead, CA",
+      "salary": "",
+      "posted": "3 hours ago",
+      "applicants": "5 people clicked apply",
+      "fit": {
+        "score": 37,
+        "qualified": false,
+        "strengths": [
+          "transferable systems/application title",
+          "sql",
+          "Python/PowerShell",
+          "implementation/onboarding"
+        ],
+        "gaps": []
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 4824,
+      "fixture": "linkedin_4453661445_southern_california_edison_sce_gis_and_system_support_specia.txt"
+    },
+    {
+      "jobId": "4215127819",
+      "url": "https://www.linkedin.com/jobs/view/4215127819/",
+      "title": "Technical Support Engineer (Bare Metal)",
+      "company": "CoreWeave",
+      "location": "Sunnyvale, CA",
+      "salary": "$83,000 to $145,000.",
+      "posted": "Reposted 2 weeks ago",
+      "applicants": "Over 100 people clicked apply",
+      "fit": {
+        "score": 30,
+        "qualified": false,
+        "strengths": [
+          "direct support-role title",
+          "incident troubleshooting",
+          "Jira/ticketing",
+          "Windows/Linux/cloud",
+          "Python/PowerShell"
+        ],
+        "gaps": [
+          "specialized GPU/data-center infrastructure"
+        ]
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 8695,
+      "fixture": "linkedin_4215127819_coreweave_technical_support_engineer_bare_metal.txt"
+    },
+    {
+      "jobId": "4435487199",
+      "url": "https://www.linkedin.com/jobs/view/4435487199/",
+      "title": "Technical Support Engineer / Field Engineer",
+      "company": "Community Energy Labs",
+      "location": "Remote",
+      "salary": "$75k-$100k",
+      "posted": "",
+      "applicants": "",
+      "fit": {
+        "score": 30,
+        "qualified": false,
+        "strengths": [
+          "direct support-role title",
+          "incident troubleshooting",
+          "Windows/Linux/cloud",
+          "Python/PowerShell",
+          "implementation/onboarding"
+        ],
+        "gaps": [
+          "specialized building-controls field work"
+        ]
+      },
+      "capture": {
+        "status": "review_only"
+      },
+      "descriptionLength": 8842,
+      "fixture": "linkedin_4435487199_community_energy_labs_technical_support_engineer_field_engin.txt"
+    }
+  ]
+}

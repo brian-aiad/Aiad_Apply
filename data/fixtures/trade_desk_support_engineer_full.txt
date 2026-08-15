@@ -1,0 +1,84 @@
+0 notifications
+I'm looking for...
+
+Home
+Jobs
+Company logo for, The Trade Desk.
+The Trade Desk
+
+Support Engineer
+
+Irvine, CA · 57 minutes ago · 3 people clicked apply
+
+Full-time
+Apply
+
+Save
+
+40%
+Resume Match
+6 of 15 keywords
+Simplify
+Simplify
+V1
+V2
+About the job
+The Trade Desk is a global technology company and the world's leading independent platform for digital advertising.
+
+We are looking to hire a Support Engineer who will work in collaboration with our Business and Engineering Teams to ensure top notch API + Technical Support. This candidate should understand web technology, have experience working with and troubleshooting JSON and REST APIs, be adaptive, and not afraid of complexity.
+
+They will ensure various Enterprise clients are supported effectively by focusing on prevention of technical issues through building QA tests, enhancing error responses and external documentation, improving internal processes such as monitoring and alarming, investigating issues to the root cause, creating internal troubleshooting documentation, and collaborating across client-facing and technical teams.
+
+What You'll Do:
+
+Serve as a Support Engineer for Technical Account Management teams responsible for communication and management of enterprise API clients and third-party partners that use various REST, JSON, GraphQL APIs.
+Proactive troubleshooting initiatives: focus on prevention of issues such as API QA testing and validation.
+Executing and manipulating stored procedures and writing queries in SQL.
+Monitor the company's ticketing case system; answer, troubleshoot and resolve various technical issues escalated by the TAM team and Client Services related to the platform and APIs.
+Responsible for owning incidents, including collaborating and escalating to Engineering, Product, and Business Intelligence.
+Enhance internal processes such as improving issue visibility for API users and internal stakeholders and improve alerting of priority issues.
+Contribute to the company and Support Team's knowledge base.
+Coordinate in-depth training on Support-related tools and processes.
+Identify opportunities for improvement within the business and lead projects to champion solutions addressing gaps or weaknesses.
+Light on-call/after-hours support.
+
+Who You Are:
+
+4-6 years relevant work experience in Technical and/or Application Support with strong knowledge of API monitoring and troubleshooting.
+Exceptional troubleshooting, analytical, and problem-solving skills.
+Ability to prioritize effectively and collaborate cross-functionally in a fast-paced, complex, and growing environment.
+Mid-level to advanced experience with databases, SQL, APIs, data structures, JSON, REST, and GraphQL APIs.
+Work well in a team, including leading knowledge sharing and training sessions to help junior team members improve.
+Experience managing complex datasets, identifying trends within the data, and performing comparisons between multiple data sources.
+Experience with programming languages including HTML, Python, Java, and JavaScript is a plus.
+Knowledge of advertising technology industry is a plus.
+
+Keyword Match - Needs Work
+Your resume has 6 out of 15 (40%) keywords that appear in the job description.
+
+V1
+V2
+Try to get your score above 70% to increase your chances!
+High Priority Keywords
+High Priority Keywords are the "must have" skills in the job description that the employer is actively searching for. These should be included in your resume!
+5/8
+JSON
+REST APIs
+Python
+JavaScript
+SQL
+GraphQL
+Java
+HTML
+Low Priority Keywords
+Low Priority Keywords are skills that are desirable but not mandatory. Including these will help you stand out from the crowd!
+1/7
+troubleshooting
+Business Intelligence
+data structures
+account management
+ticketing
+technical support
+API
+
+Update Job Description

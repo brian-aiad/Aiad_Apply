@@ -1,0 +1,88 @@
+0 notifications
+Home
+Jobs
+Company logo for, Nscale.
+Nscale
+
+Support Desk Engineer
+
+Los Angeles, CA · Reposted 1 day ago · Over 100 people clicked apply
+Hybrid
+Full-time
+
+About the job
+Nscale is the GPU cloud engineered for AI, providing infrastructure for AI startups and enterprise customers.
+
+About The Role
+Nscale is seeking a Support Desk Engineer to provide first and second-line technical support to customers and internal stakeholders across our AI cloud platform. This role diagnoses and resolves issues across GPU infrastructure, cloud services, and related systems while bridging customers and engineering teams.
+
+What You'll Be Doing
+Handle incoming support tickets and technical inquiries through email, chat, and ticketing systems.
+Provide timely professional support in line with established processes and SLAs.
+Troubleshoot issues across the GPU cloud platform, infrastructure, and related services.
+Diagnose common technical problems and escalate complex or systemic issues appropriately.
+Manage tickets accurately with documentation, status updates, clear records, and proactive customer communication.
+Diagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.
+Support customers with configuration, deployment, and optimization guidance.
+Identify recurring patterns and escalate systemic problems to engineering.
+Contribute to knowledge bases, troubleshooting guides, and FAQs.
+Support incident response and collaborate during service-impacting events.
+Work with Engineering, Infrastructure, Product, and Operations teams.
+Improve support workflows, tooling, documentation, self-service, and automation.
+
+Key Performance Indicators
+First response time and SLA adherence.
+Ticket resolution time, customer satisfaction, escalation quality, knowledge base contribution, and incident support effectiveness.
+
+About You
+2-4 years of technical support experience in a software, cloud, or infrastructure environment.
+Strong troubleshooting and analytical problem-solving skills.
+Excellent written and verbal communication skills.
+Experience with structured support processes such as ITIL.
+Ability to prioritize in a fast-paced high-growth environment.
+Strong team collaboration and customer-first mindset.
+
+Technical Knowledge
+Familiarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.
+Basic networking and Linux or Unix knowledge.
+Exposure to Docker and Kubernetes preferred.
+Experience with Jira, Zendesk, ServiceNow, or similar ticketing systems.
+Understanding of APIs and REST services.
+Familiarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.
+
+Nice to Have
+Experience supporting GPU infrastructure, HPC systems, or AI and ML platforms.
+Knowledge of Python and Bash for automation and diagnostics.
+Experience in a fast-paced startup or scale-up environment.
+Customer-facing experience in B2B SaaS or infrastructure platforms.
+
+Salary Range: $50,000 USD - $100,000 USD
+
+Set alert for similar jobs
+
+Resume Score
+33
+Only Matches 8 out of 24 keywords.
+Linux
+Docker
+Jira
+Python
+Bash
+incident response
+ai
+troubleshooting
+Azure
+Grafana
+Kubernetes
+Prometheus
+UNIX
+GCP
+Spark
+Zendesk
+ServiceNow
+containerization
+ML
+ticketing
+technical support
+GPU
+SaaS

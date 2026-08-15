@@ -1,0 +1,117 @@
+0 notifications
+
+I'm looking for…
+
+Home
+My Network
+Jobs
+Messaging
+Notifications
+
+Company logo for, Liquid I.V..
+Liquid I.V.
+
+D365 Technical Analyst
+
+El Segundo, CA · Reposted 7 hours ago · Over 100 people clicked apply
+
+Promoted by hirer · Responses managed off LinkedIn
+
+Full-time
+Apply
+
+About the job
+
+About Liquid I.V.
+
+This job description indicates in general the nature and levels of work, knowledge, skills, abilities and other essential functions expected of the role.
+
+About Our Team
+
+We are a world-class team of innovators and passionate change-makers, looking to develop transformative hydration solutions and make a meaningful impact on the world around us.
+
+About The Role
+
+Liquid I.V. is seeking a focused and technically driven IT Technical Analyst with strong communication skills to support end users and maintain the day-to-day operations of Microsoft Dynamics 365 Finance and Operations (D365 F&O). This role is responsible for triaging, troubleshooting, and resolving issues across D365 F&O and integrated systems such as Lifecycle Services and Azure DevOps. The D365 Technical Analyst will manage user access, perform system configuration updates, support reporting activities, and ensure all processes adhere to established SOX compliance requirements.
+
+Functions and duties of this role include, but not limited to:
+
+Application & End User Support
+
+Provide day-to-day support for Microsoft Dynamics 365 Finance and Operations (D365 F&O), assisting end users with application issues, questions, and requests.
+Triage, troubleshoot, and resolve incidents related to D365 F&O and integrated systems in a timely manner.
+Communicate clearly with end users to understand issues, provide status updates, and explain resolutions in non-technical terms.
+Escalate complex or unresolved issues to senior analysts, developers, or vendors as appropriate.
+
+System Operations & Maintenance
+
+Support daily operational activities within D365 F&O, including monitoring system processes, batch jobs, and integrations.
+Assist with user account management, security roles, and access requests in accordance with internal controls.
+Perform basic system configuration changes, master data maintenance, reporting, and support under established guidelines.
+Assist with testing system updates, patches, and enhancements to ensure stability and functionality.
+Environment management suchs
+
+Documentation, Compliance & Collaboration
+
+Document incidents, resolutions, and support procedures to maintain accurate system and audit records.
+Follow established IT policies, change management processes, and SOX compliance requirements.
+Collaborate with internal IT teams and business stakeholders to support continuous system improvement.
+Contribute to knowledge base articles and support documentation to improve end-user experience.
+
+Qualifications
+
+Bachelor's degree in Information Systems, Computer Science, or related field, or equivalent practical experience.
+Minimum 2 years of experience in a technical capacity in Microsoft Dynamics 365 Finance and Operations (D365 F&O), or 3+ years of experience in an IT, application support, or technology-focused environment.
+Expertise in incident management, ticketing systems, and IT support processes.
+Experience supporting or working with ERP systems, preferably in Finance, Supply Chain, or Operations context.
+Experience creating and maintaining standard operating procedures (SOPs), technical documentation, and knowledge base articles.
+Strong analytical and troubleshooting skills with the ability to identify root causes and resolve issues effectively.
+Demonstrated ability to work independently, manage multiple priorities, and drive assigned tasks to completion with minimal supervision.
+Strong written and verbal communication skills with ability to communicate technical concepts to non-technical audiences.
+Proven interpersonal skills and the ability to collaborate effectively with cross-functional teams, including IT, Finance, and Operations.
+Experience working in a SOX-controlled or regulated environment is preferred.
+Experience in the consumer-packaged goods (CPG) industry is a plus.
+
+What We Give
+
+100% company-paid medical, dental and vision insurance for employees.
+A 401k plan with company match, short and long-term disability coverage.
+A generous PTO and sick policy that includes 13+ paid annual holidays.
+
+Work Environment
+
+This role is Hybrid office environment with flexibility for industry events.
+
+Candidates must be authorized to work in the United States without sponsorship.
+
+The compensation band for this position is $77,400 - $116,000 annually.
+
+Benefits found in job post
+
+Vision insurance, 401(k)
+
+Set alert for similar jobs
+Technical Analyst, El Segundo, California, United States
+
+Resume Score
+7
+Low Resume Match
+Only Matches 1 out of 15 keywords.
+troubleshooting
+Azure
+ERP
+SOX
+account management
+ticketing
+compliance
+change management
+DevOps
+internal controls
+interpersonal skills
+cross-functional
+communication skills
+verbal communication
+written and verbal communication skills
+
+Tailor Resume
+Want to update the job description?

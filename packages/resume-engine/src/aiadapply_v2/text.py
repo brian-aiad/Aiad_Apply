@@ -42,6 +42,31 @@ def dedupe(values: Iterable[str]) -> list[str]:
     return result
 
 
+def split_skill_values(value: str) -> list[str]:
+    """Split a comma-delimited skill row without breaking parenthesized tool groups."""
+    values: list[str] = []
+    current: list[str] = []
+    depth = 0
+    opening = {"(", "[", "{"}
+    closing = {")", "]", "}"}
+    for character in value:
+        if character in opening:
+            depth += 1
+        elif character in closing and depth:
+            depth -= 1
+        if character == "," and depth == 0:
+            item = "".join(current).strip()
+            if item:
+                values.append(item)
+            current = []
+            continue
+        current.append(character)
+    item = "".join(current).strip()
+    if item:
+        values.append(item)
+    return values
+
+
 def sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 

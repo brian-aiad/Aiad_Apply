@@ -12,7 +12,7 @@ def collect_claim_risks(plan: RewritePlan) -> list[ClaimRisk]:
     seen: set[tuple[str, str]] = set()
     result: list[ClaimRisk] = []
     for risk in risks:
-        key = (risk.claim.casefold(), risk.selected_placement)
+        key = (risk.target_requirement.casefold(), risk.strength.value)
         if key not in seen:
             seen.add(key)
             result.append(risk)

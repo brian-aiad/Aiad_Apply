@@ -1,0 +1,3191 @@
+{
+  "job": {
+    "company": "Nscale",
+    "title": "Support Desk Engineer",
+    "location": "Los Angeles, CA",
+    "work_arrangement": "Hybrid",
+    "compensation": "",
+    "source_url": null,
+    "linkedin_url": null,
+    "job_description": "Nscale is the GPU cloud engineered for AI, providing infrastructure for AI startups and enterprise customers.\n\nAbout The Role\nNscale is seeking a Support Desk Engineer to provide first and second-line technical support to customers and internal stakeholders across our AI cloud platform. This role diagnoses and resolves issues across GPU infrastructure, cloud services, and related systems while bridging customers and engineering teams.\n\nWhat You'll Be Doing\nHandle incoming support tickets and technical inquiries through email, chat, and ticketing systems.\nProvide timely professional support in line with established processes and SLAs.\nTroubleshoot issues across the GPU cloud platform, infrastructure, and related services.\nDiagnose common technical problems and escalate complex or systemic issues appropriately.\nManage tickets accurately with documentation, status updates, clear records, and proactive customer communication.\nDiagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.\nSupport customers with configuration, deployment, and optimization guidance.\nIdentify recurring patterns and escalate systemic problems to engineering.\nContribute to knowledge bases, troubleshooting guides, and FAQs.\nSupport incident response and collaborate during service-impacting events.\nWork with Engineering, Infrastructure, Product, and Operations teams.\nImprove support workflows, tooling, documentation, self-service, and automation.\n\nKey Performance Indicators\nFirst response time and SLA adherence.\nTicket resolution time, customer satisfaction, escalation quality, knowledge base contribution, and incident support effectiveness.\n\nAbout You\n2-4 years of technical support experience in a software, cloud, or infrastructure environment.\nStrong troubleshooting and analytical problem-solving skills.\nExcellent written and verbal communication skills.\nExperience with structured support processes such as ITIL.\nAbility to prioritize in a fast-paced high-growth environment.\nStrong team collaboration and customer-first mindset.\n\nTechnical Knowledge\nFamiliarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.\nBasic networking and Linux or Unix knowledge.\nExposure to Docker and Kubernetes preferred.\nExperience with Jira, Zendesk, ServiceNow, or similar ticketing systems.\nUnderstanding of APIs and REST services.\nFamiliarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.\n\nNice to Have\nExperience supporting GPU infrastructure, HPC systems, or AI and ML platforms.\nKnowledge of Python and Bash for automation and diagnostics.\nExperience in a fast-paced startup or scale-up environment.\nCustomer-facing experience in B2B SaaS or infrastructure platforms.\n\nSalary Range: $50,000 USD - $100,000 USD",
+    "responsibilities": [
+      "Handle incoming support tickets and technical inquiries through email, chat, and ticketing systems.",
+      "Provide timely professional support in line with established processes and SLAs.",
+      "Troubleshoot issues across the GPU cloud platform, infrastructure, and related services.",
+      "Diagnose common technical problems and escalate complex or systemic issues appropriately.",
+      "Manage tickets accurately with documentation, status updates, clear records, and proactive customer communication.",
+      "Diagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.",
+      "Support customers with configuration, deployment, and optimization guidance.",
+      "Identify recurring patterns and escalate systemic problems to engineering.",
+      "Contribute to knowledge bases, troubleshooting guides, and FAQs.",
+      "Support incident response and collaborate during service-impacting events.",
+      "Work with Engineering, Infrastructure, Product, and Operations teams.",
+      "Improve support workflows, tooling, documentation, self-service, and automation.",
+      "First response time and SLA adherence.",
+      "Ticket resolution time, customer satisfaction, escalation quality, knowledge base contribution, and incident support effectiveness."
+    ],
+    "required_qualifications": [
+      "2-4 years of technical support experience in a software, cloud, or infrastructure environment.",
+      "Strong troubleshooting and analytical problem-solving skills.",
+      "Excellent written and verbal communication skills.",
+      "Experience with structured support processes such as ITIL.",
+      "Ability to prioritize in a fast-paced high-growth environment.",
+      "Strong team collaboration and customer-first mindset.",
+      "Familiarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.",
+      "Basic networking and Linux or Unix knowledge.",
+      "Experience with Jira, Zendesk, ServiceNow, or similar ticketing systems.",
+      "Understanding of APIs and REST services."
+    ],
+    "preferred_qualifications": [
+      "Exposure to Docker and Kubernetes preferred.",
+      "Familiarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.",
+      "Experience supporting GPU infrastructure, HPC systems, or AI and ML platforms.",
+      "Knowledge of Python and Bash for automation and diagnostics.",
+      "Experience in a fast-paced startup or scale-up environment.",
+      "Customer-facing experience in B2B SaaS or infrastructure platforms."
+    ],
+    "high_priority_keywords": [],
+    "low_priority_keywords": [],
+    "simplify_score": [
+      8,
+      24
+    ],
+    "rejected_regions": [
+      "linkedin_navigation_and_job_chrome",
+      "linkedin_insights_recommendations_and_footer"
+    ],
+    "raw_paste_sha256": "4302118316bd59d7ef4619b03a20cb617dd6a1e7db8d8cda0183fbffa475feaa",
+    "raw_paste": "0 notifications\nHome\nJobs\nCompany logo for, Nscale.\nNscale\n\nSupport Desk Engineer\n\nLos Angeles, CA \u00b7 Reposted 1 day ago \u00b7 Over 100 people clicked apply\nHybrid\nFull-time\n\nAbout the job\nNscale is the GPU cloud engineered for AI, providing infrastructure for AI startups and enterprise customers.\n\nAbout The Role\nNscale is seeking a Support Desk Engineer to provide first and second-line technical support to customers and internal stakeholders across our AI cloud platform. This role diagnoses and resolves issues across GPU infrastructure, cloud services, and related systems while bridging customers and engineering teams.\n\nWhat You'll Be Doing\nHandle incoming support tickets and technical inquiries through email, chat, and ticketing systems.\nProvide timely professional support in line with established processes and SLAs.\nTroubleshoot issues across the GPU cloud platform, infrastructure, and related services.\nDiagnose common technical problems and escalate complex or systemic issues appropriately.\nManage tickets accurately with documentation, status updates, clear records, and proactive customer communication.\nDiagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.\nSupport customers with configuration, deployment, and optimization guidance.\nIdentify recurring patterns and escalate systemic problems to engineering.\nContribute to knowledge bases, troubleshooting guides, and FAQs.\nSupport incident response and collaborate during service-impacting events.\nWork with Engineering, Infrastructure, Product, and Operations teams.\nImprove support workflows, tooling, documentation, self-service, and automation.\n\nKey Performance Indicators\nFirst response time and SLA adherence.\nTicket resolution time, customer satisfaction, escalation quality, knowledge base contribution, and incident support effectiveness.\n\nAbout You\n2-4 years of technical support experience in a software, cloud, or infrastructure environment.\nStrong troubleshooting and analytical problem-solving skills.\nExcellent written and verbal communication skills.\nExperience with structured support processes such as ITIL.\nAbility to prioritize in a fast-paced high-growth environment.\nStrong team collaboration and customer-first mindset.\n\nTechnical Knowledge\nFamiliarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.\nBasic networking and Linux or Unix knowledge.\nExposure to Docker and Kubernetes preferred.\nExperience with Jira, Zendesk, ServiceNow, or similar ticketing systems.\nUnderstanding of APIs and REST services.\nFamiliarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.\n\nNice to Have\nExperience supporting GPU infrastructure, HPC systems, or AI and ML platforms.\nKnowledge of Python and Bash for automation and diagnostics.\nExperience in a fast-paced startup or scale-up environment.\nCustomer-facing experience in B2B SaaS or infrastructure platforms.\n\nSalary Range: $50,000 USD - $100,000 USD\n\nSet alert for similar jobs\n\nResume Score\n33\nOnly Matches 8 out of 24 keywords.\nLinux\nDocker\nJira\nPython\nBash\nincident response\nai\ntroubleshooting\nAzure\nGrafana\nKubernetes\nPrometheus\nUNIX\nGCP\nSpark\nZendesk\nServiceNow\ncontainerization\nML\nticketing\ntechnical support\nGPU\nSaaS"
+  },
+  "keywords": [
+    {
+      "term": "ticketing",
+      "normalized": "ticketing",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "APIs",
+      "normalized": "apis",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "AWS",
+      "normalized": "aws",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Azure",
+      "normalized": "azure",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "GCP",
+      "normalized": "gcp",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Jira",
+      "normalized": "jira",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Linux",
+      "normalized": "linux",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ServiceNow",
+      "normalized": "servicenow",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "UNIX",
+      "normalized": "unix",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Zendesk",
+      "normalized": "zendesk",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "GPU",
+      "normalized": "gpu",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 4,
+      "source_sections": [
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 8.0
+      },
+      "hiring_importance": 42.0,
+      "placement_utility": 52.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0
+      },
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "technical support",
+      "normalized": "technical support",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 2,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 29.0,
+      "placement_utility": 29.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "diagnostics",
+      "normalized": "diagnostics",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "preferred_qualification": 6.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "communication skills",
+      "normalized": "communication skills",
+      "priority": "inferred",
+      "kind": "qualification",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "verbal communication",
+      "normalized": "verbal communication",
+      "priority": "inferred",
+      "kind": "qualification",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "written and verbal communication skills",
+      "normalized": "written and verbal communication skills",
+      "priority": "inferred",
+      "kind": "qualification",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Service Level Agreements",
+      "normalized": "service level agreements",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 24.0,
+      "placement_utility": 24.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "incident response",
+      "normalized": "incident response",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "knowledge base",
+      "normalized": "knowledge base",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "log analysis",
+      "normalized": "log analysis",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "SLA",
+      "normalized": "sla",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 18.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Bash",
+      "normalized": "bash",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Docker",
+      "normalized": "docker",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Grafana",
+      "normalized": "grafana",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Kubernetes",
+      "normalized": "kubernetes",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Prometheus",
+      "normalized": "prometheus",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Python",
+      "normalized": "python",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "AI",
+      "normalized": "ai",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 4,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0,
+        "posting_repetition": 8.0
+      },
+      "hiring_importance": 14.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "observability",
+      "normalized": "observability",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 16.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "B2B SaaS",
+      "normalized": "b2b saas",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ML",
+      "normalized": "ml",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "SaaS",
+      "normalized": "saas",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    }
+  ],
+  "keyword_decisions": [
+    {
+      "term": "ticketing",
+      "normalized": "ticketing",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "responsibilities"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "skills.technical_support",
+        "experience.original_insurance.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "responsibilities"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.technical_support",
+        "experience.original_insurance.bullet.5",
+        "experience.wehelp.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "APIs",
+      "normalized": "apis",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.apis_identity"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "AWS",
+      "normalized": "aws",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.cloud_systems",
+        "certifications.protected_body.40"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Azure",
+      "normalized": "azure",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.cloud_systems",
+        "certifications.protected_body.40"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "GCP",
+      "normalized": "gcp",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Jira",
+      "normalized": "jira",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.tools",
+        "experience.original_insurance.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Linux",
+      "normalized": "linux",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.cloud_systems"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "ServiceNow",
+      "normalized": "servicenow",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "UNIX",
+      "normalized": "unix",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Zendesk",
+      "normalized": "zendesk",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 45.0,
+      "placement_utility": 55.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "GPU",
+      "normalized": "gpu",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 4,
+      "source_sections": [
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 42.0,
+      "placement_utility": 52.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "technical support",
+      "normalized": "technical support",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 29.0,
+      "placement_utility": 29.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.technical_support"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "diagnostics",
+      "normalized": "diagnostics",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "communication skills",
+      "normalized": "communication skills",
+      "kind": "qualification",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "verbal communication",
+      "normalized": "verbal communication",
+      "kind": "qualification",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "written and verbal communication skills",
+      "normalized": "written and verbal communication skills",
+      "kind": "qualification",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.original_insurance.bullet.5",
+        "experience.csulb.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.csulb.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Service Level Agreements",
+      "normalized": "service level agreements",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 24.0,
+      "placement_utility": 24.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "incident response",
+      "normalized": "incident response",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.technical_support"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "knowledge base",
+      "normalized": "knowledge base",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.csulb.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "log analysis",
+      "normalized": "log analysis",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "experience.original_insurance.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "SLA",
+      "normalized": "sla",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 18.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.technical_support"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Bash",
+      "normalized": "bash",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.languages_dbs"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Docker",
+      "normalized": "docker",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Grafana",
+      "normalized": "grafana",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Kubernetes",
+      "normalized": "kubernetes",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Prometheus",
+      "normalized": "prometheus",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Python",
+      "normalized": "python",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 16.0,
+      "placement_utility": 26.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.languages_dbs",
+        "experience.original_insurance.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "AI",
+      "normalized": "ai",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 4,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 14.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "observability",
+      "normalized": "observability",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 16.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "B2B SaaS",
+      "normalized": "b2b saas",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "weakly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "ML",
+      "normalized": "ml",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "SaaS",
+      "normalized": "saas",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "experience.original_insurance.bullet.1",
+        "experience.original_insurance.bullet.4",
+        "projects.loavenly.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    }
+  ],
+  "role_profile": {
+    "company": "Nscale",
+    "title": "Support Desk Engineer",
+    "normalized_role_family": "technical_support_engineering",
+    "professional_identity": "Application Support Engineer aligned to cloud and SaaS technical support",
+    "seniority": "entry_mid",
+    "industry": [
+      "AI cloud infrastructure",
+      "B2B SaaS"
+    ],
+    "core_systems": [
+      "APIs",
+      "AWS",
+      "Azure",
+      "Jira",
+      "Linux",
+      "REST services",
+      "Python",
+      "Bash"
+    ],
+    "core_actions": [
+      "ticketing",
+      "troubleshooting",
+      "diagnostics",
+      "configuration",
+      "documentation",
+      "incident response",
+      "escalation",
+      "log analysis",
+      "root cause analysis"
+    ],
+    "environment_signals": [
+      "technical support",
+      "cloud infrastructure",
+      "production SaaS",
+      "customer-facing",
+      "fast-paced"
+    ],
+    "customer_or_stakeholder_type": [
+      "customers",
+      "internal stakeholders",
+      "Engineering",
+      "Infrastructure",
+      "Product",
+      "Operations"
+    ],
+    "primary_responsibilities": [
+      "Handle and resolve support tickets and technical inquiries",
+      "Troubleshoot platform, connectivity, configuration, and service issues",
+      "Use diagnostics and log analysis to identify root causes",
+      "Document ticket status and communicate proactively",
+      "Escalate complex and recurring issues",
+      "Support incident response",
+      "Contribute to knowledge bases and support-process improvements"
+    ],
+    "required_qualifications": [
+      "2-4 years of technical support experience",
+      "Troubleshooting and analytical problem-solving skills",
+      "Written and verbal communication skills",
+      "Structured support-process experience such as ITIL",
+      "Ability to prioritize in a fast-paced environment",
+      "Cloud-platform or infrastructure familiarity",
+      "Basic networking and Linux or Unix knowledge",
+      "Ticketing-system experience",
+      "Understanding of APIs and REST services"
+    ],
+    "preferred_qualifications": [
+      "Docker and Kubernetes exposure",
+      "Monitoring and observability familiarity",
+      "GPU, HPC, or AI and ML platform support",
+      "Python and Bash knowledge",
+      "Startup or scale-up experience",
+      "Customer-facing B2B SaaS or infrastructure-platform experience"
+    ],
+    "high_priority_keywords": [
+      "ticketing",
+      "troubleshooting",
+      "APIs",
+      "AWS",
+      "Azure",
+      "GCP",
+      "Jira",
+      "Linux",
+      "ServiceNow",
+      "UNIX",
+      "Zendesk",
+      "GPU",
+      "problem-solving"
+    ],
+    "secondary_keywords": [
+      "technical support",
+      "diagnostics",
+      "communication skills",
+      "verbal communication",
+      "written and verbal communication skills",
+      "configuration",
+      "documentation",
+      "Service Level Agreements",
+      "incident response",
+      "knowledge base",
+      "log analysis",
+      "SLA",
+      "Bash",
+      "Docker",
+      "Grafana",
+      "Kubernetes",
+      "Prometheus",
+      "Python",
+      "AI",
+      "observability",
+      "B2B SaaS",
+      "ML",
+      "SaaS"
+    ],
+    "noisy_rejected_keywords": [],
+    "expected_outcome_language": [
+      "resolution",
+      "SLA adherence",
+      "root cause identification",
+      "escalation quality"
+    ],
+    "expected_metrics": [
+      "resolution time",
+      "response time"
+    ],
+    "role_specific_vocabulary": [
+      "production support",
+      "support tickets",
+      "REST APIs",
+      "system diagnostics",
+      "root cause analysis",
+      "incident documentation",
+      "recurring issue tracking"
+    ],
+    "role_specific_action_verbs": [
+      "troubleshoot",
+      "diagnose",
+      "resolve",
+      "document",
+      "escalate",
+      "monitor",
+      "configure",
+      "deploy",
+      "improve"
+    ]
+  },
+  "transferability_map": {
+    "matches": [
+      {
+        "target_term": "ticketing",
+        "target_requirement": "Handle incoming support tickets through ticketing systems.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.95,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.9,
+        "strength": "strongly_transferable",
+        "reasoning": "Direct ticket-resolution experience in Jira substantiates structured ticketing work, although the noun ticketing is not stated.",
+        "suggested_placement": "experience.original_insurance.bullet.1"
+      },
+      {
+        "target_term": "troubleshooting",
+        "target_requirement": "Contribute to knowledge bases, troubleshooting guides, and FAQs.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6372401118278503,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "troubleshooting is stated directly in skills.technical_support.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "APIs",
+        "target_requirement": "Understanding of APIs and REST services.",
+        "evidence_id": "evidence.skills.apis_identity",
+        "source_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+        "semantic_score": 0.5803030133247375,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "APIs is stated directly in skills.apis_identity.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "AWS",
+        "target_requirement": "Familiarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.",
+        "evidence_id": "evidence.skills.cloud_systems",
+        "source_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "semantic_score": 0.6799534559249878,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "AWS is stated directly in skills.cloud_systems.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Azure",
+        "target_requirement": "Familiarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.",
+        "evidence_id": "evidence.certifications.protected_body.40",
+        "source_text": "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation",
+        "semantic_score": 0.6810287833213806,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Azure is stated directly in certifications.protected_body.40.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "GCP",
+        "target_requirement": "Familiarity with cloud platforms such as AWS, GCP, and Azure or infrastructure environments.",
+        "evidence_id": "evidence.certifications.protected_body.40",
+        "source_text": "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation",
+        "semantic_score": 0.6439924836158752,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, certifications.protected_body.40, does not substantiate GCP; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Jira",
+        "target_requirement": "Experience with Jira, Zendesk, ServiceNow, or similar ticketing systems.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6569415330886841,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "Jira is stated directly in experience.original_insurance.bullet.1.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Linux",
+        "target_requirement": "Basic networking and Linux or Unix knowledge.",
+        "evidence_id": "evidence.skills.cloud_systems",
+        "source_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "semantic_score": 0.5768117904663086,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Linux is stated directly in skills.cloud_systems.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "ServiceNow",
+        "target_requirement": "Experience with Jira, Zendesk, ServiceNow, or similar ticketing systems.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6285834312438965,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.1, does not substantiate ServiceNow; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "UNIX",
+        "target_requirement": "Basic networking and Linux or Unix knowledge.",
+        "evidence_id": "evidence.skills.cloud_systems",
+        "source_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "semantic_score": 0.5468213558197021,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.cloud_systems, does not substantiate UNIX; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Zendesk",
+        "target_requirement": "Experience with Jira, Zendesk, ServiceNow, or similar ticketing systems.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6158674955368042,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.1, does not substantiate Zendesk; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "GPU",
+        "target_requirement": "Troubleshoot issues across the GPU cloud platform, infrastructure, and related services.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6136931777000427,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.technical_support, does not substantiate GPU; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "problem-solving",
+        "target_requirement": "Strong analytical problem-solving skills.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.9,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 1.0,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "Root-cause isolation and fix validation strongly demonstrate analytical problem-solving.",
+        "suggested_placement": "experience.original_insurance.bullet.2"
+      },
+      {
+        "target_term": "technical support",
+        "target_requirement": "2-4 years of technical support experience in a software, cloud, or infrastructure environment.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6441726684570312,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "technical support is stated directly in skills.technical_support.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "diagnostics",
+        "target_requirement": "Use system diagnostics and basic log analysis.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.9,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 1.0,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "Log analysis, SQL queries, and API debugging are directly transferable diagnostic methods.",
+        "suggested_placement": "experience.original_insurance.bullet.2"
+      },
+      {
+        "target_term": "communication skills",
+        "target_requirement": "Excellent written and verbal communication skills.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.6,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.8,
+        "strength": "strongly_transferable",
+        "reasoning": "Written incident records and stakeholder coordination demonstrate applied communication skills.",
+        "suggested_placement": "experience.csulb.bullet.3"
+      },
+      {
+        "target_term": "verbal communication",
+        "target_requirement": "Excellent written and verbal communication skills.",
+        "evidence_id": "evidence.experience.wehelp.bullet.2",
+        "source_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "semantic_score": 0.75,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "Live training of staff and volunteers strongly supports verbal communication, though the phrase is not stated.",
+        "suggested_placement": "experience.wehelp.bullet.2"
+      },
+      {
+        "target_term": "written and verbal communication skills",
+        "target_requirement": "Excellent written and verbal communication skills.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.6,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.8,
+        "strength": "strongly_transferable",
+        "reasoning": "Documentation and cross-party coordination together substantiate written and verbal communication skills.",
+        "suggested_placement": "experience.csulb.bullet.3"
+      },
+      {
+        "target_term": "configuration",
+        "target_requirement": "Diagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.",
+        "evidence_id": "evidence.experience.csulb.bullet.2",
+        "source_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+        "semantic_score": 0.6309947967529297,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "configuration is stated directly in experience.csulb.bullet.2.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "documentation",
+        "target_requirement": "Manage tickets accurately with documentation, status updates, clear records, and proactive customer communication.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.6615405082702637,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "documentation is stated directly in experience.csulb.bullet.3.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "Service Level Agreements",
+        "target_requirement": "Service Level Agreements",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.5234400033950806,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.9,
+        "strength": "direct",
+        "reasoning": "Service Level Agreements is stated directly in skills.technical_support.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "incident response",
+        "target_requirement": "Support incident response and collaborate during service-impacting events.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6853262186050415,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "incident response is stated directly in skills.technical_support.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "knowledge base",
+        "target_requirement": "Contribute to knowledge bases and troubleshooting guides.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.7,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "Incident documentation and recurring-issue records are credible knowledge-base inputs, though formal knowledge-base ownership is not established.",
+        "suggested_placement": "experience.csulb.bullet.3"
+      },
+      {
+        "target_term": "log analysis",
+        "target_requirement": "Diagnose infrastructure, connectivity, configuration, and platform issues using system diagnostics and basic log analysis for root cause identification.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.733741819858551,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "log analysis is stated directly in experience.original_insurance.bullet.2.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "SLA",
+        "target_requirement": "First response time and SLA adherence.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6249873638153076,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.9,
+        "strength": "direct",
+        "reasoning": "SLA is stated directly in skills.technical_support.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "Bash",
+        "target_requirement": "Knowledge of Python and Bash for automation and diagnostics.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.6664574146270752,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Bash is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Docker",
+        "target_requirement": "Exposure to Docker and Kubernetes preferred.",
+        "evidence_id": "evidence.skills.tools",
+        "source_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+        "semantic_score": 0.6465212106704712,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.tools, does not substantiate Docker; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Grafana",
+        "target_requirement": "Familiarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.58779376745224,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.2, does not substantiate Grafana; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Kubernetes",
+        "target_requirement": "Exposure to Docker and Kubernetes preferred.",
+        "evidence_id": "evidence.skills.tools",
+        "source_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+        "semantic_score": 0.6321654319763184,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.tools, does not substantiate Kubernetes; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Prometheus",
+        "target_requirement": "Familiarity with Prometheus, Grafana, ELK, or other monitoring and observability tools is advantageous.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.6017929315567017,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.2, does not substantiate Prometheus; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Python",
+        "target_requirement": "Knowledge of Python and Bash for automation and diagnostics.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.6609473824501038,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Python is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "AI",
+        "target_requirement": "Experience supporting AI and ML platforms.",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.2,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "General production SaaS development and support do not establish AI-platform experience.",
+        "suggested_placement": "gap audit"
+      },
+      {
+        "target_term": "observability",
+        "target_requirement": "Familiarity with monitoring and observability tools.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.78,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 1.0,
+        "outcome_compatibility": 0.9,
+        "strength": "strongly_transferable",
+        "reasoning": "Log analysis, production monitoring, structured logs, and the established Sentry skill form a credible observability foundation.",
+        "suggested_placement": "experience.original_insurance.bullet.2"
+      },
+      {
+        "target_term": "B2B SaaS",
+        "target_requirement": "Customer-facing experience in B2B SaaS.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.68,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.9,
+        "strength": "weakly_transferable",
+        "reasoning": "Agency-management SaaS support is adjacent to B2B SaaS, but the evidence does not explicitly identify business customers or customer-facing ownership.",
+        "suggested_placement": "gap audit"
+      },
+      {
+        "target_term": "ML",
+        "target_requirement": "Experience supporting AI and ML platforms.",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.2,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "No ML platform or workload experience is established.",
+        "suggested_placement": "gap audit"
+      },
+      {
+        "target_term": "SaaS",
+        "target_requirement": "Customer-facing experience in B2B SaaS or infrastructure platforms.",
+        "evidence_id": "evidence.projects.loavenly.bullet.1",
+        "source_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "semantic_score": 0.651103138923645,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "SaaS is stated directly in projects.loavenly.bullet.1.",
+        "suggested_placement": "projects.loavenly"
+      }
+    ],
+    "direct_terms": [
+      "troubleshooting",
+      "APIs",
+      "AWS",
+      "Azure",
+      "Jira",
+      "Linux",
+      "technical support",
+      "configuration",
+      "documentation",
+      "Service Level Agreements",
+      "incident response",
+      "log analysis",
+      "SLA",
+      "Bash",
+      "Python",
+      "SaaS"
+    ],
+    "strongly_transferable_terms": [
+      "ticketing",
+      "problem-solving",
+      "diagnostics",
+      "communication skills",
+      "verbal communication",
+      "written and verbal communication skills",
+      "knowledge base",
+      "observability"
+    ],
+    "weakly_transferable_terms": [
+      "B2B SaaS"
+    ],
+    "unsupported_terms": [
+      "GCP",
+      "ServiceNow",
+      "UNIX",
+      "Zendesk",
+      "GPU",
+      "Docker",
+      "Grafana",
+      "Kubernetes",
+      "Prometheus",
+      "AI",
+      "ML"
+    ]
+  },
+  "rewrite_plan": {
+    "professional_identity": "Application Support Engineer aligned to cloud and SaaS technical support",
+    "summary": {
+      "text": "Application Support Engineer with 3+ years delivering technical support across production SaaS, cloud systems, Microsoft 365, and integrations. Resolved 200+ Jira tickets with sub-90-minute average resolution, using troubleshooting, log analysis, API debugging, and root cause analysis to support SLA and Service Level Agreements.",
+      "shorter_text": "Application Support Engineer with 3+ years in technical support for production SaaS, cloud systems, and integrations. Resolved 200+ Jira tickets with sub-90-minute average resolution using troubleshooting, log analysis, API debugging, and root cause analysis.",
+      "target_terms": [
+        "technical support",
+        "SaaS",
+        "Jira",
+        "troubleshooting",
+        "log analysis",
+        "SLA",
+        "Service Level Agreements"
+      ],
+      "evidence_ids": [
+        "evidence.summary",
+        "evidence.experience.original_insurance.bullet.1",
+        "evidence.experience.original_insurance.bullet.2",
+        "evidence.skills.technical_support"
+      ]
+    },
+    "skills": {
+      "lines": [
+        {
+          "paragraph_id": "skills.technical_support",
+          "category": "Technical Support",
+          "skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management",
+            "Ticketing"
+          ],
+          "shorter_skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management"
+          ]
+        },
+        {
+          "paragraph_id": "skills.apis_identity",
+          "category": "APIs & Identity",
+          "skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ],
+          "shorter_skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ]
+        },
+        {
+          "paragraph_id": "skills.languages_dbs",
+          "category": "Languages & DBs",
+          "skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ],
+          "shorter_skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ]
+        },
+        {
+          "paragraph_id": "skills.cloud_systems",
+          "category": "Cloud & Systems",
+          "skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)",
+            "Azure"
+          ],
+          "shorter_skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)"
+          ]
+        },
+        {
+          "paragraph_id": "skills.tools",
+          "category": "Tools",
+          "skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ],
+          "shorter_skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ]
+        }
+      ]
+    },
+    "bullets": [
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "source_paragraph_id": "experience.original_insurance.bullet.1",
+        "text": "Resolved 200+ production support tickets through Jira ticketing across agency management SaaS, integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "shorter_text": "Resolved 200+ Jira tickets across production SaaS, integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "purpose": "Lead with ticket resolution, Jira, SaaS support, and the protected service metric.",
+        "target_terms": [
+          "ticketing",
+          "Jira",
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "source_paragraph_id": "experience.original_insurance.bullet.2",
+        "text": "Performed production diagnostics using log analysis, SQL queries, and API debugging with Postman, isolating root cause through analytical problem-solving and validating fixes.",
+        "shorter_text": "Used log analysis, SQL, and Postman API diagnostics to isolate root cause and validate production fixes.",
+        "purpose": "Align production incident investigation with diagnostics, log analysis, APIs, and problem-solving.",
+        "target_terms": [
+          "diagnostics",
+          "log analysis",
+          "problem-solving"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "source_paragraph_id": "experience.original_insurance.bullet.3",
+        "text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "shorter_text": "Monitored ETL jobs for 22 carrier/vendor feeds and built a Python script reducing close prep from 5 hours to 40 minutes.",
+        "purpose": "Show production monitoring, escalation-ready triage, Python automation, and all protected metrics.",
+        "target_terms": [
+          "Python"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.3"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "source_paragraph_id": "experience.original_insurance.bullet.4",
+        "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+        "shorter_text": "Automated Microsoft 365 provisioning across 20+ SaaS apps with Graph API and PowerShell, cutting onboarding from 4 hours to 45 minutes.",
+        "purpose": "Preserve cloud identity administration, API automation, SaaS scope, and protected metrics.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.4"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "source_paragraph_id": "experience.original_insurance.bullet.5",
+        "text": "Supported webhook and carrier integration workflows, troubleshooting API payload, authentication, configuration, and data-sync failures through Postman and structured logs.",
+        "shorter_text": "Troubleshot API payload, authentication, configuration, and data-sync failures using Postman and structured logs.",
+        "purpose": "Emphasize API troubleshooting, configuration, and structured-log experience.",
+        "target_terms": [
+          "troubleshooting",
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.5"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "source_paragraph_id": "experience.csulb.bullet.1",
+        "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "shorter_text": "Provided first-line technical support for scheduling, access-control, classroom AV, and after-hours operational incidents.",
+        "purpose": "Establish first-line technical support and incident handling.",
+        "target_terms": [
+          "technical support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "source_paragraph_id": "experience.csulb.bullet.2",
+        "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting access, checking configuration, and escalating complex incidents to campus IT.",
+        "shorter_text": "Diagnosed errors, permissions, access, and configuration issues, escalating complex incidents to campus IT.",
+        "purpose": "Show structured diagnosis, configuration checks, and appropriate escalation.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "source_paragraph_id": "experience.csulb.bullet.3",
+        "text": "Maintained incident documentation, escalation notes, and recurring-issue records as knowledge base inputs while coordinating with campus IT and third-party vendors.",
+        "shorter_text": "Maintained incident documentation, escalation notes, and recurring-issue records with campus IT and vendors.",
+        "purpose": "Align documentation and recurring-issue tracking with knowledge-base contribution and stakeholder communication.",
+        "target_terms": [
+          "documentation",
+          "knowledge base"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "source_paragraph_id": "experience.wehelp.bullet.1",
+        "text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+        "shorter_text": "Built, tested, and deployed centralized food-distribution tracking across three distribution locations.",
+        "purpose": "Preserve independent deployment ownership and the protected location metric.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "source_paragraph_id": "experience.wehelp.bullet.2",
+        "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "shorter_text": "Support live Loavenly operations through access management, troubleshooting, update validation, and user training.",
+        "purpose": "Demonstrate live production support, troubleshooting, and user communication.",
+        "target_terms": [
+          "troubleshooting"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "source_paragraph_id": "projects.loavenly.bullet.1",
+        "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "shorter_text": "Operate a production multi-tenant SaaS platform with RBAC across three food bank locations.",
+        "purpose": "Show end-to-end production SaaS platform ownership while preserving the protected location metric.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "source_paragraph_id": "projects.loavenly.bullet.2",
+        "text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "shorter_text": "Resolved API, authentication, sync, and RBAC permission issues in production.",
+        "purpose": "Highlight configuration and API issue resolution in live production.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "source_paragraph_id": "projects.loavenly.bullet.3",
+        "text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "shorter_text": "Used indexing, aggregation, and pagination to maintain sub-100ms response times.",
+        "purpose": "Preserve platform optimization methods and the protected response-time metric.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.3"
+        ],
+        "claim_risks": []
+      }
+    ],
+    "intents": [
+      {
+        "paragraph_id": "summary",
+        "purpose": "Present a defensible support identity and lead with production SaaS support, ticket volume, resolution speed, diagnostics, and SLA alignment.",
+        "target_terms": [
+          "technical support",
+          "SaaS",
+          "Jira",
+          "troubleshooting",
+          "log analysis",
+          "SLA",
+          "Service Level Agreements"
+        ],
+        "evidence_ids": [
+          "evidence.summary",
+          "evidence.experience.original_insurance.bullet.1",
+          "evidence.experience.original_insurance.bullet.2",
+          "evidence.skills.technical_support"
+        ],
+        "recruiter_priority": 1
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "purpose": "Lead experience with Jira ticket resolution and service performance.",
+        "target_terms": [
+          "ticketing",
+          "Jira",
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1"
+        ],
+        "recruiter_priority": 2
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "purpose": "Demonstrate diagnostics and analytical root-cause work.",
+        "target_terms": [
+          "diagnostics",
+          "log analysis",
+          "problem-solving"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "recruiter_priority": 3
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "purpose": "Show production monitoring and Python automation.",
+        "target_terms": [
+          "Python"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.3"
+        ],
+        "recruiter_priority": 5
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "purpose": "Preserve cloud identity, API automation, and SaaS administration evidence.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.4"
+        ],
+        "recruiter_priority": 8
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "purpose": "Show API troubleshooting through logs and Postman.",
+        "target_terms": [
+          "troubleshooting",
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.5"
+        ],
+        "recruiter_priority": 4
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "purpose": "Establish first-line technical support experience.",
+        "target_terms": [
+          "technical support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "recruiter_priority": 6
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "purpose": "Show structured diagnosis, configuration checks, and escalation.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.2"
+        ],
+        "recruiter_priority": 7
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "purpose": "Show incident records, recurring-issue tracking, and knowledge-sharing inputs.",
+        "target_terms": [
+          "documentation",
+          "knowledge base"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "recruiter_priority": 9
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "purpose": "Preserve deployment ownership and operational scale.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "recruiter_priority": 12
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "purpose": "Demonstrate live production troubleshooting and user support.",
+        "target_terms": [
+          "troubleshooting"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.2"
+        ],
+        "recruiter_priority": 10
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "purpose": "Demonstrate production multi-tenant SaaS ownership.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "recruiter_priority": 11
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "purpose": "Show production API and access-configuration resolution.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "recruiter_priority": 13
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "purpose": "Preserve platform optimization and response-time evidence.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.3"
+        ],
+        "recruiter_priority": 14
+      }
+    ],
+    "claim_risks": []
+  },
+  "changes": [
+    {
+      "paragraph_id": "summary",
+      "section": "summary",
+      "paragraph_kind": "summary",
+      "before_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "proposed_text": "Application Support Engineer with 3+ years delivering technical support across production SaaS, cloud systems, Microsoft 365, and integrations. Resolved 200+ Jira tickets with sub-90-minute average resolution, using troubleshooting, log analysis, API debugging, and root cause analysis to support SLA and Service Level Agreements.",
+      "final_text": "Application Support Engineer with 3+ years delivering technical support across production SaaS, cloud systems, Microsoft 365, and integrations. Resolved 200+ Jira tickets with sub-90-minute average resolution, using troubleshooting, log analysis, API debugging, and root cause analysis to support SLA and Service Level Agreements.",
+      "change_type": "reframed",
+      "target_terms": [
+        "technical support",
+        "SaaS",
+        "Jira",
+        "troubleshooting",
+        "log analysis",
+        "SLA",
+        "Service Level Agreements"
+      ],
+      "evidence_ids": [
+        "evidence.summary",
+        "evidence.experience.original_insurance.bullet.1",
+        "evidence.experience.original_insurance.bullet.2",
+        "evidence.skills.technical_support"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Reframed the professional summary for the target role."
+    },
+    {
+      "paragraph_id": "skills.technical_support",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "proposed_text": "Technical Support: Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management, Ticketing",
+      "final_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management, Ticketing",
+      "change_type": "reframed",
+      "target_terms": [
+        "Production Support",
+        "Troubleshooting",
+        "Incident Response",
+        "Root Cause Analysis",
+        "SLA Management",
+        "Ticketing"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.apis_identity",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "proposed_text": "APIs & Identity: Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "final_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Microsoft 365",
+        "Entra ID",
+        "MFA",
+        "RBAC",
+        "SSO",
+        "Microsoft Graph API",
+        "REST APIs",
+        "Webhooks",
+        "OAuth 2.0",
+        "SAML",
+        "Postman"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.languages_dbs",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "proposed_text": "Languages & DBs: Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "final_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Python",
+        "SQL",
+        "JSON",
+        "PowerShell",
+        "JavaScript",
+        "TypeScript",
+        "Bash",
+        "PostgreSQL",
+        "MySQL",
+        "SQLite",
+        "Supabase"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.cloud_systems",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "proposed_text": "Cloud & Systems: AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions), Azure",
+      "final_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions), Azure",
+      "change_type": "reframed",
+      "target_terms": [
+        "AWS (EC2, S3, IAM)",
+        "Vercel",
+        "Linux",
+        "Windows",
+        "CI/CD (GitHub Actions)",
+        "Azure"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.tools",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "proposed_text": "Tools: Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "final_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Jira",
+        "Confluence",
+        "Excel",
+        "Sentry",
+        "Git",
+        "GitHub",
+        "VS Code"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.1",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "proposed_text": "Resolved 200+ production support tickets through Jira ticketing across agency management SaaS, integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "final_text": "Resolved 200+ production support tickets through Jira ticketing across agency management SaaS, integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "change_type": "reframed",
+      "target_terms": [
+        "ticketing",
+        "Jira",
+        "SaaS"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Lead with ticket resolution, Jira, SaaS support, and the protected service metric."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.2",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "proposed_text": "Performed production diagnostics using log analysis, SQL queries, and API debugging with Postman, isolating root cause through analytical problem-solving and validating fixes.",
+      "final_text": "Performed production diagnostics using log analysis, SQL queries, and API debugging with Postman, isolating root cause through analytical problem-solving and validating fixes.",
+      "change_type": "reframed",
+      "target_terms": [
+        "diagnostics",
+        "log analysis",
+        "problem-solving"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Align production incident investigation with diagnostics, log analysis, APIs, and problem-solving."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.3",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "proposed_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "final_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Python"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show production monitoring, escalation-ready triage, Python automation, and all protected metrics."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.4",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "proposed_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "final_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "SaaS"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.4"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Preserve cloud identity administration, API automation, SaaS scope, and protected metrics."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.5",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+      "proposed_text": "Supported webhook and carrier integration workflows, troubleshooting API payload, authentication, configuration, and data-sync failures through Postman and structured logs.",
+      "final_text": "Supported webhook and carrier integration workflows, troubleshooting API payload, authentication, configuration, and data-sync failures through Postman and structured logs.",
+      "change_type": "reframed",
+      "target_terms": [
+        "troubleshooting",
+        "configuration"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.5"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Emphasize API troubleshooting, configuration, and structured-log experience."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.1",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "proposed_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "final_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "technical support"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Establish first-line technical support and incident handling."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.2",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "proposed_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting access, checking configuration, and escalating complex incidents to campus IT.",
+      "final_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting access, checking configuration, and escalating complex incidents to campus IT.",
+      "change_type": "reframed",
+      "target_terms": [
+        "configuration"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show structured diagnosis, configuration checks, and appropriate escalation."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.3",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "proposed_text": "Maintained incident documentation, escalation notes, and recurring-issue records as knowledge base inputs while coordinating with campus IT and third-party vendors.",
+      "final_text": "Maintained incident documentation, escalation notes, and recurring-issue records as knowledge base inputs while coordinating with campus IT and third-party vendors.",
+      "change_type": "reframed",
+      "target_terms": [
+        "documentation",
+        "knowledge base"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Align documentation and recurring-issue tracking with knowledge-base contribution and stakeholder communication."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.1",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "proposed_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "final_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Preserve independent deployment ownership and the protected location metric."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.2",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "proposed_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "final_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "troubleshooting"
+      ],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate live production support, troubleshooting, and user communication."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.1",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "proposed_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "final_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "SaaS"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show end-to-end production SaaS platform ownership while preserving the protected location metric."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.2",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "proposed_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "final_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "configuration"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Highlight configuration and API issue resolution in live production."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.3",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "proposed_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "final_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Preserve platform optimization methods and the protected response-time metric."
+    }
+  ],
+  "claim_risks": [],
+  "validation": {
+    "passed": true,
+    "issues": [],
+    "protected_fields_passed": true,
+    "metrics_passed": true,
+    "structure_passed": true,
+    "keyword_coverage": 60.93
+  },
+  "layout": {
+    "passed": true,
+    "page_count": 1,
+    "rendered_lines": 74,
+    "section_anchor_deltas": {
+      "SKILLS": 0.0,
+      "EXPERIENCE": 0.0,
+      "PROJECTS": 0.0,
+      "EDUCATION": 0.0,
+      "CERTIFICATIONS": 0.0
+    },
+    "overflow_paragraph_ids": [],
+    "paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "baseline_paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "paragraph_max_width_points": {
+      "identity.name": 89.80197143554688,
+      "identity.contact": 389.3179931640625,
+      "summary": 517.4827613830566,
+      "skills.heading": 36.60227966308594,
+      "skills.technical_support": 552.6673583984375,
+      "skills.apis_identity": 578.9102172851562,
+      "skills.languages_dbs": 519.6455078125,
+      "skills.cloud_systems": 416.1678466796875,
+      "skills.tools": 316.9602966308594,
+      "experience.heading": 70.81776428222656,
+      "experience.original_insurance.heading": 576.1893310546875,
+      "experience.original_insurance.bullet.1": 555.3600234985352,
+      "experience.original_insurance.bullet.2": 547.2240371704102,
+      "experience.original_insurance.bullet.3": 548.1485977172852,
+      "experience.original_insurance.bullet.4": 531.9814834594727,
+      "experience.original_insurance.bullet.5": 552.8507461547852,
+      "experience.csulb.heading": 576.1931762695312,
+      "experience.csulb.bullet.1": 542.8428726196289,
+      "experience.csulb.bullet.2": 559.8078384399414,
+      "experience.csulb.bullet.3": 543.8823623657227,
+      "experience.wehelp.heading": 576.197021484375,
+      "experience.wehelp.bullet.1": 558.3873672485352,
+      "experience.wehelp.bullet.2": 549.4583511352539,
+      "projects.heading": 57.381492614746094,
+      "projects.loavenly.heading": 321.07781982421875,
+      "projects.loavenly.bullet.1": 548.4003067016602,
+      "projects.loavenly.bullet.2": 532.4567642211914,
+      "projects.loavenly.bullet.3": 557.0354385375977,
+      "education.heading": 70.24212646484375,
+      "education.protected_body.37": 558.6382026672363,
+      "certifications.heading": 94.99464416503906,
+      "certifications.protected_body.40": 456.5558891296387
+    },
+    "protected_horizontal_deltas": {
+      "identity.name": 0.0,
+      "identity.contact": 0.0,
+      "skills.heading": 0.0,
+      "experience.heading": 0.0,
+      "experience.original_insurance.heading": 0.0,
+      "experience.csulb.heading": 0.0,
+      "experience.wehelp.heading": 0.0,
+      "projects.heading": 0.0,
+      "projects.loavenly.heading": 0.0,
+      "education.heading": 0.0,
+      "education.protected_body.37": 0.0,
+      "certifications.heading": 0.0,
+      "certifications.protected_body.40": 0.0
+    },
+    "font_inventory": {
+      "ArialMT": [
+        8.04,
+        9.0,
+        11.04
+      ],
+      "Calibri": [
+        2.04,
+        9.96,
+        10.56,
+        11.04
+      ],
+      "Calibri-Bold": [
+        8.04,
+        10.56,
+        11.04,
+        14.04,
+        18.0
+      ],
+      "Calibri-Italic": [
+        10.56,
+        11.04
+      ]
+    },
+    "out_of_bounds_items": [],
+    "overlap_items": [],
+    "pdf_path": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\nscale_cycle1\\Brian_Aiad_resume.pdf",
+    "attempts": 1
+  },
+  "output_docx": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\nscale_cycle1\\Brian_Aiad_resume.docx",
+  "output_pdf": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\nscale_cycle1\\Brian_Aiad_resume.pdf",
+  "base_sha256": "7cb556d81f20d884fa31e5fa5351847d6dec109da6e50736a164ca7a2770a07c",
+  "reasoner": "codex-cli",
+  "pipeline_version": "0.3.0"
+}

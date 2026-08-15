@@ -1,0 +1,49 @@
+Source checked: 2026-08-05
+Official posting: https://job-boards.greenhouse.io/cresta/jobs/5318826008
+
+Home
+Jobs
+Company logo for, Cresta.
+Cresta
+
+Application Support Engineer
+
+United States (Remote) · Current employer posting
+$90,000 - $105,000
+Remote
+Full-time
+Apply
+Save
+
+About the job
+Cresta is hiring an Application Support Engineer for its Customer Success organization. The engineer connects customers with product development, turns complex incidents into actionable solutions, and supports a conversational AI and contact-center platform.
+
+What You'll Do
+Investigate, diagnose, and resolve issues involving API integrations, databases, servers, microservices, web hosting, networks, telephony, and containerized applications.
+Act as the primary technical contact for customer inquiries through email and a support portal.
+Escalate bugs, feature requests, and critical incidents while partnering with Engineering, Product, and Sales.
+Create documentation, FAQs, and knowledge base articles for customers and internal teams.
+Reproduce customer environments and reported failures to identify root causes and verify fixes.
+Develop detailed product and architecture knowledge across common customer use cases.
+Identify recurring issues and improve support processes and product quality.
+Participate in a rotational on-call schedule for urgent incidents.
+
+What You'll Bring
+4+ years of experience in technical support, helpdesk, or customer-facing engineering.
+Strong analytical troubleshooting and the ability to deconstruct complex technical problems.
+Clear written and verbal communication for technical and non-technical audiences.
+Experience with web hosting, HTTP APIs, network architecture, server operating systems, and application log analysis.
+Knowledge of VoIP protocols including SIP, SIPREC, H.323, and RTP.
+Experience with support ticketing systems such as Zendesk, Linear, or JIRA.
+Ability to work independently and cross-functionally in a fast-paced environment.
+
+Bonus Points If You Have
+Experience supporting SaaS or CCaaS applications and platforms such as Avaya, Five9, or Genesys.
+Experience with AWS services including S3, RDS, or EKS.
+Familiarity with Kubernetes and containerized applications.
+Scripting experience with Python, PowerShell, or Bash.
+Experience with Datadog, Grafana, Groundcover, or comparable logging and monitoring tools.
+
+Set alert for similar jobs
+About the company
+Cresta

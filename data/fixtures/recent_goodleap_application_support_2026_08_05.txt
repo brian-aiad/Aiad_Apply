@@ -1,0 +1,44 @@
+Source checked: 2026-08-05
+Official posting: https://jobs.lever.co/goodleap/2235409f-41a3-4ff2-b0dd-64408465edb2
+
+Home
+Jobs
+Company logo for, GoodLeap.
+GoodLeap
+
+Application Support Engineer
+
+Remote, US · Current employer posting
+$95,000 - $110,000
+Remote
+Full-time
+Apply
+Save
+
+Job Description
+GoodLeap is hiring an Application Support Engineer to maintain and troubleshoot critical business applications. The role advises internal and external customers, diagnoses application incidents, collaborates with development and infrastructure teams, and improves system efficiency for a financing technology platform.
+
+Essential Job Duties and Responsibilities
+Test application modules, reproduce bugs, verify fixes, and validate functionality against customer needs.
+Investigate and resolve application issues while minimizing disruption to business operations.
+Provide enterprise application support for end users and internal and external technical teams.
+Monitor application performance and system logs to identify incidents before they affect customers.
+Collaborate with Software Engineering, DevOps, and infrastructure teams on stability and performance.
+Perform root cause analysis for recurring issues and publish useful outcomes.
+Create troubleshooting guides, knowledge base articles, and runbooks.
+Automate support processes to reduce repetitive manual work.
+Support system upgrades, software deployments, security requirements, and operational projects.
+
+Required Skills, Knowledge and Abilities
+Bachelor's degree in a technical field or an equivalent combination of education and experience.
+3+ years of enterprise technical support or B2B software troubleshooting experience.
+Strong problem-solving skills for complex application issues and customer-facing incidents.
+Experience with AWS services such as CloudWatch, DynamoDB, Elasticsearch, Cognito, S3, and IAM.
+Working knowledge of a database language.
+Proficiency with Java, C, C++, JavaScript, Ruby, PowerShell, or another programming language.
+Ability to communicate clearly, change priorities quickly, and work in a fast-paced environment.
+Availability to work in the Pacific or Mountain time zone.
+
+Set alert for similar jobs
+About the company
+GoodLeap

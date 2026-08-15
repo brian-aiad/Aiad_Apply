@@ -13,6 +13,7 @@ from aiadapply_v2.schemas import (
 from aiadapply_v2.text import contains_term, dedupe
 
 SYSTEM_TERMS = (
+    "agency management system",
     "Astra Schedule",
     "AWS",
     "Bash",
@@ -20,11 +21,14 @@ SYSTEM_TERMS = (
     "Confluence",
     "EMS",
     "Entra ID",
+    "ETL",
     "Git",
     "GitHub",
+    "internal integrations",
     "Jira",
     "JSON",
     "Linux",
+    "Loavenly",
     "Microsoft 365",
     "Microsoft Graph API",
     "MFA",
@@ -32,6 +36,7 @@ SYSTEM_TERMS = (
     "OAuth 2.0",
     "PostgreSQL",
     "Postman",
+    "production database",
     "PowerShell",
     "Python",
     "RBAC",
@@ -42,6 +47,7 @@ SYSTEM_TERMS = (
     "SQL",
     "SSO",
     "Supabase",
+    "third-party vendors",
     "TypeScript",
     "Vercel",
     "Webhooks",
@@ -65,16 +71,64 @@ ACTION_TERMS = (
     "validation",
 )
 TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
+    "business analysis": (
+        "operational need",
+        "workflow support",
+        "reporting",
+    ),
+    "business rules": ("configuration", "workflow support", "validation"),
     "case ownership": ("support tickets", "incident support", "live operations"),
     "customer case ownership": ("support tickets", "user support", "live operations"),
+    "customer needs": ("operational need", "user support", "live operations"),
+    "customer service": ("first-line support", "user support", "training"),
+    "critical thinking": ("root cause analysis", "log analysis", "troubleshooting"),
+    "cross-functional collaboration": (
+        "coordinating",
+        "campus IT",
+        "third-party vendors",
+    ),
     "diagnostics": ("troubleshooting", "log analysis", "reproducing errors"),
+    "document management": ("documentation", "records", "reporting"),
     "failure analysis": ("root cause analysis", "triaging failures", "incident investigation"),
+    "end-user support": ("first-line support", "user access", "training"),
     "incident triage": ("incident response", "support tickets", "escalation"),
+    "interpersonal skills": ("training", "coordinating"),
+    "knowledge base": ("documentation", "recurring issue tracking", "escalation notes"),
+    "fast-paced environment": ("live operations", "after-hours", "support tickets"),
     "operational availability": ("production operations", "live operations", "platform support"),
     "product operations": ("production operations", "deployment", "workflow support"),
+    "problem-solving": ("root cause analysis", "troubleshooting", "incident investigation"),
+    "release analysis": ("validating updates", "deployment", "documentation"),
     "reliability": ("production support", "performance", "validation"),
+    "regulatory compliance": ("Compliance",),
     "service delivery": ("technical support", "SLA management", "user support"),
     "service desk": ("technical support", "support tickets", "escalation"),
+    "software adoption": ("training", "user support", "live operations"),
+    "software implementation": ("built", "tested", "deployed", "deployment"),
+    "system health": ("monitoring", "performance", "production operations"),
+    "system testing": ("tested", "validating updates", "validation"),
+    "system updates": ("validating updates", "deployment", "configuration"),
+    "task prioritization": ("support tickets", "SLA management", "after-hours"),
+    "ticketing": ("support tickets", "Jira", "incident support"),
+    "vendor interfaces": ("vendor feeds", "carrier integration", "third-party vendors"),
+    "workflow documentation": (
+        "incident documentation",
+        "recurring issue tracking",
+        "documentation",
+    ),
+    "workflow management": ("workflow support", "production operations", "deployment"),
+    "communication skills": ("documentation", "training", "coordinating"),
+    "written and verbal communication skills": (
+        "documentation",
+        "training",
+        "coordinating",
+    ),
+    "verbal communication": ("training", "coordinating"),
+    "organizational skills": (
+        "documentation",
+        "recurring issue tracking",
+        "SLA management",
+    ),
 }
 
 
@@ -89,6 +143,7 @@ def build_evidence_graph(
             ParagraphKind.summary,
             ParagraphKind.bullet,
             ParagraphKind.skill_line,
+            ParagraphKind.protected_body,
         }:
             continue
         systems = [term for term in SYSTEM_TERMS if contains_term(paragraph.text, term)]

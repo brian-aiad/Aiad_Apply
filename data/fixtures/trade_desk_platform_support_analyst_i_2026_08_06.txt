@@ -1,0 +1,73 @@
+0 notifications
+Home
+Jobs
+Company logo for, The Trade Desk.
+The Trade Desk
+
+Platform Support Analyst I
+
+Los Angeles, CA · Reposted 1 day ago · 84 people clicked apply
+Full-time
+
+About the job
+The Trade Desk is a global technology company and independent platform for digital advertising.
+
+As a Platform Support Analyst, you will use customer-facing, relationship-building, and technical skills to help Business Teams have excellent platform experiences. The role develops relationships with Customer Service, Engineering, Product Managers, and Technical Account Managers to facilitate platform improvements and customer experience.
+
+What you'll do:
+Support platform issues and ensure incidents are addressed within established SLAs.
+Multi-task, manage, and resolve technical support requests.
+Perform problem-solving and troubleshooting.
+Execute stored procedures and query databases using SQL.
+Maintain the ticketing system; answer, troubleshoot, and resolve technical issues related to the trading platform.
+Develop immediate remedies for client needs while advocating for permanent solutions with Engineering or Product teams.
+Create and manage Knowledge Base documentation and improve existing documentation.
+Coordinate in-depth training on support tools and processes.
+Mentor team members on technical case work.
+Ensure trackability on case and project work and provide data-driven business insights.
+Use AI tooling to improve support workload.
+Work with clients to address issues and areas of frustration.
+Provide light on-call and after-hours support.
+
+Who you are:
+Bachelor's Degree or relevant substitute experience.
+3+ years of technical support experience.
+2+ years of AdTech experience with RTB, DSPs, ad exchanges, aggregators, ad servers, and optimization platforms.
+Outstanding troubleshooting, analytical, and problem-solving abilities with cross-functional and cross-regional collaboration.
+Strong client-facing and de-escalation skills.
+Strong SQL and HTML experience.
+Advanced Microsoft Excel skills with large datasets, pivot tables, and formulas.
+Independent judgment and decision-making for AdTech and user experience issues.
+Effective time management and prioritization.
+Outstanding written and verbal communication skills for non-technical audiences.
+Proficient in AI tools.
+
+Bonus Traits:
+Experience with Salesforce, Jira, Confluence, Postman, Vertica, SSMS, or Tableau.
+AdTech troubleshooting including offline attribution, tracking tags, pixels, HTML5 creatives, discrepancies, and campaign optimization.
+Experience with Agile, Scrum, or collaborative workflows.
+
+$48,200-$88,300 USD
+
+Set alert for similar jobs
+
+Resume Score
+29
+Only Matches 5 out of 17 keywords.
+Postman
+Jira
+SQL
+ai
+troubleshooting
+Tableau
+Agile
+Confluence
+Excel
+Salesforce
+Vertica
+HTML
+AdTech
+database
+media buying
+ticketing
+technical support

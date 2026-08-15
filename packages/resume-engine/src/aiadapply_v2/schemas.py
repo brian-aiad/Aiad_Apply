@@ -58,6 +58,7 @@ class ParsedJob(StrictModel):
     location: str = ""
     work_arrangement: str = ""
     compensation: str = ""
+    source_url: str | None = None
     linkedin_url: str | None = None
     job_description: str
     responsibilities: list[str] = Field(default_factory=list)
@@ -195,6 +196,13 @@ class ResumeEvidenceGraph(StrictModel):
     evidence: list[ResumeEvidence]
 
 
+class CandidateProfile(StrictModel):
+    candidate_name: str
+    confirmed_skills: list[str] = Field(default_factory=list)
+    confirmed_exposure: list[str] = Field(default_factory=list)
+    drafting_notes: list[str] = Field(default_factory=list)
+
+
 class EvidenceMatch(StrictModel):
     target_term: str
     target_requirement: str
@@ -306,6 +314,7 @@ class LayoutResult(StrictModel):
     paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
     baseline_paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
     paragraph_max_width_points: dict[str, float] = Field(default_factory=dict)
+    protected_horizontal_deltas: dict[str, float] = Field(default_factory=dict)
     font_inventory: dict[str, list[float]] = Field(default_factory=dict)
     out_of_bounds_items: list[str] = Field(default_factory=list)
     overlap_items: list[str] = Field(default_factory=list)
@@ -313,12 +322,46 @@ class LayoutResult(StrictModel):
     attempts: int = 1
 
 
+class KeywordDecisionRecord(StrictModel):
+    term: str
+    normalized: str
+    kind: KeywordKind
+    priority: KeywordPriority
+    occurrences: int = 0
+    source_sections: list[str] = Field(default_factory=list)
+    hiring_importance: float = Field(ge=0.0, le=100.0)
+    placement_utility: float = Field(ge=0.0, le=100.0)
+    accepted: bool
+    used: bool
+    evidence_level: EvidenceStrength
+    placements: list[str] = Field(default_factory=list)
+    rejection_reason: str = ""
+    explanation: str = ""
+
+
+class ResumeChangeRecord(StrictModel):
+    paragraph_id: str
+    section: str
+    paragraph_kind: ParagraphKind
+    before_text: str
+    proposed_text: str
+    final_text: str
+    change_type: Literal["added", "removed", "reframed", "unchanged"]
+    target_terms: list[str] = Field(default_factory=list)
+    evidence_ids: list[str] = Field(default_factory=list)
+    risk_level: RiskLevel = RiskLevel.low
+    compressed: bool = False
+    explanation: str = ""
+
+
 class TransformationReport(StrictModel):
     job: ParsedJob
     keywords: list[JobKeyword]
+    keyword_decisions: list[KeywordDecisionRecord] = Field(default_factory=list)
     role_profile: TargetRoleProfile
     transferability_map: TransferabilityMap
     rewrite_plan: RewritePlan
+    changes: list[ResumeChangeRecord] = Field(default_factory=list)
     claim_risks: list[ClaimRisk]
     validation: ValidationResult
     layout: LayoutResult

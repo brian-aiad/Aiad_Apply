@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ApplicationStatus {
+  CAPTURED
+  TAILORING
+  REVIEW
+  READY
+  APPLIED
+  INTERVIEW
+  CLOSED
+}
+
+enum RunStatus {
+  QUEUED
+  RUNNING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+}
+
+enum EvidenceLevel {
+  DIRECT
+  STRONGLY_TRANSFERABLE
+  WEAKLY_TRANSFERABLE
+  UNSUPPORTED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ArtifactKind {
+  DOCX
+  PDF
+  REPORT_JSON
+  REPORT_MARKDOWN
+  CHARACTER_AUDIT
+  JOB_DESCRIPTION
+  PREVIEW
+}
+
+model Job {
+  id                      String       @id @default(uuid()) @db.Uuid
+  source                  String       @default("linkedin")
+  company                 String
+  title                   String
+  location                String?
+  workArrangement         String?      @map("work_arrangement")
+  employmentType          String?      @map("employment_type")
+  salaryMin               Int?         @map("salary_min")
+  salaryMax               Int?         @map("salary_max")
+  salaryCurrency          String?      @default("USD") @map("salary_currency")
+  salaryText              String?      @map("salary_text")
+  sourceUrl               String?      @map("source_url")
+  applyUrl                String?      @map("apply_url")
+  postedText              String?      @map("posted_text")
+  applicantCount          Int?         @map("applicant_count")
+  hiringTeam              Json?        @map("hiring_team")
+  rawPaste                String       @map("raw_paste")
+  rawPasteSha256          String       @unique @map("raw_paste_sha256")
+  cleanDescription        String?      @map("clean_description")
+  responsibilities        Json?
+  requiredQualifications  Json?        @map("required_qualifications")
+  preferredQualifications Json?        @map("preferred_qualifications")
+  extractedMetadata       Json?        @map("extracted_metadata")
+  capturedAt              DateTime     @default(now()) @map("captured_at")
+  updatedAt               DateTime     @updatedAt @map("updated_at")
+  application             Application?
+
+  @@index([company])
+  @@index([capturedAt])
+  @@map("jobs")
+}
+
+model Application {
+  id             String            @id @default(uuid()) @db.Uuid
+  jobId          String            @unique @map("job_id") @db.Uuid
+  job            Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  status         ApplicationStatus @default(CAPTURED)
+  priority       Int               @default(0)
+  notes          String?
+  appliedAt      DateTime?         @map("applied_at")
+  followUpAt     DateTime?         @map("follow_up_at")
+  outcome        String?
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+  tailoringRuns  TailoringRun[]
+  events         ApplicationEvent[]
+
+  @@index([status, createdAt])
+  @@index([appliedAt])
+  @@map("applications")
+}
+
+model TailoringRun {
+  id                 String          @id @default(uuid()) @db.Uuid
+  applicationId      String          @map("application_id") @db.Uuid
+  application        Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  status             RunStatus       @default(QUEUED)
+  runNumber          Int             @default(1) @map("run_number")
+  workerId           String?         @map("worker_id")
+  baseResumeSha256   String?         @map("base_resume_sha256")
+  engineVersion      String?         @map("engine_version")
+  reasoner           String?
+  keywordCoverage    Float?          @map("keyword_coverage")
+  simplifyCoverage   Float?          @map("simplify_coverage")
+  validationPassed   Boolean?        @map("validation_passed")
+  pageCount          Int?            @map("page_count")
+  riskCount          Int             @default(0) @map("risk_count")
+  outputFolder       String?         @map("output_folder")
+  reportSnapshot     Json?           @map("report_snapshot")
+  errorMessage       String?         @map("error_message")
+  queuedAt           DateTime        @default(now()) @map("queued_at")
+  startedAt          DateTime?       @map("started_at")
+  completedAt        DateTime?       @map("completed_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  keywordDecisions   KeywordDecision[]
+  changes            ResumeChange[]
+  artifacts          Artifact[]
+
+  @@unique([applicationId, runNumber])
+  @@index([status, queuedAt])
+  @@map("tailoring_runs")
+}
+
+model KeywordDecision {
+  id                 String        @id @default(uuid()) @db.Uuid
+  runId              String        @map("run_id") @db.Uuid
+  run                TailoringRun  @relation(fields: [runId], references: [id], onDelete: Cascade)
+  term               String
+  normalized         String
+  kind               String
+  priority           String
+  occurrences        Int           @default(0)
+  sourceSections     Json?         @map("source_sections")
+  hiringImportance   Float         @map("hiring_importance")
+  placementUtility   Float         @map("placement_utility")
+  accepted           Boolean
+  used               Boolean
+  evidenceLevel      EvidenceLevel @map("evidence_level")
+  placement          String?
+  rejectionReason    String?       @map("rejection_reason")
+  explanation        String?
+
+  @@index([runId, accepted])
+  @@index([normalized])
+  @@map("keyword_decisions")
+}
+
+model ResumeChange {
+  id             String       @id @default(uuid()) @db.Uuid
+  runId          String       @map("run_id") @db.Uuid
+  run            TailoringRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  paragraphId    String       @map("paragraph_id")
+  section        String
+  paragraphKind  String       @map("paragraph_kind")
+  beforeText     String       @map("before_text")
+  proposedText   String       @map("proposed_text")
+  finalText      String       @map("final_text")
+  changeType     String       @map("change_type")
+  targetTerms    Json?        @map("target_terms")
+  evidenceIds    Json?        @map("evidence_ids")
+  riskLevel      RiskLevel    @default(LOW) @map("risk_level")
+  compressed     Boolean      @default(false)
+  explanation    String?
+
+  @@index([runId, section])
+  @@map("resume_changes")
+}
+
+model Artifact {
+  id            String       @id @default(uuid()) @db.Uuid
+  runId         String       @map("run_id") @db.Uuid
+  run           TailoringRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+  kind          ArtifactKind
+  fileName      String       @map("file_name")
+  localPath     String?      @map("local_path")
+  storagePath   String?      @map("storage_path")
+  sha256        String?
+  byteSize      Int?         @map("byte_size")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@index([runId, kind])
+  @@map("artifacts")
+}
+
+model ApplicationEvent {
+  id            String       @id @default(uuid()) @db.Uuid
+  applicationId String       @map("application_id") @db.Uuid
+  application   Application  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  eventType     String       @map("event_type")
+  fromValue     String?      @map("from_value")
+  toValue       String?      @map("to_value")
+  detail        Json?
+  occurredAt    DateTime     @default(now()) @map("occurred_at")
+
+  @@index([applicationId, occurredAt])
+  @@map("application_events")
+}
+
+model DailyGoal {
+  id        String   @id @default(uuid()) @db.Uuid
+  date      DateTime @unique @db.Date
+  target    Int      @default(8)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("daily_goals")
+}
+
+model ResumeVersion {
+  id               String   @id @default(uuid()) @db.Uuid
+  label            String
+  localPath        String   @map("local_path")
+  sha256           String   @unique
+  formatSha256     String?  @map("format_sha256")
+  active           Boolean  @default(false)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@map("resume_versions")
+}
+
+model Setting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}

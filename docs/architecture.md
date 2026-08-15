@@ -56,13 +56,19 @@ The intake parser:
 Keyword grading keeps hiring importance separate from placement utility.
 Required/responsibility/title occurrence, repetition, Simplify priority, and
 tool specificity add weight. Malformed, generic, legal, and company-marketing
-terms receive explainable penalties.
+terms receive explainable penalties. Simplify panels are advisory: a panel term
+cannot become mandatory without sufficient evidence in the title,
+responsibilities, qualifications, or repeated hiring language.
+The employer description is always graded independently; an empty or inaccurate
+Simplify panel does not prevent the system from extracting role terms.
 
 ## Evidence Retrieval
 
-Evidence is rebuilt from the base DOCX for every run. Direct terms are tested
-against source text and extracted systems/actions. Transfer bridges are
-represented separately so they can never be mislabeled as direct evidence.
+Evidence is rebuilt from the base DOCX and the validated candidate profile for
+every run. Candidate-confirmed tools may be used in Skills without requiring
+them to already appear in the DOCX. Direct terms are tested against source text
+and extracted systems/actions. Transfer bridges remain separate from direct
+evidence.
 
 Milestone one uses `BAAI/bge-small-en-v1.5` through sentence-transformers and an
 in-memory cosine index. Exact direct evidence outranks embedding similarity.
@@ -80,6 +86,7 @@ guesses. PyMuPDF measures:
 - the line count, width, and vertical bounds of every semantic paragraph
 - the rendered font names and point sizes
 - the Y position of all five section anchors
+- the left and right coordinates of every protected, non-editable paragraph
 - candidate drift relative to a fresh render of the untouched base
 
 The candidate is rejected when any paragraph exceeds its source line budget or
@@ -87,12 +94,43 @@ when any section anchor shifts more than two points. When a candidate wraps,
 the engine shortens one paragraph at a time, rerenders, and stops as soon as the
 baseline is restored. It never shrinks the entire resume at once.
 
+Before layout selection, overly aggressive model fallbacks are replaced with the
+original evidence-rich paragraph. A fallback cannot remove named systems,
+protected operating context, or more than 10% of the source paragraph. Rewrites
+that add no actual target term are reverted. After a candidate passes, embedded
+font binaries are removed from the DOCX and the optimized package is revalidated
+against both the protected base and the selected render. This keeps the final
+file below the 2.5 MB ATS parse limit without changing its visible layout.
+
+## Application Tracker
+
+The interface is a fresh Next.js App Router application. It does not reuse the
+old AIAD Apply pages or tailoring logic. It reuses the existing hosted
+infrastructure:
+
+- Supabase Postgres stores jobs, applications, daily goals, tailoring runs,
+  keyword decisions, paragraph changes, events, and artifact metadata.
+- A private Supabase Storage bucket stores generated DOCX, PDF, and audit files.
+- A local Python worker claims durable database-backed tailoring runs through
+  secret-protected server routes and runs the same validated resume engine used
+  by the terminal.
+- During a run, the worker writes best-effort stage events to the application
+  timeline; the detail page refreshes automatically until the run completes.
+- Vercel hosts the review and tracking interface. The Python/LibreOffice worker
+  stays local because a resume run is longer and more stateful than a Vercel
+  function.
+
+The web application never exposes the database password or Supabase service
+role to the browser. Production pages and non-worker APIs are protected with
+HTTP Basic authentication, while worker APIs use a separate bearer secret.
+Robots are instructed not to index the site.
+
 ## Deferred Infrastructure
 
 - Qdrant and pgvector: the evidence corpus is currently a few dozen paragraphs.
-- Redis: no distributed job queue exists.
+- Redis, pg-boss, and Supabase Queues: one local worker and locked run rows are
+  sufficient for the current single-user workload.
 - LangGraph or multiple agents: the workflow is linear and deterministic.
-- FastAPI/Next.js: CLI validation precedes a review UI.
 - Microsoft Word automation: it is Windows-only and PDF export was unreliable
   on the development machine.
 - Pandoc/template regeneration: it cannot preserve the finalized DOCX.

@@ -7,6 +7,8 @@ from zipfile import ZipFile
 
 from lxml import etree
 
+from aiadapply_v2.documents.optimizer import font_deembedded_equivalent
+
 W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 XML_NS = "http://www.w3.org/XML/1998/namespace"
 NS = {"w": W_NS}
@@ -63,11 +65,18 @@ def compare_format_integrity(
         package_format_metadata(candidate_path)
     )
     issues: list[tuple[str, str]] = []
-    if base_parts != candidate_parts:
+    approved_font_optimization = font_deembedded_equivalent(base_path, candidate_path)
+    if base_parts != candidate_parts and not approved_font_optimization:
         issues.append(("package_parts_changed", "The DOCX package part inventory changed."))
-    changed_parts = [
-        part for part, digest in base_immutable.items() if candidate_immutable.get(part) != digest
-    ]
+    changed_parts = (
+        []
+        if approved_font_optimization
+        else [
+            part
+            for part, digest in base_immutable.items()
+            if candidate_immutable.get(part) != digest
+        ]
+    )
     if changed_parts:
         issues.append(
             (

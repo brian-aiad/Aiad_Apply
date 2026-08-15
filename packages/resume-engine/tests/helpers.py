@@ -11,6 +11,7 @@ from aiadapply_v2.schemas import (
     TargetRoleProfile,
     TransferabilityMap,
 )
+from aiadapply_v2.text import split_skill_values
 
 
 def identity_plan(document: ResumeDocument) -> RewritePlan:
@@ -22,7 +23,7 @@ def identity_plan(document: ResumeDocument) -> RewritePlan:
     for paragraph in document.paragraphs:
         if paragraph.kind.value == "skill_line":
             category, values = paragraph.text.split(":", 1)
-            items = [item.strip() for item in values.split(",") if item.strip()]
+            items = split_skill_values(values)
             skills.append(
                 ProposedSkillLine(
                     paragraph_id=paragraph.paragraph_id,

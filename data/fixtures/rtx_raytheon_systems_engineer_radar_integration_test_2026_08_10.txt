@@ -1,0 +1,60 @@
+rtx_logo
+-
+-
+4551347_RTX_Careers_Site_Home_Header_3
+Systems Engineer I: Radar System Integration & Test - Onsite
+Raytheon
+El Segundo, California, United States of America
+Category Engineering
+Job Type Full time
+Onsite
+Relocation Eligible
+Job ID: 01865166
+Date Posted: 2026-08-10
+
+Country: United States of America
+Location: US-CA-EL SEGUNDO-R02 ~ 1970 E Imperial Hwy ~ BLDG R02
+Position Role Type: Onsite
+U.S. Citizen, U.S. Person, or Immigration Status Requirements:
+Active and transferable U.S. government issued security clearance is required prior to start date. U.S. citizenship is required, as only U.S. citizens are eligible for a security clearance.
+Security Clearance Type: DoD Clearance: Secret
+Security Clearance Status: Ability to obtain INTERIM U.S. government issued security clearance is required prior to start date
+
+The Space & Airborne Center within Systems Integration & Test seeks talented Systems Engineers. Our Space & Airborne team members located in El Segundo, CA integrate hardware and software, develop test plans and procedures, debug and evaluate system functions and interfaces, and verify system requirements in support of final sell-off to the customer.
+
+You will support Radar Mode requirement verification, engineering testing, integration and flight-testing, production, system deployment, and post deployment support in a hands-on laboratory environment. Through Digital Transformation (DTx), you will perform these functions using a variety of methods and enabling technologies, which may include Model-Based Systems Engineering (MBSE) and Agile product development. You will develop and execute test procedures and identify or isolate anomalies to hardware, software, or system interfaces.
+
+What You Will Do
+Support planning and execution of Integration, Verification, and Validation Test activities in our labs or, occasionally, in the field
+Support troubleshooting and failure data analyses, including root cause and corrective action processes and advanced use of lab or field test equipment
+Handle system hardware modules or units, some with the use of support equipment
+Complete detailed system or software test data records, including the use of analysis tools such as MATLAB
+Prepare and present results in reports and briefings to internal or external stakeholders
+Support in managing engineering support activities related to test and troubleshooting of hardware
+Interpret and maintain design specifications and drawings (Schematics & Assembly Drawings)
+Maintain engineering databases
+Support the development of system technical solutions with Engineering teams
+Provide support to Engineering Integrated Product Team Leads via periodic team meetings, working group meetings, and individual tasks
+Support activity may require travel
+
+What You Will Learn
+After completion of comprehensive on-the-job training, the candidate will be part of a team supporting Systems Engineering, Systems Integration & Test activities across the product development lifecycle.
+
+Qualifications You Must Have
+Bachelor's degree in Science, Technology, Engineering or Mathematics (STEM)
+Experience with troubleshooting technical issues with electronics in an academic or internship setting, including the use of common commercial test equipment (oscilloscope, spectrum analyzer, etc.)
+Experience with tools, such as Microsoft Office, MATLAB or Python, for data analysis and automation
+Experience may be obtained through on-the-job experience, research, coursework, or projects
+
+Qualifications We Prefer
+Bachelor of Science degree in Electrical Engineering, with coursework in RF electronics
+Experience with electrical schematics, interface control documentation, and communications protocols
+Experience with reading and integrating software routines with hardware/electronics; C/C++/C# preferred
+Experience with using telemetry data collection equipment to capture real time data and/or real time monitoring
+Experience with instrumentation and collection of large data sets, including the application of scripting or automation to data collection and analysis
+
+What We Offer
+Relocation eligible
+This position is an onsite role in El Segundo, CA. Test event support activity may require travel which is not expected to exceed 10%.
+This position requires the ability to obtain a security clearance.
+The salary range for this role is 62,900 USD - 119,700 USD.

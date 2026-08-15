@@ -1,0 +1,2644 @@
+{
+  "job": {
+    "company": "PDS Health",
+    "title": "Analyst I, Epic Application Professional Billing and Claims",
+    "location": "Irvine, CA",
+    "work_arrangement": "",
+    "compensation": "$83K/yr - $103K/yr",
+    "source_url": null,
+    "linkedin_url": null,
+    "job_description": "Now is the time to join PDS Health. You will have opportunities to learn new skills from our team of experienced professionals. If you're ready to take your career to the next level and gain valuable experience, apply today!\n\nThe Analyst I, Epic Application Professional Billing and Claims is primarily responsible for assisting with basic Epic Professional Billing and Claims system configuration, routine tasks like build updates, testing, and report creation. Serves as contact for end users, assists with troubleshooting issues, and responds to related tickets.\n\nResponsibilities\nAssists with basic Epic system configuration, support, and maintenance.\nWorks under close supervision to perform routine tasks such as building updates, testing, and report creation.\nPrepares documentation for system workflows and technical changes.\nAssists with help desk; collaborates with end users to troubleshoot issues.\nParticipates in training sessions and gains proficiency in the Professional Billing/Claims Epic module.\nOther duties and responsibilities as assigned.\n\nQualifications\nBachelor's degree in IT, healthcare, or a related field (or equivalent experience).\n0-2 years of relevant experience.\nProficiency in basic IT tools; Epic certification preferred but not required (must be obtained within the first year).\n\nPreferred\nProfessional certifications in healthcare information systems or business applications.\nExperience in managing clinical and business information systems within a healthcare environment.\nKnowledge of dental operations, integrated care delivery systems, and healthcare application ecosystems.\nDemonstrated experience leading patient experience or digital engagement initiatives.\n\nKnowledge/Skills/Abilities\nStrong problem-solving and troubleshooting skills with the ability to analyze complex issues and recommend effective solutions.\nDemonstrated organizational skills, with the ability to prioritize tasks, manage multiple projects, and meet deadlines.\nProven ability to work independently as well as within a team environment.\nCustomer service-driven mindset with a focus on continuous improvement and operational efficiency.\n\nBenefits\nMedical, dental, and vision insurance\nPaid time off\nTuition Reimbursement\n401K\nPaid time to volunteer in your local community\n\nCompensation Information\n$83,000.00-$103,000.00 / Annually\n\nPDS Health is an Equal Opportunity Employer.",
+    "responsibilities": [
+      "Assists with basic Epic system configuration, support, and maintenance.",
+      "Works under close supervision to perform routine tasks such as building updates, testing, and report creation.",
+      "Prepares documentation for system workflows and technical changes.",
+      "Assists with help desk; collaborates with end users to troubleshoot issues.",
+      "Participates in training sessions and gains proficiency in the Professional Billing/Claims Epic module.",
+      "Other duties and responsibilities as assigned."
+    ],
+    "required_qualifications": [
+      "Bachelor's degree in IT, healthcare, or a related field (or equivalent experience).",
+      "0-2 years of relevant experience.",
+      "Strong problem-solving and troubleshooting skills with the ability to analyze complex issues and recommend effective solutions.",
+      "Demonstrated organizational skills, with the ability to prioritize tasks, manage multiple projects, and meet deadlines.",
+      "Proven ability to work independently as well as within a team environment.",
+      "Customer service-driven mindset with a focus on continuous improvement and operational efficiency."
+    ],
+    "preferred_qualifications": [
+      "Proficiency in basic IT tools; Epic certification preferred but not required (must be obtained within the first year).",
+      "Professional certifications in healthcare information systems or business applications.",
+      "Experience in managing clinical and business information systems within a healthcare environment.",
+      "Knowledge of dental operations, integrated care delivery systems, and healthcare application ecosystems.",
+      "Demonstrated experience leading patient experience or digital engagement initiatives."
+    ],
+    "high_priority_keywords": [],
+    "low_priority_keywords": [],
+    "simplify_score": [
+      1,
+      4
+    ],
+    "rejected_regions": [
+      "linkedin_navigation_and_job_chrome",
+      "linkedin_insights_recommendations_and_footer"
+    ],
+    "raw_paste_sha256": "fc9dd07b4d46315954ff88aa7a5bca087653e4dd0b695c23cec9e4d2c265a581",
+    "raw_paste": "Company logo for, PDS Health.\nPDS Health\n\nAnalyst I, Epic Application Professional Billing and Claims\n\nIrvine, CA \u00b7 12 minutes ago \u00b7 3 people clicked apply\n\n$83K/yr - $103K/yr\nFull-time\n\nAbout the job\nNow is the time to join PDS Health. You will have opportunities to learn new skills from our team of experienced professionals. If you're ready to take your career to the next level and gain valuable experience, apply today!\n\nThe Analyst I, Epic Application Professional Billing and Claims is primarily responsible for assisting with basic Epic Professional Billing and Claims system configuration, routine tasks like build updates, testing, and report creation. Serves as contact for end users, assists with troubleshooting issues, and responds to related tickets.\n\nResponsibilities\nAssists with basic Epic system configuration, support, and maintenance.\nWorks under close supervision to perform routine tasks such as building updates, testing, and report creation.\nPrepares documentation for system workflows and technical changes.\nAssists with help desk; collaborates with end users to troubleshoot issues.\nParticipates in training sessions and gains proficiency in the Professional Billing/Claims Epic module.\nOther duties and responsibilities as assigned.\n\nQualifications\nBachelor's degree in IT, healthcare, or a related field (or equivalent experience).\n0-2 years of relevant experience.\nProficiency in basic IT tools; Epic certification preferred but not required (must be obtained within the first year).\n\nPreferred\nProfessional certifications in healthcare information systems or business applications.\nExperience in managing clinical and business information systems within a healthcare environment.\nKnowledge of dental operations, integrated care delivery systems, and healthcare application ecosystems.\nDemonstrated experience leading patient experience or digital engagement initiatives.\n\nKnowledge/Skills/Abilities\nStrong problem-solving and troubleshooting skills with the ability to analyze complex issues and recommend effective solutions.\nDemonstrated organizational skills, with the ability to prioritize tasks, manage multiple projects, and meet deadlines.\nProven ability to work independently as well as within a team environment.\nCustomer service-driven mindset with a focus on continuous improvement and operational efficiency.\n\nBenefits\nMedical, dental, and vision insurance\nPaid time off\nTuition Reimbursement\n401K\nPaid time to volunteer in your local community\n\nCompensation Information\n$83,000.00-$103,000.00 / Annually\n\nPDS Health is an Equal Opportunity Employer.\n\nBenefits found in job post\nVision insurance, 401(k)\n\nResume Score\n25\nLow Resume Match\nOnly Matches 1 out of 4 keywords.\ntroubleshooting\norganizational skills\ncustomer service\nproblem-solving\n\nLinkedIn Corporation"
+  },
+  "keywords": [
+    {
+      "term": "Epic",
+      "normalized": "epic",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 5,
+      "source_sections": [
+        "responsibilities",
+        "preferred",
+        "title"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "preferred_qualification": 6.0,
+        "title": 15.0,
+        "specific_system": 10.0,
+        "posting_repetition": 8.0
+      },
+      "hiring_importance": 59.0,
+      "placement_utility": 69.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 39.0,
+      "placement_utility": 49.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Professional Billing",
+      "normalized": "professional billing",
+      "priority": "inferred",
+      "kind": "vocabulary",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities",
+        "title"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "title": 15.0,
+        "posting_repetition": 6.0
+      },
+      "hiring_importance": 39.0,
+      "placement_utility": 39.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Claims",
+      "normalized": "claims",
+      "priority": "inferred",
+      "kind": "vocabulary",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities",
+        "title"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "title": 15.0,
+        "posting_repetition": 6.0
+      },
+      "hiring_importance": 39.0,
+      "placement_utility": 39.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "customer service",
+      "normalized": "customer service",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0
+      },
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0
+      },
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "task prioritization",
+      "normalized": "task prioritization",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0
+      },
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "continuous improvement",
+      "normalized": "continuous improvement",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "operational efficiency",
+      "normalized": "operational efficiency",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "organizational skills",
+      "normalized": "organizational skills",
+      "priority": "inferred",
+      "kind": "qualification",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0
+      },
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "build updates",
+      "normalized": "build updates",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "end-user support",
+      "normalized": "end-user support",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "report creation",
+      "normalized": "report creation",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "help desk",
+      "normalized": "help desk",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "system maintenance",
+      "normalized": "system maintenance",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "system workflows",
+      "normalized": "system workflows",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "technical changes",
+      "normalized": "technical changes",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "training",
+      "normalized": "training",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "application support",
+      "normalized": "application support",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 0,
+      "source_sections": [
+        "title",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "title_responsibility_composite": 18.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "dental operations",
+      "normalized": "dental operations",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "digital engagement",
+      "normalized": "digital engagement",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Epic certification",
+      "normalized": "epic certification",
+      "priority": "inferred",
+      "kind": "qualification",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "healthcare application ecosystems",
+      "normalized": "healthcare application ecosystems",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "healthcare information systems",
+      "normalized": "healthcare information systems",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "integrated care delivery systems",
+      "normalized": "integrated care delivery systems",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "patient experience",
+      "normalized": "patient experience",
+      "priority": "inferred",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "scoring_factors": {
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    }
+  ],
+  "keyword_decisions": [
+    {
+      "term": "Epic",
+      "normalized": "epic",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 5,
+      "source_sections": [
+        "responsibilities",
+        "preferred",
+        "title"
+      ],
+      "hiring_importance": 59.0,
+      "placement_utility": 69.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 39.0,
+      "placement_utility": 49.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.technical_support",
+        "experience.wehelp.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Professional Billing",
+      "normalized": "professional billing",
+      "kind": "vocabulary",
+      "priority": "inferred",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities",
+        "title"
+      ],
+      "hiring_importance": 39.0,
+      "placement_utility": 39.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Claims",
+      "normalized": "claims",
+      "kind": "vocabulary",
+      "priority": "inferred",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities",
+        "title"
+      ],
+      "hiring_importance": 39.0,
+      "placement_utility": 39.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "customer service",
+      "normalized": "customer service",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "task prioritization",
+      "normalized": "task prioritization",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "continuous improvement",
+      "normalized": "continuous improvement",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "projects.loavenly.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "operational efficiency",
+      "normalized": "operational efficiency",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "organizational skills",
+      "normalized": "organizational skills",
+      "kind": "qualification",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 25.0,
+      "placement_utility": 25.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.csulb.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "build updates",
+      "normalized": "build updates",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "weakly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "direct",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "end-user support",
+      "normalized": "end-user support",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "report creation",
+      "normalized": "report creation",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "projects.loavenly.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.csulb.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "help desk",
+      "normalized": "help desk",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "system maintenance",
+      "normalized": "system maintenance",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "system workflows",
+      "normalized": "system workflows",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "strongly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "technical changes",
+      "normalized": "technical changes",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "weakly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "training",
+      "normalized": "training",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.wehelp.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "application support",
+      "normalized": "application support",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 0,
+      "source_sections": [
+        "title",
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "experience.original_insurance.heading",
+        "experience.csulb.bullet.1",
+        "experience.wehelp.heading"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "dental operations",
+      "normalized": "dental operations",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "digital engagement",
+      "normalized": "digital engagement",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Epic certification",
+      "normalized": "epic certification",
+      "kind": "qualification",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "healthcare application ecosystems",
+      "normalized": "healthcare application ecosystems",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "healthcare information systems",
+      "normalized": "healthcare information systems",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "integrated care delivery systems",
+      "normalized": "integrated care delivery systems",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "patient experience",
+      "normalized": "patient experience",
+      "kind": "environment",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "preferred"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    }
+  ],
+  "role_profile": {
+    "company": "PDS Health",
+    "title": "Analyst I, Epic Application Professional Billing and Claims",
+    "normalized_role_family": "healthcare_application_support",
+    "professional_identity": "Application Support Analyst",
+    "seniority": "entry",
+    "industry": [
+      "healthcare information systems",
+      "dental healthcare"
+    ],
+    "core_systems": [
+      "Epic Professional Billing and Claims"
+    ],
+    "core_actions": [
+      "application support",
+      "troubleshooting",
+      "configuration",
+      "testing",
+      "build updates",
+      "report creation",
+      "documentation",
+      "end-user support",
+      "help desk support",
+      "system maintenance",
+      "training",
+      "task prioritization"
+    ],
+    "environment_signals": [
+      "healthcare application ecosystems",
+      "dental operations",
+      "integrated care delivery systems",
+      "patient experience",
+      "digital engagement",
+      "continuous improvement",
+      "operational efficiency"
+    ],
+    "customer_or_stakeholder_type": [
+      "end users",
+      "healthcare operations staff",
+      "IT teams"
+    ],
+    "primary_responsibilities": [
+      "Assist with Epic configuration, support, and maintenance",
+      "Perform build updates, testing, and report creation",
+      "Document system workflows and technical changes",
+      "Provide help desk and end-user support",
+      "Troubleshoot application issues",
+      "Participate in training for Epic Professional Billing and Claims"
+    ],
+    "required_qualifications": [
+      "Bachelor's degree in IT, healthcare, or a related field, or equivalent experience",
+      "0-2 years of relevant experience",
+      "Problem-solving and troubleshooting",
+      "Organizational skills and task prioritization",
+      "Independent and team-based work",
+      "Customer service and continuous improvement mindset"
+    ],
+    "preferred_qualifications": [
+      "Epic certification",
+      "Healthcare information systems certification",
+      "Experience managing clinical or business information systems",
+      "Knowledge of dental operations and healthcare application ecosystems",
+      "Patient experience or digital engagement experience"
+    ],
+    "high_priority_keywords": [
+      "Epic",
+      "troubleshooting",
+      "Professional Billing",
+      "Claims",
+      "customer service",
+      "problem-solving",
+      "task prioritization"
+    ],
+    "secondary_keywords": [
+      "continuous improvement",
+      "operational efficiency",
+      "organizational skills",
+      "build updates",
+      "configuration",
+      "end-user support",
+      "report creation",
+      "documentation",
+      "help desk",
+      "system maintenance",
+      "system workflows",
+      "technical changes",
+      "training",
+      "application support",
+      "dental operations",
+      "digital engagement",
+      "Epic certification",
+      "healthcare application ecosystems",
+      "healthcare information systems",
+      "integrated care delivery systems",
+      "patient experience"
+    ],
+    "noisy_rejected_keywords": [],
+    "expected_outcome_language": [
+      "continuous improvement",
+      "operational efficiency",
+      "effective solutions",
+      "meet deadlines"
+    ],
+    "expected_metrics": [
+      "ticket volume",
+      "resolution time",
+      "workflow efficiency",
+      "issue resolution"
+    ],
+    "role_specific_vocabulary": [
+      "Epic",
+      "Professional Billing",
+      "Claims",
+      "build updates",
+      "system workflows",
+      "technical changes",
+      "end users",
+      "tickets"
+    ],
+    "role_specific_action_verbs": [
+      "configure",
+      "support",
+      "maintain",
+      "build",
+      "test",
+      "document",
+      "troubleshoot",
+      "analyze",
+      "prioritize",
+      "train"
+    ]
+  },
+  "transferability_map": {
+    "matches": [
+      {
+        "target_term": "Epic",
+        "target_requirement": "Assists with basic Epic system configuration, support, and maintenance.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.5775265693664551,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.technical_support, does not substantiate Epic; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "troubleshooting",
+        "target_requirement": "Strong problem-solving and troubleshooting skills with the ability to analyze complex issues and recommend effective solutions.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.5798922777175903,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "troubleshooting is stated directly in skills.technical_support.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Professional Billing",
+        "target_requirement": "Gain proficiency in the Professional Billing/Claims Epic module",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "Insurance SaaS support does not establish Epic Professional Billing experience.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "Claims",
+        "target_requirement": "Gain proficiency in the Professional Billing/Claims Epic module",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "Agency-management and carrier integrations do not establish healthcare claims experience.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "customer service",
+        "target_requirement": "Customer service-driven mindset",
+        "evidence_id": "evidence.experience.wehelp.bullet.2",
+        "source_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.7,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.8,
+        "strength": "strongly_transferable",
+        "reasoning": "Live support and training for staff and volunteers directly demonstrate service-oriented user support.",
+        "suggested_placement": "experience.wehelp"
+      },
+      {
+        "target_term": "problem-solving",
+        "target_requirement": "Analyze complex issues and recommend effective solutions",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.9,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "Root-cause isolation and fix validation strongly demonstrate problem-solving.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "task prioritization",
+        "target_requirement": "Prioritize tasks, manage multiple projects, and meet deadlines",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.85,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.9,
+        "strength": "strongly_transferable",
+        "reasoning": "Managing a substantial ticket queue within a documented resolution time supports task prioritization.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "continuous improvement",
+        "target_requirement": "Focus on continuous improvement",
+        "evidence_id": "evidence.projects.loavenly.bullet.3",
+        "source_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.7,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "Measured platform optimization directly supports a continuous improvement orientation.",
+        "suggested_placement": "projects.loavenly"
+      },
+      {
+        "target_term": "operational efficiency",
+        "target_requirement": "Focus on operational efficiency",
+        "evidence_id": "evidence.experience.original_insurance.bullet.3",
+        "source_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "semantic_score": 0.9,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "The reconciliation automation produced a directly measured efficiency improvement.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "organizational skills",
+        "target_requirement": "Prioritize tasks, manage multiple projects, and meet deadlines",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.7,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "Structured issue tracking and multi-party coordination demonstrate organizational skills.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "build updates",
+        "target_requirement": "Perform routine build updates and testing",
+        "evidence_id": "evidence.experience.wehelp.bullet.2",
+        "source_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "semantic_score": 0.65,
+        "action_compatibility": 0.7,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.7,
+        "outcome_compatibility": 0.6,
+        "strength": "weakly_transferable",
+        "reasoning": "The candidate validates updates to a self-built application, but Epic build activity is not established.",
+        "suggested_placement": "experience.wehelp"
+      },
+      {
+        "target_term": "configuration",
+        "target_requirement": "Assists with basic Epic system configuration, support, and maintenance.",
+        "evidence_id": "evidence.projects.loavenly.bullet.2",
+        "source_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "semantic_score": 0.5366823673248291,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "configuration is stated directly in projects.loavenly.bullet.2.",
+        "suggested_placement": "projects.loavenly"
+      },
+      {
+        "target_term": "end-user support",
+        "target_requirement": "Collaborate with end users to troubleshoot issues",
+        "evidence_id": "evidence.experience.csulb.bullet.1",
+        "source_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "semantic_score": 0.9,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.8,
+        "strength": "strongly_transferable",
+        "reasoning": "First-line support and resolution of user access issues directly bridge to end-user support.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "report creation",
+        "target_requirement": "Perform report creation",
+        "evidence_id": "evidence.projects.loavenly.bullet.1",
+        "source_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "semantic_score": 0.75,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.7,
+        "environment_compatibility": 0.7,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "The candidate built and operates an application with reporting functionality, supporting a credible report-creation bridge.",
+        "suggested_placement": "projects.loavenly"
+      },
+      {
+        "target_term": "documentation",
+        "target_requirement": "Prepares documentation for system workflows and technical changes.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.6476407051086426,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "documentation is stated directly in experience.csulb.bullet.3.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "help desk",
+        "target_requirement": "Assist with help desk",
+        "evidence_id": "evidence.experience.csulb.bullet.1",
+        "source_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "First-line application support is functionally compatible with help desk work, though that label is not present in the source.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "system maintenance",
+        "target_requirement": "Assist with system maintenance",
+        "evidence_id": "evidence.experience.original_insurance.bullet.3",
+        "source_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script.",
+        "semantic_score": 0.7,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.7,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "Production monitoring and failure triage are transferable to routine system maintenance.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "system workflows",
+        "target_requirement": "Document system workflows",
+        "evidence_id": "evidence.experience.original_insurance.bullet.5",
+        "source_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+        "semantic_score": 0.8,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 0.7,
+        "strength": "strongly_transferable",
+        "reasoning": "The source directly establishes support for application integration workflows.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "technical changes",
+        "target_requirement": "Document technical changes",
+        "evidence_id": "evidence.experience.wehelp.bullet.2",
+        "source_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "semantic_score": 0.6,
+        "action_compatibility": 0.7,
+        "system_compatibility": 0.6,
+        "environment_compatibility": 0.7,
+        "outcome_compatibility": 0.6,
+        "strength": "weakly_transferable",
+        "reasoning": "Validating application updates provides limited evidence for technical changes, but change documentation is not established.",
+        "suggested_placement": "experience.wehelp"
+      },
+      {
+        "target_term": "training",
+        "target_requirement": "Participates in training sessions and gains proficiency in the Professional Billing/Claims Epic module.",
+        "evidence_id": "evidence.experience.wehelp.bullet.2",
+        "source_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "semantic_score": 0.5533047318458557,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "training is stated directly in experience.wehelp.bullet.2.",
+        "suggested_placement": "experience.wehelp"
+      },
+      {
+        "target_term": "application support",
+        "target_requirement": "application support",
+        "evidence_id": "evidence.experience.csulb.bullet.1",
+        "source_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "semantic_score": 0.6615918278694153,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "application support is stated directly in experience.csulb.bullet.1.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "dental operations",
+        "target_requirement": "Knowledge of dental operations",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "No dental operations evidence appears in the resume.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "digital engagement",
+        "target_requirement": "Lead digital engagement initiatives",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.1,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "Building a volunteer application does not establish a digital engagement initiative in the posting's healthcare context.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "Epic certification",
+        "target_requirement": "Epic certification preferred",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "The listed certifications do not include Epic certification.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "healthcare application ecosystems",
+        "target_requirement": "Knowledge of healthcare application ecosystems",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.1,
+        "action_compatibility": 0.2,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "Food-distribution SaaS and campus systems do not establish healthcare application ecosystem experience.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "healthcare information systems",
+        "target_requirement": "Healthcare information systems experience or certification",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.1,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "No healthcare information system or related certification is established.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "integrated care delivery systems",
+        "target_requirement": "Knowledge of integrated care delivery systems",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "No care-delivery-system evidence appears in the resume.",
+        "suggested_placement": "keyword gap audit"
+      },
+      {
+        "target_term": "patient experience",
+        "target_requirement": "Lead patient experience initiatives",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "The resume does not establish work with patients or patient-experience initiatives.",
+        "suggested_placement": "keyword gap audit"
+      }
+    ],
+    "direct_terms": [
+      "troubleshooting",
+      "configuration",
+      "documentation",
+      "training",
+      "application support"
+    ],
+    "strongly_transferable_terms": [
+      "customer service",
+      "problem-solving",
+      "task prioritization",
+      "continuous improvement",
+      "operational efficiency",
+      "organizational skills",
+      "end-user support",
+      "report creation",
+      "help desk",
+      "system maintenance",
+      "system workflows"
+    ],
+    "weakly_transferable_terms": [
+      "build updates",
+      "technical changes"
+    ],
+    "unsupported_terms": [
+      "Epic",
+      "Professional Billing",
+      "Claims",
+      "dental operations",
+      "digital engagement",
+      "Epic certification",
+      "healthcare application ecosystems",
+      "healthcare information systems",
+      "integrated care delivery systems",
+      "patient experience"
+    ]
+  },
+  "rewrite_plan": {
+    "professional_identity": "Application Support Analyst",
+    "summary": {
+      "text": "Application Support Analyst with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution through troubleshooting, problem-solving, and task prioritization; built and supports a production multi-tenant SaaS platform. Strengths include customer service.",
+      "shorter_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "target_terms": [
+        "application support",
+        "troubleshooting",
+        "problem-solving",
+        "task prioritization"
+      ],
+      "evidence_ids": [
+        "evidence.summary",
+        "evidence.skills.technical_support",
+        "evidence.experience.original_insurance.bullet.1",
+        "evidence.experience.original_insurance.bullet.2"
+      ]
+    },
+    "skills": {
+      "lines": [
+        {
+          "paragraph_id": "skills.technical_support",
+          "category": "Technical Support",
+          "skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management"
+          ],
+          "shorter_skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management"
+          ]
+        },
+        {
+          "paragraph_id": "skills.apis_identity",
+          "category": "APIs & Identity",
+          "skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ],
+          "shorter_skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ]
+        },
+        {
+          "paragraph_id": "skills.languages_dbs",
+          "category": "Languages & DBs",
+          "skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ],
+          "shorter_skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ]
+        },
+        {
+          "paragraph_id": "skills.cloud_systems",
+          "category": "Cloud & Systems",
+          "skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)"
+          ],
+          "shorter_skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)"
+          ]
+        },
+        {
+          "paragraph_id": "skills.tools",
+          "category": "Tools",
+          "skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ],
+          "shorter_skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ]
+        }
+      ]
+    },
+    "bullets": [
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "source_paragraph_id": "experience.original_insurance.bullet.1",
+        "text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, using task prioritization to maintain sub-90-minute average resolution.",
+        "shorter_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "purpose": "Demonstrate ticket-based application support, prioritization, and service performance.",
+        "target_terms": [
+          "task prioritization"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "source_paragraph_id": "experience.original_insurance.bullet.2",
+        "text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, applying problem-solving to isolate root cause and validate fixes in live environments.",
+        "shorter_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "purpose": "Show evidence-backed technical troubleshooting and problem-solving.",
+        "target_terms": [
+          "problem-solving"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "source_paragraph_id": "experience.original_insurance.bullet.3",
+        "text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+        "shorter_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "purpose": "Connect production monitoring and automation to operational efficiency.",
+        "target_terms": [
+          "operational efficiency",
+          "system maintenance"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.3"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "source_paragraph_id": "experience.original_insurance.bullet.4",
+        "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+        "shorter_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+        "purpose": "Preserve strong systems-administration evidence and protected metrics.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.4"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "source_paragraph_id": "experience.original_insurance.bullet.5",
+        "text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+        "shorter_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+        "purpose": "Align integration support with system workflows and troubleshooting.",
+        "target_terms": [
+          "system workflows",
+          "troubleshooting"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.5"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "source_paragraph_id": "experience.csulb.bullet.1",
+        "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "shorter_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "purpose": "Present the closest evidence for user-facing application and help desk support.",
+        "target_terms": [
+          "application support",
+          "end-user support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "source_paragraph_id": "experience.csulb.bullet.2",
+        "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+        "shorter_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+        "purpose": "Preserve detailed diagnostic and configuration-checking methods.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "source_paragraph_id": "experience.csulb.bullet.3",
+        "text": "Applied organizational skills to maintain incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "shorter_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "purpose": "Emphasize documentation, organization, and stakeholder coordination.",
+        "target_terms": [
+          "documentation",
+          "organizational skills"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "source_paragraph_id": "experience.wehelp.bullet.1",
+        "text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+        "shorter_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+        "purpose": "Demonstrate independent application testing and deployment.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "source_paragraph_id": "experience.wehelp.bullet.2",
+        "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "shorter_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "purpose": "Connect live user support to customer service, troubleshooting, updates, and training.",
+        "target_terms": [
+          "customer service",
+          "troubleshooting",
+          "build updates",
+          "training"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.2",
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "source_paragraph_id": "projects.loavenly.bullet.1",
+        "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory, report creation, and RBAC across three food bank locations.",
+        "shorter_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "purpose": "Surface transferable report creation and production application ownership.",
+        "target_terms": [
+          "report creation"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "source_paragraph_id": "projects.loavenly.bullet.2",
+        "text": "Performed RBAC configuration and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "shorter_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "purpose": "Use direct configuration evidence and production issue resolution.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "source_paragraph_id": "projects.loavenly.bullet.3",
+        "text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "shorter_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "purpose": "Connect measured platform optimization to continuous improvement.",
+        "target_terms": [
+          "continuous improvement"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.3"
+        ],
+        "claim_risks": []
+      }
+    ],
+    "intents": [
+      {
+        "paragraph_id": "summary",
+        "purpose": "Establish a defensible application-support identity and surface the strongest supported requirements.",
+        "target_terms": [
+          "application support",
+          "troubleshooting",
+          "problem-solving",
+          "task prioritization"
+        ],
+        "evidence_ids": [
+          "evidence.summary",
+          "evidence.skills.technical_support",
+          "evidence.experience.original_insurance.bullet.1",
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "recruiter_priority": 1
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "purpose": "Lead with ticket support and prioritization performance.",
+        "target_terms": [
+          "task prioritization"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1"
+        ],
+        "recruiter_priority": 2
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "purpose": "Demonstrate complex technical investigation.",
+        "target_terms": [
+          "problem-solving"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "recruiter_priority": 3
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "purpose": "Show first-line user-facing application support.",
+        "target_terms": [
+          "application support",
+          "end-user support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "recruiter_priority": 4
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "purpose": "Show documentation and organizational discipline.",
+        "target_terms": [
+          "documentation",
+          "organizational skills"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "recruiter_priority": 5
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "purpose": "Show live customer service, troubleshooting, update validation, and training.",
+        "target_terms": [
+          "customer service",
+          "troubleshooting",
+          "build updates",
+          "training"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1",
+          "evidence.experience.wehelp.bullet.2"
+        ],
+        "recruiter_priority": 6
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "purpose": "Show report creation in an owned production application.",
+        "target_terms": [
+          "report creation"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "recruiter_priority": 7
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "purpose": "Show direct configuration experience.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "recruiter_priority": 8
+      }
+    ],
+    "claim_risks": []
+  },
+  "changes": [
+    {
+      "paragraph_id": "summary",
+      "section": "summary",
+      "paragraph_kind": "summary",
+      "before_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "proposed_text": "Application Support Analyst with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution through troubleshooting, problem-solving, and task prioritization; built and supports a production multi-tenant SaaS platform. Strengths include customer service.",
+      "final_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "application support",
+        "troubleshooting",
+        "problem-solving",
+        "task prioritization"
+      ],
+      "evidence_ids": [
+        "evidence.summary",
+        "evidence.skills.technical_support",
+        "evidence.experience.original_insurance.bullet.1",
+        "evidence.experience.original_insurance.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": true,
+      "explanation": "Reframed the professional summary for the target role."
+    },
+    {
+      "paragraph_id": "skills.technical_support",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "proposed_text": "Technical Support: Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "final_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Production Support",
+        "Troubleshooting",
+        "Incident Response",
+        "Root Cause Analysis",
+        "SLA Management"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.apis_identity",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "proposed_text": "APIs & Identity: Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "final_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Microsoft 365",
+        "Entra ID",
+        "MFA",
+        "RBAC",
+        "SSO",
+        "Microsoft Graph API",
+        "REST APIs",
+        "Webhooks",
+        "OAuth 2.0",
+        "SAML",
+        "Postman"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.languages_dbs",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "proposed_text": "Languages & DBs: Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "final_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Python",
+        "SQL",
+        "JSON",
+        "PowerShell",
+        "JavaScript",
+        "TypeScript",
+        "Bash",
+        "PostgreSQL",
+        "MySQL",
+        "SQLite",
+        "Supabase"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.cloud_systems",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "proposed_text": "Cloud & Systems: AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "final_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "change_type": "unchanged",
+      "target_terms": [
+        "AWS (EC2, S3, IAM)",
+        "Vercel",
+        "Linux",
+        "Windows",
+        "CI/CD (GitHub Actions)"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.tools",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "proposed_text": "Tools: Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "final_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Jira",
+        "Confluence",
+        "Excel",
+        "Sentry",
+        "Git",
+        "GitHub",
+        "VS Code"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.1",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "proposed_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, using task prioritization to maintain sub-90-minute average resolution.",
+      "final_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, using task prioritization to maintain sub-90-minute average resolution.",
+      "change_type": "reframed",
+      "target_terms": [
+        "task prioritization"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate ticket-based application support, prioritization, and service performance."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.2",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "proposed_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, applying problem-solving to isolate root cause and validate fixes in live environments.",
+      "final_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, applying problem-solving to isolate root cause and validate fixes in live environments.",
+      "change_type": "reframed",
+      "target_terms": [
+        "problem-solving"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show evidence-backed technical troubleshooting and problem-solving."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.3",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "proposed_text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+      "final_text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+      "change_type": "reframed",
+      "target_terms": [
+        "operational efficiency",
+        "system maintenance"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Connect production monitoring and automation to operational efficiency."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.4",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "proposed_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "final_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.4"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Preserve strong systems-administration evidence and protected metrics."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.5",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+      "proposed_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+      "final_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "system workflows",
+        "troubleshooting"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.5"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Align integration support with system workflows and troubleshooting."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.1",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "proposed_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "final_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "application support",
+        "end-user support"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Present the closest evidence for user-facing application and help desk support."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.2",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "proposed_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "final_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Preserve detailed diagnostic and configuration-checking methods."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.3",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "proposed_text": "Applied organizational skills to maintain incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "final_text": "Applied organizational skills to maintain incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "change_type": "reframed",
+      "target_terms": [
+        "documentation",
+        "organizational skills"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Emphasize documentation, organization, and stakeholder coordination."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.1",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "proposed_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "final_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate independent application testing and deployment."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.2",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "proposed_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "final_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "customer service",
+        "troubleshooting",
+        "build updates",
+        "training"
+      ],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.2",
+        "evidence.experience.wehelp.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Connect live user support to customer service, troubleshooting, updates, and training."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.1",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "proposed_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory, report creation, and RBAC across three food bank locations.",
+      "final_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory, report creation, and RBAC across three food bank locations.",
+      "change_type": "reframed",
+      "target_terms": [
+        "report creation"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Surface transferable report creation and production application ownership."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.2",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "proposed_text": "Performed RBAC configuration and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "final_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "configuration"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": true,
+      "explanation": "Use direct configuration evidence and production issue resolution."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.3",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "proposed_text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "final_text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "change_type": "reframed",
+      "target_terms": [
+        "continuous improvement"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Connect measured platform optimization to continuous improvement."
+    }
+  ],
+  "claim_risks": [],
+  "validation": {
+    "passed": true,
+    "issues": [
+      {
+        "code": "important_keyword_missing_after_compression",
+        "message": "Compression removed an important accepted keyword: customer service.",
+        "paragraph_id": null,
+        "severity": "warning"
+      }
+    ],
+    "protected_fields_passed": true,
+    "metrics_passed": true,
+    "structure_passed": true,
+    "keyword_coverage": 42.48
+  },
+  "layout": {
+    "passed": true,
+    "page_count": 1,
+    "rendered_lines": 74,
+    "section_anchor_deltas": {
+      "SKILLS": 0.0,
+      "EXPERIENCE": 0.0,
+      "PROJECTS": 0.0,
+      "EDUCATION": 0.0,
+      "CERTIFICATIONS": 0.0
+    },
+    "overflow_paragraph_ids": [],
+    "paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "baseline_paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "paragraph_max_width_points": {
+      "identity.name": 89.80197143554688,
+      "identity.contact": 389.3179931640625,
+      "summary": 519.0280132293701,
+      "skills.heading": 36.60227966308594,
+      "skills.technical_support": 509.2552490234375,
+      "skills.apis_identity": 578.9102172851562,
+      "skills.languages_dbs": 519.6455078125,
+      "skills.cloud_systems": 386.52587890625,
+      "skills.tools": 316.9602966308594,
+      "experience.heading": 70.81776428222656,
+      "experience.original_insurance.heading": 576.1893310546875,
+      "experience.original_insurance.bullet.1": 554.8137588500977,
+      "experience.original_insurance.bullet.2": 544.0945205688477,
+      "experience.original_insurance.bullet.3": 513.5649185180664,
+      "experience.original_insurance.bullet.4": 531.9814834594727,
+      "experience.original_insurance.bullet.5": 543.2276992797852,
+      "experience.csulb.heading": 576.1931762695312,
+      "experience.csulb.bullet.1": 542.8428726196289,
+      "experience.csulb.bullet.2": 499.7525405883789,
+      "experience.csulb.bullet.3": 554.5441055297852,
+      "experience.wehelp.heading": 576.197021484375,
+      "experience.wehelp.bullet.1": 558.3873672485352,
+      "experience.wehelp.bullet.2": 549.4583511352539,
+      "projects.heading": 57.381492614746094,
+      "projects.loavenly.heading": 321.07781982421875,
+      "projects.loavenly.bullet.1": 536.4675064086914,
+      "projects.loavenly.bullet.2": 532.4567642211914,
+      "projects.loavenly.bullet.3": 554.6354141235352,
+      "education.heading": 70.24212646484375,
+      "education.protected_body.37": 558.6382026672363,
+      "certifications.heading": 94.99464416503906,
+      "certifications.protected_body.40": 456.5558891296387
+    },
+    "protected_horizontal_deltas": {
+      "identity.name": 0.0,
+      "identity.contact": 0.0,
+      "skills.heading": 0.0,
+      "experience.heading": 0.0,
+      "experience.original_insurance.heading": 0.0,
+      "experience.csulb.heading": 0.0,
+      "experience.wehelp.heading": 0.0,
+      "projects.heading": 0.0,
+      "projects.loavenly.heading": 0.0,
+      "education.heading": 0.0,
+      "education.protected_body.37": 0.0,
+      "certifications.heading": 0.0,
+      "certifications.protected_body.40": 0.0
+    },
+    "font_inventory": {
+      "ArialMT": [
+        8.04,
+        9.0,
+        11.04
+      ],
+      "Calibri": [
+        2.04,
+        9.96,
+        10.56,
+        11.04
+      ],
+      "Calibri-Bold": [
+        8.04,
+        10.56,
+        11.04,
+        14.04,
+        18.0
+      ],
+      "Calibri-Italic": [
+        10.56,
+        11.04
+      ]
+    },
+    "out_of_bounds_items": [],
+    "overlap_items": [],
+    "pdf_path": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\pds_cycle6\\Brian_Aiad_resume.pdf",
+    "attempts": 3
+  },
+  "output_docx": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\pds_cycle6\\Brian_Aiad_resume.docx",
+  "output_pdf": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\pds_cycle6\\Brian_Aiad_resume.pdf",
+  "base_sha256": "7cb556d81f20d884fa31e5fa5351847d6dec109da6e50736a164ca7a2770a07c",
+  "reasoner": "codex-cli",
+  "pipeline_version": "0.3.0"
+}

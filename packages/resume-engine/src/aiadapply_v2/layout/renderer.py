@@ -15,6 +15,7 @@ from aiadapply_v2.schemas import LayoutResult, ResumeDocument
 
 SECTION_ANCHORS = ("SKILLS", "EXPERIENCE", "PROJECTS", "EDUCATION", "CERTIFICATIONS")
 MAX_ANCHOR_DRIFT_POINTS = 2.0
+MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS = 0.5
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:\+)?")
 
 
@@ -25,6 +26,8 @@ class ParagraphMetric(TypedDict):
     max_width_points: float
     top_points: float
     bottom_points: float
+    left_points: float
+    right_points: float
 
 
 class RenderingError(RuntimeError):
@@ -48,14 +51,22 @@ def find_libreoffice() -> Path | None:
 
 
 def render_docx_to_pdf(docx_path: str | Path, output_dir: str | Path) -> Path:
+    source = Path(docx_path).resolve()
+    destination = Path(output_dir).resolve()
+    destination.mkdir(parents=True, exist_ok=True)
+    preferred = os.environ.get("AIADAPPLY_RENDERER", "").casefold()
+    if os.name == "nt" and preferred != "libreoffice":
+        word_output = _render_docx_with_word(source, destination)
+        if word_output is not None:
+            return word_output
+        if preferred == "word":
+            raise RenderingError("Microsoft Word PDF export failed.")
+
     executable = find_libreoffice()
     if not executable:
         raise RenderingError(
             "LibreOffice was not found. Install it to render and validate one-page output."
         )
-    source = Path(docx_path).resolve()
-    destination = Path(output_dir).resolve()
-    destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="aiadapply-lo-profile-") as profile_name:
         profile_uri = _file_uri(Path(profile_name))
         command = [
@@ -84,6 +95,42 @@ def render_docx_to_pdf(docx_path: str | Path, output_dir: str | Path) -> Path:
     if result.returncode != 0 or not output.exists():
         details = (result.stderr or result.stdout)[-3000:]
         raise RenderingError(f"LibreOffice PDF conversion failed: {details}")
+    return output
+
+
+def _render_docx_with_word(source: Path, destination: Path) -> Path | None:
+    script = Path(__file__).with_name("export_word_pdf.ps1")
+    output = destination / f"{source.stem}.pdf"
+    command = [
+        "powershell",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        str(script),
+        "-InputDocx",
+        str(source),
+        "-OutputPdf",
+        str(output),
+    ]
+    creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            timeout=120,
+            check=False,
+            creationflags=creationflags,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if result.returncode != 0 or not output.exists():
+        output.unlink(missing_ok=True)
+        return None
     return output
 
 
@@ -140,6 +187,24 @@ def inspect_pdf(
     ]
     new_bounds_issues = sorted(set(bounds_issues) - set(baseline_bounds))
     new_overlap_issues = sorted(set(overlap_issues) - set(baseline_overlaps))
+    protected_horizontal_deltas: dict[str, float] = {}
+    if baseline_document is not None:
+        for paragraph in baseline_document.paragraphs:
+            if paragraph.editable:
+                continue
+            current_metric = paragraph_metrics.get(paragraph.paragraph_id)
+            baseline_metric = baseline_metrics.get(paragraph.paragraph_id)
+            if not current_metric or not baseline_metric:
+                continue
+            protected_horizontal_deltas[paragraph.paragraph_id] = max(
+                abs(float(current_metric["left_points"]) - float(baseline_metric["left_points"])),
+                abs(float(current_metric["right_points"]) - float(baseline_metric["right_points"])),
+            )
+    horizontally_drifted = [
+        paragraph_id
+        for paragraph_id, delta in protected_horizontal_deltas.items()
+        if delta > MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS
+    ]
     passed = (
         page_count == 1
         and rendered_lines <= baseline_lines
@@ -149,6 +214,7 @@ def inspect_pdf(
         and not unmatched
         and not new_bounds_issues
         and not new_overlap_issues
+        and not horizontally_drifted
     )
     return LayoutResult(
         passed=passed,
@@ -160,6 +226,7 @@ def inspect_pdf(
             *drifted,
             *paragraph_overflow,
             *unmatched,
+            *(f"horizontal:{paragraph_id}" for paragraph_id in horizontally_drifted),
         ],
         paragraph_line_counts={
             paragraph_id: int(metric["line_count"])
@@ -173,6 +240,7 @@ def inspect_pdf(
             paragraph_id: float(metric["max_width_points"])
             for paragraph_id, metric in paragraph_metrics.items()
         },
+        protected_horizontal_deltas=protected_horizontal_deltas,
         font_inventory=fonts,
         out_of_bounds_items=new_bounds_issues,
         overlap_items=new_overlap_issues,
@@ -247,6 +315,8 @@ def measure_pdf_paragraphs(
                 "max_width_points": 0.0,
                 "top_points": 0.0,
                 "bottom_points": 0.0,
+                "left_points": 0.0,
+                "right_points": 0.0,
             }
             continue
         start, end = token_span
@@ -264,6 +334,8 @@ def measure_pdf_paragraphs(
             "max_width_points": max(widths, default=0.0),
             "top_points": min(box[1] for _token, box in matched),
             "bottom_points": max(box[3] for _token, box in matched),
+            "left_points": min(box[0] for _token, box in matched),
+            "right_points": max(box[2] for _token, box in matched),
         }
     return result
 

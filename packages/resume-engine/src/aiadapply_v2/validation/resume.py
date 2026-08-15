@@ -5,7 +5,8 @@ from collections import Counter
 
 from aiadapply_v2.documents.formatting import compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
-from aiadapply_v2.grading.keywords import important_keywords
+from aiadapply_v2.evidence.loaders import SYSTEM_TERMS
+from aiadapply_v2.grading.keywords import NON_PROSE_QUALIFICATIONS, important_keywords
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text
 from aiadapply_v2.schemas import (
     EvidenceStrength,
@@ -16,7 +17,7 @@ from aiadapply_v2.schemas import (
     ValidationIssue,
     ValidationResult,
 )
-from aiadapply_v2.text import contains_term
+from aiadapply_v2.text import contains_term, split_skill_values
 
 
 def validate_rewrite_plan(
@@ -24,6 +25,9 @@ def validate_rewrite_plan(
     plan: RewritePlan,
     keywords: list[JobKeyword],
     profile: TargetRoleProfile,
+    *,
+    forbidden_terms: list[str] | None = None,
+    coverage_keywords: list[JobKeyword] | None = None,
 ) -> ValidationResult:
     issues: list[ValidationIssue] = []
     expected_skill_ids = {
@@ -66,6 +70,32 @@ def validate_rewrite_plan(
                     paragraph_id=line.paragraph_id,
                 )
             )
+        source_skill_line = next(
+            (
+                paragraph.text
+                for paragraph in base.paragraphs
+                if paragraph.paragraph_id == line.paragraph_id
+            ),
+            "",
+        )
+        source_skills = split_skill_values(source_skill_line.split(":", 1)[-1])
+        missing_base_skills = [
+            skill
+            for skill in source_skills
+            if not any(contains_term(value, skill) for value in line.skills)
+        ]
+        if missing_base_skills:
+            issues.append(
+                ValidationIssue(
+                    code="base_skill_removed",
+                    message=(
+                        "Tailoring removed verified base skills: "
+                        + ", ".join(missing_base_skills)
+                        + ". Preserve them in this skill category."
+                    ),
+                    paragraph_id=line.paragraph_id,
+                )
+            )
     if expected_bullet_ids != actual_bullet_ids:
         issues.append(
             ValidationIssue(
@@ -94,24 +124,93 @@ def validate_rewrite_plan(
                     paragraph_id=bullet.paragraph_id,
                 )
             )
-        if not bullet.shorter_text or len(bullet.shorter_text) >= len(bullet.text):
+        boundary_enforced = any(not risk.export_allowed for risk in bullet.claim_risks)
+        invalid_shorter = (
+            not bullet.shorter_text
+            or len(bullet.shorter_text) > len(bullet.text)
+            or (not boundary_enforced and len(bullet.shorter_text) == len(bullet.text))
+        )
+        if invalid_shorter:
             issues.append(
                 ValidationIssue(
                     code="invalid_shorter_candidate",
-                    message="shorter_text must be present and shorter than the primary bullet.",
+                    message=(
+                        "shorter_text must be present and shorter than the primary bullet, "
+                        "unless an export boundary already selected that fallback."
+                    ),
                     paragraph_id=bullet.paragraph_id,
                 )
             )
-    if not plan.summary.shorter_text or len(plan.summary.shorter_text) >= len(plan.summary.text):
+        source = next(
+            (
+                paragraph.text
+                for paragraph in base.paragraphs
+                if paragraph.paragraph_id == bullet.source_paragraph_id
+            ),
+            "",
+        )
+        missing_systems = [
+            term
+            for term in SYSTEM_TERMS
+            if contains_term(source, term) and not contains_term(bullet.text, term)
+        ]
+        if missing_systems:
+            issues.append(
+                ValidationIssue(
+                    code="source_system_removed",
+                    message=(
+                        "Primary rewrite removed established source systems/tools: "
+                        + ", ".join(missing_systems)
+                        + ". Preserve them or keep the source paragraph unchanged."
+                    ),
+                    paragraph_id=bullet.paragraph_id,
+                )
+            )
+    summary_boundary_enforced = any(
+        not risk.export_allowed and "summary" in risk.selected_placement.casefold()
+        for risk in plan.claim_risks
+    )
+    invalid_summary_fallback = (
+        not plan.summary.shorter_text
+        or len(plan.summary.shorter_text) > len(plan.summary.text)
+        or (
+            not summary_boundary_enforced
+            and len(plan.summary.shorter_text) == len(plan.summary.text)
+        )
+    )
+    if invalid_summary_fallback:
         issues.append(
             ValidationIssue(
                 code="invalid_shorter_summary",
-                message="The summary fallback must be shorter than the primary summary.",
+                message=(
+                    "The summary fallback must be shorter than the primary summary, unless an "
+                    "export boundary already selected that fallback."
+                ),
                 paragraph_id="summary",
             )
         )
 
     identity_terms = {
+        "business_systems_functional": (
+            "Business Systems Support Analyst",
+            "Application Support Analyst",
+            "Systems Support Analyst",
+        ),
+        "support_desk_engineering": (
+            "Technical Support Engineer",
+            "Support Desk Engineer",
+            "IT Support Engineer",
+        ),
+        "platform_support_analysis": (
+            "Application Support Analyst",
+            "Platform Support Analyst",
+            "Technical Support Analyst",
+        ),
+        "healthcare_application_support": (
+            "Application Support Analyst",
+            "Application Support Engineer",
+            "Business Applications Analyst",
+        ),
         "technical_support_integrations": (
             "Technical Support Engineer",
             "Integration Support Engineer",
@@ -119,6 +218,8 @@ def validate_rewrite_plan(
         "product_operations": (
             "Product Operations",
             "Technical Operations Specialist",
+            "Application Support Specialist",
+            "Application Support Engineer",
         ),
         "technical_operations_support": (
             "Technical Operations Support",
@@ -170,8 +271,20 @@ def validate_rewrite_plan(
         )
 
     proposed = "\n".join(all_proposed_text(plan))
+    protected = "\n".join(paragraph.text for paragraph in base.paragraphs if not paragraph.editable)
+    resume_text = "\n".join((protected, proposed))
+    for term in forbidden_terms or []:
+        if contains_term(proposed, term):
+            issues.append(
+                ValidationIssue(
+                    code="unsupported_keyword_inserted",
+                    message=f"Remove unsupported target term from resume prose: {term}.",
+                )
+            )
     for keyword in important_keywords(keywords):
-        if not contains_term(proposed, keyword.term):
+        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not contains_term(
+            resume_text, keyword.term
+        ):
             issues.append(
                 ValidationIssue(
                     code="important_keyword_missing",
@@ -210,7 +323,24 @@ def validate_rewrite_plan(
                 )
             )
 
-    coverage = weighted_keyword_coverage(proposed, keywords)
+    base_primary_chars = sum(
+        len(paragraph.text)
+        for paragraph in base.paragraphs
+        if paragraph.editable and paragraph.kind.value in {"summary", "bullet", "skill_line"}
+    )
+    proposed_primary_chars = sum(len(text) for text in all_proposed_text(plan))
+    if base_primary_chars and proposed_primary_chars < (0.90 * base_primary_chars):
+        issues.append(
+            ValidationIssue(
+                code="resume_information_density_reduced",
+                message=(
+                    "Primary tailored content is more than 10% shorter than the protected base. "
+                    "Keep useful source detail and leave low-value paragraphs unchanged."
+                ),
+            )
+        )
+
+    coverage = weighted_keyword_coverage(resume_text, coverage_keywords or keywords)
     errors = [issue for issue in issues if issue.severity == "error"]
     return ValidationResult(
         passed=not errors,
@@ -235,6 +365,8 @@ def validate_candidate_docx(
     base: ResumeDocument,
     candidate_path: str,
     keywords: list[JobKeyword],
+    *,
+    coverage_keywords: list[JobKeyword] | None = None,
 ) -> ValidationResult:
     candidate = parse_resume_docx(candidate_path)
     issues: list[ValidationIssue] = []
@@ -301,11 +433,14 @@ def validate_candidate_docx(
         )
 
     for keyword in important_keywords(keywords):
-        if not contains_term(candidate_text, keyword.term):
+        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not contains_term(
+            candidate_text, keyword.term
+        ):
             issues.append(
                 ValidationIssue(
                     code="important_keyword_missing_after_compression",
                     message=(f"Compression removed an important accepted keyword: {keyword.term}."),
+                    severity="warning",
                 )
             )
 
@@ -333,7 +468,7 @@ def validate_candidate_docx(
             }
             for issue in errors
         ),
-        keyword_coverage=weighted_keyword_coverage(candidate_text, keywords),
+        keyword_coverage=weighted_keyword_coverage(candidate_text, coverage_keywords or keywords),
     )
 
 

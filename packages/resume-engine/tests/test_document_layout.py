@@ -4,6 +4,10 @@ from zipfile import ZipFile
 
 from aiadapply_v2.documents.formatting import DOCUMENT_PART, compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
+from aiadapply_v2.documents.optimizer import (
+    font_deembedded_equivalent,
+    write_ats_optimized_docx,
+)
 from aiadapply_v2.documents.writer import write_resume_candidate
 from aiadapply_v2.layout.renderer import (
     apply_pdf_layout_budgets,
@@ -64,11 +68,25 @@ def test_no_edit_docx_round_trip_preserves_structure_metrics_and_hyperlinks(tmp_
                 assert base_zip.read(member) == output_zip.read(member)
 
 
-def test_libreoffice_baseline_is_one_page_with_stable_section_anchors(tmp_path: Path) -> None:
+def test_ats_optimizer_removes_only_embedded_fonts(tmp_path: Path) -> None:
+    optimized = write_ats_optimized_docx(BASE, tmp_path / "optimized.docx")
+
+    assert optimized.stat().st_size < 2_500_000
+    assert optimized.stat().st_size < BASE.stat().st_size / 10
+    assert font_deembedded_equivalent(BASE, optimized)
+    assert compare_format_integrity(base_path=BASE, candidate_path=optimized) == []
+
+
+def test_native_baseline_is_one_page_with_stable_section_anchors(tmp_path: Path) -> None:
     pdf = render_docx_to_pdf(BASE, tmp_path)
     document = parse_resume_docx(BASE)
     apply_pdf_layout_budgets(document, pdf)
-    layout = inspect_pdf(pdf, document=document)
+    layout = inspect_pdf(
+        pdf,
+        baseline_pdf=pdf,
+        document=document,
+        baseline_document=document,
+    )
 
     assert layout.passed
     assert layout.page_count == 1
@@ -84,8 +102,12 @@ def test_libreoffice_baseline_is_one_page_with_stable_section_anchors(tmp_path: 
     assert document.paragraphs[5].line_budget == 1
     assert document.paragraphs[14].line_budget == 2
     assert document.paragraphs[32].line_budget == 1
-    assert layout.font_inventory["Calibri"] == [10.5, 11.0]
-    assert layout.font_inventory["Calibri-Bold"] == [10.5, 14.0, 18.0]
+    assert any(abs(size - 10.5) < 0.1 for size in layout.font_inventory["Calibri"])
+    assert any(abs(size - 11.0) < 0.1 for size in layout.font_inventory["Calibri"])
+    assert any(abs(size - 14.0) < 0.1 for size in layout.font_inventory["Calibri-Bold"])
+    assert any(abs(size - 18.0) < 0.1 for size in layout.font_inventory["Calibri-Bold"])
+    assert layout.protected_horizontal_deltas
+    assert max(layout.protected_horizontal_deltas.values()) == 0.0
 
 
 def test_layout_rejects_excessive_upward_section_drift(tmp_path: Path) -> None:

@@ -1,0 +1,57 @@
+[
+  {
+    "run": "data\\benchmarks\\2026-08-06\\niagara_cycle6",
+    "company": "Niagara Bottling",
+    "role": "IT Systems Functional I",
+    "coverage": 58.56,
+    "retention": 104.51,
+    "docx_bytes": 27426,
+    "review_flags": 4,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "run": "data\\benchmarks\\2026-08-06\\nscale_cycle2",
+    "company": "Nscale",
+    "role": "Support Desk Engineer",
+    "coverage": 66.6,
+    "retention": 99.94,
+    "docx_bytes": 27378,
+    "review_flags": 0,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "run": "data\\benchmarks\\2026-08-06\\trade_desk_cycle6",
+    "company": "The Trade Desk",
+    "role": "Platform Support Analyst I",
+    "coverage": 52.47,
+    "retention": 102.44,
+    "docx_bytes": 27377,
+    "review_flags": 1,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "run": "data\\benchmarks\\2026-08-06\\la_times_cycle2",
+    "company": "Los Angeles Times",
+    "role": "Application Support Engineer",
+    "coverage": 66.15,
+    "retention": 99.91,
+    "docx_bytes": 27350,
+    "review_flags": 2,
+    "passed": true,
+    "errors": []
+  },
+  {
+    "run": "data\\benchmarks\\2026-08-06\\pds_cycle9",
+    "company": "PDS Health",
+    "role": "Analyst I, Epic Application Professional Billing and Claims",
+    "coverage": 44.12,
+    "retention": 103.12,
+    "docx_bytes": 27413,
+    "review_flags": 0,
+    "passed": true,
+    "errors": []
+  }
+]

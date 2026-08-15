@@ -1,0 +1,178 @@
+Company logo for, Community Energy Labs.
+Community Energy Labs
+Technical Support Engineer / Field Engineer
+Remote
+Remote
+Full-time
+$75k-$100k
+Source URL: https://www.linkedin.com/jobs/view/4435487199/
+About the job
+Community Energy Labs (CEL) is looking for a West Coast based Technical Support Engineer / Field Engineer to help deliver our innovative, money- and carbon-saving solution to our customers. In this role, you’ll be the technical bridge between our customers, our building integrations, and our product team. You’ll support site onboarding, troubleshooting technical issues, coordinate integrations, and help ensure our technology is delivering value in real buildings. You’ll work directly with facility teams, controls vendors, and contractors while collaborating closely with our product and engineering team to improve our technology and customer experience. The role is about 75% customer operations and technical support and 25% field engineering. Occasional travel is required (especially in spring and summer) for site visits, installation and troubleshooting. If your colleagues describe you as organized, dependable, curious, and an excellent communicator of technical information we’d love to hear from you. We are willing to train strong candidates coming from either building controls or technical support backgrounds.
+
+
+
+
+
+
+
+WHAT WE DO
+
+Community Energy Labs enables buildings to use energy when clean sources of power are available and to use less energy overall by making smart decisions about when and how energy is used. We primarily work with communities and schools, whose buildings make up nearly 30% of the commercial floor space in the US! 
+
+
+
+
+Community Energy Labs, its employees, and its customers are driven to be a part of the solution to saving our planet. Our software combines cutting edge control algorithms, machine learning, and traditional control techniques to lower cost and manage energy. We combine that with an intuitive user interface that doesn’t require a PhD in mechanical engineering to make saving money and the planet easy for everyone - even cash-strapped schools with overworked building operators.
+
+
+
+
+CEL's core AI-powered clean building control platform concept was a regional winner of CleanTech Open's 2020 international accelerator, an overall winner in the 2020 Madrona Venture Labs Go Vertical challenge, a three time SBIR winner with the Department of Energy, USDA, and NSF. CEL is a community member in Elemental Excelerator, Google for Startups and other prestigious accelerators. Follow CEL on LinkedIn.
+
+
+
+
+ESSENTIAL FUNCTIONS & RESPONSIBILITIES
+
+// PRODUCT & CUSTOMER SUPPORT
+
+Act as a project manager for new site onboarding.
+Coordinate with customers, control vendors, and facility teams to integrate HVAC systems and thermostat platforms with CEL’s software.
+Configure and monitor edge devices, local services, APIs, and data connections to ensure reliable communication between customer equipment and the CEL platform.
+Validate data quality, troubleshoot system issues, and monitor system performance.
+Install and commission gateway devices, electrical meters, and sensors that enable secure communication between building systems and CEL’s cloud platform.
+Document site-specific integrations, IP assignments, network diagrams, and device configurations.
+Collaborate with engineering and product teams to investigate technical issues, solve problems, and improve product functionality.
+Join customer meetings to provide insight and address technical and occupant concerns about product implementation.
+Understand and use CEL’s internal software tools, observability, and admin systems.
+
+
+
+
+// FIELD RESPONSIBILITIES
+
+Travel to customer sites to support onboarding, commissioning, troubleshooting, and relationship building.
+Meet with facility and energy managers, electricians and controls technicians.
+Walk the facility, enter mechanical & electrical rooms and climb up ladders to the roof to document building equipment using a tablet/phone.
+Provide professional and responsive on-site customer support.
+Coordinate with multiple stakeholders (customers, vendors, internal teams) for scheduling site work and updating technical documentation.
+Keep customer onboarding moving forward with clarity and efficiency.
+Coordinate with the Operations team to order, prepare and commission parts, schedule labor & equipment, update inventory, and prepare reports.
+Assist with bill of materials (BOM) development, manage inventory processes, and report on site performance.
+
+
+
+
+QUALIFICATIONS
+
+// REQUIRED EXPERIENCE
+
+2+ years of experience troubleshooting technical systems in a customer-facing, operations, facilities, controls, field service, technical support or technical project management role.
+Experience coordinating projects or working across multiple stakeholders to complete technical work.
+Ability and willingness to travel to customer sites.
+A valid driver's license and reliable transportation.
+
+
+
+
+// NECESSARY SKILLS/ABILITIES
+
+Excellent verbal and written communication skills, including the ability to effectively communicate technical information to non-technical audiences.
+Strong troubleshooting and problem-solving skills with a methodical approach to diagnosing issues,
+Comfortable working with Linux systems such as Debian or Ubuntu.
+Familiarity with SSH, SFTP, and common remote administration tools. 
+Basic understanding of network setup, such as IP addresses, DHCP, and VLANs.
+Familiarity with working with APIs, structured data formats (JSON, XML), and system integrations.
+Strong organizational skills and ability to manage multiple projects simultaneously.
+Ability to work independently while coordinating effectively with remote teammates.
+
+
+
+
+// NICE TO HAVE BUT NOT REQUIRED
+
+Experience with HVAC systems, building automation systems (BAS), or controls technologies. 
+Experience with BACnet, Modbus, or other building systems communication protocols.
+Experience working in the trades, construction management, field operations or similar experience.
+Scripting ability (Bash, Python) for automating common tasks.
+Experience supporting IoT devices, gateways, sensors, or distributed systems.
+Experience as a Controls Engineer or Technician, Building Automation Specialist, Controls Engineer, Energy Engineer, Commissioning Agent, or similar role.
+
+
+
+
+ROLE BASICS
+
+// WORKSPACE REQUIREMENTS AND EXPECTED HOURS OF WORK & TRAVEL
+
+This position is currently only open to Candidates on the West Coast.
+Dedicated workspace with two (2) monitors. Reliable and fast internet connection.
+This is a fully remote role with some travel responsibilities. Occasional overnight trips for site visits and on-site installation, customer prospect visits.
+This position is a full-time, exempt position that may occasionally require extra hours and weekend work that is not compensated as overtime.
+
+
+
+
+// SUPERVISORY RESPONSIBILITIES
+
+This position initially has no supervisory responsibilities. As an integral part of CEL's product team, you'll operate with a high degree of autonomy while actively collaborating with the product team and senior engineers for direction, support and mentorship.
+
+
+
+
+// SALARY
+
+The annual salary for this position is expected to be $75k-$100k per year commensurate with experience for a 40 hours per week work schedule.
+
+
+
+
+// PHYSICAL REQUIREMENTS
+
+This role may involve physical activity during site visits:
+Ability to stand for extended periods and navigate rugged/unstable conditions (reasonable accommodations will be made where possible).
+Work in outdoor or adverse weather during site visits.
+Enter mechanical/electrical rooms, climb ladders, crouch/kneel as needed.
+No heavy lifting expected.
+
+
+
+
+ATTRIBUTES
+
+// Ideal CEL community members demonstrate:
+
+Curiosity
+High accountability
+Empathy for customers and team
+Transparency
+Ability to task switch and stay focused
+Attention to detail
+Intrinsic drive to achieve results
+Willingness to communicate and teach
+Willingness to listen and learn
+Solid work habits and organization
+
+
+
+
+
+
+
+YES, THAT MEANS YOU!
+
+We’ve read the research and we know that certain underrepresented groups in tech might read our post and think “Oh, gee, well I only have nine out of ten qualifications.” If our mission and this job speak to you and you have the interest and ability to work smart, learn, and grow with us then we want you to apply for this job!
+
+
+
+
+Community Energy Labs is an equal opportunity employer and all qualified applicants will receive consideration for employment without regard to race, color, religion, sex, sexual orientation, gender identity or expression, pregnancy, age, national origin, disability status, genetic information, protected veteran status, or any other characteristic protected by state or federal law.
+
+
+
+
+APPLY NOW
+
+To ensure your application is considered, kindly submit it through the CEL website (https://communityenergylabs.com/open_roles/technical-support-engineer). Applications submitted through other means will not be reviewed.
+
+… more

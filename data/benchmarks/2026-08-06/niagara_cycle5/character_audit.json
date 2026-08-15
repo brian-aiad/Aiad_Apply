@@ -1,0 +1,413 @@
+{
+  "base_docx_sha256": "7cb556d81f20d884fa31e5fa5351847d6dec109da6e50736a164ca7a2770a07c",
+  "candidate_docx_sha256": "c2f3e8a760b56eafce60bf64f495fd87522bdc99e0d2abb4002a978159695968",
+  "candidate_pdf_sha256": "1f647986b386e62c8673a11508b836b2b0e589df301b27e593bfdcb392668113",
+  "pdf_text_sha256": "a5668f1330c0a2cd95ddd54a99eeaa7cb31f36b970a9e82df62da5e47d114d7e",
+  "page_count": 1,
+  "format_integrity_passed": true,
+  "format_issues": [],
+  "section_anchor_deltas": {
+    "SKILLS": 0.0,
+    "EXPERIENCE": 0.0,
+    "PROJECTS": 0.0,
+    "EDUCATION": 0.0,
+    "CERTIFICATIONS": 0.0
+  },
+  "font_inventory": {
+    "ArialMT": [
+      8.04,
+      9.0,
+      11.04
+    ],
+    "Calibri": [
+      2.04,
+      9.96,
+      10.56,
+      11.04
+    ],
+    "Calibri-Bold": [
+      8.04,
+      10.56,
+      11.04,
+      14.04,
+      18.0
+    ],
+    "Calibri-Italic": [
+      10.56,
+      11.04
+    ]
+  },
+  "out_of_bounds_items": [],
+  "overlap_items": [],
+  "paragraphs": [
+    {
+      "paragraph_id": "identity.name",
+      "text": "BRIAN AIAD",
+      "character_count": 10,
+      "utf8_byte_count": 10,
+      "text_sha256": "e28f48bfb5ff299d40590ac3ee0185c4e077b07d2c49358394226c5de8071f07",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "identity.contact",
+      "text": "csbrianaiad@gmail.com | 310-625-6844 | linkedin.com/in/brian-aiad | Los Angeles, CA",
+      "character_count": 83,
+      "utf8_byte_count": 83,
+      "text_sha256": "8b502c3e20f20bc3bb2c9b4da484d8d7a6e9bd62c363f1c37b4c6701218abd53",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "header.spacer.2",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "summary",
+      "text": "Business Systems Support Analyst with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "character_count": 357,
+      "utf8_byte_count": 357,
+      "text_sha256": "c9c83a134e04b70bef27116dc836170b340b0d03c1e67311f3ae25b072bef0e8",
+      "rendered_line_count": 3,
+      "baseline_line_count": 3
+    },
+    {
+      "paragraph_id": "skills.heading",
+      "text": "SKILLS",
+      "character_count": 6,
+      "utf8_byte_count": 6,
+      "text_sha256": "463051f456ad180aff19c834b279b6a3e58a4cbb2f12984234b66f0b393db4c7",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.technical_support",
+      "text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "character_count": 116,
+      "utf8_byte_count": 116,
+      "text_sha256": "65d4ed25d0baffb1bddbff4a2023983a035f26855618572ee926caee390ab829",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.apis_identity",
+      "text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "character_count": 135,
+      "utf8_byte_count": 135,
+      "text_sha256": "94e28b0df76076005fb27570d019de1e38d47a06b8e474843ca2e8660401b3dc",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.languages_dbs",
+      "text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "character_count": 121,
+      "utf8_byte_count": 121,
+      "text_sha256": "a7bffd72a5008ec9ffdd8b64c5fee6d13cc21d0f2f444610990290751050e420",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.cloud_systems",
+      "text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "character_count": 91,
+      "utf8_byte_count": 91,
+      "text_sha256": "340d8e744e564d6d8a24f2698403c1abd9a7bf43cbf4a7d6b5be383beeed7ab3",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.tools",
+      "text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code, Outlook, Microsoft Office",
+      "character_count": 116,
+      "utf8_byte_count": 116,
+      "text_sha256": "285b504f4e18d0d994637d1d8e313fc7e6c6245d044458e55db5883574ee39f4",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "skills.spacer.10",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "experience.heading",
+      "text": "EXPERIENCE",
+      "character_count": 10,
+      "utf8_byte_count": 10,
+      "text_sha256": "00fa6bdd35c8f5dfe41c3d548874639ad78c53e07abaf856d421eb51dcc58f51",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "experience.spacer.12",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "experience.original_insurance.heading",
+      "text": "ORIGINAL INSURANCE GROUP INC | Application Support Specialist\tJun 2024 - Present | Downey, CA",
+      "character_count": 93,
+      "utf8_byte_count": 93,
+      "text_sha256": "c8654fb82acca4a3a92e556a22ad665c064692cef442e28ef5a4bd71266e50d4",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.1",
+      "text": "Applied task prioritization while resolving 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365,, maintaining sub-90-minute average resolution.",
+      "character_count": 204,
+      "utf8_byte_count": 204,
+      "text_sha256": "a7cd0877a3eedd7d688890d47e6df7f2243a07d9b55c70ed246f97e6b4c47fe5",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.2",
+      "text": "Investigated production incidents through critical thinking and problem-solving, log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "character_count": 203,
+      "utf8_byte_count": 203,
+      "text_sha256": "5350d5d9dcad7fa23f684e2fc2bc162bf481dbf5a5d8ce70629aff49d86c4188",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.3",
+      "text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "character_count": 218,
+      "utf8_byte_count": 218,
+      "text_sha256": "2bb917ff5945e3241d2086676307979e3250b85d0395cc7b04287a87da4705eb",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.4",
+      "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "character_count": 231,
+      "utf8_byte_count": 231,
+      "text_sha256": "fc975298a8d6d7da90e97da14a9820062256ee63a7d461b00bcbe40eb71fd0e6",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.5",
+      "text": "Supported webhook and carrier integration workflows for the agency management system, troubleshooting payload, authentication, and data-sync failures with Postman and structured logs.",
+      "character_count": 183,
+      "utf8_byte_count": 183,
+      "text_sha256": "37d2ecaa310f2a2499b2e4fc8506bc33340528e4fd1af174d4a199dc467af72b",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.spacer.19",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "experience.csulb.heading",
+      "text": "CALIFORNIA STATE UNIVERSITY, LONG BEACH | Building Manager, IT Operations Support\tJan 2024 - Aug 2025 | Long Beach, CA",
+      "character_count": 118,
+      "utf8_byte_count": 118,
+      "text_sha256": "ff973d51ad755c86414fdaeb5502d7e5eba18ed50af5b8deaf93ba0e8450e7dd",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.1",
+      "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "character_count": 253,
+      "utf8_byte_count": 253,
+      "text_sha256": "e74332eb14834f924c3f612bb2ab0802b45b5ddad56863649d2693ca08edb865",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.2",
+      "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "character_count": 180,
+      "utf8_byte_count": 180,
+      "text_sha256": "be7d932f5a67884de4546cf839dd35a11f500dc35329d77e9241f4b9349df930",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.3",
+      "text": "Maintained incident documentation, escalation notes, and recurring issue tracking, using verbal communication and cross-functional collaboration with campus IT and third-party vendors.",
+      "character_count": 184,
+      "utf8_byte_count": 184,
+      "text_sha256": "cd1b38885b9fb521514d16329205349b0d45fc6799a42c4335bebdae67476466",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.spacer.24",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "experience.wehelp.heading",
+      "text": "WEHELP, CHRIST THE GOOD SHEPHERD FOOD BANK | Volunteer Application Support Specialist\tApr 2021 - Present | Long Beach, CA",
+      "character_count": 121,
+      "utf8_byte_count": 121,
+      "text_sha256": "0416b7e00c2f24de1798f151d688df27e5cc2a1cbd07359551f6d9bb43391fbc",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.1",
+      "text": "Applied business analysis to identify the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "character_count": 217,
+      "utf8_byte_count": 217,
+      "text_sha256": "529f22e93b71f295324fae5e2d1474c7fbeaeac82f8967c5ffcd58efb897252e",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.2",
+      "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "character_count": 180,
+      "utf8_byte_count": 180,
+      "text_sha256": "b2372f60b425768aced01e9ea6b80c969930330891e105f34ed620710f6304b7",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "experience.spacer.28",
+      "text": "\t",
+      "character_count": 1,
+      "utf8_byte_count": 1,
+      "text_sha256": "2b4c342f5433ebe591a1da77e013d1b72475562d48578dca8b84bac6651c3cb9",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "projects.heading",
+      "text": "PROJECTS",
+      "character_count": 8,
+      "utf8_byte_count": 8,
+      "text_sha256": "59891d08e1d3e26bb7f23f03f9403d62f279d044266fadba8ffb4cf8515031fe",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "projects.loavenly.heading",
+      "text": "LOAVENLY | Multi-Tenant Food Bank Operations Platform | loavenly.com",
+      "character_count": 68,
+      "utf8_byte_count": 68,
+      "text_sha256": "79a9cbd39e71e9ea18d152876a661e8da337dcc83b0fcb4cae3952d4cf04a803",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.1",
+      "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "character_count": 168,
+      "utf8_byte_count": 168,
+      "text_sha256": "cd381328f9cc0a788c79bee21603623ac987356b403ab2b2d81d3e190711de37",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.2",
+      "text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "character_count": 123,
+      "utf8_byte_count": 123,
+      "text_sha256": "2bfb1fd611fc08766b9dbef005120cc8d26001885f3fbaed214f6176cc7bfa06",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.3",
+      "text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "character_count": 140,
+      "utf8_byte_count": 140,
+      "text_sha256": "7b5ece780a505ca6dbb3c8f99bf41ac7987fa496b3351626d9df4c77f86797b7",
+      "rendered_line_count": 2,
+      "baseline_line_count": 2
+    },
+    {
+      "paragraph_id": "projects.spacer.34",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "education.heading",
+      "text": "EDUCATION",
+      "character_count": 9,
+      "utf8_byte_count": 9,
+      "text_sha256": "25c3308bcdc49ca36826fbe41a38f8525335489864ea299cca7f2090e0670b5c",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "education.spacer.36",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "education.protected_body.37",
+      "text": "       Bachelor of Science | Computer Science, California State University, Long Beach\tMay 2025",
+      "character_count": 95,
+      "utf8_byte_count": 95,
+      "text_sha256": "bbb89ca4373a35948d6932085085bceafb89fecd29259826785fff58f5c43225",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "education.spacer.38",
+      "text": "",
+      "character_count": 0,
+      "utf8_byte_count": 0,
+      "text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "rendered_line_count": 0,
+      "baseline_line_count": 0
+    },
+    {
+      "paragraph_id": "certifications.heading",
+      "text": "CERTIFICATIONS ",
+      "character_count": 15,
+      "utf8_byte_count": 15,
+      "text_sha256": "44e476c50904851a6c09426355ebb915ed148ec43ea262f3a92927b70bf6c5e6",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    },
+    {
+      "paragraph_id": "certifications.protected_body.40",
+      "text": "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation",
+      "character_count": 105,
+      "utf8_byte_count": 105,
+      "text_sha256": "fc8ec6278d0bbefd8e21e82a95d4c162aa8eddc88585b25ea536084d5f3d8477",
+      "rendered_line_count": 1,
+      "baseline_line_count": 1
+    }
+  ]
+}

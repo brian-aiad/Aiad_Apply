@@ -1,0 +1,3375 @@
+{
+  "job": {
+    "company": "Los Angeles Times",
+    "title": "Application Support Engineer",
+    "location": "El Segundo, CA",
+    "work_arrangement": "",
+    "compensation": "$95,000-$110,000",
+    "source_url": null,
+    "linkedin_url": null,
+    "job_description": "The Application Support Engineer is responsible for supporting, configuring, maintaining, and optimizing enterprise applications that support critical business operations. This role ensures applications remain reliable, secure, and available by monitoring system performance, troubleshooting technical issues, implementing configuration changes, supporting integrations, and participating in application upgrades and enhancements.\n\nWorking closely with business users, software developers, infrastructure teams, cybersecurity, and third-party vendors, the Application Support Engineer provides technical expertise to resolve application issues, improve system performance, automate operational processes, and support continuous improvement initiatives. The role serves as a technical resource for assigned applications while contributing to projects that enhance application stability, scalability, and operational efficiency.\n\nResponsibilities\n\nSupport the administration, configuration, maintenance, and optimization of assigned enterprise applications to ensure reliable, secure, and efficient business operations.\nTroubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.\nMonitor application health, availability, performance, and system capacity using enterprise monitoring tools to proactively identify and resolve potential issues.\nConfigure application settings, security permissions, user access, workflows, and system integrations in accordance with business requirements and organizational standards.\nDevelop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.\nSupport application deployments, upgrades, patches, configuration changes, testing activities, and production releases while following established change management processes.\nCollaborate with software developers, infrastructure, networking, cloud, cybersecurity, database teams, vendors, and business stakeholders to implement enhancements and resolve technical issues.\nCreate and maintain technical documentation, system configurations, support procedures, knowledge base articles, and operational documentation.\nSupport incident, problem, and service request management activities while meeting established service level agreements and contributing to continuous service improvement.\nGenerate reports, dashboards, and application performance metrics to support operational decision-making and identify process improvements.\nCoordinate with software vendors to troubleshoot application issues, support upgrades, and resolve technical problems.\nParticipate in disaster recovery testing, system validation, business continuity planning, and production support activities.\n\nRequirements\n\nBachelor's degree in Computer Science, Information Technology, Information Systems, or Software Engineering and 3+ years supporting enterprise applications, SaaS platforms, cloud applications, or business systems, or 5+ years of equivalent progressive experience.\nExperience supporting enterprise business applications in production environments.\nExperience troubleshooting application issues involving databases, APIs, integrations, and application configurations.\nWorking knowledge of REST APIs, web services, integration technologies, and data exchange processes.\nExperience writing SQL queries for troubleshooting, reporting, and data analysis.\nExperience using PowerShell, Python, Bash, or similar scripting languages to automate operational tasks is preferred.\nWorking knowledge of software development lifecycle, change management, and IT service management practices.\nExperience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.\nUnderstanding of application security, authentication, user provisioning, role-based access, and security best practices.\nExperience with application monitoring, logging, and performance monitoring tools.\nFamiliarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.\nStrong analytical, troubleshooting, organizational, and problem-solving skills.\nAbility to communicate effectively with technical teams, business users, and third-party vendors.\nAbility to manage multiple priorities while maintaining attention to detail and meeting deadlines.\n\nPreferred Qualifications\n\nExperience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.\nExperience supporting application integrations using REST APIs, middleware, or ETL tools.\nFamiliarity with ITIL service management principles.\nExperience participating in application implementations, upgrades, or migration projects.\nKnowledge of relational database design and performance optimization.\nRelevant certifications such as ITIL Foundation, Microsoft Azure Fundamentals, AWS Cloud Practitioner, CompTIA Network+, Security+, or similar technical certifications.\nExperience supporting SaaS and hybrid cloud environments.\nExperience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.\n\nUS Salary Range\n\n$95,000-$110,000 USD",
+    "responsibilities": [
+      "Support the administration, configuration, maintenance, and optimization of assigned enterprise applications to ensure reliable, secure, and efficient business operations.",
+      "Troubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.",
+      "Monitor application health, availability, performance, and system capacity using enterprise monitoring tools to proactively identify and resolve potential issues.",
+      "Configure application settings, security permissions, user access, workflows, and system integrations in accordance with business requirements and organizational standards.",
+      "Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.",
+      "Support application deployments, upgrades, patches, configuration changes, testing activities, and production releases while following established change management processes.",
+      "Collaborate with software developers, infrastructure, networking, cloud, cybersecurity, database teams, vendors, and business stakeholders to implement enhancements and resolve technical issues.",
+      "Create and maintain technical documentation, system configurations, support procedures, knowledge base articles, and operational documentation.",
+      "Support incident, problem, and service request management activities while meeting established service level agreements and contributing to continuous service improvement.",
+      "Generate reports, dashboards, and application performance metrics to support operational decision-making and identify process improvements.",
+      "Coordinate with software vendors to troubleshoot application issues, support upgrades, and resolve technical problems.",
+      "Participate in disaster recovery testing, system validation, business continuity planning, and production support activities."
+    ],
+    "required_qualifications": [
+      "Bachelor's degree in Computer Science, Information Technology, Information Systems, or Software Engineering and 3+ years supporting enterprise applications, SaaS platforms, cloud applications, or business systems, or 5+ years of equivalent progressive experience.",
+      "Experience supporting enterprise business applications in production environments.",
+      "Experience troubleshooting application issues involving databases, APIs, integrations, and application configurations.",
+      "Working knowledge of REST APIs, web services, integration technologies, and data exchange processes.",
+      "Experience writing SQL queries for troubleshooting, reporting, and data analysis.",
+      "Working knowledge of software development lifecycle, change management, and IT service management practices.",
+      "Experience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.",
+      "Understanding of application security, authentication, user provisioning, role-based access, and security best practices.",
+      "Experience with application monitoring, logging, and performance monitoring tools.",
+      "Familiarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.",
+      "Strong analytical, troubleshooting, organizational, and problem-solving skills.",
+      "Ability to communicate effectively with technical teams, business users, and third-party vendors.",
+      "Ability to manage multiple priorities while maintaining attention to detail and meeting deadlines."
+    ],
+    "preferred_qualifications": [
+      "Experience using PowerShell, Python, Bash, or similar scripting languages to automate operational tasks is preferred.",
+      "Experience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.",
+      "Experience supporting application integrations using REST APIs, middleware, or ETL tools.",
+      "Familiarity with ITIL service management principles.",
+      "Experience participating in application implementations, upgrades, or migration projects.",
+      "Knowledge of relational database design and performance optimization.",
+      "Relevant certifications such as ITIL Foundation, Microsoft Azure Fundamentals, AWS Cloud Practitioner, CompTIA Network+, Security+, or similar technical certifications.",
+      "Experience supporting SaaS and hybrid cloud environments.",
+      "Experience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms."
+    ],
+    "high_priority_keywords": [
+      "Jira",
+      "REST APIs",
+      "Python",
+      "Bash",
+      "SQL",
+      "troubleshooting",
+      "Tableau",
+      "Looker",
+      "Azure",
+      "Power BI",
+      "Google Cloud",
+      "ERP",
+      "SDLC",
+      "PowerShell",
+      "Service Level Agreements",
+      "ServiceNow"
+    ],
+    "low_priority_keywords": [
+      "database",
+      "production support",
+      "ticketing",
+      "API",
+      "change management",
+      "CRM",
+      "ETL",
+      "hybrid cloud",
+      "SaaS",
+      "web services"
+    ],
+    "simplify_score": [
+      6,
+      26
+    ],
+    "rejected_regions": [
+      "linkedin_navigation_and_job_chrome"
+    ],
+    "raw_paste_sha256": "738748cc9c70a565cbdc89b9177cdc742fbebb2cc9c0fb2ec321b4295ec36a64",
+    "raw_paste": "0 notifications\n\nHome\nMy Network\nJobs\nMessaging\nNotifications\n\nCompany logo for, Los Angeles Times.\nLos Angeles Times\n\nApplication Support Engineer\n\nEl Segundo, CA \u00b7 1 day ago \u00b7 52 people clicked apply\nFull-time\nApply\nSave\n\n23%\nResume Match\n6 of 26 keywords\nSimplify\nHigh Priority Keywords\nJira\nREST APIs\nPython\nBash\nSQL\ntroubleshooting\nTableau\nLooker\nAzure\nPower BI\nGoogle Cloud\nERP\nSDLC\nPowerShell\nService Level Agreements\nServiceNow\nLow Priority Keywords\ndatabase\nproduction support\nticketing\nAPI\nchange management\nCRM\nETL\nhybrid cloud\nSaaS\nweb services\n\nAbout the job\n\nThe Application Support Engineer is responsible for supporting, configuring, maintaining, and optimizing enterprise applications that support critical business operations. This role ensures applications remain reliable, secure, and available by monitoring system performance, troubleshooting technical issues, implementing configuration changes, supporting integrations, and participating in application upgrades and enhancements.\n\nWorking closely with business users, software developers, infrastructure teams, cybersecurity, and third-party vendors, the Application Support Engineer provides technical expertise to resolve application issues, improve system performance, automate operational processes, and support continuous improvement initiatives. The role serves as a technical resource for assigned applications while contributing to projects that enhance application stability, scalability, and operational efficiency.\n\nResponsibilities\n\nSupport the administration, configuration, maintenance, and optimization of assigned enterprise applications to ensure reliable, secure, and efficient business operations.\nTroubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.\nMonitor application health, availability, performance, and system capacity using enterprise monitoring tools to proactively identify and resolve potential issues.\nConfigure application settings, security permissions, user access, workflows, and system integrations in accordance with business requirements and organizational standards.\nDevelop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.\nSupport application deployments, upgrades, patches, configuration changes, testing activities, and production releases while following established change management processes.\nCollaborate with software developers, infrastructure, networking, cloud, cybersecurity, database teams, vendors, and business stakeholders to implement enhancements and resolve technical issues.\nCreate and maintain technical documentation, system configurations, support procedures, knowledge base articles, and operational documentation.\nSupport incident, problem, and service request management activities while meeting established service level agreements and contributing to continuous service improvement.\nGenerate reports, dashboards, and application performance metrics to support operational decision-making and identify process improvements.\nCoordinate with software vendors to troubleshoot application issues, support upgrades, and resolve technical problems.\nParticipate in disaster recovery testing, system validation, business continuity planning, and production support activities.\n\nRequirements\n\nBachelor's degree in Computer Science, Information Technology, Information Systems, or Software Engineering and 3+ years supporting enterprise applications, SaaS platforms, cloud applications, or business systems, or 5+ years of equivalent progressive experience.\nExperience supporting enterprise business applications in production environments.\nExperience troubleshooting application issues involving databases, APIs, integrations, and application configurations.\nWorking knowledge of REST APIs, web services, integration technologies, and data exchange processes.\nExperience writing SQL queries for troubleshooting, reporting, and data analysis.\nExperience using PowerShell, Python, Bash, or similar scripting languages to automate operational tasks is preferred.\nWorking knowledge of software development lifecycle, change management, and IT service management practices.\nExperience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.\nUnderstanding of application security, authentication, user provisioning, role-based access, and security best practices.\nExperience with application monitoring, logging, and performance monitoring tools.\nFamiliarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.\nStrong analytical, troubleshooting, organizational, and problem-solving skills.\nAbility to communicate effectively with technical teams, business users, and third-party vendors.\nAbility to manage multiple priorities while maintaining attention to detail and meeting deadlines.\n\nPreferred Qualifications\n\nExperience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.\nExperience supporting application integrations using REST APIs, middleware, or ETL tools.\nFamiliarity with ITIL service management principles.\nExperience participating in application implementations, upgrades, or migration projects.\nKnowledge of relational database design and performance optimization.\nRelevant certifications such as ITIL Foundation, Microsoft Azure Fundamentals, AWS Cloud Practitioner, CompTIA Network+, Security+, or similar technical certifications.\nExperience supporting SaaS and hybrid cloud environments.\nExperience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.\n\nUS Salary Range\n\n$95,000-$110,000 USD"
+  },
+  "keywords": [
+    {
+      "term": "SQL",
+      "normalized": "sql",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 79.0,
+      "placement_utility": 89.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "application support",
+      "normalized": "application support",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 10,
+      "source_sections": [
+        "title",
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "title_responsibility_composite": 18.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 6.0,
+        "preferred_qualification": 6.0,
+        "title": 15.0,
+        "posting_repetition": 8.0
+      },
+      "hiring_importance": 71.0,
+      "placement_utility": 81.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "REST APIs",
+      "normalized": "rest apis",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 67.0,
+      "placement_utility": 77.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Azure",
+      "normalized": "azure",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 67.0,
+      "placement_utility": 77.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "change management",
+      "normalized": "change management",
+      "priority": "low",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_low",
+        "required",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 63.0,
+      "placement_utility": 73.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Tableau",
+      "normalized": "tableau",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Looker",
+      "normalized": "looker",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Power BI",
+      "normalized": "power bi",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Google Cloud",
+      "normalized": "google cloud",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "APIs",
+      "normalized": "apis",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 3,
+      "source_sections": [
+        "required",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 6.0
+      },
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "priority": "high",
+      "kind": "action",
+      "occurrences": 4,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "posting_repetition": 8.0
+      },
+      "hiring_importance": 55.0,
+      "placement_utility": 65.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "AWS",
+      "normalized": "aws",
+      "priority": "inferred",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 55.0,
+      "placement_utility": 65.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "web services",
+      "normalized": "web services",
+      "priority": "low",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "required"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 51.0,
+      "placement_utility": 61.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Python",
+      "normalized": "python",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Bash",
+      "normalized": "bash",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "PowerShell",
+      "normalized": "powershell",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "database",
+      "normalized": "database",
+      "priority": "low",
+      "kind": "system",
+      "occurrences": 3,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0,
+        "posting_repetition": 6.0
+      },
+      "hiring_importance": 48.0,
+      "placement_utility": 58.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "SaaS",
+      "normalized": "saas",
+      "priority": "low",
+      "kind": "environment",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_low",
+        "required",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "required_qualification": 25.0,
+        "preferred_qualification": 6.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 41.0,
+      "placement_utility": 41.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "scoring_factors": {
+        "required_qualification": 25.0,
+        "required_technical_core": 10.0
+      },
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "API",
+      "normalized": "api",
+      "priority": "low",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 34.0,
+      "placement_utility": 44.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Service Level Agreements",
+      "normalized": "service level agreements",
+      "priority": "high",
+      "kind": "outcome",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 30.0,
+      "placement_utility": 30.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "Jira",
+      "normalized": "jira",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ERP",
+      "normalized": "erp",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ServiceNow",
+      "normalized": "servicenow",
+      "priority": "high",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "posting_repetition": 6.0
+      },
+      "hiring_importance": 26.0,
+      "placement_utility": 36.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "production support",
+      "normalized": "production support",
+      "priority": "low",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 2.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "CRM",
+      "normalized": "crm",
+      "priority": "low",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ETL",
+      "normalized": "etl",
+      "priority": "low",
+      "kind": "system",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "preferred_qualification": 6.0,
+        "specific_system": 10.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "operational efficiency",
+      "normalized": "operational efficiency",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0,
+        "posting_repetition": 4.0
+      },
+      "hiring_importance": 22.0,
+      "placement_utility": 22.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "knowledge base",
+      "normalized": "knowledge base",
+      "priority": "inferred",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "scoring_factors": {
+        "responsibility": 18.0,
+        "responsibility_repetition": 0.0
+      },
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "ticketing",
+      "normalized": "ticketing",
+      "priority": "low",
+      "kind": "action",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 12.0,
+      "placement_utility": 22.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "SDLC",
+      "normalized": "sdlc",
+      "priority": "high",
+      "kind": "environment",
+      "occurrences": 0,
+      "source_sections": [
+        "simplify_high"
+      ],
+      "scoring_factors": {
+        "simplify_high": 12.0
+      },
+      "hiring_importance": 12.0,
+      "placement_utility": 12.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "hybrid cloud",
+      "normalized": "hybrid cloud",
+      "priority": "low",
+      "kind": "environment",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "scoring_factors": {
+        "simplify_low": 6.0,
+        "preferred_qualification": 6.0
+      },
+      "hiring_importance": 12.0,
+      "placement_utility": 12.0,
+      "accepted": true,
+      "rejection_reason": ""
+    },
+    {
+      "term": "continuous improvement",
+      "normalized": "continuous improvement",
+      "priority": "inferred",
+      "kind": "outcome",
+      "occurrences": 1,
+      "source_sections": [
+        "job_description"
+      ],
+      "scoring_factors": {
+        "technical_role_summary": 6.0
+      },
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "rejection_reason": ""
+    }
+  ],
+  "keyword_decisions": [
+    {
+      "term": "SQL",
+      "normalized": "sql",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "responsibilities"
+      ],
+      "hiring_importance": 79.0,
+      "placement_utility": 89.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.languages_dbs",
+        "experience.original_insurance.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "application support",
+      "normalized": "application support",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 10,
+      "source_sections": [
+        "title",
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 71.0,
+      "placement_utility": 81.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "experience.original_insurance.heading",
+        "experience.csulb.bullet.1",
+        "experience.wehelp.heading"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "REST APIs",
+      "normalized": "rest apis",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "preferred"
+      ],
+      "hiring_importance": 67.0,
+      "placement_utility": 77.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.apis_identity"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Azure",
+      "normalized": "azure",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "required",
+        "preferred"
+      ],
+      "hiring_importance": 67.0,
+      "placement_utility": 77.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "certifications.protected_body.40"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "change management",
+      "normalized": "change management",
+      "kind": "action",
+      "priority": "low",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_low",
+        "required",
+        "responsibilities"
+      ],
+      "hiring_importance": 63.0,
+      "placement_utility": 73.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Tableau",
+      "normalized": "tableau",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Looker",
+      "normalized": "looker",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Power BI",
+      "normalized": "power bi",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "Google Cloud",
+      "normalized": "google cloud",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "APIs",
+      "normalized": "apis",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 3,
+      "source_sections": [
+        "required",
+        "preferred"
+      ],
+      "hiring_importance": 57.0,
+      "placement_utility": 67.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.apis_identity"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "troubleshooting",
+      "normalized": "troubleshooting",
+      "kind": "action",
+      "priority": "high",
+      "occurrences": 4,
+      "source_sections": [
+        "simplify_high",
+        "required"
+      ],
+      "hiring_importance": 55.0,
+      "placement_utility": 65.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.technical_support",
+        "experience.wehelp.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "AWS",
+      "normalized": "aws",
+      "kind": "system",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "required",
+        "preferred"
+      ],
+      "hiring_importance": 55.0,
+      "placement_utility": 65.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.cloud_systems",
+        "certifications.protected_body.40"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "web services",
+      "normalized": "web services",
+      "kind": "system",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "required"
+      ],
+      "hiring_importance": 51.0,
+      "placement_utility": 61.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.original_insurance.bullet.5"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Python",
+      "normalized": "python",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.languages_dbs",
+        "experience.original_insurance.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Bash",
+      "normalized": "bash",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.languages_dbs"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "PowerShell",
+      "normalized": "powershell",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 50.0,
+      "placement_utility": 60.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.languages_dbs",
+        "experience.original_insurance.bullet.4"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "database",
+      "normalized": "database",
+      "kind": "system",
+      "priority": "low",
+      "occurrences": 3,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities",
+        "preferred"
+      ],
+      "hiring_importance": 48.0,
+      "placement_utility": 58.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.original_insurance.bullet.3",
+        "projects.loavenly.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "SaaS",
+      "normalized": "saas",
+      "kind": "environment",
+      "priority": "low",
+      "occurrences": 2,
+      "source_sections": [
+        "simplify_low",
+        "required",
+        "preferred"
+      ],
+      "hiring_importance": 41.0,
+      "placement_utility": 41.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "experience.original_insurance.bullet.1",
+        "experience.original_insurance.bullet.4",
+        "projects.loavenly.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "problem-solving",
+      "normalized": "problem-solving",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "required"
+      ],
+      "hiring_importance": 35.0,
+      "placement_utility": 45.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "summary"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "API",
+      "normalized": "api",
+      "kind": "system",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities"
+      ],
+      "hiring_importance": 34.0,
+      "placement_utility": 44.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "summary",
+        "skills.apis_identity",
+        "experience.original_insurance.bullet.2",
+        "experience.original_insurance.bullet.4",
+        "projects.loavenly.bullet.2"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "Service Level Agreements",
+      "normalized": "service level agreements",
+      "kind": "outcome",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "responsibilities"
+      ],
+      "hiring_importance": 30.0,
+      "placement_utility": 30.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "direct",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "Jira",
+      "normalized": "jira",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.tools",
+        "experience.original_insurance.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "ERP",
+      "normalized": "erp",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "ServiceNow",
+      "normalized": "servicenow",
+      "kind": "system",
+      "priority": "high",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_high",
+        "preferred"
+      ],
+      "hiring_importance": 28.0,
+      "placement_utility": 38.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "configuration",
+      "normalized": "configuration",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 3,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 26.0,
+      "placement_utility": 36.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "direct",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed to preserve stronger evidence and the one-page layout."
+    },
+    {
+      "term": "production support",
+      "normalized": "production support",
+      "kind": "action",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "responsibilities"
+      ],
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "skills.technical_support",
+        "experience.original_insurance.bullet.1"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "documentation",
+      "normalized": "documentation",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 24.0,
+      "placement_utility": 34.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.csulb.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "CRM",
+      "normalized": "crm",
+      "kind": "system",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "ETL",
+      "normalized": "etl",
+      "kind": "system",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 32.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "direct",
+      "placements": [
+        "experience.original_insurance.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "operational efficiency",
+      "normalized": "operational efficiency",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 2,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 22.0,
+      "placement_utility": 22.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "experience.original_insurance.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    },
+    {
+      "term": "knowledge base",
+      "normalized": "knowledge base",
+      "kind": "action",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "responsibilities"
+      ],
+      "hiring_importance": 18.0,
+      "placement_utility": 28.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "weakly_transferable",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "ticketing",
+      "normalized": "ticketing",
+      "kind": "action",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "hiring_importance": 12.0,
+      "placement_utility": 22.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "direct",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because it is lower-priority or scanner-only language."
+    },
+    {
+      "term": "SDLC",
+      "normalized": "sdlc",
+      "kind": "environment",
+      "priority": "high",
+      "occurrences": 0,
+      "source_sections": [
+        "simplify_high"
+      ],
+      "hiring_importance": 12.0,
+      "placement_utility": 12.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "hybrid cloud",
+      "normalized": "hybrid cloud",
+      "kind": "environment",
+      "priority": "low",
+      "occurrences": 1,
+      "source_sections": [
+        "simplify_low",
+        "preferred"
+      ],
+      "hiring_importance": 12.0,
+      "placement_utility": 12.0,
+      "accepted": true,
+      "used": false,
+      "evidence_level": "unsupported",
+      "placements": [],
+      "rejection_reason": "",
+      "explanation": "Not placed because candidate evidence does not substantiate it."
+    },
+    {
+      "term": "continuous improvement",
+      "normalized": "continuous improvement",
+      "kind": "outcome",
+      "priority": "inferred",
+      "occurrences": 1,
+      "source_sections": [
+        "job_description"
+      ],
+      "hiring_importance": 6.0,
+      "placement_utility": 6.0,
+      "accepted": true,
+      "used": true,
+      "evidence_level": "strongly_transferable",
+      "placements": [
+        "projects.loavenly.bullet.3"
+      ],
+      "rejection_reason": "",
+      "explanation": "Placed in the strongest natural resume location."
+    }
+  ],
+  "role_profile": {
+    "company": "Los Angeles Times",
+    "title": "Application Support Engineer",
+    "normalized_role_family": "application_support_engineering",
+    "professional_identity": "Application Support Engineer",
+    "seniority": "entry_mid",
+    "industry": [
+      "media_publishing"
+    ],
+    "core_systems": [
+      "SQL",
+      "REST APIs",
+      "AWS",
+      "Azure",
+      "APIs",
+      "web services",
+      "Python",
+      "Bash",
+      "PowerShell",
+      "database",
+      "Jira"
+    ],
+    "core_actions": [
+      "application support",
+      "troubleshooting",
+      "configuration",
+      "production support",
+      "documentation",
+      "ticketing",
+      "system validation",
+      "application monitoring"
+    ],
+    "environment_signals": [
+      "SaaS",
+      "production",
+      "operational",
+      "customer-facing",
+      "enterprise applications",
+      "cloud-based"
+    ],
+    "customer_or_stakeholder_type": [
+      "business users",
+      "software developers",
+      "infrastructure teams",
+      "cybersecurity teams",
+      "database teams",
+      "third-party vendors"
+    ],
+    "primary_responsibilities": [
+      "Support, configure, maintain, and optimize enterprise applications.",
+      "Troubleshoot application, integration, API, database, and system issues.",
+      "Monitor application health, availability, performance, and capacity.",
+      "Configure application settings, permissions, access, workflows, and integrations.",
+      "Use SQL and scripting to automate tasks and support monitoring and reporting.",
+      "Support deployments, upgrades, testing, configuration changes, and releases.",
+      "Collaborate with technical teams, business stakeholders, and vendors.",
+      "Maintain technical documentation and support procedures.",
+      "Support incident, problem, and service request management.",
+      "Generate operational reports and application performance metrics."
+    ],
+    "required_qualifications": [
+      "Bachelor's degree in a relevant technical discipline or equivalent progressive experience.",
+      "Experience supporting enterprise business applications in production environments.",
+      "Experience troubleshooting databases, APIs, integrations, and application configurations.",
+      "Working knowledge of REST APIs, web services, integration technologies, and data exchange.",
+      "Experience writing SQL queries for troubleshooting, reporting, and analysis.",
+      "Working knowledge of SDLC, change management, and IT service management practices.",
+      "Experience supporting cloud-based applications or platforms.",
+      "Understanding of application security, authentication, user provisioning, and role-based access.",
+      "Experience with application monitoring, logging, and performance monitoring tools.",
+      "Familiarity with reporting and analytics tools.",
+      "Strong analytical, troubleshooting, organizational, and problem-solving skills.",
+      "Effective communication with technical teams, business users, and vendors."
+    ],
+    "preferred_qualifications": [
+      "Scripting experience with PowerShell, Python, Bash, or similar languages.",
+      "Experience supporting media, publishing, subscription, CRM, ERP, or customer-facing applications.",
+      "Experience supporting REST API, middleware, or ETL integrations.",
+      "Familiarity with ITIL service management principles.",
+      "Experience with application implementations, upgrades, or migrations.",
+      "Knowledge of relational databases and performance optimization.",
+      "Relevant cloud, ITIL, networking, or security certifications.",
+      "Experience supporting SaaS and hybrid cloud environments.",
+      "Experience with Jira Service Management, ServiceNow, or similar ticketing systems."
+    ],
+    "high_priority_keywords": [
+      "SQL",
+      "application support",
+      "REST APIs",
+      "Azure",
+      "change management",
+      "Tableau",
+      "Looker",
+      "Power BI",
+      "Google Cloud",
+      "APIs",
+      "troubleshooting",
+      "AWS",
+      "web services",
+      "Python",
+      "Bash",
+      "PowerShell",
+      "database",
+      "SaaS",
+      "problem-solving"
+    ],
+    "secondary_keywords": [
+      "API",
+      "Service Level Agreements",
+      "Jira",
+      "ERP",
+      "ServiceNow",
+      "configuration",
+      "production support",
+      "documentation",
+      "CRM",
+      "ETL",
+      "operational efficiency",
+      "knowledge base",
+      "ticketing",
+      "SDLC",
+      "hybrid cloud",
+      "continuous improvement"
+    ],
+    "noisy_rejected_keywords": [],
+    "expected_outcome_language": [
+      "Service Level Agreements",
+      "operational efficiency",
+      "continuous improvement",
+      "availability"
+    ],
+    "expected_metrics": [
+      "availability",
+      "incident resolution time",
+      "application performance",
+      "automation time savings"
+    ],
+    "role_specific_vocabulary": [
+      "SQL",
+      "application support",
+      "REST APIs",
+      "Azure",
+      "APIs",
+      "troubleshooting",
+      "AWS",
+      "web services",
+      "Python",
+      "Bash",
+      "PowerShell",
+      "database",
+      "SaaS",
+      "API",
+      "Service Level Agreements",
+      "Jira",
+      "configuration",
+      "production support",
+      "documentation",
+      "ETL",
+      "ticketing"
+    ],
+    "role_specific_action_verbs": [
+      "support",
+      "troubleshoot",
+      "resolve",
+      "configure",
+      "monitor",
+      "document",
+      "coordinate",
+      "improve",
+      "test",
+      "deploy"
+    ]
+  },
+  "transferability_map": {
+    "matches": [
+      {
+        "target_term": "SQL",
+        "target_requirement": "Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.7827948331832886,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "SQL is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "application support",
+        "target_requirement": "application support",
+        "evidence_id": "evidence.experience.csulb.bullet.1",
+        "source_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "semantic_score": 0.6615918278694153,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "application support is stated directly in experience.csulb.bullet.1.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "REST APIs",
+        "target_requirement": "Working knowledge of REST APIs, web services, integration technologies, and data exchange processes.",
+        "evidence_id": "evidence.skills.apis_identity",
+        "source_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+        "semantic_score": 0.6182612180709839,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "REST APIs is stated directly in skills.apis_identity.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Azure",
+        "target_requirement": "Experience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.",
+        "evidence_id": "evidence.certifications.protected_body.40",
+        "source_text": "   AWS Certified Cloud Practitioner | CompTIA Network+ | Microsoft Azure Fundamentals | ITIL 4 Foundation",
+        "semantic_score": 0.6602981090545654,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Azure is stated directly in certifications.protected_body.40.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "change management",
+        "target_requirement": "Follow established change management processes for releases and configuration changes.",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "Testing, deployment, and update validation do not establish formal change management practice.",
+        "suggested_placement": "gap"
+      },
+      {
+        "target_term": "Tableau",
+        "target_requirement": "Familiarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.5728709697723389,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.2, does not substantiate Tableau; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Looker",
+        "target_requirement": "Familiarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.",
+        "evidence_id": "evidence.projects.loavenly.bullet.3",
+        "source_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "semantic_score": 0.5545620322227478,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.1,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, projects.loavenly.bullet.3, does not substantiate Looker; the term must remain outside resume prose.",
+        "suggested_placement": "projects.loavenly"
+      },
+      {
+        "target_term": "Power BI",
+        "target_requirement": "Familiarity with reporting and analytics tools such as Power BI, Tableau, Looker, or similar platforms.",
+        "evidence_id": "evidence.skills.tools",
+        "source_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+        "semantic_score": 0.5698870420455933,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.tools, does not substantiate Power BI; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Google Cloud",
+        "target_requirement": "Experience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.",
+        "evidence_id": "evidence.skills.cloud_systems",
+        "source_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "semantic_score": 0.6429601907730103,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.cloud_systems, does not substantiate Google Cloud; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "APIs",
+        "target_requirement": "Experience troubleshooting application issues involving databases, APIs, integrations, and application configurations.",
+        "evidence_id": "evidence.skills.apis_identity",
+        "source_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+        "semantic_score": 0.5510625243186951,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "APIs is stated directly in skills.apis_identity.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "troubleshooting",
+        "target_requirement": "Experience troubleshooting application issues involving databases, APIs, integrations, and application configurations.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6736053824424744,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "troubleshooting is stated directly in skills.technical_support.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "AWS",
+        "target_requirement": "Experience supporting cloud-based applications and platforms such as Microsoft Azure, AWS, or Google Cloud Platform.",
+        "evidence_id": "evidence.skills.cloud_systems",
+        "source_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+        "semantic_score": 0.7004884481430054,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "AWS is stated directly in skills.cloud_systems.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "web services",
+        "target_requirement": "Working knowledge of REST APIs, web services, integration technologies, and data exchange processes.",
+        "evidence_id": "evidence.skills.apis_identity",
+        "source_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+        "semantic_score": 0.5727612972259521,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "web services is stated directly in skills.apis_identity.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Python",
+        "target_requirement": "Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.7570881843566895,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Python is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "Bash",
+        "target_requirement": "Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.7534223794937134,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "Bash is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "PowerShell",
+        "target_requirement": "Develop and maintain SQL queries, PowerShell, Python, Bash, or similar scripts to automate routine tasks, improve operational efficiency, and support application monitoring and reporting.",
+        "evidence_id": "evidence.skills.languages_dbs",
+        "source_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+        "semantic_score": 0.7547074556350708,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "PowerShell is stated directly in skills.languages_dbs.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "database",
+        "target_requirement": "Troubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.7256661653518677,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "database is stated directly in experience.original_insurance.bullet.2.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "SaaS",
+        "target_requirement": "Bachelor's degree in Computer Science, Information Technology, Information Systems, or Software Engineering and 3+ years supporting enterprise applications, SaaS platforms, cloud applications, or business systems, or 5+ years of equivalent progressive experience.",
+        "evidence_id": "evidence.summary",
+        "source_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+        "semantic_score": 0.664003312587738,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "SaaS is stated directly in summary.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "problem-solving",
+        "target_requirement": "Strong analytical, troubleshooting, and problem-solving skills.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.9,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.9,
+        "outcome_compatibility": 0.9,
+        "strength": "strongly_transferable",
+        "reasoning": "Structured incident investigation, root-cause isolation, and fix validation demonstrate problem-solving.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "API",
+        "target_requirement": "Troubleshoot and resolve application, integration, API, database, and system issues by identifying root causes, implementing corrective actions, and escalating complex issues when appropriate.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.2",
+        "source_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "semantic_score": 0.704105019569397,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "API is stated directly in experience.original_insurance.bullet.2.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "Service Level Agreements",
+        "target_requirement": "Support incident, problem, and service request management activities while meeting established service level agreements and contributing to continuous service improvement.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.63758784532547,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.9,
+        "strength": "direct",
+        "reasoning": "Service Level Agreements is stated directly in skills.technical_support.",
+        "suggested_placement": "summary"
+      },
+      {
+        "target_term": "Jira",
+        "target_requirement": "Experience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6419875025749207,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "Jira is stated directly in experience.original_insurance.bullet.1.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "ERP",
+        "target_requirement": "Experience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.5953359603881836,
+        "action_compatibility": 0.5,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, skills.technical_support, does not substantiate ERP; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "ServiceNow",
+        "target_requirement": "Experience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6017290949821472,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, experience.original_insurance.bullet.1, does not substantiate ServiceNow; the term must remain outside resume prose.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "configuration",
+        "target_requirement": "Support the administration, configuration, maintenance, and optimization of assigned enterprise applications to ensure reliable, secure, and efficient business operations.",
+        "evidence_id": "evidence.projects.loavenly.bullet.2",
+        "source_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "semantic_score": 0.5843940377235413,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "configuration is stated directly in projects.loavenly.bullet.2.",
+        "suggested_placement": "projects.loavenly"
+      },
+      {
+        "target_term": "production support",
+        "target_requirement": "Participate in disaster recovery testing, system validation, business continuity planning, and production support activities.",
+        "evidence_id": "evidence.skills.technical_support",
+        "source_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+        "semantic_score": 0.6960287094116211,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "production support is stated directly in skills.technical_support.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "documentation",
+        "target_requirement": "Create and maintain technical documentation, system configurations, support procedures, knowledge base articles, and operational documentation.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.649614691734314,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.1,
+        "outcome_compatibility": 0.1,
+        "strength": "direct",
+        "reasoning": "documentation is stated directly in experience.csulb.bullet.3.",
+        "suggested_placement": "experience.csulb"
+      },
+      {
+        "target_term": "CRM",
+        "target_requirement": "Experience supporting media, publishing, broadcasting, subscription, CRM, ERP, or customer-facing business applications.",
+        "evidence_id": "evidence.candidate_profile.confirmed",
+        "source_text": "Candidate-confirmed skills and tools: React, R, Excel, Outlook. Candidate-confirmed exposure: Compliance. These items were explicitly confirmed by Brian and may be listed in Skills. Do not attach a confirmed skill to a specific employer or accomplishment unless the base resume supplies that context.",
+        "semantic_score": 0.5730473399162292,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.1,
+        "strength": "unsupported",
+        "reasoning": "The closest paragraph, candidate_profile.confirmed, does not substantiate CRM; the term must remain outside resume prose.",
+        "suggested_placement": "skills"
+      },
+      {
+        "target_term": "ETL",
+        "target_requirement": "Experience supporting application integrations using REST APIs, middleware, or ETL tools.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.3",
+        "source_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "semantic_score": 0.633236825466156,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "ETL is stated directly in experience.original_insurance.bullet.3.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "operational efficiency",
+        "target_requirement": "Automate routine tasks to improve operational efficiency.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.3",
+        "source_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+        "semantic_score": 0.95,
+        "action_compatibility": 1.0,
+        "system_compatibility": 0.9,
+        "environment_compatibility": 1.0,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "The quantified reduction in monthly close preparation directly demonstrates improved operational efficiency.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "knowledge base",
+        "target_requirement": "Create and maintain knowledge base articles and support procedures.",
+        "evidence_id": "evidence.experience.csulb.bullet.3",
+        "source_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "semantic_score": 0.65,
+        "action_compatibility": 0.8,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.6,
+        "outcome_compatibility": 0.5,
+        "strength": "weakly_transferable",
+        "reasoning": "Incident documentation and recurring issue tracking are adjacent to knowledge-base work but do not prove publication of knowledge base articles.",
+        "suggested_placement": "gap"
+      },
+      {
+        "target_term": "ticketing",
+        "target_requirement": "Experience using ticketing systems such as ServiceNow, Jira Service Management, or similar platforms.",
+        "evidence_id": "evidence.experience.original_insurance.bullet.1",
+        "source_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "semantic_score": 0.6382585763931274,
+        "action_compatibility": 0.1,
+        "system_compatibility": 0.5,
+        "environment_compatibility": 0.5,
+        "outcome_compatibility": 0.5,
+        "strength": "direct",
+        "reasoning": "ticketing is stated directly in experience.original_insurance.bullet.1.",
+        "suggested_placement": "experience.original_insurance"
+      },
+      {
+        "target_term": "SDLC",
+        "target_requirement": "Working knowledge of the software development lifecycle.",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "Building, testing, and deploying software does not by itself establish knowledge of a formal SDLC practice.",
+        "suggested_placement": "gap"
+      },
+      {
+        "target_term": "hybrid cloud",
+        "target_requirement": "Experience supporting SaaS and hybrid cloud environments.",
+        "evidence_id": null,
+        "source_text": "",
+        "semantic_score": 0.0,
+        "action_compatibility": 0.0,
+        "system_compatibility": 0.0,
+        "environment_compatibility": 0.0,
+        "outcome_compatibility": 0.0,
+        "strength": "unsupported",
+        "reasoning": "SaaS and cloud skills do not establish a hybrid cloud environment.",
+        "suggested_placement": "gap"
+      },
+      {
+        "target_term": "continuous improvement",
+        "target_requirement": "Contribute to continuous improvement initiatives.",
+        "evidence_id": "evidence.projects.loavenly.bullet.3",
+        "source_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "semantic_score": 0.88,
+        "action_compatibility": 0.9,
+        "system_compatibility": 0.8,
+        "environment_compatibility": 0.8,
+        "outcome_compatibility": 1.0,
+        "strength": "strongly_transferable",
+        "reasoning": "Measured, ongoing platform optimization credibly demonstrates continuous improvement.",
+        "suggested_placement": "projects.loavenly"
+      }
+    ],
+    "direct_terms": [
+      "SQL",
+      "application support",
+      "REST APIs",
+      "Azure",
+      "APIs",
+      "troubleshooting",
+      "AWS",
+      "web services",
+      "Python",
+      "Bash",
+      "PowerShell",
+      "database",
+      "SaaS",
+      "API",
+      "Service Level Agreements",
+      "Jira",
+      "configuration",
+      "production support",
+      "documentation",
+      "ETL",
+      "ticketing"
+    ],
+    "strongly_transferable_terms": [
+      "problem-solving",
+      "operational efficiency",
+      "continuous improvement"
+    ],
+    "weakly_transferable_terms": [
+      "knowledge base"
+    ],
+    "unsupported_terms": [
+      "change management",
+      "Tableau",
+      "Looker",
+      "Power BI",
+      "Google Cloud",
+      "ERP",
+      "ServiceNow",
+      "CRM",
+      "SDLC",
+      "hybrid cloud"
+    ]
+  },
+  "rewrite_plan": {
+    "professional_identity": "Application Support Engineer",
+    "summary": {
+      "text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis. Strengths include problem-solving.",
+      "shorter_text": "Application Support Engineer with 3+ years in application support and IT operations across production SaaS, Microsoft 365, and integrations. Resolved 200+ tickets at sub-90-minute average resolution and built Loavenly, applying SQL, log analysis, API debugging, and root cause analysis. Strengths include problem-solving.",
+      "target_terms": [
+        "application support",
+        "SaaS",
+        "SQL",
+        "API"
+      ],
+      "evidence_ids": [
+        "evidence.summary"
+      ]
+    },
+    "skills": {
+      "lines": [
+        {
+          "paragraph_id": "skills.technical_support",
+          "category": "Technical Support",
+          "skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management"
+          ],
+          "shorter_skills": [
+            "Production Support",
+            "Troubleshooting",
+            "Incident Response",
+            "Root Cause Analysis",
+            "SLA Management"
+          ]
+        },
+        {
+          "paragraph_id": "skills.apis_identity",
+          "category": "APIs & Identity",
+          "skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ],
+          "shorter_skills": [
+            "Microsoft 365",
+            "Entra ID",
+            "MFA",
+            "RBAC",
+            "SSO",
+            "Microsoft Graph API",
+            "REST APIs",
+            "Webhooks",
+            "OAuth 2.0",
+            "SAML",
+            "Postman"
+          ]
+        },
+        {
+          "paragraph_id": "skills.languages_dbs",
+          "category": "Languages & DBs",
+          "skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ],
+          "shorter_skills": [
+            "Python",
+            "SQL",
+            "JSON",
+            "PowerShell",
+            "JavaScript",
+            "TypeScript",
+            "Bash",
+            "PostgreSQL",
+            "MySQL",
+            "SQLite",
+            "Supabase"
+          ]
+        },
+        {
+          "paragraph_id": "skills.cloud_systems",
+          "category": "Cloud & Systems",
+          "skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)"
+          ],
+          "shorter_skills": [
+            "AWS (EC2, S3, IAM)",
+            "Vercel",
+            "Linux",
+            "Windows",
+            "CI/CD (GitHub Actions)"
+          ]
+        },
+        {
+          "paragraph_id": "skills.tools",
+          "category": "Tools",
+          "skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ],
+          "shorter_skills": [
+            "Jira",
+            "Confluence",
+            "Excel",
+            "Sentry",
+            "Git",
+            "GitHub",
+            "VS Code"
+          ]
+        }
+      ]
+    },
+    "bullets": [
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "source_paragraph_id": "experience.original_insurance.bullet.1",
+        "text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+        "shorter_text": "Resolved 200+ Jira production support tickets across SaaS, integrations, and Microsoft 365 within Service Level Agreements; averaged sub-90-minute resolution.",
+        "purpose": "Emphasize quantified production ticketing, SaaS support, and service-level performance.",
+        "target_terms": [
+          "Jira",
+          "production support",
+          "SaaS",
+          "Service Level Agreements"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1",
+          "evidence.skills.technical_support"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "source_paragraph_id": "experience.original_insurance.bullet.2",
+        "text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+        "shorter_text": "Investigated production incidents with logs, SQL queries, and API debugging in Postman, isolating root cause and validating live fixes.",
+        "purpose": "Show production troubleshooting across logs, SQL, and APIs.",
+        "target_terms": [
+          "SQL",
+          "API"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "source_paragraph_id": "experience.original_insurance.bullet.3",
+        "text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+        "shorter_text": "Monitored ETL jobs for 22 carrier/vendor feeds and built a Python script that improved operational efficiency, cutting close prep from 5 hours to 40 minutes.",
+        "purpose": "Demonstrate application monitoring, ETL support, scripting automation, and quantified efficiency.",
+        "target_terms": [
+          "ETL",
+          "database",
+          "Python",
+          "operational efficiency"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.3"
+        ],
+        "claim_risks": [
+          {
+            "claim": "The automation improved operational efficiency.",
+            "target_requirement": "Automate operational tasks to improve operational efficiency.",
+            "evidence_ids": [
+              "evidence.experience.original_insurance.bullet.3"
+            ],
+            "strength": "strongly_transferable",
+            "risk_level": "low",
+            "explanation": "operational efficiency is placed in experience.original_insurance.bullet.3 using strongly transferable evidence; verify this wording before applying.",
+            "selected_placement": "experience.original_insurance.bullet.3",
+            "export_allowed": true
+          }
+        ]
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "source_paragraph_id": "experience.original_insurance.bullet.4",
+        "text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+        "shorter_text": "Administered Microsoft 365, Entra ID, MFA, and RBAC; used Graph API and PowerShell to provision users across 20+ SaaS apps, cutting onboarding from 4 hours to 45 minutes.",
+        "purpose": "Show identity administration, security permissions, SaaS provisioning, APIs, and automation.",
+        "target_terms": [
+          "API",
+          "PowerShell",
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.4"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "source_paragraph_id": "experience.original_insurance.bullet.5",
+        "text": "Supported webhook-based web services and carrier integrations for the agency management system, debugging payload, authentication, and data-sync failures with Postman and structured logs.",
+        "shorter_text": "Supported webhook web services and carrier integrations, debugging payload, authentication, and data-sync failures with Postman and logs.",
+        "purpose": "Align integration support with web services, authentication, and data exchange requirements.",
+        "target_terms": [
+          "web services"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.5",
+          "evidence.skills.apis_identity"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "source_paragraph_id": "experience.csulb.bullet.1",
+        "text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+        "shorter_text": "Provided application support for Astra Schedule, EMS, and access control systems, resolving scheduling, user access, AV, and after-hours operational issues.",
+        "purpose": "Establish direct application support for operational business systems.",
+        "target_terms": [
+          "application support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "source_paragraph_id": "experience.csulb.bullet.2",
+        "text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+        "shorter_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, checking configurations, and escalating complex incidents.",
+        "purpose": "Show structured diagnosis, configuration checks, access support, and escalation.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "source_paragraph_id": "experience.csulb.bullet.3",
+        "text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+        "shorter_text": "Maintained incident documentation and recurring issue tracking while coordinating with campus IT and vendors.",
+        "purpose": "Demonstrate documentation and cross-functional vendor coordination.",
+        "target_terms": [
+          "documentation"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "source_paragraph_id": "experience.wehelp.bullet.1",
+        "text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+        "shorter_text": "Built, tested, and deployed Loavenly, a centralized tracking system for staff and volunteers across three distribution locations.",
+        "purpose": "Show end-to-end application implementation, testing, and deployment.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "source_paragraph_id": "experience.wehelp.bullet.2",
+        "text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+        "shorter_text": "Support live Loavenly operations by managing access, troubleshooting production issues, validating updates, and training users.",
+        "purpose": "Show live production support, access management, troubleshooting, validation, and user communication.",
+        "target_terms": [
+          "troubleshooting"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "source_paragraph_id": "projects.loavenly.bullet.1",
+        "text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+        "shorter_text": "Built and operate a multi-tenant SaaS platform for intake, inventory, reporting, and RBAC across three food bank locations.",
+        "purpose": "Establish production SaaS ownership, reporting, and role-based access experience.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "source_paragraph_id": "projects.loavenly.bullet.2",
+        "text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+        "shorter_text": "Configured RBAC and resolved API, authentication, sync, and permission issues in production.",
+        "purpose": "Show application configuration and production issue resolution across access and integrations.",
+        "target_terms": [
+          "API"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "claim_risks": []
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "source_paragraph_id": "projects.loavenly.bullet.3",
+        "text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+        "shorter_text": "Improved performance with database indexing, aggregation, and pagination while maintaining sub-100ms response times.",
+        "purpose": "Demonstrate database performance optimization and continuous improvement.",
+        "target_terms": [
+          "continuous improvement",
+          "database"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.3"
+        ],
+        "claim_risks": [
+          {
+            "claim": "Performance optimization is characterized as continuous improvement.",
+            "target_requirement": "Contribute to continuous improvement initiatives.",
+            "evidence_ids": [
+              "evidence.projects.loavenly.bullet.3"
+            ],
+            "strength": "strongly_transferable",
+            "risk_level": "low",
+            "explanation": "continuous improvement is placed in projects.loavenly.bullet.3 using strongly transferable evidence; verify this wording before applying.",
+            "selected_placement": "projects.loavenly.bullet.3",
+            "export_allowed": true
+          }
+        ]
+      }
+    ],
+    "intents": [
+      {
+        "paragraph_id": "summary",
+        "purpose": "Retain the already well-aligned professional identity, production SaaS context, core diagnostic methods, and all protected metrics.",
+        "target_terms": [
+          "application support",
+          "SaaS",
+          "SQL",
+          "API"
+        ],
+        "evidence_ids": [
+          "evidence.summary"
+        ],
+        "recruiter_priority": 1
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.1",
+        "purpose": "Lead with quantified Jira ticketing, production SaaS support, and service-level performance.",
+        "target_terms": [
+          "Jira",
+          "production support",
+          "SaaS",
+          "Service Level Agreements"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.1",
+          "evidence.skills.technical_support"
+        ],
+        "recruiter_priority": 2
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.3",
+        "purpose": "Highlight ETL monitoring, Python automation, production data support, and operational efficiency.",
+        "target_terms": [
+          "ETL",
+          "database",
+          "Python",
+          "operational efficiency"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.3"
+        ],
+        "recruiter_priority": 3
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.2",
+        "purpose": "Highlight production diagnosis using SQL, logs, APIs, and Postman.",
+        "target_terms": [
+          "SQL",
+          "API"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.2"
+        ],
+        "recruiter_priority": 4
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.4",
+        "purpose": "Demonstrate identity administration, permissions, provisioning automation, and SaaS support.",
+        "target_terms": [
+          "PowerShell",
+          "API",
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.4"
+        ],
+        "recruiter_priority": 5
+      },
+      {
+        "paragraph_id": "experience.original_insurance.bullet.5",
+        "purpose": "Translate webhook integration support into credible web services alignment.",
+        "target_terms": [
+          "web services"
+        ],
+        "evidence_ids": [
+          "evidence.experience.original_insurance.bullet.5",
+          "evidence.skills.apis_identity"
+        ],
+        "recruiter_priority": 6
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.1",
+        "purpose": "Establish direct first-line application support for operational systems.",
+        "target_terms": [
+          "application support"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.1"
+        ],
+        "recruiter_priority": 7
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.2",
+        "purpose": "Show repeatable diagnosis, access validation, configuration checks, and escalation.",
+        "target_terms": [
+          "configuration"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.2"
+        ],
+        "recruiter_priority": 8
+      },
+      {
+        "paragraph_id": "experience.csulb.bullet.3",
+        "purpose": "Show incident documentation and vendor coordination.",
+        "target_terms": [
+          "documentation"
+        ],
+        "evidence_ids": [
+          "evidence.experience.csulb.bullet.3"
+        ],
+        "recruiter_priority": 9
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.1",
+        "purpose": "Show application implementation, testing, and deployment ownership.",
+        "target_terms": [],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.1"
+        ],
+        "recruiter_priority": 10
+      },
+      {
+        "paragraph_id": "experience.wehelp.bullet.2",
+        "purpose": "Show live troubleshooting, access management, update validation, and user training.",
+        "target_terms": [
+          "troubleshooting"
+        ],
+        "evidence_ids": [
+          "evidence.experience.wehelp.bullet.2"
+        ],
+        "recruiter_priority": 11
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.1",
+        "purpose": "Show production multi-tenant SaaS ownership and RBAC.",
+        "target_terms": [
+          "SaaS"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.1"
+        ],
+        "recruiter_priority": 12
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.2",
+        "purpose": "Show live API, authentication, synchronization, and permission issue resolution.",
+        "target_terms": [
+          "API"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.2"
+        ],
+        "recruiter_priority": 13
+      },
+      {
+        "paragraph_id": "projects.loavenly.bullet.3",
+        "purpose": "Show database performance optimization and continuous improvement.",
+        "target_terms": [
+          "continuous improvement",
+          "database"
+        ],
+        "evidence_ids": [
+          "evidence.projects.loavenly.bullet.3"
+        ],
+        "recruiter_priority": 14
+      }
+    ],
+    "claim_risks": []
+  },
+  "changes": [
+    {
+      "paragraph_id": "summary",
+      "section": "summary",
+      "paragraph_kind": "summary",
+      "before_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
+      "proposed_text": "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis. Strengths include problem-solving.",
+      "final_text": "Application Support Engineer with 3+ years in application support and IT operations across production SaaS, Microsoft 365, and integrations. Resolved 200+ tickets at sub-90-minute average resolution and built Loavenly, applying SQL, log analysis, API debugging, and root cause analysis. Strengths include problem-solving.",
+      "change_type": "reframed",
+      "target_terms": [
+        "application support",
+        "SaaS",
+        "SQL",
+        "API"
+      ],
+      "evidence_ids": [
+        "evidence.summary"
+      ],
+      "risk_level": "low",
+      "compressed": true,
+      "explanation": "Reframed the professional summary for the target role."
+    },
+    {
+      "paragraph_id": "skills.technical_support",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "proposed_text": "Technical Support: Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "final_text": "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Production Support",
+        "Troubleshooting",
+        "Incident Response",
+        "Root Cause Analysis",
+        "SLA Management"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.apis_identity",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "proposed_text": "APIs & Identity: Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "final_text": "APIs & Identity:            Microsoft 365, Entra ID, MFA, RBAC, SSO, Microsoft Graph API, REST APIs, Webhooks, OAuth 2.0, SAML, Postman",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Microsoft 365",
+        "Entra ID",
+        "MFA",
+        "RBAC",
+        "SSO",
+        "Microsoft Graph API",
+        "REST APIs",
+        "Webhooks",
+        "OAuth 2.0",
+        "SAML",
+        "Postman"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.languages_dbs",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "proposed_text": "Languages & DBs: Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "final_text": "Languages & DBs:         Python, SQL, JSON, PowerShell, JavaScript, TypeScript, Bash, PostgreSQL, MySQL, SQLite, Supabase",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Python",
+        "SQL",
+        "JSON",
+        "PowerShell",
+        "JavaScript",
+        "TypeScript",
+        "Bash",
+        "PostgreSQL",
+        "MySQL",
+        "SQLite",
+        "Supabase"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.cloud_systems",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "proposed_text": "Cloud & Systems: AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "final_text": "Cloud & Systems:         AWS (EC2, S3, IAM), Vercel, Linux, Windows, CI/CD (GitHub Actions)",
+      "change_type": "unchanged",
+      "target_terms": [
+        "AWS (EC2, S3, IAM)",
+        "Vercel",
+        "Linux",
+        "Windows",
+        "CI/CD (GitHub Actions)"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "skills.tools",
+      "section": "skills",
+      "paragraph_kind": "skill_line",
+      "before_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "proposed_text": "Tools: Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "final_text": "Tools:                              Jira, Confluence, Excel, Sentry, Git, GitHub, VS Code",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Jira",
+        "Confluence",
+        "Excel",
+        "Sentry",
+        "Git",
+        "GitHub",
+        "VS Code"
+      ],
+      "evidence_ids": [],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Fused the existing skill inventory with role-relevant terms."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.1",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "proposed_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "final_text": "Resolved 200+ production support tickets via Jira across agency management SaaS, internal integrations, and Microsoft 365, maintaining sub-90-minute average resolution.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "Jira",
+        "production support",
+        "SaaS",
+        "Service Level Agreements"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.1",
+        "evidence.skills.technical_support"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Emphasize quantified production ticketing, SaaS support, and service-level performance."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.2",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "proposed_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "final_text": "Investigated production incidents using log analysis, SQL queries, and API debugging with Postman, isolating root cause and validating fixes in live environments.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "SQL",
+        "API"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show production troubleshooting across logs, SQL, and APIs."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.3",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Monitored nightly ETL jobs syncing data from 22 carrier/vendor feeds into a production database, triaging failures and building a Python reconciliation script that reduced monthly close prep from 5 hours to 40 minutes.",
+      "proposed_text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+      "final_text": "Monitored nightly ETL jobs syncing 22 carrier/vendor feeds to a production database, triaged failures, and built a Python reconciliation script that improved operational efficiency by reducing monthly close prep from 5 hours to 40 minutes.",
+      "change_type": "reframed",
+      "target_terms": [
+        "ETL",
+        "database",
+        "Python",
+        "operational efficiency"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate application monitoring, ETL support, scripting automation, and quantified efficiency."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.4",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "proposed_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "final_text": "Administered Microsoft 365 and Entra ID, including MFA, RBAC, and license management, and used Microsoft Graph API and PowerShell to streamline user provisioning across 20+ SaaS apps, reducing onboarding from 4 hours to 45 minutes.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "API",
+        "PowerShell",
+        "SaaS"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.4"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show identity administration, security permissions, SaaS provisioning, APIs, and automation."
+    },
+    {
+      "paragraph_id": "experience.original_insurance.bullet.5",
+      "section": "experience.original_insurance",
+      "paragraph_kind": "bullet",
+      "before_text": "Supported webhook and carrier integration workflows for the agency management system, debugging payload, authentication, and data-sync failures using Postman and structured logs.",
+      "proposed_text": "Supported webhook-based web services and carrier integrations for the agency management system, debugging payload, authentication, and data-sync failures with Postman and structured logs.",
+      "final_text": "Supported webhook-based web services and carrier integrations for the agency management system, debugging payload, authentication, and data-sync failures with Postman and structured logs.",
+      "change_type": "reframed",
+      "target_terms": [
+        "web services"
+      ],
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.5",
+        "evidence.skills.apis_identity"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Align integration support with web services, authentication, and data exchange requirements."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.1",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "proposed_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "final_text": "Provided first-line application support for Astra Schedule, EMS, and campus access control systems, resolving room scheduling conflicts, user access issues, classroom AV incidents, and operational system disruptions during after-hours campus operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "application support"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Establish direct application support for operational business systems."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.2",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "proposed_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "final_text": "Diagnosed access and scheduling issues by reproducing errors, validating permissions, resetting user access, checking configurations, and escalating complex incidents to campus IT.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "configuration"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show structured diagnosis, configuration checks, access support, and escalation."
+    },
+    {
+      "paragraph_id": "experience.csulb.bullet.3",
+      "section": "experience.csulb",
+      "paragraph_kind": "bullet",
+      "before_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "proposed_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "final_text": "Maintained incident documentation, escalation notes, and recurring issue tracking while coordinating with campus IT and third-party vendors.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "documentation"
+      ],
+      "evidence_ids": [
+        "evidence.experience.csulb.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate documentation and cross-functional vendor coordination."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.1",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "proposed_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "final_text": "Identified the need for a centralized food-distribution tracking system, then independently built, tested, and deployed Loavenly for staff and volunteers across three distribution locations.",
+      "change_type": "unchanged",
+      "target_terms": [],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show end-to-end application implementation, testing, and deployment."
+    },
+    {
+      "paragraph_id": "experience.wehelp.bullet.2",
+      "section": "experience.wehelp",
+      "paragraph_kind": "bullet",
+      "before_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "proposed_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "final_text": "Support Loavenly during live Wednesday and Saturday distributions by managing user access, troubleshooting production issues, validating updates, and training staff and volunteers.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "troubleshooting"
+      ],
+      "evidence_ids": [
+        "evidence.experience.wehelp.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show live production support, access management, troubleshooting, validation, and user communication."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.1",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "proposed_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "final_text": "Built, deployed, and operate a production multi-tenant SaaS platform supporting client intake, inventory tracking, reporting, and RBAC across three food bank locations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "SaaS"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.1"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Establish production SaaS ownership, reporting, and role-based access experience."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.2",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "proposed_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "final_text": "Configured RBAC and resolved API, authentication, synchronization, and permission issues during live production operations.",
+      "change_type": "unchanged",
+      "target_terms": [
+        "API"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.2"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Show application configuration and production issue resolution across access and integrations."
+    },
+    {
+      "paragraph_id": "projects.loavenly.bullet.3",
+      "section": "projects.loavenly",
+      "paragraph_kind": "bullet",
+      "before_text": "Improved platform performance through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "proposed_text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "final_text": "Drove continuous improvement through database indexing, server-side aggregation, and pagination while maintaining sub-100ms response times.",
+      "change_type": "reframed",
+      "target_terms": [
+        "continuous improvement",
+        "database"
+      ],
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.3"
+      ],
+      "risk_level": "low",
+      "compressed": false,
+      "explanation": "Demonstrate database performance optimization and continuous improvement."
+    }
+  ],
+  "claim_risks": [
+    {
+      "claim": "The automation improved operational efficiency.",
+      "target_requirement": "Automate operational tasks to improve operational efficiency.",
+      "evidence_ids": [
+        "evidence.experience.original_insurance.bullet.3"
+      ],
+      "strength": "strongly_transferable",
+      "risk_level": "low",
+      "explanation": "operational efficiency is placed in experience.original_insurance.bullet.3 using strongly transferable evidence; verify this wording before applying.",
+      "selected_placement": "experience.original_insurance.bullet.3",
+      "export_allowed": true
+    },
+    {
+      "claim": "Performance optimization is characterized as continuous improvement.",
+      "target_requirement": "Contribute to continuous improvement initiatives.",
+      "evidence_ids": [
+        "evidence.projects.loavenly.bullet.3"
+      ],
+      "strength": "strongly_transferable",
+      "risk_level": "low",
+      "explanation": "continuous improvement is placed in projects.loavenly.bullet.3 using strongly transferable evidence; verify this wording before applying.",
+      "selected_placement": "projects.loavenly.bullet.3",
+      "export_allowed": true
+    }
+  ],
+  "validation": {
+    "passed": true,
+    "issues": [],
+    "protected_fields_passed": true,
+    "metrics_passed": true,
+    "structure_passed": true,
+    "keyword_coverage": 66.15
+  },
+  "layout": {
+    "passed": true,
+    "page_count": 1,
+    "rendered_lines": 74,
+    "section_anchor_deltas": {
+      "SKILLS": 0.0,
+      "EXPERIENCE": 0.0,
+      "PROJECTS": 0.0,
+      "EDUCATION": 0.0,
+      "CERTIFICATIONS": 0.0
+    },
+    "overflow_paragraph_ids": [],
+    "paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "baseline_paragraph_line_counts": {
+      "identity.name": 1,
+      "identity.contact": 1,
+      "summary": 3,
+      "skills.heading": 1,
+      "skills.technical_support": 1,
+      "skills.apis_identity": 1,
+      "skills.languages_dbs": 1,
+      "skills.cloud_systems": 1,
+      "skills.tools": 1,
+      "experience.heading": 1,
+      "experience.original_insurance.heading": 1,
+      "experience.original_insurance.bullet.1": 2,
+      "experience.original_insurance.bullet.2": 2,
+      "experience.original_insurance.bullet.3": 2,
+      "experience.original_insurance.bullet.4": 2,
+      "experience.original_insurance.bullet.5": 2,
+      "experience.csulb.heading": 1,
+      "experience.csulb.bullet.1": 2,
+      "experience.csulb.bullet.2": 2,
+      "experience.csulb.bullet.3": 2,
+      "experience.wehelp.heading": 1,
+      "experience.wehelp.bullet.1": 2,
+      "experience.wehelp.bullet.2": 2,
+      "projects.heading": 1,
+      "projects.loavenly.heading": 1,
+      "projects.loavenly.bullet.1": 2,
+      "projects.loavenly.bullet.2": 1,
+      "projects.loavenly.bullet.3": 2,
+      "education.heading": 1,
+      "education.protected_body.37": 1,
+      "certifications.heading": 1,
+      "certifications.protected_body.40": 1
+    },
+    "paragraph_max_width_points": {
+      "identity.name": 89.80197143554688,
+      "identity.contact": 389.3179931640625,
+      "summary": 504.2835750579834,
+      "skills.heading": 36.60227966308594,
+      "skills.technical_support": 509.2552490234375,
+      "skills.apis_identity": 578.9102172851562,
+      "skills.languages_dbs": 519.6455078125,
+      "skills.cloud_systems": 386.52587890625,
+      "skills.tools": 316.9602966308594,
+      "experience.heading": 70.81776428222656,
+      "experience.original_insurance.heading": 576.1893310546875,
+      "experience.original_insurance.bullet.1": 529.6793594360352,
+      "experience.original_insurance.bullet.2": 526.4692764282227,
+      "experience.original_insurance.bullet.3": 513.5649185180664,
+      "experience.original_insurance.bullet.4": 531.9814834594727,
+      "experience.original_insurance.bullet.5": 518.6440200805664,
+      "experience.csulb.heading": 576.1931762695312,
+      "experience.csulb.bullet.1": 542.8428726196289,
+      "experience.csulb.bullet.2": 499.7525405883789,
+      "experience.csulb.bullet.3": 545.1514053344727,
+      "experience.wehelp.heading": 576.197021484375,
+      "experience.wehelp.bullet.1": 558.3873672485352,
+      "experience.wehelp.bullet.2": 549.4583511352539,
+      "projects.heading": 57.381492614746094,
+      "projects.loavenly.heading": 321.07781982421875,
+      "projects.loavenly.bullet.1": 548.4003067016602,
+      "projects.loavenly.bullet.2": 532.4567642211914,
+      "projects.loavenly.bullet.3": 554.6354141235352,
+      "education.heading": 70.24212646484375,
+      "education.protected_body.37": 558.6382026672363,
+      "certifications.heading": 94.99464416503906,
+      "certifications.protected_body.40": 456.5558891296387
+    },
+    "protected_horizontal_deltas": {
+      "identity.name": 0.0,
+      "identity.contact": 0.0,
+      "skills.heading": 0.0,
+      "experience.heading": 0.0,
+      "experience.original_insurance.heading": 0.0,
+      "experience.csulb.heading": 0.0,
+      "experience.wehelp.heading": 0.0,
+      "projects.heading": 0.0,
+      "projects.loavenly.heading": 0.0,
+      "education.heading": 0.0,
+      "education.protected_body.37": 0.0,
+      "certifications.heading": 0.0,
+      "certifications.protected_body.40": 0.0
+    },
+    "font_inventory": {
+      "ArialMT": [
+        8.04,
+        9.0,
+        11.04
+      ],
+      "Calibri": [
+        2.04,
+        9.96,
+        10.56,
+        11.04
+      ],
+      "Calibri-Bold": [
+        8.04,
+        10.56,
+        11.04,
+        14.04,
+        18.0
+      ],
+      "Calibri-Italic": [
+        10.56,
+        11.04
+      ]
+    },
+    "out_of_bounds_items": [],
+    "overlap_items": [],
+    "pdf_path": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\la_times_cycle2\\Brian_Aiad_resume.pdf",
+    "attempts": 2
+  },
+  "output_docx": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\la_times_cycle2\\Brian_Aiad_resume.docx",
+  "output_pdf": "C:\\Users\\kingt\\Desktop\\aiadapplyV2\\data\\benchmarks\\2026-08-06\\la_times_cycle2\\Brian_Aiad_resume.pdf",
+  "base_sha256": "7cb556d81f20d884fa31e5fa5351847d6dec109da6e50736a164ca7a2770a07c",
+  "reasoner": "codex-cli",
+  "pipeline_version": "0.3.0"
+}

@@ -14,6 +14,7 @@ from aiadapply_v2.documents.formatting import (
     body_paragraphs,
 )
 from aiadapply_v2.schemas import ResumeDocument, RewritePlan
+from aiadapply_v2.text import split_skill_values
 
 
 def write_resume_candidate(
@@ -23,6 +24,7 @@ def write_resume_candidate(
     *,
     compression_level: int = 0,
     compressed_paragraph_ids: set[str] | None = None,
+    reverted_paragraph_ids: set[str] | None = None,
 ) -> Path:
     """Replace only editable XML text while retaining the source DOCX package."""
     output = Path(output_path)
@@ -32,7 +34,9 @@ def write_resume_candidate(
 
     summary_meta = by_id["summary"]
     replacements[summary_meta.index] = (
-        _select_text(
+        summary_meta.text
+        if reverted_paragraph_ids is not None and "summary" in reverted_paragraph_ids
+        else _select_text(
             plan.summary.text,
             plan.summary.shorter_text,
             summary_meta.character_budget,
@@ -48,7 +52,9 @@ def write_resume_candidate(
     for paragraph_id, proposed_skill in proposed_skills.items():
         meta = by_id[paragraph_id]
         selected_skills = (
-            proposed_skill.shorter_skills
+            split_skill_values(meta.text.split(":", 1)[1])
+            if reverted_paragraph_ids is not None and paragraph_id in reverted_paragraph_ids
+            else proposed_skill.shorter_skills
             if (compressed_paragraph_ids is not None and paragraph_id in compressed_paragraph_ids)
             or compression_level >= 2
             or (
@@ -68,7 +74,9 @@ def write_resume_candidate(
     for paragraph_id, proposed_bullet in proposed_bullets.items():
         meta = by_id[paragraph_id]
         replacements[meta.index] = (
-            _select_text(
+            meta.text
+            if reverted_paragraph_ids is not None and paragraph_id in reverted_paragraph_ids
+            else _select_text(
                 proposed_bullet.text,
                 proposed_bullet.shorter_text,
                 meta.character_budget,

@@ -7,6 +7,61 @@ from aiadapply_v2.schemas import JobKeyword, KeywordKind, ParsedJob, TargetRoleP
 from aiadapply_v2.text import contains_term, dedupe
 
 ROLE_FAMILIES: dict[str, tuple[str, ...]] = {
+    "semiconductor_manufacturing_engineering": (
+        "semiconductor manufacturing engineer",
+        "semiconductor processing",
+        "cleanroom",
+        "focal plane arrays",
+        "wet etch",
+    ),
+    "rf_antenna_engineering": (
+        "rf/microwave antenna",
+        "antenna theory",
+        "phased array antennas",
+        "circulators",
+        "radiators",
+    ),
+    "product_quality_engineering": (
+        "product quality engineer",
+        "material review board",
+        "nonconforming material",
+        "quality management system",
+        "quality engineering",
+    ),
+    "manufacturing_engineering": (
+        "manufacturing engineer",
+        "manufacturing processes",
+        "manufacturing plans",
+        "bills of material",
+        "production environment",
+    ),
+    "business_systems_functional": (
+        "it systems functional",
+        "business analysis",
+        "supply chain applications",
+        "use cases",
+        "business requirements",
+    ),
+    "support_desk_engineering": (
+        "support desk engineer",
+        "first and second-line",
+        "gpu cloud",
+        "support tickets",
+        "customer-first",
+    ),
+    "platform_support_analysis": (
+        "platform support analyst",
+        "platform issues",
+        "trading platform",
+        "client-facing",
+        "knowledge base",
+    ),
+    "healthcare_application_support": (
+        "epic application",
+        "professional billing",
+        "claims",
+        "healthcare application",
+    ),
     "technical_support_integrations": (
         "technical support engineer",
         "integrations",
@@ -21,8 +76,12 @@ ROLE_FAMILIES: dict[str, tuple[str, ...]] = {
         "failure data",
     ),
     "technical_operations_support": (
+        "technology support ii",
         "technical operations support",
         "operational support",
+        "transaction processing",
+        "operational agreements",
+        "monitoring signals",
         "sla",
         "platform stability",
         "service availability",
@@ -37,6 +96,10 @@ ROLE_FAMILIES: dict[str, tuple[str, ...]] = {
     "application_support_administration": (
         "application support administrator",
         "enterprise application support",
+        "loan origination system",
+        "encompass",
+        "business rules",
+        "system updates",
         "production support",
         "batch processing",
         "incident management",
@@ -132,12 +195,52 @@ def _role_family(job: ParsedJob) -> str:
 
 
 def _professional_identity(job: ParsedJob, family: str) -> str:
+    if family == "semiconductor_manufacturing_engineering":
+        return (
+            "Technical operations professional aligned to semiconductor manufacturing, "
+            "data-driven troubleshooting, and production support"
+        )
+    if family == "rf_antenna_engineering":
+        return (
+            "Systems-oriented technical professional aligned to RF test, "
+            "analysis, automation, and cross-functional troubleshooting"
+        )
+    if family == "product_quality_engineering":
+        return (
+            "Technical operations professional aligned to product quality, "
+            "root-cause investigation, and documented corrective action"
+        )
+    if family == "manufacturing_engineering":
+        return (
+            "Technical operations professional aligned to manufacturing support, "
+            "process improvement, and documented troubleshooting"
+        )
+    if family == "business_systems_functional":
+        return (
+            "Business Systems Support Analyst focused on requirements, "
+            "application configuration, and process improvement"
+        )
+    if family == "support_desk_engineering":
+        return (
+            "Technical Support Engineer focused on ticket resolution, "
+            "cloud operations, and customer communication"
+        )
+    if family == "platform_support_analysis":
+        return (
+            "Application Support Analyst focused on platform incidents, "
+            "SQL investigation, and client resolution"
+        )
+    if family == "healthcare_application_support":
+        return (
+            "Application Support Analyst focused on configuration, testing, "
+            "documentation, and end-user support"
+        )
     if family == "technical_support_integrations":
         return "Technical Support Engineer focused on integrations and customer case resolution"
     if family == "product_operations":
         return (
-            "Product Operations Technical Specialist focused on incident resolution "
-            "and availability"
+            "Application Support Specialist aligned to product operations, "
+            "incident resolution, and availability"
         )
     if family == "technical_operations_support":
         return (
@@ -197,10 +300,45 @@ def _industry(text: str) -> list[str]:
             "core banking",
             "financial services",
             "banking applications",
+            "mortgage lending",
+            "residential lending",
+            "loan origination",
         ),
         "access_control": ("access control", "credential management", "osdp", "wiegand"),
         "erp_business_systems": ("d365 f&o", "dynamics 365", "erp systems", "sox"),
         "ai_platform": ("ai platform", "ai tooling", "agentic systems"),
+        "ai_cloud_infrastructure": (
+            "gpu cloud",
+            "gpu infrastructure",
+            "hpc systems",
+            "ai/ml platforms",
+        ),
+        "advertising_technology": (
+            "adtech",
+            "media buying",
+            "trading platform",
+            "ad exchanges",
+        ),
+        "healthcare_information_systems": (
+            "healthcare information systems",
+            "epic module",
+            "professional billing",
+            "claims",
+        ),
+        "manufacturing_supply_chain": (
+            "manufacturing environment",
+            "supply chain",
+            "distribution",
+            "production",
+        ),
+        "aerospace_defense": (
+            "aerospace",
+            "raytheon",
+            "collins aerospace",
+            "flight-based",
+            "defense industry",
+        ),
+        "media_publishing": ("media", "publishing", "broadcasting", "subscription"),
     }
     return [
         name for name, terms in catalog.items() if any(contains_term(text, term) for term in terms)

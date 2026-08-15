@@ -12,6 +12,7 @@ from aiadapply_v2.schemas import (
     EvidenceMatch,
     EvidenceStrength,
     JobKeyword,
+    KeywordKind,
     ResumeEvidence,
     ResumeEvidenceGraph,
     TargetRoleProfile,
@@ -20,6 +21,36 @@ from aiadapply_v2.schemas import (
 from aiadapply_v2.text import contains_term
 
 DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"
+SYSTEM_CATEGORY_EVIDENCE: dict[str, tuple[str, ...]] = {
+    "api integrations": ("REST APIs", "Webhooks", "Microsoft Graph API"),
+    "api security": ("OAuth 2.0", "MFA", "SSO", "RBAC"),
+    "command line": ("Bash", "PowerShell"),
+    "configuration": ("configured", "configurations"),
+    "database": ("SQL", "PostgreSQL", "MySQL", "SQLite"),
+    "erp": ("Dynamics 365", "D365 F&O"),
+    "microsoft office": ("Microsoft 365", "Excel", "Outlook"),
+    "operating systems": ("Windows", "Linux", "macOS", "UNIX"),
+    "service level agreements": ("SLA", "SLA Management"),
+    "stem degree": ("Bachelor of Science", "Computer Science"),
+    "ticketing": ("support tickets", "Jira"),
+    "web services": ("REST APIs", "Webhooks"),
+}
+EXACT_EVIDENCE_TERMS = {
+    "atf access",
+    "electrical engineering",
+    "fintech",
+    "internal controls",
+    "residential lending",
+    "security clearance",
+    "sox",
+    "u.s. citizenship",
+    "u.s. person",
+}
+# Related resume evidence can support these concepts in conversation, but is
+# insufficient to rename an artifact or duty as the employer's formal term.
+ALWAYS_WEAK_TRANSFER_TERMS = {
+    "knowledge base",
+}
 
 
 class SemanticEncoder(Protocol):
@@ -69,7 +100,7 @@ def build_transferability_map(
     graph: ResumeEvidenceGraph,
     encoder: SemanticEncoder,
 ) -> TransferabilityMap:
-    evidence = [item for item in graph.evidence if item.section != "skills"]
+    evidence = list(graph.evidence)
     passages = [_evidence_passage(item) for item in evidence]
     matches: list[EvidenceMatch] = []
 
@@ -81,15 +112,22 @@ def build_transferability_map(
             for index, evidence_item in enumerate(evidence)
             if _direct_match(keyword.term, evidence_item)
         ]
+        transferable_indices = [
+            index
+            for index, evidence_item in enumerate(evidence)
+            if _transferable_match(keyword.term, evidence_item)
+        ]
         if direct_indices:
             best_index = max(direct_indices, key=lambda index: scores[index])
+        elif transferable_indices:
+            best_index = max(transferable_indices, key=lambda index: scores[index])
         else:
             best_index = int(np.argmax(scores)) if scores else -1
         best = evidence[best_index] if best_index >= 0 else None
         semantic_score = float(scores[best_index]) if best_index >= 0 else 0.0
         direct = _direct_match(keyword.term, best)
         transferable = _transferable_match(keyword.term, best)
-        strength = _strength(direct, transferable, semantic_score)
+        strength = _strength(keyword.term, keyword.kind, direct, transferable, semantic_score)
         matches.append(
             EvidenceMatch(
                 target_term=keyword.term,
@@ -159,7 +197,14 @@ def _direct_match(term: str, evidence: ResumeEvidence | None) -> bool:
         *evidence.environment_signals,
         *evidence.outcomes,
     ]
-    return any(contains_term(value, term) for value in direct_fields)
+    if any(contains_term(value, term) for value in direct_fields):
+        return True
+    category_evidence = SYSTEM_CATEGORY_EVIDENCE.get(term.casefold(), ())
+    return any(
+        contains_term(value, evidence_term)
+        for evidence_term in category_evidence
+        for value in direct_fields
+    )
 
 
 def _transferable_match(term: str, evidence: ResumeEvidence | None) -> bool:
@@ -171,9 +216,23 @@ def _transferable_match(term: str, evidence: ResumeEvidence | None) -> bool:
     return False
 
 
-def _strength(direct: bool, transferable: bool, score: float) -> EvidenceStrength:
+def _strength(
+    term: str,
+    kind: KeywordKind,
+    direct: bool,
+    transferable: bool,
+    score: float,
+) -> EvidenceStrength:
     if direct:
         return EvidenceStrength.direct
+    if term.casefold() in EXACT_EVIDENCE_TERMS:
+        return EvidenceStrength.unsupported
+    if term.casefold() in ALWAYS_WEAK_TRANSFER_TERMS:
+        return EvidenceStrength.weakly_transferable
+    # Named tools, products, protocols, and platforms are not interchangeable.
+    # Semantic proximity to another system is not evidence of hands-on experience.
+    if kind == KeywordKind.system:
+        return EvidenceStrength.unsupported
     if transferable or score >= 0.64:
         return EvidenceStrength.strongly_transferable
     if score >= 0.42:
@@ -211,7 +270,7 @@ def _reasoning(
         )
     return (
         f"The closest paragraph, {evidence.paragraph_id}, does not substantiate {term}; "
-        "the term may still be inserted under the configured transformation policy."
+        "the term must remain outside resume prose."
     )
 
 

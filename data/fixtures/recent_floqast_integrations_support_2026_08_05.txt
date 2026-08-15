@@ -1,0 +1,48 @@
+Source checked: 2026-08-05
+Official posting: https://jobs.lever.co/floqast/e7138177-4869-49cc-8201-ef254a2d1506
+
+Home
+Jobs
+Company logo for, FloQast.
+FloQast
+
+Technical Support Engineer (Integrations)
+
+Los Angeles, CA · Current employer posting
+$60,000 - $90,000
+Hybrid
+Full-time
+Apply
+Save
+
+About the job
+FloQast is hiring a customer-facing Technical Support Engineer for its Accounting Transformation Platform and integration ecosystem. The role works with customer IT teams, financial system administrators, Product, Engineering, Customer Success, and other partners to resolve technical obstacles. Los Angeles employees work in the office Tuesday through Thursday.
+
+What You'll Do
+Own customer support cases, prioritize urgency, and communicate accurate resolutions through email and screen sharing.
+Troubleshoot error messages and unexpected behavior, identify root causes, and explain technical resolutions.
+Configure customer environments according to platform practices and client requirements.
+Resolve L1, L2, and L3 cases involving ERP systems, cloud storage, SSO identity providers, subledgers, banks, and other integrations.
+Use account administration tools for CRUD operations while assisting customer environments.
+Perform deep troubleshooting with session replay, application logs, browser developer tools, and API clients such as Postman.
+Maintain knowledge base content for customers, internal support teams, and AI-enabled support workflows.
+Collaborate across Product, Engineering, Customer Success, and other stakeholders on releases, defects, and complex cases.
+
+What You'll Bring
+2+ years of experience in Technical Support, IT, or a related technical field.
+Ability to assess customer urgency and provide timely, empathetic support.
+Strong critical thinking for diagnosing and resolving customer-reported technical issues.
+Clear written and verbal communication with technical and non-technical audiences.
+Experience working cross-functionally with Engineering, Product, and Customer Success.
+Ability to prioritize concurrent work in a fast-paced environment.
+
+Nice To Haves/Other
+Experience supporting B2B SaaS, fintech, enterprise software, ERP systems, or cloud applications.
+Experience with Zendesk, Salesforce, JIRA, or similar ticket and escalation systems.
+Working knowledge of SQL, API troubleshooting, and data integration concepts.
+Knowledge of OAuth, SAML, SSO, SFTP, and REST APIs.
+Experience with Postman, session replay, log analysis, support automation, or AI-powered support tools.
+
+Set alert for similar jobs
+About the company
+FloQast

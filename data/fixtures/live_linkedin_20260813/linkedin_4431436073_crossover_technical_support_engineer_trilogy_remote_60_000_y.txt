@@ -1,0 +1,69 @@
+Company logo for, Crossover.
+Crossover
+Technical Support Engineer, Trilogy (Remote) - $60,000/year USD
+Remote
+Remote
+Full-time
+Source URL: https://www.linkedin.com/jobs/view/4431436073/
+About the job
+The toughest tickets don't require another person following scripts. They require someone capable of navigating unclear context, misconfigured systems, conflicting information, upset customers, and misleading AI outputs—then determining what's genuinely broken. This position is designed for the support engineer who thrives on unresolved cases: replicating failures, analyzing logs, tracking API behavior, examining JSON payloads, distinguishing a 401 from a 404 from a 429, and leveraging AI aggressively without accepting its conclusions uncritically.
+
+Traditional support teams remain organized around ticket queues, templated responses, handoff protocols, and predefined issue guides. We are constructing something different. Standard support inquiries are increasingly addressed through AI and first-level workflows, meaning human expertise is allocated to the most challenging problems. AI is not replacing you in this role. It is the instrument you control, validate, challenge, and verify.
+
+This position is not about copying AI-generated answers, making rapid guesses, waiting for direction, or escalating as soon as the issue becomes unfamiliar. It is not suited for someone who specializes deeply in a single product and becomes ineffective when the next ticket involves a different technology stack. It is about delivering the correct answer with the minimum number of customer interactions the problem permits: reproducing issues before proposing solutions, investigating across tickets, Slack channels, knowledge bases, logs, configurations, and actual artifacts before escalating, and composing customer communications clear enough to defuse tension. The technical foundation is assumed: REST APIs, JSON, HTTP status codes, command line interface, and logs. That qualifies you for consideration. Sound judgment amid ambiguity is what makes you effective.
+
+In this position, your responsibility is to maintain ownership of the issue until it is either resolved or escalated with clarity, accompanied by diagnostic reasoning valuable enough for the subsequent agent and the next AI workflow. You will excel in this role if the ticket that defies logic is the one you find most engaging. You will dislike it if you require a single product, a single playbook, and someone else to remove obstacles. If that type of challenge motivates you, we encourage you to apply.
+
+What You Will Be Doing
+
+
+AI-Augmented Customer Resolutions: Complex, escalated tickets resolved through deep, hands-on troubleshooting combined with AI that you guide, validate against authentic documentation, and confirm for accuracy.
+
+
+What You Won’t Be Doing
+
+
+Spending two full months onboarding; you will be required to become proficient with multiple products within the first month (we recognize this is demanding)
+Depending on your managers for assistance; if you are not skilled at removing your own blockers, you will probably find this role difficult
+
+
+Technical Support Engineer Key Responsibilities
+
+
+Combine technical human judgment and AI capabilities to provide outstanding customer support, concentrating on complex problems that AI cannot yet independently resolve
+
+
+Basic Requirements
+
+
+2+ years in a hands-on technical role such as technical support, customer support engineering, software engineering, QA, or sysadmin/DevOps. The title does not need to be "support."
+Comfortable making and reading REST API calls and JSON, interpreting HTTP status codes (such as 401 vs 404 and 429 vs 403), and working in a command line (CLI) and logs.
+Hands-on experience using generative AI tools (such as ChatGPT or Claude) in your daily technical work.
+Professional fluency in English, written and spoken.
+Able to work a full 40-hour week during US business hours (Eastern Time). This is a full US-daytime shift, which means an overnight shift in some time zones.
+Based in North America, Central America, South America, Australia, New Zealand, the United Kingdom, Ireland, or the Philippines (no relocation support).
+
+
+Nice-to-have Requirements
+
+
+Experience supporting technical or business customers on enterprise software or B2B SaaS, not just internal IT.
+API troubleshooting with tools like Postman or curl.
+A track record of troubleshooting across several unrelated products or tech stacks, not just one.
+Developer-grade depth: you can read code or trace an API call when the problem demands it.
+
+
+About Trilogy
+
+Hundreds of software businesses run on the Trilogy Business Platform. For three decades, Trilogy has been known for 3 things: Relentlessly seeking top talent, Innovating new technology, and incubating new businesses. Our technological innovation is spearheaded by a passion for simple customer-facing designs. Our incubation of new businesses ranges from entirely new moon-shot ideas to rearchitecting existing projects for today's modern cloud-based stack. Trilogy is a place where you can be surrounded with great people, be proud of doing great work, and grow your career by leaps and bounds.
+
+There is so much to cover for this exciting role, and space here is limited. Hit the Apply button if you found this interesting and want to learn more. We look forward to meeting you!
+
+Working with us
+
+This is a full-time (40 hours per week), long-term position. The position is immediately available and requires entering into an independent contractor agreement with Crossover as a Contractor of Record. The compensation level for this role is $30 USD/hour, which equates to $60,000 USD/year assuming 40 hours per week and 50 weeks per year. The payment period is weekly. Consult www.crossover.com/help-and-faqs for more details on this topic.
+
+Crossover Job Code: LJ-3330-US-SantaCla-TechnicalSuppo1
+
+
+… more
