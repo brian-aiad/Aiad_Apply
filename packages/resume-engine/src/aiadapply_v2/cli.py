@@ -13,6 +13,7 @@ from typing import Annotated
 import typer
 from rich import print
 
+from aiadapply_v2.config import default_output_root
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.candidate_profile import (
     add_candidate_profile_evidence,
@@ -43,7 +44,7 @@ app = typer.Typer(no_args_is_help=True, help="Reasoning-based resume transformat
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_BASE = REPOSITORY_ROOT / "data" / "resumes" / "Brian_Aiad_BASE.docx"
 DEFAULT_PROFILE = REPOSITORY_ROOT / "data" / "profile" / "Brian_Aiad_PROFILE.json"
-DEFAULT_OUTPUT_ROOT = Path(r"C:\Users\kingt\OneDrive\Downloads\Resume_Builder\OUTPUT_RESUMES")
+DEFAULT_OUTPUT_ROOT = default_output_root()
 
 
 @app.command()
@@ -184,7 +185,7 @@ def draft(
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
     print(f"[bold]Drafting:[/bold] {job.company} — {job.title}\n[bold]Output:[/bold] {folder}")
-    tracking: tuple[str, str, str, str] | None = None
+    tracking: tuple[str, str, str, str, str] | None = None
     try:
         tracking = register_terminal_run(raw_paste=raw_paste, api_url=api_url)
     except Exception as error:
@@ -196,13 +197,14 @@ def draft(
         _print_progress(message)
         if tracking is None or not progress_sync_available:
             return
-        api_url, secret, _, run_id = tracking
+        api_url, secret, _, run_id, worker_id = tracking
         try:
             submit_worker_progress(
                 api_url=api_url,
                 secret=secret,
                 run_id=run_id,
                 stage=message,
+                worker_id=worker_id,
             )
         except Exception as error:
             progress_sync_available = False
@@ -219,7 +221,7 @@ def draft(
         )
     except Exception as error:
         if tracking is not None:
-            api_url, secret, _, run_id = tracking
+            api_url, secret, _, run_id, worker_id = tracking
             try:
                 submit_terminal_failure(
                     api_url=api_url,
@@ -227,12 +229,13 @@ def draft(
                     run_id=run_id,
                     error=error,
                     output_folder=folder,
+                    worker_id=worker_id,
                 )
             except Exception as tracking_error:
                 print(f"[yellow]Tracking failure sync failed:[/yellow] {tracking_error}")
         raise
     if tracking is not None:
-        api_url, secret, application_id, run_id = tracking
+        api_url, secret, application_id, run_id, worker_id = tracking
         try:
             submit_terminal_result(
                 api_url=api_url,
@@ -241,6 +244,7 @@ def draft(
                 report=report,
                 output_folder=folder,
                 application_id=application_id,
+                worker_id=worker_id,
             )
         except Exception as error:
             print(f"[yellow]Resume generated, but tracking sync failed:[/yellow] {error}")

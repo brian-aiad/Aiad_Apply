@@ -1,9 +1,12 @@
 import { createReadStream, existsSync } from "node:fs";
 import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
+import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { db } from "@/lib/db";
+import { pathIsInside, safeArtifactName } from "@/lib/worker-security";
 
 export const runtime = "nodejs";
 
@@ -11,25 +14,54 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await context.params;
-  const artifact = await db.artifact.findUnique({ where: { id } });
+  const parameters = z.object({ id: z.string().uuid() }).safeParse(await context.params);
+  if (!parameters.success) {
+    return NextResponse.json({ error: "Invalid artifact identifier." }, { status: 400 });
+  }
+  const { id } = parameters.data;
+  const artifact = await db.artifact.findUnique({
+    where: { id },
+    include: { run: { select: { outputFolder: true } } },
+  });
   if (!artifact) return NextResponse.json({ error: "File not found." }, { status: 404 });
 
-  if (artifact.localPath && existsSync(artifact.localPath)) {
-    const file = await stat(artifact.localPath);
-    const stream = Readable.toWeb(createReadStream(artifact.localPath)) as ReadableStream;
-    return new NextResponse(stream, {
-      headers: {
-        "Content-Length": file.size.toString(),
-        "Content-Disposition": `attachment; filename="${artifact.fileName}"`,
-        "Content-Type":
-          artifact.kind === "PDF"
-            ? "application/pdf"
-            : artifact.kind === "DOCX"
-              ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-              : "application/octet-stream",
-      },
-    });
+  const localPath = artifact.localPath;
+  const outputFolder = artifact.run.outputFolder;
+  if (
+    localPath &&
+    outputFolder &&
+    pathIsInside(outputFolder, localPath) &&
+    path.basename(localPath) === artifact.fileName &&
+    existsSync(localPath)
+  ) {
+    try {
+      const file = await stat(localPath);
+      if (!file.isFile()) throw new Error("Artifact is not a regular file.");
+      const stream = Readable.toWeb(createReadStream(localPath)) as ReadableStream;
+      const fileName = safeArtifactName(artifact.fileName);
+      return new NextResponse(stream, {
+        headers: {
+          "Cache-Control": "private, no-store",
+          "Content-Length": file.size.toString(),
+          "Content-Disposition": `attachment; filename="${fileName}"`,
+          "X-Content-Type-Options": "nosniff",
+          "Content-Type":
+            artifact.kind === "PDF"
+              ? "application/pdf"
+              : artifact.kind === "DOCX"
+                ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                : artifact.kind === "REPORT_JSON" || artifact.kind === "CHARACTER_AUDIT"
+                  ? "application/json"
+                  : artifact.kind === "REPORT_MARKDOWN"
+                    ? "text/markdown; charset=utf-8"
+                    : artifact.kind === "JOB_DESCRIPTION"
+                      ? "text/plain; charset=utf-8"
+                      : "application/octet-stream",
+        },
+      });
+    } catch {
+      // The local file may have moved between the existence check and the read.
+    }
   }
 
   if (artifact.storagePath) {
@@ -40,7 +72,11 @@ export async function GET(
       const { data, error } = await supabase.storage
         .from("resume-artifacts")
         .createSignedUrl(artifact.storagePath, 60);
-      if (!error && data.signedUrl) return NextResponse.redirect(data.signedUrl);
+      if (!error && data.signedUrl) {
+        const response = NextResponse.redirect(data.signedUrl);
+        response.headers.set("Cache-Control", "private, no-store");
+        return response;
+      }
     }
   }
 

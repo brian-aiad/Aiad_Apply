@@ -83,6 +83,11 @@ a {
   animation: spin 0.9s linear infinite;
 }
 
+:focus-visible {
+  outline: 2px solid var(--violet-bright);
+  outline-offset: 3px;
+}
+
 button:disabled {
   cursor: not-allowed;
   opacity: 0.52;
@@ -285,6 +290,17 @@ button:disabled {
 .select:focus {
   border-color: #7048c9;
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.11);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 .data-table {

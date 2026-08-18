@@ -30,12 +30,13 @@ export default async function ApplicationDetailPage({
   const { id } = await params;
   const application = await getApplication(id);
   if (!application) notFound();
-  const latestRun = application.tailoringRuns[0];
+  const activeRun = application.tailoringRuns.find((run) =>
+    ["QUEUED", "RUNNING"].includes(run.status),
+  );
+  const latestRun = activeRun ?? application.tailoringRuns[0];
   const visibleChanges =
     latestRun?.changes.filter((change) => change.changeType !== "unchanged") ?? [];
-  const hasActiveRun = Boolean(
-    latestRun && ["QUEUED", "RUNNING"].includes(latestRun.status),
-  );
+  const hasActiveRun = Boolean(activeRun);
   const progressEvent = application.events.find(
     (event) => event.eventType === "tailoring_progress" && event.toValue === latestRun?.id,
   );

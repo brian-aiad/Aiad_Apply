@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 
@@ -16,6 +18,14 @@ async function main() {
   );
   const base = await readFile(basePath);
   const sha256 = createHash("sha256").update(base).digest("hex");
+  const windowsOneDriveDownloads = path.join(homedir(), "OneDrive", "Downloads");
+  const defaultDownloads =
+    process.platform === "win32" && existsSync(windowsOneDriveDownloads)
+      ? windowsOneDriveDownloads
+      : path.join(homedir(), "Downloads");
+  const outputRoot =
+    process.env.AIADAPPLY_OUTPUT_ROOT ||
+    path.join(defaultDownloads, "Resume_Builder", "OUTPUT_RESUMES");
 
   await prisma.setting.upsert({
     where: { key: "product" },
@@ -23,8 +33,7 @@ async function main() {
       value: {
         dailyGoal: 8,
         timezone: "America/Los_Angeles",
-        outputRoot:
-          "C:\\Users\\kingt\\OneDrive\\Downloads\\Resume_Builder\\OUTPUT_RESUMES",
+        outputRoot,
         testFixturesVisible: false,
       },
     },
@@ -33,8 +42,7 @@ async function main() {
       value: {
         dailyGoal: 8,
         timezone: "America/Los_Angeles",
-        outputRoot:
-          "C:\\Users\\kingt\\OneDrive\\Downloads\\Resume_Builder\\OUTPUT_RESUMES",
+        outputRoot,
         testFixturesVisible: false,
       },
     },

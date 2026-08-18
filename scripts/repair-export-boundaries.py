@@ -31,6 +31,7 @@ def repair(
     base_resume: Path,
     run_id: str | None,
     application_id: str | None,
+    worker_id: str | None,
     api_url: str,
 ) -> TransformationReport:
     output_dir = report_path.resolve().parent
@@ -109,7 +110,7 @@ def repair(
         output_dir=output_dir,
     )
 
-    if run_id and application_id:
+    if run_id and application_id and worker_id:
         resolved_url, secret = tracking_configuration(api_url)
         submit_terminal_result(
             api_url=resolved_url,
@@ -118,6 +119,7 @@ def repair(
             report=report,
             output_folder=output_dir,
             application_id=application_id,
+            worker_id=worker_id,
         )
     return report
 
@@ -132,15 +134,18 @@ def main() -> None:
     )
     parser.add_argument("--run-id")
     parser.add_argument("--application-id")
+    parser.add_argument("--worker-id")
     parser.add_argument("--api-url", default="http://127.0.0.1:3000")
     args = parser.parse_args()
-    if bool(args.run_id) != bool(args.application_id):
-        parser.error("--run-id and --application-id must be supplied together")
+    tracking_arguments = (args.run_id, args.application_id, args.worker_id)
+    if any(tracking_arguments) and not all(tracking_arguments):
+        parser.error("--run-id, --application-id, and --worker-id must be supplied together")
     result = repair(
         report_path=args.report,
         base_resume=args.base_resume,
         run_id=args.run_id,
         application_id=args.application_id,
+        worker_id=args.worker_id,
         api_url=args.api_url,
     )
     print(

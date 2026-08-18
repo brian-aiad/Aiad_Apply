@@ -419,7 +419,10 @@ test("records authenticated worker progress and displays the current stage", asy
 
   const progress = await request.post(`/api/worker/runs/${registered.runId}/progress`, {
     headers: { Authorization: `Bearer ${workerSecret}` },
-    data: { stage: "Building candidate evidence and role transferability" },
+    data: {
+      stage: "Building candidate evidence and role transferability",
+      workerId: "playwright-progress-test",
+    },
   });
   expect(progress.status(), await progress.text()).toBe(200);
 
@@ -434,6 +437,7 @@ test("records authenticated worker progress and displays the current stage", asy
   const completed = await request.post(`/api/worker/runs/${registered.runId}`, {
     headers: { Authorization: `Bearer ${workerSecret}` },
     data: {
+      workerId: "playwright-progress-test",
       success: true,
       report: {
         validation: { passed: true, keyword_coverage: 50 },

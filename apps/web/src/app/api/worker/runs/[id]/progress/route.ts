@@ -1,24 +1,21 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { workerAuthorized, WORKER_ID_PATTERN } from "@/lib/worker-security";
 
 const payloadSchema = z.object({
   stage: z.string().trim().min(2).max(200),
+  workerId: z.string().trim().regex(WORKER_ID_PATTERN),
 });
 
 const RUN_VISIBILITY_ATTEMPTS = 6;
 const RUN_VISIBILITY_DELAY_MS = 100;
 
-function authorized(request: Request) {
-  const expected = process.env.WORKER_SECRET || process.env.CRON_SECRET;
-  return Boolean(expected && request.headers.get("authorization") === `Bearer ${expected}`);
-}
-
 async function findRun(id: string) {
   for (let attempt = 0; attempt < RUN_VISIBILITY_ATTEMPTS; attempt += 1) {
     const run = await db.tailoringRun.findUnique({
       where: { id },
-      select: { applicationId: true, status: true },
+      select: { applicationId: true, status: true, workerId: true },
     });
     if (run) return run;
     if (attempt < RUN_VISIBILITY_ATTEMPTS - 1) {
@@ -32,7 +29,7 @@ export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  if (!authorized(request)) {
+  if (!workerAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -41,7 +38,11 @@ export async function POST(
     return NextResponse.json({ error: "Invalid progress update." }, { status: 400 });
   }
 
-  const { id } = await context.params;
+  const parameters = z.object({ id: z.string().uuid() }).safeParse(await context.params);
+  if (!parameters.success) {
+    return NextResponse.json({ error: "Invalid run identifier." }, { status: 400 });
+  }
+  const { id } = parameters.data;
   const run = await findRun(id);
   if (!run) return NextResponse.json({ error: "Run not found." }, { status: 404 });
   if (run.status !== "RUNNING") {
@@ -50,15 +51,35 @@ export async function POST(
       { status: 409 },
     );
   }
+  if (run.workerId !== input.data.workerId) {
+    return NextResponse.json(
+      { error: "This run is owned by another worker." },
+      { status: 409 },
+    );
+  }
 
-  await db.applicationEvent.create({
-    data: {
-      applicationId: run.applicationId,
-      eventType: "tailoring_progress",
-      toValue: id,
-      detail: { stage: input.data.stage },
-    },
+  const refreshed = await db.$transaction(async (transaction) => {
+    const update = await transaction.tailoringRun.updateMany({
+      where: { id, status: "RUNNING", workerId: input.data.workerId },
+      data: { updatedAt: new Date() },
+    });
+    if (update.count !== 1) return false;
+    await transaction.applicationEvent.create({
+      data: {
+        applicationId: run.applicationId,
+        eventType: "tailoring_progress",
+        toValue: id,
+        detail: { stage: input.data.stage },
+      },
+    });
+    return true;
   });
+  if (!refreshed) {
+    return NextResponse.json(
+      { error: "This run is no longer owned by this worker." },
+      { status: 409 },
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

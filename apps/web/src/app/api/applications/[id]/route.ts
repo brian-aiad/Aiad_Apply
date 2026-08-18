@@ -1,19 +1,24 @@
-import { ApplicationStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 
 const updateSchema = z.object({
-  status: z.nativeEnum(ApplicationStatus).optional(),
+  status: z
+    .enum(["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED"])
+    .optional(),
   notes: z.string().max(10000).optional(),
-  sourceUrl: z.string().url().nullable().optional().or(z.literal("")),
+  sourceUrl: z.string().max(2_000).url().nullable().optional().or(z.literal("")),
 });
 
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await context.params;
+  const parameters = z.object({ id: z.string().uuid() }).safeParse(await context.params);
+  if (!parameters.success) {
+    return NextResponse.json({ error: "Invalid application identifier." }, { status: 400 });
+  }
+  const { id } = parameters.data;
   const input = updateSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {
     return NextResponse.json({ error: "Invalid application update." }, { status: 400 });

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { parseCapture } from "../../src/lib/job-parser";
@@ -158,5 +158,28 @@ test("parses the dated live LinkedIn corpus consistently", () => {
     assert.equal(parsed.responsibilities.length, responsibilities, name);
     assert.equal(parsed.requiredQualifications.length, required, name);
     assert.equal(parsed.preferredQualifications.length, preferred, name);
+  }
+});
+
+test("extracts usable sections from every saved real-posting fixture", () => {
+  const fixtureFiles: string[] = [];
+  const collect = (directory: string) => {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) collect(fullPath);
+      else if (entry.name.endsWith(".txt")) fixtureFiles.push(fullPath);
+    }
+  };
+  collect(fixtureRoot);
+
+  assert.ok(fixtureFiles.length >= 35, "expected the real-posting fixture corpus");
+  for (const filePath of fixtureFiles) {
+    const parsed = parseCapture(readFileSync(filePath, "utf8"));
+    const label = path.relative(fixtureRoot, filePath);
+    assert.notEqual(parsed.company, "Unknown company", label);
+    assert.notEqual(parsed.title, "Untitled role", label);
+    assert.ok(parsed.cleanDescription.length >= 100, label);
+    assert.ok(parsed.responsibilities.length > 0, `${label}: responsibilities`);
+    assert.ok(parsed.requiredQualifications.length > 0, `${label}: requirements`);
   }
 });

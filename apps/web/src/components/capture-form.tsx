@@ -20,7 +20,7 @@ export function CaptureForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rawPaste, sourceUrl, queueTailoring }),
       });
-      const payload = await response.json();
+      const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to capture this job.");
       router.push(`/applications/${payload.id}`);
       router.refresh();
@@ -51,6 +51,8 @@ export function CaptureForm() {
           className="textarea"
           value={rawPaste}
           onChange={(event) => setRawPaste(event.target.value)}
+          maxLength={500_000}
+          aria-describedby="job-paste-count"
           placeholder="Paste the full LinkedIn, Simplify, or employer job page here. Navigation, recommendations, and scanner keywords can remain in the text."
           autoFocus
         />
@@ -63,8 +65,8 @@ export function CaptureForm() {
             marginTop: 12,
           }}
         >
-          <span className="muted" style={{ fontSize: 11 }}>
-            {rawPaste.length.toLocaleString()} characters
+          <span id="job-paste-count" className="muted" style={{ fontSize: 11 }}>
+            {rawPaste.length.toLocaleString()} / 500,000 characters
           </span>
           <div style={{ display: "flex", gap: 8 }}>
             <button
@@ -93,6 +95,7 @@ export function CaptureForm() {
         </div>
         {error ? (
           <div
+            role="alert"
             style={{
               marginTop: 12,
               padding: "10px 12px",
@@ -118,6 +121,7 @@ export function CaptureForm() {
             className="input"
             value={sourceUrl}
             onChange={(event) => setSourceUrl(event.target.value)}
+            maxLength={2_000}
             placeholder="https://linkedin.com/jobs/view/…"
           />
           <p className="muted" style={{ margin: "9px 0 0", fontSize: 11 }}>

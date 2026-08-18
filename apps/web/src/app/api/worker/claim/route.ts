@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import {
+  staleWorkerCutoff,
+  workerAuthorized,
+  WORKER_ID_PATTERN,
+} from "@/lib/worker-security";
 
-const requestSchema = z.object({ workerId: z.string().min(2).max(100) });
-
-function authorized(request: Request) {
-  const expected = process.env.WORKER_SECRET || process.env.CRON_SECRET;
-  return Boolean(expected && request.headers.get("authorization") === `Bearer ${expected}`);
-}
+const requestSchema = z.object({
+  workerId: z.string().trim().regex(WORKER_ID_PATTERN),
+});
 
 export async function POST(request: Request) {
-  if (!authorized(request)) {
+  if (!workerAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
   const parsed = requestSchema.safeParse(await request.json().catch(() => null));
@@ -18,10 +20,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid worker identifier." }, { status: 400 });
   }
 
-  const queued = await db.tailoringRun.findFirst({
-    where: { status: "QUEUED" },
-    orderBy: { queuedAt: "asc" },
-    include: { application: { include: { job: true } } },
+  const cutoff = staleWorkerCutoff();
+  const queued = await db.$transaction(async (transaction) => {
+    const staleRuns = await transaction.tailoringRun.findMany({
+      where: { status: "RUNNING", updatedAt: { lt: cutoff } },
+      select: { id: true, applicationId: true, workerId: true },
+      orderBy: { updatedAt: "asc" },
+      take: 25,
+    });
+    for (const stale of staleRuns) {
+      const recovered = await transaction.tailoringRun.updateMany({
+        where: { id: stale.id, status: "RUNNING", updatedAt: { lt: cutoff } },
+        data: {
+          status: "QUEUED",
+          workerId: null,
+          startedAt: null,
+          errorMessage: "Worker lease expired; run automatically requeued.",
+        },
+      });
+      if (recovered.count === 1) {
+        await transaction.applicationEvent.create({
+          data: {
+            applicationId: stale.applicationId,
+            eventType: "tailoring_requeued",
+            toValue: stale.id,
+            detail: { previousWorkerId: stale.workerId, reason: "worker_lease_expired" },
+          },
+        });
+      }
+    }
+    return transaction.tailoringRun.findFirst({
+      where: { status: "QUEUED" },
+      orderBy: { queuedAt: "asc" },
+      include: { application: { include: { job: true } } },
+    });
   });
   if (!queued) return new NextResponse(null, { status: 204 });
 

@@ -12,11 +12,12 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from aiadapply_v2.config import default_output_root
 from aiadapply_v2.pipeline import Reasoner, transform_resume
 from aiadapply_v2.schemas import TransformationReport
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
-DEFAULT_OUTPUT_ROOT = Path(r"C:\Users\kingt\OneDrive\Downloads\Resume_Builder\OUTPUT_RESUMES")
+DEFAULT_OUTPUT_ROOT = default_output_root()
 
 
 def load_tracking_environment() -> None:
@@ -52,7 +53,7 @@ def register_terminal_run(
     *,
     raw_paste: str,
     api_url: str | None = None,
-) -> tuple[str, str, str, str]:
+) -> tuple[str, str, str, str, str]:
     url, secret = tracking_configuration(api_url)
     worker_id = f"terminal-{socket.gethostname()}-{os.getpid()}"
     result = _request_json(
@@ -62,7 +63,7 @@ def register_terminal_run(
     )
     if result is None:
         raise RuntimeError("Tracking registration returned no application.")
-    return url, secret, str(result["applicationId"]), str(result["runId"])
+    return url, secret, str(result["applicationId"]), str(result["runId"]), worker_id
 
 
 def submit_terminal_result(
@@ -73,6 +74,7 @@ def submit_terminal_result(
     report: TransformationReport,
     output_folder: Path,
     application_id: str,
+    worker_id: str,
 ) -> None:
     _request_json(
         f"{api_url}/api/worker/runs/{run_id}",
@@ -81,7 +83,9 @@ def submit_terminal_result(
             report=report,
             output_folder=output_folder,
             application_id=application_id,
+            worker_id=worker_id,
         ),
+        retry_attempts=2,
     )
 
 
@@ -91,11 +95,12 @@ def submit_worker_progress(
     secret: str,
     run_id: str,
     stage: str,
+    worker_id: str,
 ) -> None:
     _request_json(
         f"{api_url}/api/worker/runs/{run_id}/progress",
         secret=secret,
-        payload={"stage": stage},
+        payload={"stage": stage, "workerId": worker_id},
         timeout_seconds=10,
     )
 
@@ -107,11 +112,13 @@ def submit_terminal_failure(
     run_id: str,
     error: BaseException,
     output_folder: Path,
+    worker_id: str,
 ) -> None:
     _request_json(
         f"{api_url}/api/worker/runs/{run_id}",
         secret=secret,
         payload={
+            "workerId": worker_id,
             "success": False,
             "error": f"{type(error).__name__}: {error}",
             "outputFolder": str(output_folder),
@@ -119,6 +126,7 @@ def submit_terminal_failure(
             "changes": [],
             "artifacts": [],
         },
+        retry_attempts=2,
     )
 
 
@@ -169,6 +177,7 @@ def run_worker(
                     secret=secret,
                     run_id=current_run_id,
                     stage=message,
+                    worker_id=worker_id,
                 )
             except Exception as error:
                 progress_sync_available = False
@@ -187,9 +196,11 @@ def run_worker(
                 report=report,
                 output_folder=folder,
                 application_id=application_id,
+                worker_id=worker_id,
             )
         except Exception as error:
             payload = {
+                "workerId": worker_id,
                 "success": False,
                 "error": f"{type(error).__name__}: {error}",
                 "outputFolder": str(folder),
@@ -197,11 +208,17 @@ def run_worker(
                 "changes": [],
                 "artifacts": [],
             }
-        _request_json(
-            f"{url}/api/worker/runs/{run_id}",
-            secret=secret,
-            payload=payload,
-        )
+        try:
+            _request_json(
+                f"{url}/api/worker/runs/{run_id}",
+                secret=secret,
+                payload=payload,
+                retry_attempts=2,
+            )
+        except Exception as error:
+            print(f"Final result sync failed; the run will be recovered by its lease: {error}")
+            if once:
+                raise
         if once:
             return
 
@@ -211,6 +228,7 @@ def build_worker_payload(
     report: TransformationReport,
     output_folder: Path,
     application_id: str,
+    worker_id: str,
 ) -> dict[str, Any]:
     del application_id
     report_payload = report.model_dump(mode="json")
@@ -229,6 +247,7 @@ def build_worker_payload(
     ]
     artifacts = [_artifact_payload(kind, path) for kind, path in files if path.exists()]
     return {
+        "workerId": worker_id,
         "success": True,
         "outputFolder": str(output_folder),
         "report": report_payload,
@@ -266,6 +285,7 @@ def _request_json(
     payload: dict[str, Any],
     allow_empty: bool = False,
     timeout_seconds: float = 60,
+    retry_attempts: int = 0,
 ) -> dict[str, Any] | None:
     request = urllib.request.Request(
         url,
@@ -276,18 +296,25 @@ def _request_json(
         },
         method="POST",
     )
-    try:
-        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
-            content = response.read()
-            if response.status == 204 or not content:
+    for attempt in range(retry_attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+                content = response.read()
+                if response.status == 204 or not content:
+                    return None
+                parsed: dict[str, Any] = json.loads(content.decode("utf-8"))
+                return parsed
+        except urllib.error.HTTPError as error:
+            if allow_empty and error.code in {204, 409}:
                 return None
-            parsed: dict[str, Any] = json.loads(content.decode("utf-8"))
-            return parsed
-    except urllib.error.HTTPError as error:
-        if allow_empty and error.code in {204, 409}:
-            return None
-        detail = error.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"Tracking API returned {error.code}: {detail}") from error
+            detail = error.read().decode("utf-8", errors="replace")
+            if error.code not in {429, 500, 502, 503, 504} or attempt >= retry_attempts:
+                raise RuntimeError(f"Tracking API returned {error.code}: {detail}") from error
+        except (TimeoutError, urllib.error.URLError) as error:
+            if attempt >= retry_attempts:
+                raise RuntimeError(f"Tracking API is unreachable: {error}") from error
+        time.sleep(0.5 * (2**attempt))
+    raise RuntimeError("Tracking API request exhausted its retry budget.")
 
 
 def _slug(value: str) -> str:

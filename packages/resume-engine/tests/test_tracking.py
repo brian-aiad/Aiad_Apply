@@ -1,4 +1,6 @@
+import io
 import json
+import urllib.error
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -6,6 +8,7 @@ from typing import Any
 import pytest
 from aiadapply_v2 import tracking
 from aiadapply_v2.tracking import (
+    _request_json,
     run_worker,
     submit_terminal_failure,
     submit_worker_progress,
@@ -60,6 +63,7 @@ def test_progress_and_failure_requests_are_bearer_authenticated(
         secret="worker-secret",
         run_id="run-123",
         stage="Parsing the job posting",
+        worker_id="worker-123",
     )
     submit_terminal_failure(
         api_url="https://tracker.example",
@@ -67,16 +71,21 @@ def test_progress_and_failure_requests_are_bearer_authenticated(
         run_id="run-123",
         error=ValueError("invalid output"),
         output_folder=tmp_path,
+        worker_id="worker-123",
     )
 
     progress_request, progress_timeout = captured[0]
     failure_request, failure_timeout = captured[1]
     assert progress_request.full_url.endswith("/runs/run-123/progress")
     assert progress_request.get_header("Authorization") == "Bearer worker-secret"
-    assert json.loads(progress_request.data or b"{}") == {"stage": "Parsing the job posting"}
+    assert json.loads(progress_request.data or b"{}") == {
+        "stage": "Parsing the job posting",
+        "workerId": "worker-123",
+    }
     assert progress_timeout == 10
     assert failure_request.full_url.endswith("/runs/run-123")
     assert json.loads(failure_request.data or b"{}") == {
+        "workerId": "worker-123",
         "success": False,
         "error": "ValueError: invalid output",
         "outputFolder": str(tmp_path),
@@ -99,8 +108,9 @@ def test_worker_reports_progress_and_records_transform_failure(
         payload: dict[str, Any],
         allow_empty: bool = False,
         timeout_seconds: float = 60,
+        retry_attempts: int = 0,
     ) -> dict[str, Any] | None:
-        del secret, allow_empty, timeout_seconds
+        del secret, allow_empty, timeout_seconds, retry_attempts
         requests.append((url, payload))
         if url.endswith("/claim"):
             return {
@@ -132,10 +142,46 @@ def test_worker_reports_progress_and_records_transform_failure(
     assert progress_calls == [
         (
             "http://web/api/worker/runs/run-456/progress",
-            {"stage": "Parsing and grading the job posting"},
+            {
+                "stage": "Parsing and grading the job posting",
+                "workerId": requests[0][1]["workerId"],
+            },
         )
     ]
     final_url, final_payload = requests[-1]
     assert final_url == "http://web/api/worker/runs/run-456"
     assert final_payload["success"] is False
     assert final_payload["error"] == "RuntimeError: reasoner unavailable"
+
+
+def test_request_retries_transient_server_errors_but_not_client_errors(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    attempts = 0
+    sleeps: list[float] = []
+
+    def flaky_urlopen(request: urllib.request.Request, timeout: float) -> _JsonResponse:
+        nonlocal attempts
+        del request, timeout
+        attempts += 1
+        if attempts == 1:
+            raise urllib.error.HTTPError(
+                "https://tracker.example/result",
+                503,
+                "Unavailable",
+                {},
+                io.BytesIO(b"try again"),
+            )
+        return _JsonResponse()
+
+    monkeypatch.setattr(urllib.request, "urlopen", flaky_urlopen)
+    monkeypatch.setattr(tracking.time, "sleep", sleeps.append)
+
+    assert _request_json(
+        "https://tracker.example/result",
+        secret="secret",
+        payload={"ok": True},
+        retry_attempts=2,
+    ) == {"ok": True}
+    assert attempts == 2
+    assert sleeps == [0.5]

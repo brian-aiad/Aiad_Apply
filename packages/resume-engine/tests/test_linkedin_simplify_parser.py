@@ -9,6 +9,25 @@ from aiadapply_v2.profiling.role_profile import build_target_role_profile
 FIXTURES = Path("data/fixtures")
 
 
+def test_every_saved_real_posting_produces_a_usable_role_profile() -> None:
+    fixture_paths = sorted(FIXTURES.rglob("*.txt"))
+    assert len(fixture_paths) >= 35
+
+    for path in fixture_paths:
+        job = parse_linkedin_simplify(path.read_text(encoding="utf-8", errors="replace"))
+        keywords = grade_job_keywords(job)
+        profile = build_target_role_profile(job, keywords)
+        label = str(path.relative_to(FIXTURES))
+
+        assert job.company and job.company != "Unknown company", label
+        assert job.title and job.title != "Untitled role", label
+        assert len(job.job_description) >= 100, label
+        assert job.responsibilities, f"{label}: responsibilities"
+        assert job.required_qualifications, f"{label}: qualifications"
+        assert profile.professional_identity, label
+        assert any(keyword.accepted for keyword in keywords), f"{label}: keywords"
+
+
 @pytest.mark.parametrize(
     ("filename", "company", "title", "family"),
     [

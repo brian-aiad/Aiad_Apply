@@ -8,6 +8,10 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $webRoot = Join-Path $repositoryRoot "apps\web"
 $runtimeRoot = Join-Path $repositoryRoot ".runtime"
 $processFile = Join-Path $runtimeRoot "processes.json"
+$webLog = Join-Path $runtimeRoot "web.log"
+$webErrorLog = Join-Path $runtimeRoot "web-error.log"
+$workerLog = Join-Path $runtimeRoot "worker.log"
+$workerErrorLog = Join-Path $runtimeRoot "worker-error.log"
 $localUrl = "http://127.0.0.1:3000"
 
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
@@ -29,6 +33,8 @@ $webCommand = "Set-Location -LiteralPath '$($webRoot.Replace("'", "''"))'; npm r
 $webProcess = Start-Process powershell.exe `
     -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $webCommand) `
     -WindowStyle Hidden `
+    -RedirectStandardOutput $webLog `
+    -RedirectStandardError $webErrorLog `
     -PassThru
 
 $ready = $false
@@ -54,7 +60,15 @@ $workerCommand = "Set-Location -LiteralPath '$($repositoryRoot.Replace("'", "''"
 $workerProcess = Start-Process powershell.exe `
     -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $workerCommand) `
     -WindowStyle Hidden `
+    -RedirectStandardOutput $workerLog `
+    -RedirectStandardError $workerErrorLog `
     -PassThru
+
+Start-Sleep -Seconds 1
+if ($workerProcess.HasExited) {
+    Stop-Process -Id $webProcess.Id -Force -ErrorAction SilentlyContinue
+    throw "The worker did not remain running. See $workerErrorLog."
+}
 
 @{
     repository = $repositoryRoot
@@ -64,6 +78,7 @@ $workerProcess = Start-Process powershell.exe `
 } | ConvertTo-Json | Set-Content -LiteralPath $processFile -Encoding utf8
 
 Write-Host "AIAD Apply is running at $localUrl"
+Write-Host "Logs are stored in $runtimeRoot"
 Write-Host "Use scripts\stop-local.ps1 to stop the local services."
 if (-not $NoBrowser) {
     Start-Process $localUrl

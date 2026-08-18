@@ -3,36 +3,164 @@ import { Prisma } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import {
+  safeArtifactName,
+  workerAuthorized,
+  WORKER_ID_PATTERN,
+} from "@/lib/worker-security";
 
 const payloadSchema = z.object({
+  workerId: z.string().trim().regex(WORKER_ID_PATTERN),
   success: z.boolean(),
-  error: z.string().optional(),
-  outputFolder: z.string().optional(),
+  error: z.string().max(5_000).optional(),
+  outputFolder: z.string().max(4_000).optional(),
   report: z.record(z.string(), z.unknown()).optional(),
-  keywords: z.array(z.record(z.string(), z.unknown())).default([]),
-  changes: z.array(z.record(z.string(), z.unknown())).default([]),
-  artifacts: z.array(z.record(z.string(), z.unknown())).default([]),
+  keywords: z.array(z.record(z.string(), z.unknown())).max(1_000).default([]),
+  changes: z.array(z.record(z.string(), z.unknown())).max(1_000).default([]),
+  artifacts: z.array(z.record(z.string(), z.unknown())).max(20).default([]),
 });
 
-function authorized(request: Request) {
-  const expected = process.env.WORKER_SECRET || process.env.CRON_SECRET;
-  return Boolean(expected && request.headers.get("authorization") === `Bearer ${expected}`);
+const evidenceLevels = new Set([
+  "DIRECT",
+  "STRONGLY_TRANSFERABLE",
+  "WEAKLY_TRANSFERABLE",
+  "UNSUPPORTED",
+]);
+const riskLevels = new Set(["LOW", "MEDIUM", "HIGH"]);
+const artifactKinds = new Set([
+  "DOCX",
+  "PDF",
+  "REPORT_JSON",
+  "REPORT_MARKDOWN",
+  "CHARACTER_AUDIT",
+  "JOB_DESCRIPTION",
+  "PREVIEW",
+]);
+
+function normalizedField(
+  record: Record<string, unknown>,
+  camelName: string,
+  snakeName: string,
+  fallback: string,
+) {
+  return String(record[camelName] ?? record[snakeName] ?? fallback).toLocaleUpperCase();
 }
+
+function workerRecordsAreValid(input: z.infer<typeof payloadSchema>) {
+  const reportValidation = input.report?.validation;
+  const reportLayout = input.report?.layout;
+  if (
+    (input.success &&
+      (!reportValidation ||
+        typeof reportValidation !== "object" ||
+        Array.isArray(reportValidation) ||
+        (reportValidation as Record<string, unknown>).passed !== true ||
+        !reportLayout ||
+        typeof reportLayout !== "object" ||
+        Array.isArray(reportLayout) ||
+        (reportLayout as Record<string, unknown>).page_count !== 1)) ||
+    (!input.success && !input.error)
+  ) {
+    return false;
+  }
+  if (
+    input.keywords.some(
+      (keyword) =>
+        typeof keyword.term !== "string" ||
+        keyword.term.length < 1 ||
+        keyword.term.length > 250 ||
+        typeof keyword.accepted !== "boolean" ||
+        typeof keyword.used !== "boolean" ||
+        !Number.isFinite(Number(keyword.occurrences ?? 0)) ||
+        !Number.isFinite(
+          Number(keyword.hiringImportance ?? keyword.hiring_importance ?? 0),
+        ) ||
+        !Number.isFinite(
+          Number(keyword.placementUtility ?? keyword.placement_utility ?? 0),
+        ) ||
+        !evidenceLevels.has(
+          normalizedField(keyword, "evidenceLevel", "evidence_level", "UNSUPPORTED"),
+        ),
+    ) ||
+    input.changes.some(
+      (change) =>
+        typeof (change.paragraphId ?? change.paragraph_id) !== "string" ||
+        String(change.paragraphId ?? change.paragraph_id).length > 250 ||
+        typeof change.section !== "string" ||
+        change.section.length > 250 ||
+        typeof (change.beforeText ?? change.before_text) !== "string" ||
+        String(change.beforeText ?? change.before_text).length > 10_000 ||
+        typeof (change.finalText ?? change.final_text) !== "string" ||
+        String(change.finalText ?? change.final_text).length > 10_000 ||
+        !riskLevels.has(normalizedField(change, "riskLevel", "risk_level", "LOW")),
+    )
+  ) {
+    return false;
+  }
+  return input.artifacts.every((artifact) => {
+    const kind = normalizedField(artifact, "kind", "kind", "REPORT_JSON");
+    const fileName = artifact.fileName ?? artifact.file_name;
+    const encoded = artifact.contentBase64;
+    return (
+      artifactKinds.has(kind) &&
+      typeof fileName === "string" &&
+      fileName.length > 0 &&
+      fileName.length <= 255 &&
+      (artifact.localPath === undefined ||
+        (typeof artifact.localPath === "string" && artifact.localPath.length <= 4_000)) &&
+      (encoded === undefined ||
+        (typeof encoded === "string" &&
+          encoded.length <= 10_000_000 &&
+          /^[A-Za-z0-9+/]*={0,2}$/.test(encoded))) &&
+      (artifact.byteSize === undefined ||
+        (typeof artifact.byteSize === "number" &&
+          Number.isInteger(artifact.byteSize) &&
+          artifact.byteSize >= 0))
+    );
+  });
+}
+
+class RunOwnershipError extends Error {}
 
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
-  if (!authorized(request)) {
+  if (!workerAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
-  const { id } = await context.params;
-  const input = payloadSchema.safeParse(await request.json().catch(() => null));
-  if (!input.success) {
+  const parameters = z.object({ id: z.string().uuid() }).safeParse(await context.params);
+  if (!parameters.success) {
+    return NextResponse.json({ error: "Invalid run identifier." }, { status: 400 });
+  }
+  const { id } = parameters.data;
+  const rawBody = await request.text();
+  if (rawBody.length > 20_000_000) {
+    return NextResponse.json({ error: "Worker result is too large." }, { status: 413 });
+  }
+  const input = payloadSchema.safeParse(
+    (() => {
+      try {
+        return JSON.parse(rawBody);
+      } catch {
+        return null;
+      }
+    })(),
+  );
+  if (!input.success || !workerRecordsAreValid(input.data)) {
     return NextResponse.json({ error: "Invalid worker result." }, { status: 400 });
   }
   const run = await db.tailoringRun.findUnique({ where: { id } });
   if (!run) return NextResponse.json({ error: "Run not found." }, { status: 404 });
+  if (["SUCCEEDED", "FAILED"].includes(run.status) && run.workerId === input.data.workerId) {
+    return NextResponse.json({ ok: true, duplicate: true });
+  }
+  if (run.status !== "RUNNING" || run.workerId !== input.data.workerId) {
+    return NextResponse.json(
+      { error: "This run is no longer owned by this worker." },
+      { status: 409 },
+    );
+  }
 
   const report = input.data.report as Record<string, unknown> | undefined;
   const validation = report?.validation as Record<string, unknown> | undefined;
@@ -58,9 +186,10 @@ export async function POST(
       supabaseUrl &&
       serviceKey
     ) {
-      const storagePath = `${run.applicationId}/${id}/${String(
-        artifact.fileName ?? artifact.file_name ?? "artifact",
-      )}`;
+      const fileName = safeArtifactName(
+        String(artifact.fileName ?? artifact.file_name ?? "artifact"),
+      );
+      const storagePath = `${run.applicationId}/${id}/${input.data.workerId}/${fileName}`;
       const supabase = createClient(supabaseUrl, serviceKey, {
         auth: { persistSession: false },
       });
@@ -76,10 +205,33 @@ export async function POST(
     uploadedArtifacts.push(normalized);
   }
 
-  await db.$transaction(async (transaction) => {
-    await transaction.keywordDecision.deleteMany({ where: { runId: id } });
-    await transaction.resumeChange.deleteMany({ where: { runId: id } });
-    await transaction.artifact.deleteMany({ where: { runId: id } });
+  try {
+    await db.$transaction(async (transaction) => {
+      const finished = await transaction.tailoringRun.updateMany({
+        where: { id, status: "RUNNING", workerId: input.data.workerId },
+        data: {
+          status: input.data.success ? "SUCCEEDED" : "FAILED",
+          errorMessage: input.data.error,
+          outputFolder: input.data.outputFolder,
+          reportSnapshot: input.data.report as Prisma.InputJsonValue | undefined,
+          engineVersion: report?.pipeline_version ? String(report.pipeline_version) : null,
+          reasoner: report?.reasoner ? String(report.reasoner) : null,
+          baseResumeSha256: report?.base_sha256 ? String(report.base_sha256) : null,
+          keywordCoverage:
+            typeof validation?.keyword_coverage === "number"
+              ? validation.keyword_coverage
+              : null,
+          validationPassed:
+            typeof validation?.passed === "boolean" ? validation.passed : null,
+          pageCount: typeof layout?.page_count === "number" ? layout.page_count : null,
+          riskCount: reviewRiskCount,
+          completedAt: new Date(),
+        },
+      });
+      if (finished.count !== 1) throw new RunOwnershipError();
+      await transaction.keywordDecision.deleteMany({ where: { runId: id } });
+      await transaction.resumeChange.deleteMany({ where: { runId: id } });
+      await transaction.artifact.deleteMany({ where: { runId: id } });
     if (input.data.success) {
       for (const keyword of input.data.keywords) {
         await transaction.keywordDecision.create({
@@ -148,7 +300,9 @@ export async function POST(
               | "CHARACTER_AUDIT"
               | "JOB_DESCRIPTION"
               | "PREVIEW",
-            fileName: String(artifact.fileName ?? artifact.file_name ?? ""),
+            fileName: safeArtifactName(
+              String(artifact.fileName ?? artifact.file_name ?? "artifact"),
+            ),
             localPath: artifact.localPath ? String(artifact.localPath) : null,
             storagePath: artifact.storagePath ? String(artifact.storagePath) : null,
             sha256: artifact.sha256 ? String(artifact.sha256) : null,
@@ -157,40 +311,42 @@ export async function POST(
         });
       }
     }
-    await transaction.tailoringRun.update({
-      where: { id },
-      data: {
-        status: input.data.success ? "SUCCEEDED" : "FAILED",
-        errorMessage: input.data.error,
-        outputFolder: input.data.outputFolder,
-        reportSnapshot: input.data.report as Prisma.InputJsonValue | undefined,
-        engineVersion: report?.pipeline_version ? String(report.pipeline_version) : null,
-        reasoner: report?.reasoner ? String(report.reasoner) : null,
-        baseResumeSha256: report?.base_sha256 ? String(report.base_sha256) : null,
-        keywordCoverage:
-          typeof validation?.keyword_coverage === "number"
-            ? validation.keyword_coverage
-            : null,
-        validationPassed:
-          typeof validation?.passed === "boolean" ? validation.passed : null,
-        pageCount: typeof layout?.page_count === "number" ? layout.page_count : null,
-        riskCount: reviewRiskCount,
-        completedAt: new Date(),
-      },
+      const otherActiveRuns = await transaction.tailoringRun.count({
+        where: {
+          applicationId: run.applicationId,
+          id: { not: id },
+          status: { in: ["QUEUED", "RUNNING"] },
+        },
+      });
+      await transaction.application.update({
+        where: { id: run.applicationId },
+        data: {
+          status:
+            otherActiveRuns > 0
+              ? "TAILORING"
+              : input.data.success
+                ? "REVIEW"
+                : "CAPTURED",
+        },
+      });
+      await transaction.applicationEvent.create({
+        data: {
+          applicationId: run.applicationId,
+          eventType: input.data.success ? "tailoring_completed" : "tailoring_failed",
+          toValue: id,
+          detail: input.data.error ? { error: input.data.error } : undefined,
+        },
+      });
     });
-    await transaction.application.update({
-      where: { id: run.applicationId },
-      data: { status: input.data.success ? "REVIEW" : "CAPTURED" },
-    });
-    await transaction.applicationEvent.create({
-      data: {
-        applicationId: run.applicationId,
-        eventType: input.data.success ? "tailoring_completed" : "tailoring_failed",
-        toValue: id,
-        detail: input.data.error ? { error: input.data.error } : undefined,
-      },
-    });
-  });
+  } catch (error) {
+    if (error instanceof RunOwnershipError) {
+      return NextResponse.json(
+        { error: "This run is no longer owned by this worker." },
+        { status: 409 },
+      );
+    }
+    throw error;
+  }
 
   return NextResponse.json({ ok: true });
 }

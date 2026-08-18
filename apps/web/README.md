@@ -13,6 +13,9 @@ Python worker:
 .\scripts\start-local.ps1
 ```
 
+On macOS, run `bash scripts/start-local.sh` and stop it with
+`bash scripts/stop-local.sh`.
+
 Run the web application by itself from this directory:
 
 ```powershell
@@ -39,6 +42,10 @@ npm run typecheck
 npm run build
 npm run test:e2e
 ```
+
+Set `AIADAPPLY_E2E_DATABASE_URL` to an isolated disposable database or schema before
+running Playwright. The suite refuses to clean fixture data from the normal dashboard
+database.
 
 Playwright tests exercise database-backed capture, duplicate handling, source-link
 extraction, status updates, authenticated worker progress, mobile navigation, and

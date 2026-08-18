@@ -17,6 +17,12 @@ Start the localhost dashboard and its tailoring worker:
 .\scripts\start-local.ps1
 ```
 
+On macOS:
+
+```bash
+bash scripts/start-local.sh
+```
+
 The launcher opens `http://127.0.0.1:3000`. Use **Capture job** to paste a
 posting, optionally add or edit its URL, and either save it for later or queue
 the tailored draft immediately.
@@ -53,6 +59,8 @@ Use this command when finished:
 ```powershell
 .\scripts\stop-local.ps1
 ```
+
+On macOS, stop both services with `bash scripts/stop-local.sh`.
 
 Terminal drafting remains available. A successful terminal draft is
 automatically recorded in the same dashboard whenever its tracking endpoint is
@@ -111,6 +119,11 @@ Raw LinkedIn/Simplify/employer-page paste
 Python 3.12+ and [uv](https://docs.astral.sh/uv/) are required. Codex must be
 installed and logged in. LibreOffice is the supported renderer on both Windows
 and macOS.
+
+The canonical base resume is `data/resumes/Brian_Aiad_BASE.docx`. Keep that
+document factual and role-neutral; every tailored resume is derived from it.
+Outputs default to `~/Downloads/Resume_Builder/OUTPUT_RESUMES` on macOS and the
+equivalent Downloads folder on Windows. Set `AIADAPPLY_OUTPUT_ROOT` to override it.
 
 ```powershell
 uv sync --extra dev
@@ -179,6 +192,10 @@ npm run test:unit
 npm run build
 npm run test:e2e
 ```
+
+Playwright deletes and recreates its fixture records, so `npm run test:e2e`
+requires `AIADAPPLY_E2E_DATABASE_URL` pointing to an isolated disposable database
+or PostgreSQL schema. It intentionally refuses to use the normal dashboard database.
 
 Audit a set of completed real-job stress runs:
 

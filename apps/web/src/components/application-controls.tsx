@@ -35,25 +35,35 @@ export function ApplicationControls({
   async function save() {
     setBusy("save");
     setMessage("");
-    const response = await fetch(`/api/applications/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, sourceUrl }),
-    });
-    const payload = await response.json();
-    setBusy(null);
-    setMessage(response.ok ? "Saved" : payload.error || "Unable to save.");
-    router.refresh();
+    try {
+      const response = await fetch(`/api/applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, sourceUrl }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      setMessage(response.ok ? "Saved" : payload.error || "Unable to save.");
+      if (response.ok) router.refresh();
+    } catch {
+      setMessage("Unable to reach the dashboard server.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function tailor() {
     setBusy("tailor");
     setMessage("");
-    const response = await fetch(`/api/applications/${id}/tailor`, { method: "POST" });
-    const payload = await response.json();
-    setBusy(null);
-    setMessage(response.ok ? "Tailoring queued" : payload.error || "Unable to queue.");
-    router.refresh();
+    try {
+      const response = await fetch(`/api/applications/${id}/tailor`, { method: "POST" });
+      const payload = await response.json().catch(() => ({}));
+      setMessage(response.ok ? "Tailoring queued" : payload.error || "Unable to queue.");
+      if (response.ok) router.refresh();
+    } catch {
+      setMessage("Unable to reach the dashboard server.");
+    } finally {
+      setBusy(null);
+    }
   }
 
   return (
@@ -89,6 +99,7 @@ export function ApplicationControls({
             placeholder="Add source URL later"
             value={sourceUrl}
             onChange={(event) => setSourceUrl(event.target.value)}
+            maxLength={2_000}
           />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -111,7 +122,7 @@ export function ApplicationControls({
           </button>
         </div>
         {message ? (
-          <div className="muted" style={{ fontSize: 11 }}>
+          <div className="muted" role="status" aria-live="polite" style={{ fontSize: 11 }}>
             {message}
           </div>
         ) : null}

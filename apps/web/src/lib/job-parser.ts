@@ -158,11 +158,11 @@ function extractJobSections(lines: string[]) {
   let current: keyof typeof result | null = null;
   let qualificationsStarted = false;
   const responsibilityHeading =
-    /^(?:Responsibilities|Job Responsibilities|What You(?:'|’|â€™)ll (?:Do|Be Doing|Accomplish)|Essential Job Duties and Responsibilities|Key Responsibilities|Functions and duties of this role include, but not limited to):?$/i;
+    /^(?:Responsibilities|Job Responsibilities|What You(?:'|’|â€™)ll (?:Do|Be Doing|Accomplish)|Essential Job Duties and Responsibilities|Essential Functions(?: & Responsibilities)?|Key Responsibilities|Required Duties|Accountabilities|Your Impact|Functions and duties of this role include, but not limited to):?$/i;
   const requiredHeading =
-    /^(?:Required Qualifications|Requirements|Qualifications|Job Qualifications\/Requirements|Who You Are|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities):?$/i;
+    /^(?:Required Qualifications(?:, Capabilities And Skills)?|Required Technical Experience \(MUST\)|Required Education\/Credentials\/Qualifications|Requirements|Qualifications|Minimum Requirements|Job Qualifications\/Requirements|Who You Are|What We Require|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities):?$/i;
   const preferredHeading =
-    /^(?:Preferred Qualifications|Nice To Have|Bonus Points If You Have|Experience That Would Be Helpful):?$/i;
+    /^(?:Preferred|Preferred Qualifications(?:, Capabilities And Skills)?|Nice To Have|Bonus Points If You Have|Experience That Would Be Helpful):?$/i;
   const expandedResponsibilityHeading =
     /^(?:Core Responsibilities|Your Responsibilities|Technical Support Engineer Key Responsibilities|You Will|Your Team Will|In This Role, You Will|Essential Functions & Responsibilities):?$/i;
   const officialResponsibilityHeading = /^What You Will Do:?$/i;
@@ -188,7 +188,10 @@ function extractJobSections(lines: string[]) {
 
   for (const sourceLine of lines) {
     const rawLine = sourceLine.replace(/^\/\/\s*/, "");
-    const line = rawLine.replace(/^[•●\-]\s*/, "").trim();
+    const line = rawLine
+      .replace(/^[•●\-]\s*/, "")
+      .replace(/^\d+[.)]\s*/, "")
+      .trim();
     if (/\bsuchs\s*[.!]?$/i.test(line)) continue;
     if (
       responsibilityHeading.test(line) ||

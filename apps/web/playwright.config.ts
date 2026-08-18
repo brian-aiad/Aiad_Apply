@@ -1,4 +1,14 @@
+import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
+
+const e2eDatabaseUrl = process.env.AIADAPPLY_E2E_DATABASE_URL;
+if (!e2eDatabaseUrl) {
+  throw new Error(
+    "AIADAPPLY_E2E_DATABASE_URL is required. E2E cleanup must never target the normal dashboard database.",
+  );
+}
+process.env.DATABASE_URL = e2eDatabaseUrl;
+process.env.DIRECT_URL = process.env.AIADAPPLY_E2E_DIRECT_URL || e2eDatabaseUrl;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -16,6 +26,11 @@ export default defineConfig({
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     timeout: 120_000,
+    env: {
+      ...process.env,
+      DATABASE_URL: e2eDatabaseUrl,
+      DIRECT_URL: process.env.DIRECT_URL,
+    },
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },
