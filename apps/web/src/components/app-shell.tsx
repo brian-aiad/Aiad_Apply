@@ -11,6 +11,7 @@ import {
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { SystemStatus } from "@/components/system-status";
 
 const navigation = [
   { href: "/", label: "Today", icon: Crosshair },
@@ -120,7 +121,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Settings
           </Link>
           <div className="muted" style={{ marginTop: 15, fontSize: 10 }}>
-            LOCAL WORKER · V2
+            LOCAL · PRIVATE
           </div>
         </div>
       </aside>
@@ -132,9 +133,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Job search command center
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="status status-green">Database online</span>
-          </div>
+          <SystemStatus />
         </header>
         {children}
       </main>

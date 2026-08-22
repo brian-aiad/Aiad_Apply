@@ -1,18 +1,29 @@
 import { addDays } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { db } from "@/lib/db";
+import { DEFAULT_TIMEZONE, readProductSettings } from "@/lib/product-settings";
 
-const TIMEZONE = "America/Los_Angeles";
-
-export function todayBounds() {
-  const date = formatInTimeZone(new Date(), TIMEZONE, "yyyy-MM-dd");
-  const start = fromZonedTime(`${date}T00:00:00`, TIMEZONE);
+export function todayBounds(timezone = DEFAULT_TIMEZONE) {
+  const date = formatInTimeZone(new Date(), timezone, "yyyy-MM-dd");
+  const start = fromZonedTime(`${date}T00:00:00`, timezone);
   return { start, end: addDays(start, 1), date };
 }
 
 export async function getDashboard() {
-  const { start, end } = todayBounds();
-  const [applications, appliedToday, interviews, ready, total] = await Promise.all([
+  const setting = await db.setting.findUnique({ where: { key: "product" } });
+  const product = readProductSettings(setting?.value);
+  const { start, end } = todayBounds(product.timezone);
+  const [
+    applications,
+    appliedToday,
+    interviews,
+    ready,
+    total,
+    captured,
+    tailoring,
+    review,
+    applied,
+  ] = await Promise.all([
     db.application.findMany({
       take: 8,
       orderBy: { updatedAt: "desc" },
@@ -25,8 +36,24 @@ export async function getDashboard() {
     db.application.count({ where: { status: "INTERVIEW" } }),
     db.application.count({ where: { status: "READY" } }),
     db.application.count(),
+    db.application.count({ where: { status: "CAPTURED" } }),
+    db.application.count({ where: { status: "TAILORING" } }),
+    db.application.count({ where: { status: "REVIEW" } }),
+    db.application.count({ where: { status: { in: ["APPLIED", "INTERVIEW", "CLOSED"] } } }),
   ]);
-  return { applications, appliedToday, interviews, ready, total, goal: 8 };
+  return {
+    applications,
+    appliedToday,
+    interviews,
+    ready,
+    total,
+    captured,
+    tailoring,
+    review,
+    applied,
+    goal: product.dailyGoal,
+    timezone: product.timezone,
+  };
 }
 
 export async function getApplications() {

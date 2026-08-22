@@ -29,6 +29,7 @@ from aiadapply_v2.layout.renderer import (
 )
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text, collect_claim_risks
+from aiadapply_v2.planning.stretch_lab import build_stretch_lab
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
 from aiadapply_v2.reporting.writer import write_transformation_report
 from aiadapply_v2.schemas import (
@@ -61,7 +62,7 @@ from aiadapply_v2.validation.resume import (
     validate_rewrite_plan,
 )
 
-PIPELINE_VERSION = "0.3.0"
+PIPELINE_VERSION = "0.4.0"
 OUTPUT_BASENAME = "Brian_Aiad_resume"
 SUMMARY_STRENGTH_TERMS = {
     "critical thinking",
@@ -178,6 +179,12 @@ def transform_resume(
             )
             _normalize_reasoning_keyword_profile(reasoning, keywords)
             _merge_transferability_map(reasoning, preliminary_map, keywords)
+            reasoning.stretch_lab = build_stretch_lab(
+                reasoning.role_profile,
+                keywords,
+                reasoning.transferability_map,
+                reasoning.stretch_lab,
+            )
             _prune_direct_evidence_risks(reasoning)
             _ensure_target_identity(reasoning)
             _normalize_skill_display(reasoning.rewrite_plan)
@@ -368,7 +375,11 @@ def transform_resume(
         optimized_validation.passed = not any(
             issue.severity == "error" for issue in optimized_validation.issues
         )
-        optimized_pdf = render_docx_to_pdf(output_docx, temp / "ats-output-render")
+        optimized_pdf = render_docx_to_pdf(
+            output_docx,
+            temp / "ats-output-render",
+            font_source_docx=selected_docx,
+        )
         optimized_layout = inspect_pdf(
             optimized_pdf,
             baseline_pdf=selected_pdf,
@@ -398,6 +409,7 @@ def transform_resume(
         role_profile=reasoning.role_profile,
         transferability_map=reasoning.transferability_map,
         rewrite_plan=reasoning.rewrite_plan,
+        stretch_lab=reasoning.stretch_lab,
         changes=_build_change_manifest(
             base,
             final_document,
@@ -481,6 +493,8 @@ def _build_keyword_decisions(
                 placements=placements,
                 rejection_reason=keyword.rejection_reason,
                 explanation=explanation,
+                context=keyword.context,
+                context_snippets=keyword.context_snippets,
             )
         )
     return decisions
@@ -825,6 +839,39 @@ def _supported_placement_keywords(keywords: list[JobKeyword]) -> list[JobKeyword
 
 def _place_direct_category_keyword(plan: RewritePlan, keyword: JobKeyword) -> None:
     """Express exact category vocabulary through an established concrete technology."""
+    if keyword.normalized == "account management":
+        bullet = next(
+            (
+                item
+                for item in plan.bullets
+                if item.paragraph_id == "experience.original_insurance.bullet.4"
+            ),
+            None,
+        )
+        if bullet and not contains_term(bullet.text, keyword.term):
+            for field in ("text", "shorter_text"):
+                value = getattr(bullet, field)
+                value = re.sub(
+                    r"\blicense management\b",
+                    "account management",
+                    value,
+                    count=1,
+                    flags=re.IGNORECASE,
+                )
+                if not contains_term(value, keyword.term):
+                    value = re.sub(
+                        r"\buser provisioning\b",
+                        "user account management and provisioning",
+                        value,
+                        count=1,
+                        flags=re.IGNORECASE,
+                    )
+                setattr(bullet, field, value)
+            if contains_term(bullet.text, keyword.term) and keyword.term.casefold() not in {
+                term.casefold() for term in bullet.target_terms
+            }:
+                bullet.target_terms.append(keyword.term)
+        return
     if keyword.normalized == "problem-solving":
         bullet = next(
             (

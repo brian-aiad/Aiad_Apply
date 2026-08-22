@@ -5,6 +5,9 @@ const DEFAULT_WORKER_LEASE_SECONDS = 30 * 60;
 const MINIMUM_WORKER_LEASE_SECONDS = 10 * 60;
 const MAXIMUM_WORKER_LEASE_SECONDS = 24 * 60 * 60;
 export const WORKER_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{1,99}$/;
+export const WORKER_HEARTBEAT_PREFIX = "worker:heartbeat:";
+export const WORKER_HEARTBEAT_WRITE_INTERVAL_MS = 10_000;
+export const WORKER_HEARTBEAT_MAX_AGE_MS = 20_000;
 
 function secretsMatch(actual: string, expected: string) {
   const actualBytes = Buffer.from(actual);
@@ -42,6 +45,18 @@ export function staleWorkerCutoff(
   environment: Readonly<Record<string, string | undefined>> = process.env,
 ) {
   return new Date(now.getTime() - workerLeaseMilliseconds(environment));
+}
+
+export function workerHeartbeatKey(workerId: string) {
+  return `${WORKER_HEARTBEAT_PREFIX}${workerId}`;
+}
+
+export function workerHeartbeatCutoff(now = new Date()) {
+  return new Date(now.getTime() - WORKER_HEARTBEAT_MAX_AGE_MS);
+}
+
+export function workerHeartbeatWriteCutoff(now = new Date()) {
+  return new Date(now.getTime() - WORKER_HEARTBEAT_WRITE_INTERVAL_MS);
 }
 
 export function safeArtifactName(fileName: string) {

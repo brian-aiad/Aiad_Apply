@@ -242,6 +242,9 @@ def test_rtx_stress_set_preserves_official_identity_sections_and_role_vocabulary
         len(job.required_qualifications),
         len(job.preferred_qualifications),
     ) == counts
+    assert "necessary cookies" not in job.job_description
+    assert "Similar Jobs" not in job.job_description
+    assert "Workday, Inc." not in job.job_description
     assert profile.normalized_role_family == family
     assert terms <= {item.normalized for item in keywords if item.accepted}
 
@@ -254,6 +257,37 @@ def test_rtx_none_required_clearance_metadata_does_not_create_a_false_gate() -> 
         job = parse_linkedin_simplify((FIXTURES / filename).read_text(encoding="utf-8"))
         accepted = {item.normalized for item in grade_job_keywords(job) if item.accepted}
         assert "security clearance" not in accepted
+
+
+def test_nesco_negative_help_desk_phrase_is_not_a_resume_target() -> None:
+    job = parse_linkedin_simplify(
+        (
+            FIXTURES / "nesco_resource_technical_client_operations_specialist_aliso_viejo.txt"
+        ).read_text(encoding="utf-8")
+    )
+    by_term = {item.normalized: item for item in grade_job_keywords(job)}
+
+    help_desk = by_term["help desk"]
+    assert not help_desk.accepted
+    assert help_desk.context == "negative"
+    assert "explicitly excludes" in help_desk.rejection_reason
+    assert "negative_context" in help_desk.source_sections
+    assert help_desk.context_snippets == [
+        "This is not a traditional help desk role where you spend the day waiting for tickets "
+        "to come in."
+    ]
+    assert by_term["technical support"].accepted
+    assert by_term["software implementation"].accepted
+
+
+def test_positive_help_desk_requirement_remains_eligible_for_transfer() -> None:
+    job = parse_linkedin_simplify(
+        (FIXTURES / "pds_health_epic_analyst_full_2026_08_06.txt").read_text(encoding="utf-8")
+    )
+    keyword = next(item for item in grade_job_keywords(job) if item.normalized == "help desk")
+
+    assert keyword.accepted
+    assert keyword.context != "negative"
 
     riverside = parse_linkedin_simplify(
         (FIXTURES / "rtx_collins_manufacturing_engineer_riverside_01865676.txt").read_text(

@@ -8,6 +8,7 @@ const updateSchema = z.object({
     .optional(),
   notes: z.string().max(10000).optional(),
   sourceUrl: z.string().max(2_000).url().nullable().optional().or(z.literal("")),
+  followUpAt: z.string().datetime().nullable().optional().or(z.literal("")),
 });
 
 export async function PATCH(
@@ -44,6 +45,12 @@ export async function PATCH(
       data: {
         status: input.data.status,
         notes: input.data.notes,
+        followUpAt:
+          input.data.followUpAt === undefined
+            ? undefined
+            : input.data.followUpAt
+              ? new Date(input.data.followUpAt)
+              : null,
         appliedAt:
           input.data.status === "APPLIED" && !current.appliedAt
             ? new Date()

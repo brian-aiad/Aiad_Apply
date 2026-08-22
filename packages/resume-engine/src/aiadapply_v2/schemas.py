@@ -27,6 +27,16 @@ class KeywordKind(StrEnum):
     noise = "noise"
 
 
+class KeywordContext(StrEnum):
+    required = "required"
+    responsibility = "responsibility"
+    preferred = "preferred"
+    job_title = "title"
+    positive = "positive"
+    scanner_only = "scanner_only"
+    negative = "negative"
+
+
 class EvidenceStrength(StrEnum):
     direct = "direct"
     strongly_transferable = "strongly_transferable"
@@ -84,6 +94,8 @@ class JobKeyword(StrictModel):
     placement_utility: float = Field(ge=0.0, le=100.0)
     accepted: bool = True
     rejection_reason: str = ""
+    context: KeywordContext = KeywordContext.positive
+    context_snippets: list[str] = Field(default_factory=list)
 
 
 class TargetRoleProfile(StrictModel):
@@ -226,6 +238,46 @@ class TransferabilityMap(StrictModel):
     unsupported_terms: list[str] = Field(default_factory=list)
 
 
+class StretchOpportunity(StrictModel):
+    target_term: str
+    evidence_strength: EvidenceStrength
+    evidence_ids: list[str] = Field(default_factory=list)
+    rationale: str
+    review_question: str
+    export_allowed: Literal[False] = False
+
+
+class StretchGap(StrictModel):
+    target_term: str
+    category: Literal["technology", "method", "domain", "qualification", "other"]
+    hiring_importance: float = Field(ge=0.0, le=100.0)
+    why_it_matters: str
+    proof_needed: list[str] = Field(default_factory=list)
+    language_after_confirmation: str
+    export_allowed: Literal[False] = False
+
+
+class StretchProject(StrictModel):
+    title: str
+    status: Literal["proposed_not_completed"] = "proposed_not_completed"
+    target_terms: list[str] = Field(default_factory=list)
+    objective: str
+    build_steps: list[str] = Field(default_factory=list)
+    evidence_to_collect: list[str] = Field(default_factory=list)
+    resume_language_after_completion: str
+    export_allowed: Literal[False] = False
+
+
+class StretchLab(StrictModel):
+    disclaimer: str = (
+        "Review-only development ideas. These items are not verified resume claims and are "
+        "never exported into the application-ready resume."
+    )
+    transferable_opportunities: list[StretchOpportunity] = Field(default_factory=list)
+    gaps: list[StretchGap] = Field(default_factory=list)
+    proposed_projects: list[StretchProject] = Field(default_factory=list)
+
+
 class ClaimRisk(StrictModel):
     claim: str
     target_requirement: str
@@ -287,6 +339,7 @@ class ReasoningResult(StrictModel):
     role_profile: TargetRoleProfile
     transferability_map: TransferabilityMap
     rewrite_plan: RewritePlan
+    stretch_lab: StretchLab = Field(default_factory=StretchLab)
 
 
 class ValidationIssue(StrictModel):
@@ -337,6 +390,8 @@ class KeywordDecisionRecord(StrictModel):
     placements: list[str] = Field(default_factory=list)
     rejection_reason: str = ""
     explanation: str = ""
+    context: KeywordContext = KeywordContext.positive
+    context_snippets: list[str] = Field(default_factory=list)
 
 
 class ResumeChangeRecord(StrictModel):
@@ -361,6 +416,7 @@ class TransformationReport(StrictModel):
     role_profile: TargetRoleProfile
     transferability_map: TransferabilityMap
     rewrite_plan: RewritePlan
+    stretch_lab: StretchLab = Field(default_factory=StretchLab)
     changes: list[ResumeChangeRecord] = Field(default_factory=list)
     claim_risks: list[ClaimRisk]
     validation: ValidationResult

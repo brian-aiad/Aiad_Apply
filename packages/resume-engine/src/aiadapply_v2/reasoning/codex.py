@@ -36,9 +36,9 @@ AI_API_KEY_VARIABLES = {
 class CodexReasoner:
     name = "codex-cli"
 
-    def __init__(self, executable: str = "codex", timeout_seconds: int = 420) -> None:
+    def __init__(self, executable: str = "codex", timeout_seconds: int | None = None) -> None:
         self.executable = executable
-        self.timeout_seconds = timeout_seconds
+        self.timeout_seconds = timeout_seconds or _configured_timeout_seconds()
 
     def reason(
         self,
@@ -136,6 +136,17 @@ def _resolve_executable(executable: str) -> str | None:
 def _codex_environment() -> dict[str, str]:
     """Force interactive Codex authentication instead of inheriting AI API keys."""
     return {key: value for key, value in os.environ.items() if key not in AI_API_KEY_VARIABLES}
+
+
+def _configured_timeout_seconds() -> int:
+    raw_value = os.environ.get("AIADAPPLY_CODEX_TIMEOUT_SECONDS", "900")
+    try:
+        value = int(raw_value)
+    except ValueError as error:
+        raise ValueError("AIADAPPLY_CODEX_TIMEOUT_SECONDS must be an integer.") from error
+    if not 60 <= value <= 1800:
+        raise ValueError("AIADAPPLY_CODEX_TIMEOUT_SECONDS must be between 60 and 1800.")
+    return value
 
 
 def _codex_failure_detail(output: str) -> str:
@@ -272,6 +283,15 @@ Non-negotiable output rules:
     only shorter_text/shorter_skills are compression fallbacks for a demonstrated overflow.
 15. If revision_feedback is non-empty, the previous candidate was rejected. Correct
     every listed issue while preserving all other constraints.
+16. Populate stretch_lab as a physically separate, review-only analysis. It may identify
+    strongly transferable wording, unsupported gaps, and proposed personal projects that
+    would help close those gaps. Every stretch item must keep export_allowed false. Never
+    describe a proposed project as completed, never add it to rewrite_plan, and never treat
+    a project idea as evidence. Prefer one small, buildable project that covers several
+    important gaps over a list of generic courses. For language_after_confirmation and
+    resume_language_after_completion, explain what could be added only after the candidate
+    supplies real evidence. Do not propose projects for citizenship, clearance, degree,
+    authorization, or other status requirements.
 
 INPUT JSON:
 {json.dumps(payload, ensure_ascii=True)}

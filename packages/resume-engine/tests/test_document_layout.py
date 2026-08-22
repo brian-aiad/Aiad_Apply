@@ -5,6 +5,7 @@ from zipfile import ZipFile
 from aiadapply_v2.documents.formatting import DOCUMENT_PART, compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.documents.optimizer import (
+    extract_embedded_fonts,
     font_deembedded_equivalent,
     write_ats_optimized_docx,
 )
@@ -75,6 +76,13 @@ def test_ats_optimizer_removes_only_embedded_fonts(tmp_path: Path) -> None:
     assert optimized.stat().st_size < BASE.stat().st_size / 10
     assert font_deembedded_equivalent(BASE, optimized)
     assert compare_format_integrity(base_path=BASE, candidate_path=optimized) == []
+
+
+def test_embedded_fonts_can_be_extracted_for_temporary_rendering(tmp_path: Path) -> None:
+    fonts = extract_embedded_fonts(BASE, tmp_path / "fonts")
+
+    assert len(fonts) == 10
+    assert all(font.read_bytes()[:4] in {b"\x00\x01\x00\x00", b"OTTO"} for font in fonts)
 
 
 def test_native_baseline_is_one_page_with_stable_section_anchors(tmp_path: Path) -> None:

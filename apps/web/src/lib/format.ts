@@ -26,3 +26,12 @@ export function titleCaseStatus(value: string) {
     .replace(/_/g, " ")
     .replace(/\b\w/g, (letter) => letter.toLocaleUpperCase());
 }
+
+export function formatShortDate(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}

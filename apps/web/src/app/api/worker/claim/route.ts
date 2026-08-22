@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { recordWorkerHeartbeat } from "@/lib/worker-heartbeat";
 import {
   staleWorkerCutoff,
   workerAuthorized,
@@ -19,6 +20,8 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid worker identifier." }, { status: 400 });
   }
+
+  await recordWorkerHeartbeat(parsed.data.workerId);
 
   const cutoff = staleWorkerCutoff();
   const queued = await db.$transaction(async (transaction) => {

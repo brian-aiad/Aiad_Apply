@@ -4,9 +4,21 @@ import test from "node:test";
 import {
   assessFit,
   buildPaste,
+  extractJobIdFromUrl,
   extractSalary,
   parseTopCardMetadata,
 } from "../../scripts/linkedin-review.mjs";
+
+test("job ID extraction supports canonical and public slugged LinkedIn URLs", () => {
+  assert.equal(extractJobIdFromUrl("https://www.linkedin.com/jobs/view/4454474521/"), "4454474521");
+  assert.equal(
+    extractJobIdFromUrl(
+      "https://www.linkedin.com/jobs/view/application-support-engineer-at-example-4454474521?position=1",
+    ),
+    "4454474521",
+  );
+  assert.equal(extractJobIdFromUrl("https://www.linkedin.com/company/example"), "");
+});
 
 test("top-card metadata stays scoped to the selected job", () => {
   const result = parseTopCardMetadata({

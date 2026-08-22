@@ -123,7 +123,7 @@ test("parses the five-role RTX manufacturing, quality, semiconductor, and RF str
     ["rtx_collins_manufacturing_engineer_riverside_01865676.txt", "Collins Aerospace", "Manufacturing Engineer", "Riverside, California, United States of America", 9, 5, 6],
     ["rtx_collins_product_quality_engineer_i_01863833.txt", "Collins Aerospace", "Product Quality Engineer I (Onsite)", "Fairfield, California, United States of America", 11, 4, 7],
     ["rtx_raytheon_semiconductor_manufacturing_engineer_01862457.txt", "Raytheon", "Semiconductor Manufacturing Engineer - Goleta, CA", "Goleta, California, United States of America", 8, 3, 8],
-    ["rtx_raytheon_rf_microwave_antenna_engineer_i_01864246.txt", "Raytheon", "RF/Microwave Antenna Electrical Engineer I (Onsite)", "El Segundo, California, United States of America", 3, 3, 10],
+    ["rtx_raytheon_rf_microwave_antenna_engineer_i_01864246.txt", "Raytheon", "RF/Microwave Antenna Electrical Engineer I (Onsite)", "El Segundo, California", 3, 3, 10],
     ["rtx_raytheon_manufacturing_engineer_goleta_01864965.txt", "Raytheon", "Manufacturing Engineer", "Goleta, California, United States of America", 8, 2, 8],
   ] as const;
 
@@ -137,6 +137,9 @@ test("parses the five-role RTX manufacturing, quality, semiconductor, and RF str
     assert.equal(parsed.responsibilities.length, responsibilities, name);
     assert.equal(parsed.requiredQualifications.length, required, name);
     assert.equal(parsed.preferredQualifications.length, preferred, name);
+    assert.ok(!parsed.cleanDescription.includes("necessary cookies"), name);
+    assert.ok(!parsed.cleanDescription.includes("Similar Jobs"), name);
+    assert.ok(!parsed.cleanDescription.includes("Workday, Inc."), name);
   }
 });
 

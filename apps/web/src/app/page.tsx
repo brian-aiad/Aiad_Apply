@@ -1,5 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness, Check, Clock3, Target } from "lucide-react";
+import {
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  ClipboardCheck,
+  Clock3,
+  FileSearch,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { formatInTimeZone } from "date-fns-tz";
 import { ApplicationTable } from "@/components/application-table";
 import { getDashboard } from "@/lib/queries";
@@ -11,13 +20,20 @@ export default async function DashboardPage() {
   const percentage = Math.min(100, Math.round((data.appliedToday / data.goal) * 100));
   const todayLabel = formatInTimeZone(
     new Date(),
-    "America/Los_Angeles",
+    data.timezone,
     "EEEE · MMMM d",
   );
+  const nextAction = data.captured
+    ? { href: "/applications", label: "Tailor captured jobs", note: `${data.captured} waiting to be tailored` }
+    : data.review
+      ? { href: "/applications", label: "Review tailored resumes", note: `${data.review} waiting for your decision` }
+      : data.ready
+        ? { href: "/applications", label: "Submit ready applications", note: `${data.ready} ready to apply` }
+        : { href: "/capture", label: "Capture your next job", note: "Paste a posting to begin" };
 
   return (
     <div className="content">
-      <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between" }}>
+      <div className="page-heading" style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 16 }}>
         <div>
           <div className="eyebrow">{todayLabel} · Daily plan</div>
           <h1 className="page-title">Today</h1>
@@ -32,7 +48,35 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <section className="metric-grid" style={{ marginTop: 25 }}>
+      <section className="workflow-panel" aria-labelledby="workflow-title">
+        <div className="workflow-copy">
+          <span className="eyebrow">Recommended next step</span>
+          <h2 id="workflow-title">{nextAction.label}</h2>
+          <p>{nextAction.note}</p>
+          <Link href={nextAction.href} className="button button-primary">
+            Continue workflow <ArrowRight size={15} />
+          </Link>
+        </div>
+        <ol className="workflow-rail" aria-label="Application workflow">
+          {[
+            ["Capture", data.captured, FileSearch],
+            ["Tailor", data.tailoring, Sparkles],
+            ["Review", data.review, ClipboardCheck],
+            ["Apply", data.applied, Check],
+          ].map(([label, count, Icon], index) => {
+            const WorkflowIcon = Icon as typeof FileSearch;
+            return (
+              <li key={String(label)} className={Number(count) ? "workflow-step workflow-step-active" : "workflow-step"}>
+                <span className="workflow-marker"><WorkflowIcon size={16} /></span>
+                <span><strong>{String(label)}</strong><small>{Number(count)} current</small></span>
+                {index < 3 ? <span className="workflow-connector" aria-hidden="true" /> : null}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+
+      <section className="metric-grid" style={{ marginTop: 14 }}>
         <div className="panel metric">
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span className="eyebrow">Daily goal</span>

@@ -33,6 +33,8 @@ const sectionStops = [
   "Exclusive Job Seeker Insights",
   "About the company",
   "More jobs",
+  "Privacy Policy and Terms",
+  "Similar Jobs",
   "Hiring?",
 ];
 
@@ -80,6 +82,14 @@ function findCompany(lines: string[]) {
     return lines[logoIndex + 1] ?? "Unknown company";
   }
   if (isOfficialEmployerPage(lines)) {
+    const titledBusiness = lines
+      .map((line) =>
+        line.match(
+          /^(Raytheon|Collins Aerospace|Pratt & Whitney)\s+(?:Full-time|Part-time)\b/i,
+        ),
+      )
+      .find((match) => match !== null);
+    if (titledBusiness) return titledBusiness[1];
     const rtxBusiness = lines
       .map((line) => line.match(/\bRTX\b.*\b(Raytheon|Collins Aerospace|Pratt & Whitney)\b/i))
       .find((match) => match !== null);
@@ -134,6 +144,12 @@ function looksLikeOfficialMetadata(line: string) {
 function findOfficialTitleIndex(lines: string[]) {
   const dateIndex = lines.findIndex((line) => /^Date Posted:/i.test(line));
   const limit = dateIndex >= 0 ? dateIndex : Math.min(lines.length, 20);
+  const headerIndex = lines.slice(0, limit).findIndex(
+    (line) =>
+      /^(?:Raytheon\s+)?Full-time\s+.+/i.test(line) &&
+      !line.toLocaleLowerCase().endsWith("page is loaded"),
+  );
+  if (headerIndex >= 0) return headerIndex;
   return lines.slice(0, limit).findIndex((line) => {
     if (looksLikeOfficialMetadata(line)) return false;
     if (/^(?:Raytheon|RTX|Collins Aerospace|Pratt & Whitney)$/i.test(line)) return false;
@@ -282,7 +298,9 @@ export function parseCapture(
   const lines = cleanLines(normalized);
   const company = findCompany(lines);
   const title = findTitle(lines, company);
-  const titleIndex = lines.findIndex((line) => line === title);
+  const titleIndex = isOfficialEmployerPage(lines)
+    ? findOfficialTitleIndex(lines)
+    : lines.findIndex((line) => line === title);
   const nearbyHeaderLines = lines.slice(titleIndex + 1, titleIndex + 9);
   const locationLine =
     nearbyHeaderLines.find((line) =>
@@ -295,7 +313,13 @@ export function parseCapture(
         line,
       ),
     );
-  const location = locationLine?.split(/\s*(?:Â·|·)\s*/)[0]?.trim() ?? null;
+  const narrativeLocation = normalized.match(
+    /\blocated in\s+([A-Za-z][A-Za-z .'-]+,\s*[A-Z][A-Za-z ]+)(?:[.,]|$)/i,
+  );
+  const location =
+    locationLine?.split(/\s*(?:Â·|·)\s*/)[0]?.trim() ??
+    narrativeLocation?.[1]?.trim() ??
+    null;
   const postedText =
     locationLine?.match(
       /\b(?:Reposted\s+)?\d+\s+(?:minute|hour|day|week|month)s?\s+ago\b/i,
@@ -323,8 +347,13 @@ export function parseCapture(
   );
 
   const aboutIndex = lines.findIndex((line) => /^About the job$/i.test(line));
+  const officialDateIndex = lines.findIndex((line) => /^Date Posted:/i.test(line));
   const descriptionStart =
-    aboutIndex >= 0 ? aboutIndex + 1 : Math.max(titleIndex + 1, 0);
+    aboutIndex >= 0
+      ? aboutIndex + 1
+      : officialDateIndex >= 0
+        ? officialDateIndex
+        : Math.max(titleIndex + 1, 0);
   let descriptionEnd = lines.length;
   for (const stop of sectionStops) {
     const index = lines.findIndex(

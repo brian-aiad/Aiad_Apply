@@ -1,5 +1,7 @@
 import { subDays } from "date-fns";
+import { Info, ShieldAlert } from "lucide-react";
 import { db } from "@/lib/db";
+import { isEligibilityConstraint } from "@/lib/gap-classification";
 
 export const dynamic = "force-dynamic";
 
@@ -57,12 +59,17 @@ export default async function AnalyticsPage() {
       gaps.set(decision.normalized, current);
     }
   }
-  const recurringGaps = [...gaps.values()]
+  const sortedGaps = [...gaps.values()]
     .sort(
       (left, right) =>
         right.occurrences - left.occurrences || right.importance - left.importance,
-    )
+    );
+  const buildableGaps = sortedGaps
+    .filter((gap) => !isEligibilityConstraint(gap.term))
     .slice(0, 8);
+  const eligibilityConstraints = sortedGaps.filter((gap) =>
+    isEligibilityConstraint(gap.term),
+  );
 
   const pipeline = [
     ["Captured", applications.filter((item) => item.status === "CAPTURED").length],
@@ -84,6 +91,10 @@ export default async function AnalyticsPage() {
         Track submission outcomes and use tailoring audits to identify recurring,
         high-value qualification gaps.
       </p>
+      <div className="coverage-explainer">
+        <Info size={16} />
+        <p><strong>Coverage is an evidence measure, not an interview prediction.</strong> A lower score can be the correct result when a role requires tools or domain experience your protected resume cannot prove. Stretch Lab shows how to close those gaps without presenting unfinished work as experience.</p>
+      </div>
       <section className="metric-grid" style={{ marginTop: 24 }}>
         {[
           ["Applied", applied.length, "Submitted applications"],
@@ -93,7 +104,7 @@ export default async function AnalyticsPage() {
             "Interviews divided by applications",
           ],
           [
-            "Avg. job coverage",
+            "Avg. evidence coverage",
             averageCoverage === null ? "—" : `${averageCoverage}%`,
             "Latest successful tailoring runs",
           ],
@@ -153,15 +164,15 @@ export default async function AnalyticsPage() {
         <section className="panel">
           <div className="panel-header">
             <div>
-              <div className="panel-title">Coverage &amp; skill gaps</div>
+              <div className="panel-title">Buildable skill gaps</div>
               <div className="muted" style={{ marginTop: 2, fontSize: 11 }}>
-                Accepted terms missing from the latest tailored résumés
+                Technical and domain terms worth learning or substantiating
               </div>
             </div>
           </div>
-          {recurringGaps.length ? (
+          {buildableGaps.length ? (
             <div style={{ display: "grid" }}>
-              {recurringGaps.map((gap) => (
+              {buildableGaps.map((gap) => (
                 <div
                   key={gap.term}
                   style={{
@@ -195,14 +206,43 @@ export default async function AnalyticsPage() {
               <div>
                 <div style={{ fontWeight: 650 }}>No audited gaps yet</div>
                 <p className="muted" style={{ maxWidth: 410, margin: "6px 0 0" }}>
-                  Complete a tailoring run to see unsupported or unplaced requirements
-                  aggregated across target roles.
+                  Complete a tailoring run to see missing tools, methods, and domain
+                  requirements aggregated across target roles.
                 </p>
               </div>
             </div>
           )}
         </section>
       </div>
+
+      {eligibilityConstraints.length ? (
+        <section className="panel" style={{ marginTop: 14 }}>
+          <div className="panel-header">
+            <div>
+              <div className="panel-title constraint-title">
+                <ShieldAlert size={15} /> Eligibility &amp; credential constraints
+              </div>
+              <div className="muted" style={{ marginTop: 4, fontSize: 11 }}>
+                Tracked separately because keywords, rewrites, and practice projects
+                cannot satisfy these requirements.
+              </div>
+            </div>
+          </div>
+          <div className="constraint-grid">
+            {eligibilityConstraints.map((gap) => (
+              <div className="constraint-item" key={gap.term}>
+                <div>
+                  <div style={{ fontWeight: 650 }}>{gap.term}</div>
+                  <div className="muted" style={{ marginTop: 3, fontSize: 10 }}>
+                    Required by {gap.companies.size} compan{gap.companies.size === 1 ? "y" : "ies"}
+                  </div>
+                </div>
+                <span className="status status-red">Verify before applying</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

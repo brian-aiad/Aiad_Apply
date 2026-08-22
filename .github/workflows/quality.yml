@@ -35,6 +35,33 @@ jobs:
       - run: uv run mypy packages/resume-engine/src
       - run: uv run pytest
 
+      - name: Validate Windows launchers
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $failed = $false
+          Get-ChildItem scripts\*.ps1 | ForEach-Object {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $_.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $failed = $true
+              $errors | ForEach-Object { Write-Error $_.Message }
+            }
+          }
+          if ($failed) { throw "PowerShell launcher syntax validation failed." }
+
+      - name: Validate macOS launchers
+        if: runner.os == 'macOS'
+        run: >-
+          bash -n scripts/start-local.sh scripts/stop-local.sh
+          scripts/start-linkedin-review.sh "Start AiadApply.command"
+          "Stop AiadApply.command"
+
   dashboard-quality:
     runs-on: ubuntu-latest
     defaults:

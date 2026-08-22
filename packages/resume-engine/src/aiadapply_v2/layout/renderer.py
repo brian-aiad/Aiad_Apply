@@ -1,16 +1,21 @@
 from __future__ import annotations
 
+import ctypes
 import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import TypedDict
 from urllib.parse import quote
 
 import fitz
 
+from aiadapply_v2.documents.optimizer import extract_embedded_fonts
 from aiadapply_v2.schemas import LayoutResult, ResumeDocument
 
 SECTION_ANCHORS = ("SKILLS", "EXPERIENCE", "PROJECTS", "EDUCATION", "CERTIFICATIONS")
@@ -50,7 +55,12 @@ def find_libreoffice() -> Path | None:
     return None
 
 
-def render_docx_to_pdf(docx_path: str | Path, output_dir: str | Path) -> Path:
+def render_docx_to_pdf(
+    docx_path: str | Path,
+    output_dir: str | Path,
+    *,
+    font_source_docx: str | Path | None = None,
+) -> Path:
     source = Path(docx_path).resolve()
     destination = Path(output_dir).resolve()
     destination.mkdir(parents=True, exist_ok=True)
@@ -82,20 +92,99 @@ def render_docx_to_pdf(docx_path: str | Path, output_dir: str | Path) -> Path:
             str(destination),
             str(source),
         ]
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=120,
-            check=False,
-        )
+        with _registered_macos_document_fonts(font_source_docx, Path(profile_name)):
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=120,
+                check=False,
+            )
     output = destination / f"{source.stem}.pdf"
     if result.returncode != 0 or not output.exists():
         details = (result.stderr or result.stdout)[-3000:]
         raise RenderingError(f"LibreOffice PDF conversion failed: {details}")
     return output
+
+
+@contextmanager
+def _registered_macos_document_fonts(
+    source_docx: str | Path | None,
+    temporary_root: Path,
+) -> Iterator[None]:
+    """Temporarily expose editable embedded fonts to a macOS LibreOffice child process."""
+    if sys.platform != "darwin" or source_docx is None:
+        yield
+        return
+    font_paths = extract_embedded_fonts(source_docx, temporary_root / "document-fonts")
+    if not font_paths:
+        yield
+        return
+
+    core_foundation = ctypes.CDLL(
+        "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"
+    )
+    core_text = ctypes.CDLL("/System/Library/Frameworks/CoreText.framework/CoreText")
+    core_foundation.CFURLCreateFromFileSystemRepresentation.argtypes = [
+        ctypes.c_void_p,
+        ctypes.c_char_p,
+        ctypes.c_long,
+        ctypes.c_bool,
+    ]
+    core_foundation.CFURLCreateFromFileSystemRepresentation.restype = ctypes.c_void_p
+    core_foundation.CFRelease.argtypes = [ctypes.c_void_p]
+    core_text.CTFontManagerRegisterFontsForURL.argtypes = [
+        ctypes.c_void_p,
+        ctypes.c_uint32,
+        ctypes.POINTER(ctypes.c_void_p),
+    ]
+    core_text.CTFontManagerRegisterFontsForURL.restype = ctypes.c_bool
+    core_text.CTFontManagerUnregisterFontsForURL.argtypes = [
+        ctypes.c_void_p,
+        ctypes.c_uint32,
+        ctypes.POINTER(ctypes.c_void_p),
+    ]
+    core_text.CTFontManagerUnregisterFontsForURL.restype = ctypes.c_bool
+
+    session_scope = 3
+    registered_urls: list[int] = []
+    created_urls: list[int] = []
+    try:
+        for font_path in font_paths:
+            encoded_path = os.fsencode(font_path.resolve())
+            url = core_foundation.CFURLCreateFromFileSystemRepresentation(
+                None,
+                encoded_path,
+                len(encoded_path),
+                False,
+            )
+            if not url:
+                continue
+            created_urls.append(url)
+            error = ctypes.c_void_p()
+            if core_text.CTFontManagerRegisterFontsForURL(
+                url,
+                session_scope,
+                ctypes.byref(error),
+            ):
+                registered_urls.append(url)
+            if error.value:
+                core_foundation.CFRelease(error.value)
+        yield
+    finally:
+        for url in reversed(registered_urls):
+            error = ctypes.c_void_p()
+            core_text.CTFontManagerUnregisterFontsForURL(
+                url,
+                session_scope,
+                ctypes.byref(error),
+            )
+            if error.value:
+                core_foundation.CFRelease(error.value)
+        for url in created_urls:
+            core_foundation.CFRelease(url)
 
 
 def _render_docx_with_word(source: Path, destination: Path) -> Path | None:

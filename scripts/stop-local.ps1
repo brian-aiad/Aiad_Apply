@@ -26,8 +26,29 @@ function Get-DescendantProcessIds {
     return $descendants
 }
 
+function Assert-AiadApplyProcess {
+    param([int]$ProcessId)
+
+    $process = Get-CimInstance Win32_Process -Filter "ProcessId = $ProcessId" -ErrorAction Stop
+    $commandLine = [string]$process.CommandLine
+    $belongsToRepository = $commandLine.IndexOf(
+        $repositoryRoot,
+        [StringComparison]::OrdinalIgnoreCase
+    ) -ge 0
+    $hasExpectedCommand = $commandLine -match "npm\s+run\s+dev|aiadapplyv2\s+worker"
+    if (-not $belongsToRepository -or -not $hasExpectedCommand) {
+        throw "Refusing to stop PID $ProcessId because it is not an AIAD Apply process from this repository."
+    }
+}
+
 $rootIds = @($recorded.webPid, $recorded.workerPid) |
-    Where-Object { $_ -and (Get-Process -Id $_ -ErrorAction SilentlyContinue) }
+    Where-Object { $_ -and (Get-Process -Id $_ -ErrorAction SilentlyContinue) } |
+    ForEach-Object { [int]$_ }
+
+# Validate every recorded root before terminating any process.
+foreach ($rootId in $rootIds) {
+    Assert-AiadApplyProcess -ProcessId $rootId
+}
 
 foreach ($rootId in $rootIds) {
     $descendants = @(Get-DescendantProcessIds -ParentId $rootId)

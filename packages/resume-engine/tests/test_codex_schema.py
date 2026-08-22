@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.loaders import build_evidence_graph
 from aiadapply_v2.grading.keywords import grade_job_keywords
@@ -7,6 +8,7 @@ from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
 from aiadapply_v2.reasoning.codex import (
     AI_API_KEY_VARIABLES,
+    CodexReasoner,
     _build_prompt,
     _codex_environment,
     _codex_failure_detail,
@@ -54,6 +56,19 @@ def test_codex_subprocess_never_inherits_ai_api_keys(monkeypatch) -> None:
 
     assert environment["PATH"] == "keep-this"
     assert not (AI_API_KEY_VARIABLES & environment.keys())
+
+
+def test_codex_timeout_can_be_configured_for_slower_local_runs(monkeypatch) -> None:
+    monkeypatch.setenv("AIADAPPLY_CODEX_TIMEOUT_SECONDS", "1200")
+
+    assert CodexReasoner().timeout_seconds == 1200
+
+
+def test_codex_timeout_rejects_out_of_range_values(monkeypatch) -> None:
+    monkeypatch.setenv("AIADAPPLY_CODEX_TIMEOUT_SECONDS", "30")
+
+    with pytest.raises(ValueError, match="between 60 and 1800"):
+        CodexReasoner()
 
 
 def test_job_prompt_injection_remains_serialized_as_untrusted_data() -> None:

@@ -57,7 +57,9 @@ def _markdown(report: TransformationReport) -> str:
     )
     lines.extend(["", "## Rejected Keywords", ""])
     lines.extend(
-        f"- {item.term}: {item.rejection_reason or 'insufficient hiring signal'}"
+        f"- {item.term} [{item.context.value}]: "
+        f"{item.rejection_reason or 'insufficient hiring signal'}"
+        + (f" Context: {' | '.join(item.context_snippets)}" if item.context_snippets else "")
         for item in rejected
     )
     lines.extend(["", "## Claim Risks", ""])
@@ -89,6 +91,45 @@ def _markdown(report: TransformationReport) -> str:
         for issue in report.validation.issues
     )
     if not report.validation.issues:
+        lines.append("- None")
+    lines.extend(["", "## Stretch Lab — Review Only", "", report.stretch_lab.disclaimer, ""])
+    lines.extend(["### Transferable Opportunities", ""])
+    lines.extend(
+        f"- **{item.target_term}**: {item.rationale} Review: {item.review_question}"
+        for item in report.stretch_lab.transferable_opportunities
+    )
+    if not report.stretch_lab.transferable_opportunities:
+        lines.append("- None")
+    lines.extend(["", "### Evidence Gaps", ""])
+    for gap in report.stretch_lab.gaps:
+        lines.extend(
+            [
+                f"- **{gap.target_term}** ({gap.category}, importance "
+                f"{gap.hiring_importance:.0f}): {gap.why_it_matters}",
+                f"  - Proof needed: {'; '.join(gap.proof_needed)}",
+                f"  - After confirmation: {gap.language_after_confirmation}",
+            ]
+        )
+    if not report.stretch_lab.gaps:
+        lines.append("- None")
+    lines.extend(["", "### Proposed Gap-Closing Projects", ""])
+    for project in report.stretch_lab.proposed_projects:
+        lines.extend(
+            [
+                f"#### {project.title}",
+                "",
+                "- Status: PROPOSED — NOT COMPLETED — NOT EXPORTABLE",
+                f"- Target terms: {', '.join(project.target_terms)}",
+                f"- Objective: {project.objective}",
+                "- Build steps:",
+                *(f"  - {step}" for step in project.build_steps),
+                "- Evidence to collect:",
+                *(f"  - {item}" for item in project.evidence_to_collect),
+                f"- Resume use: {project.resume_language_after_completion}",
+                "",
+            ]
+        )
+    if not report.stretch_lab.proposed_projects:
         lines.append("- None")
     return "\n".join(lines) + "\n"
 

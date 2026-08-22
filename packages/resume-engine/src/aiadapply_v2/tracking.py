@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import socket
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -105,6 +106,21 @@ def submit_worker_progress(
     )
 
 
+def submit_worker_heartbeat(
+    *,
+    api_url: str,
+    secret: str,
+    worker_id: str,
+    run_id: str,
+) -> None:
+    _request_json(
+        f"{api_url}/api/worker/heartbeat",
+        secret=secret,
+        payload={"workerId": worker_id, "runId": run_id},
+        timeout_seconds=10,
+    )
+
+
 def submit_terminal_failure(
     *,
     api_url: str,
@@ -165,6 +181,34 @@ def run_worker(
         folder.mkdir(parents=True, exist_ok=True)
         (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
         progress_sync_available = True
+        heartbeat_stop = threading.Event()
+
+        def keep_run_alive(
+            *,
+            current_run_id: str = run_id,
+            stop_event: threading.Event = heartbeat_stop,
+        ) -> None:
+            failure_reported = False
+            while not stop_event.wait(10):
+                try:
+                    submit_worker_heartbeat(
+                        api_url=url,
+                        secret=secret,
+                        worker_id=worker_id,
+                        run_id=current_run_id,
+                    )
+                    failure_reported = False
+                except Exception as error:
+                    if not failure_reported:
+                        print(f"Worker heartbeat unavailable; continuing locally: {error}")
+                    failure_reported = True
+
+        heartbeat_thread = threading.Thread(
+            target=keep_run_alive,
+            name=f"aiadapply-heartbeat-{run_id[:8]}",
+            daemon=True,
+        )
+        heartbeat_thread.start()
 
         def report_progress(message: str, *, current_run_id: str = run_id) -> None:
             nonlocal progress_sync_available
@@ -184,30 +228,34 @@ def run_worker(
                 print(f"Progress sync unavailable; continuing locally: {error}")
 
         try:
-            report = transform_resume(
-                raw_paste=raw_paste,
-                base_resume=base_resume,
-                output_dir=folder,
-                reasoner=reasoner,
-                candidate_profile=candidate_profile,
-                progress=report_progress,
-            )
-            payload = build_worker_payload(
-                report=report,
-                output_folder=folder,
-                application_id=application_id,
-                worker_id=worker_id,
-            )
-        except Exception as error:
-            payload = {
-                "workerId": worker_id,
-                "success": False,
-                "error": f"{type(error).__name__}: {error}",
-                "outputFolder": str(folder),
-                "keywords": [],
-                "changes": [],
-                "artifacts": [],
-            }
+            try:
+                report = transform_resume(
+                    raw_paste=raw_paste,
+                    base_resume=base_resume,
+                    output_dir=folder,
+                    reasoner=reasoner,
+                    candidate_profile=candidate_profile,
+                    progress=report_progress,
+                )
+                payload = build_worker_payload(
+                    report=report,
+                    output_folder=folder,
+                    application_id=application_id,
+                    worker_id=worker_id,
+                )
+            except Exception as error:
+                payload = {
+                    "workerId": worker_id,
+                    "success": False,
+                    "error": f"{type(error).__name__}: {error}",
+                    "outputFolder": str(folder),
+                    "keywords": [],
+                    "changes": [],
+                    "artifacts": [],
+                }
+        finally:
+            heartbeat_stop.set()
+            heartbeat_thread.join(timeout=1)
         try:
             _request_json(
                 f"{url}/api/worker/runs/{run_id}",

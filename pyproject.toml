@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aiadapplyv2"
-version = "0.3.0"
+version = "0.4.0"
 description = "Evidence-based resume transformation engine."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13,<3.14"
 dependencies = [
   "lxml>=5.3",
   "numpy>=2.0",

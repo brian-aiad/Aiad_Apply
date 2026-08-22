@@ -531,6 +531,36 @@ def test_support_process_terms_are_placed_in_direct_experience_evidence() -> Non
     assert "campus IT and third-party vendors" in incident.text
 
 
+def test_account_management_is_placed_in_existing_identity_administration_evidence() -> None:
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/liquid_iv_d365_technical_analyst_2026_08_12.txt").read_text(
+            encoding="utf-8"
+        )
+    )
+    keyword = next(
+        item for item in grade_job_keywords(job) if item.normalized == "account management"
+    )
+    plan = identity_plan(parse_resume_docx(BASE))
+    source_bullet = next(
+        item
+        for item in plan.bullets
+        if item.paragraph_id == "experience.original_insurance.bullet.4"
+    )
+    source_length = len(source_bullet.text)
+
+    _place_direct_category_keyword(plan, keyword)
+
+    bullet = next(
+        item
+        for item in plan.bullets
+        if item.paragraph_id == "experience.original_insurance.bullet.4"
+    )
+    assert "MFA, RBAC, and account management" in bullet.text
+    assert "MFA, RBAC, and account management" in bullet.shorter_text
+    assert len(bullet.text) == source_length
+    assert "account management" in bullet.target_terms
+
+
 def test_weakly_transferable_terms_are_not_export_supported() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/los_angeles_times_application_support_full.txt").read_text(

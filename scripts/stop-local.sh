@@ -10,7 +10,7 @@ if [[ ! -f "$process_file" ]]; then
 fi
 
 IFS=$'\t' read -r recorded_root web_pid worker_pid < <(
-  python3 - "$process_file" <<'PY'
+  uv run python - "$process_file" <<'PY'
 import json, sys
 record = json.load(open(sys.argv[1], encoding="utf-8"))
 print(record.get("repository", ""), record.get("webPid", ""), record.get("workerPid", ""), sep="\t")

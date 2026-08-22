@@ -61,6 +61,10 @@ cannot become mandatory without sufficient evidence in the title,
 responsibilities, qualifications, or repeated hiring language.
 The employer description is always graded independently; an empty or inaccurate
 Simplify panel does not prevent the system from extracting role terms.
+Sentence-scoped context rules also distinguish positive requirements from
+explicit exclusions such as `not a traditional help desk role`, `without`, and
+`not required`. Excluded phrases remain visible in the audit but never become
+resume targets.
 
 ## Evidence Retrieval
 
@@ -73,6 +77,17 @@ evidence.
 Milestone one uses `BAAI/bge-small-en-v1.5` through sentence-transformers and an
 in-memory cosine index. Exact direct evidence outranks embedding similarity.
 There is no vector database or service dependency.
+
+## Stretch Lab
+
+The strict rewrite plan and review-only development ideas are separate schema
+branches. Only `RewritePlan` can reach the DOCX writer. `StretchLab` may contain
+transferability questions, unsupported gaps, and proposed personal projects, but
+every item is marked non-exportable and the project status is always
+`proposed_not_completed`. The pipeline normalizes Codex suggestions against the
+accepted job vocabulary and deterministically supplies a small cross-role project
+outline when useful. This preserves an aggressive ideation surface without turning
+an uncompleted idea into candidate evidence.
 
 ## Layout
 
@@ -99,8 +114,12 @@ original evidence-rich paragraph. A fallback cannot remove named systems,
 protected operating context, or more than 10% of the source paragraph. Rewrites
 that add no actual target term are reverted. After a candidate passes, embedded
 font binaries are removed from the DOCX and the optimized package is revalidated
-against both the protected base and the selected render. This keeps the final
-file below the 2.5 MB ATS parse limit without changing its visible layout.
+against both the protected base and the selected render. On macOS, the renderer
+temporarily activates the source document's editable embedded fonts for that final
+validation and unregisters them immediately afterward; this prevents LibreOffice
+font substitution from invalidating an otherwise equivalent optimized file. This
+keeps the final file below the 2.5 MB ATS parse limit without changing its visible
+layout.
 
 ## Application Tracker
 
@@ -114,8 +133,24 @@ infrastructure:
 - A local Python worker claims durable database-backed tailoring runs through
   secret-protected server routes and runs the same validated resume engine used
   by the terminal.
+- While a run is active, a lightweight authenticated heartbeat keeps both the
+  worker status and run lease fresh without adding noisy timeline events.
 - During a run, the worker writes best-effort stage events to the application
   timeline; the detail page refreshes automatically until the run completes.
+- The browser reads `/api/health` to verify database access, the active base
+  resume, and a fresh heartbeat from the local tailoring worker. The UI does not
+  claim the system is ready until all three checks pass.
+- Product settings persist the daily application target and IANA timezone. Daily
+  boundaries are calculated from those settings rather than a hard-coded value.
+- Application notes and follow-up reminders share the existing application
+  record; search, status filters, and coverage sorting remain client-side because
+  this is a bounded single-user dataset.
+- Review-only Stretch Lab content is visually and structurally separated from
+  downloadable DOCX/PDF artifacts. Only validated artifacts receive the primary
+  download treatment.
+- Analytics separates tools and domain skills that can be learned from legal,
+  clearance, and degree constraints that no keyword rewrite or practice project
+  can satisfy.
 - Vercel hosts the review and tracking interface. The Python/LibreOffice worker
   stays local because a resume run is longer and more stateful than a Vercel
   function.

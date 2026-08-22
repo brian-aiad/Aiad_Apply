@@ -33,6 +33,16 @@ function canonicalJobUrl(jobId) {
   return `https://www.linkedin.com/jobs/view/${jobId}/`;
 }
 
+export function extractJobIdFromUrl(value) {
+  try {
+    const pathname = new URL(value, "https://www.linkedin.com").pathname;
+    if (!pathname.includes("/jobs/view/")) return "";
+    return pathname.match(/(\d{7,})\/?$/)?.[1] || "";
+  } catch {
+    return "";
+  }
+}
+
 function normalize(text) {
   return (text || "").replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ").trim();
 }
@@ -185,7 +195,8 @@ async function collectJobIds(page) {
         if (id && /^\d{7,}$/.test(id)) found.push(id);
       }
       for (const anchor of document.querySelectorAll('a[href*="/jobs/view/"]')) {
-        const match = anchor.href.match(/\/jobs\/view\/(\d{7,})/);
+        const pathname = new URL(anchor.href, location.href).pathname;
+        const match = pathname.match(/(\d{7,})\/?$/);
         if (match) found.push(match[1]);
       }
       return found;

@@ -23,9 +23,31 @@ On macOS:
 bash scripts/start-local.sh
 ```
 
+For everyday use, you can instead double-click `Start AiadApply.command` on
+macOS or `Start AiadApply.cmd` on Windows. Matching Stop launchers are included
+in the repository root. The command-line scripts remain available for readable
+diagnostics when setup needs attention.
+
 The launcher opens `http://127.0.0.1:3000`. Use **Capture job** to paste a
 posting, optionally add or edit its URL, and either save it for later or queue
 the tailored draft immediately.
+
+The dashboard now guides each record through **Capture → Tailor → Review → Apply**:
+
+- Search, filter, and sort Applications by status or evidence-backed coverage.
+- Use the review guide to jump between posting details, exact resume changes,
+  keyword decisions, Stretch Lab, and downloadable files.
+- Store private notes and an optional follow-up reminder on each application.
+- Change the daily goal and timezone from Settings; Today uses those preferences
+  immediately.
+- The top-right health indicator verifies the database, protected base resume,
+  and a fresh local-worker heartbeat instead of displaying a hard-coded online
+  state.
+
+Coverage is not an ATS guarantee or interview probability. It reports how much
+of a posting can be supported by evidence already present in the protected
+candidate record. A specialized role can correctly have low coverage while its
+review-only Stretch Lab proposes honest ways to close the gap.
 
 For a bounded LinkedIn review session, open the isolated browser profile:
 
@@ -34,6 +56,17 @@ For a bounded LinkedIn review session, open the isolated browser profile:
 Set-Location apps\web
 npm run linkedin:review -- --limit 8
 ```
+
+On macOS:
+
+```bash
+bash scripts/start-linkedin-review.sh
+cd apps/web
+npm run linkedin:review -- --limit 8
+```
+
+The dedicated profile is stored under `.runtime/`, separately from your normal
+Chrome profile. Sign into LinkedIn in that window if prompted.
 
 To preserve a read-only review as dated local fixtures, pass a new directory.
 The collector refuses to overwrite existing fixture files:
@@ -50,6 +83,10 @@ each role actually queued for resume tailoring uses the Codex review pipeline.
 Normal capture, save, and status updates do not consume Codex usage. A tailoring
 run normally makes one structured Codex call and makes one correction call only
 when deterministic validation rejects the first plan.
+
+Local Codex calls allow up to 15 minutes by default so a correction pass can
+finish on slower machines. Set `AIADAPPLY_CODEX_TIMEOUT_SECONDS` to a value from
+60 through 1800 seconds when a different bound is needed.
 
 The hosted dashboard is protected by `AIADAPPLY_PASSWORD` using HTTP Basic
 authentication; the optional username defaults to `brian`.
@@ -77,8 +114,14 @@ the unrelated `NEXTAUTH_URL` setting is never used for worker tracking.
 ## Product Policy
 
 - There is one transformation system, not selectable safety modes.
+- Every run also produces a review-only Stretch Lab with evidence questions,
+  qualification gaps, and proposed gap-closing projects. Stretch items are never
+  inserted into the application-ready DOCX/PDF unless they are later completed or
+  confirmed in the candidate profile.
 - Important job terms may be inserted when direct or defensibly transferable
   evidence exists.
+- Explicitly negative phrases such as `not a traditional help desk role` are
+  classified as exclusions instead of target keywords.
 - Unsupported technologies and protocols are omitted from resume prose and
   remain visible as qualification gaps in the transformation report.
 - Candidate-confirmed skills in `data/profile/Brian_Aiad_PROFILE.json` are durable
@@ -104,6 +147,7 @@ Raw LinkedIn/Simplify/employer-page paste
 -> DOCX-derived evidence graph
 -> BGE in-memory semantic retrieval
 -> structured Codex review and rewrite
+-> context-aware keyword exclusions and review-only Stretch Lab
 -> authenticated live progress events in the tracker
 -> protected-content and metric validation
 -> byte-preserving OOXML text-node replacement
@@ -116,9 +160,14 @@ Raw LinkedIn/Simplify/employer-page paste
 
 ## Setup
 
-Python 3.12+ and [uv](https://docs.astral.sh/uv/) are required. Codex must be
-installed and logged in. LibreOffice is the supported renderer on both Windows
-and macOS.
+Python 3.13, [uv](https://docs.astral.sh/uv/), and Node.js 22 are required. The
+repository includes `.python-version` and `.nvmrc`; `uv sync --extra dev` selects
+the tested Python release, while `nvm install && nvm use` selects the tested Node
+release. Codex must be installed and logged in. LibreOffice is the supported
+renderer on both Windows and macOS.
+
+The macOS launcher also repairs the inherited Finder hidden flag found on some
+copied `.venv` directories, which otherwise makes Python 3.13 skip editable installs.
 
 The canonical base resume is `data/resumes/Brian_Aiad_BASE.docx`. Keep that
 document factual and role-neutral; every tailored resume is derived from it.

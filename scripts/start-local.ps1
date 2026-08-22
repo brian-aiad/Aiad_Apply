@@ -14,18 +14,69 @@ $workerLog = Join-Path $runtimeRoot "worker.log"
 $workerErrorLog = Join-Path $runtimeRoot "worker-error.log"
 $localUrl = "http://127.0.0.1:3000"
 
+foreach ($commandName in @("node", "npm", "uv")) {
+    if (-not (Get-Command $commandName -ErrorAction SilentlyContinue)) {
+        throw "Missing required command: $commandName"
+    }
+}
+$nodeMajor = [int](& node -p 'process.versions.node.split(".")[0]')
+if ($nodeMajor -ne 22) {
+    throw "Node.js 22 is required; found $(& node --version). Run 'nvm install 22 && nvm use 22'."
+}
+if (-not (Test-Path -LiteralPath (Join-Path $webRoot ".env")) -and
+    -not (Test-Path -LiteralPath (Join-Path $webRoot ".env.local"))) {
+    throw "Missing apps\web\.env or apps\web\.env.local; copy .env.example and configure it."
+}
+
+Push-Location $repositoryRoot
+try {
+    & uv run python -c "import aiadapply_v2" 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Repairing the local Python environment..."
+        & uv sync --extra dev
+        if ($LASTEXITCODE -ne 0) {
+            throw "uv sync failed."
+        }
+        & uv run python -c "import aiadapply_v2"
+        if ($LASTEXITCODE -ne 0) {
+            throw "The resume engine is not importable after uv sync."
+        }
+    }
+}
+finally {
+    Pop-Location
+}
+
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
 
 if (Test-Path -LiteralPath $processFile) {
     $recorded = Get-Content -LiteralPath $processFile -Raw | ConvertFrom-Json
+    if ([IO.Path]::GetFullPath([string]$recorded.repository) -ne [IO.Path]::GetFullPath($repositoryRoot)) {
+        throw "The process record does not belong to this repository."
+    }
     $running = @($recorded.webPid, $recorded.workerPid) |
         Where-Object { $_ -and (Get-Process -Id $_ -ErrorAction SilentlyContinue) }
-    if ($running.Count -gt 0) {
-        Write-Host "AIAD Apply is already running at $localUrl"
-        if (-not $NoBrowser) {
-            Start-Process $localUrl
+    if ($running.Count -eq 2) {
+        try {
+            $health = Invoke-RestMethod -Uri "$localUrl/api/health" -TimeoutSec 2
+            if ($health.database -and $health.baseResume -and $health.worker) {
+                Write-Host "AIAD Apply is already running at $localUrl"
+                if (-not $NoBrowser) {
+                    Start-Process $localUrl
+                }
+                exit 0
+            }
         }
-        exit 0
+        catch {
+            # The recorded processes are present but not healthy; recover below.
+        }
+    }
+    if ($running.Count -gt 0) {
+        Write-Host "Recovering an incomplete AIAD Apply start..."
+        & (Join-Path $PSScriptRoot "stop-local.ps1")
+    }
+    else {
+        Remove-Item -LiteralPath $processFile -Force
     }
 }
 
@@ -47,6 +98,9 @@ for ($attempt = 0; $attempt -lt 60; $attempt++) {
         }
     }
     catch {
+        # Retry until both services have reported healthy.
+    }
+    if (-not $workerReady) {
         Start-Sleep -Milliseconds 500
     }
 }
@@ -64,8 +118,23 @@ $workerProcess = Start-Process powershell.exe `
     -RedirectStandardError $workerErrorLog `
     -PassThru
 
-Start-Sleep -Seconds 1
-if ($workerProcess.HasExited) {
+$workerReady = $false
+for ($attempt = 0; $attempt -lt 20; $attempt++) {
+    if ($workerProcess.HasExited) {
+        break
+    }
+    try {
+        $health = Invoke-RestMethod -Uri "$localUrl/api/health" -TimeoutSec 2
+        if ($health.database -and $health.baseResume -and $health.worker) {
+            $workerReady = $true
+            break
+        }
+    }
+    catch {
+        Start-Sleep -Milliseconds 500
+    }
+}
+if (-not $workerReady) {
     Stop-Process -Id $webProcess.Id -Force -ErrorAction SilentlyContinue
     throw "The worker did not remain running. See $workerErrorLog."
 }

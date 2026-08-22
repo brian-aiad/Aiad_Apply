@@ -72,8 +72,14 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
   await expect(page.getByText("URL can be added later")).toBeVisible();
 
   await page.getByLabel("Status").selectOption("APPLIED");
-  await page.getByRole("button", { name: "Save" }).click();
+  await page.getByLabel("Private notes").fill("Follow up with the recruiting team.");
+  await page.getByLabel("Follow-up reminder").fill("2026-08-25T09:30");
+  await page.getByRole("button", { name: "Save changes" }).click();
   await expect(page.locator("span.status", { hasText: "Applied" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel("Private notes")).toHaveValue(
+    "Follow up with the recruiting team.",
+  );
 
   await page.goto("/");
   await expect(page.getByText("1 / 8")).toBeVisible();
@@ -112,11 +118,19 @@ test("remains usable at a mobile viewport", async ({ page, request }) => {
   await expect(mobileNavigation).toBeVisible();
   await mobileNavigation.getByRole("link", { name: "Apps" }).click();
   await expect(page.getByRole("heading", { name: "Applications" })).toBeVisible();
+  await page.getByRole("searchbox", { name: "Search applications" }).fill("Technology Support");
+  await expect(page.getByRole("link", { name: "Technology Support II", exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Support Engineer", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Clear search" }).click();
   await page.screenshot({ path: "test-results/mobile-applications.png", fullPage: true });
   let overflow = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
   );
   expect(overflow).toBe(false);
+
+  const health = await request.get("/api/health");
+  expect(health.status()).toBe(200);
+  await expect(health.json()).resolves.toMatchObject({ database: true, baseResume: true });
 
   await page.getByRole("link", { name: "Technology Support II", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Technology Support II" })).toBeVisible();
@@ -177,7 +191,7 @@ test("captures current application-support postings with their core fields", asy
 
   await page.goto("/analytics");
   await expect(page.getByRole("heading", { name: "Analytics" })).toBeVisible();
-  await expect(page.getByText("Coverage & skill gaps")).toBeVisible();
+  await expect(page.getByText("Buildable skill gaps")).toBeVisible();
 });
 
 test("captures unheaded Encompass duties and nested qualification sections", async ({
@@ -269,7 +283,7 @@ test("captures supplied LinkedIn and employer postings without section leakage",
       record: records[19],
       company: "Raytheon",
       title: "RF/Microwave Antenna Electrical Engineer I (Onsite)",
-      location: "El Segundo, California, United States of America",
+      location: "El Segundo, California",
       arrangement: "On-site",
       responsibilities: 3,
       required: 3,

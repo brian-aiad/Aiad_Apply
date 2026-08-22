@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
+  Check,
+  CircleAlert,
   Download,
   ExternalLink,
   FileWarning,
@@ -22,6 +24,35 @@ function stringList(value: unknown) {
     : [];
 }
 
+function objectRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function objectList(value: unknown) {
+  return Array.isArray(value)
+    ? value.map(objectRecord).filter((item): item is Record<string, unknown> => Boolean(item))
+    : [];
+}
+
+function displayValue(value: unknown, fallback = "") {
+  return typeof value === "string" && value.length > 0 ? value : fallback;
+}
+
+function paragraphLabel(section: string, paragraphId: string) {
+  const prefix = `${section}.`;
+  return paragraphId.startsWith(prefix) ? paragraphId.slice(prefix.length) : paragraphId;
+}
+
+function humanizeReference(value: string) {
+  return value
+    .replace(/^evidence\./, "")
+    .replace(/\.bullet\.(\d+)/g, " · bullet $1")
+    .replace(/\./g, " › ")
+    .replaceAll("_", " ");
+}
+
 export default async function ApplicationDetailPage({
   params,
 }: {
@@ -34,6 +65,11 @@ export default async function ApplicationDetailPage({
     ["QUEUED", "RUNNING"].includes(run.status),
   );
   const latestRun = activeRun ?? application.tailoringRuns[0];
+  const reportSnapshot = objectRecord(latestRun?.reportSnapshot);
+  const stretchLab = objectRecord(reportSnapshot?.stretch_lab);
+  const stretchOpportunities = objectList(stretchLab?.transferable_opportunities);
+  const stretchGaps = objectList(stretchLab?.gaps);
+  const stretchProjects = objectList(stretchLab?.proposed_projects);
   const visibleChanges =
     latestRun?.changes.filter((change) => change.changeType !== "unchanged") ?? [];
   const hasActiveRun = Boolean(activeRun);
@@ -48,6 +84,38 @@ export default async function ApplicationDetailPage({
     typeof progressEvent.detail.stage === "string"
       ? progressEvent.detail.stage
       : null;
+  const primaryEvents = application.events.filter(
+    (event) => event.eventType !== "tailoring_progress" || event.id === progressEvent?.id,
+  );
+  const technicalEvents = application.events.filter(
+    (event) => event.eventType === "tailoring_progress" && event.id !== progressEvent?.id,
+  );
+  const resumeArtifacts = latestRun?.artifacts.filter((artifact) => ["DOCX", "PDF"].includes(artifact.kind)) ?? [];
+  const auditArtifacts = latestRun?.artifacts.filter((artifact) => !["DOCX", "PDF"].includes(artifact.kind)) ?? [];
+  const reviewHeadline = hasActiveRun
+    ? "Tailoring is in progress"
+    : !latestRun
+      ? "Tailor this posting when you are ready"
+      : latestRun.status === "FAILED"
+        ? "This run needs attention"
+        : application.status === "READY"
+          ? "Resume reviewed and ready"
+          : application.status === "APPLIED"
+            ? "Application submitted"
+            : latestRun.riskCount > 0
+              ? `Review ${latestRun.riskCount} flagged ${latestRun.riskCount === 1 ? "item" : "items"}`
+              : "Review the tailored resume";
+  const reviewCopy = hasActiveRun
+    ? progressStage || "The audit and files will appear here automatically."
+    : !latestRun
+      ? "The protected base remains untouched until you start a tailoring run."
+      : latestRun.status === "FAILED"
+        ? latestRun.errorMessage || "Read the failure details below, then try the run again."
+        : application.status === "READY"
+          ? "Download the DOCX or PDF, then update the status after you apply."
+          : application.status === "APPLIED"
+            ? "Add a follow-up reminder or notes in Application details."
+            : "Inspect the exact changes, resolve review flags, then mark the application Ready.";
 
   return (
     <div className="content">
@@ -62,7 +130,7 @@ export default async function ApplicationDetailPage({
       </Link>
 
       <div
-        className="application-layout"
+        className="application-layout page-heading"
         style={{
           display: "flex",
           alignItems: "end",
@@ -95,6 +163,28 @@ export default async function ApplicationDetailPage({
         <StatusPill status={application.status} />
       </div>
 
+      <section className="review-guide" aria-labelledby="review-guide-title">
+        <div className="review-guide-copy">
+          {latestRun?.status === "FAILED" ? <CircleAlert size={20} color="var(--red)" /> : <Check size={20} color="var(--green)" />}
+          <div><div className="eyebrow">Your next decision</div><h2 id="review-guide-title">{reviewHeadline}</h2><p>{reviewCopy}</p></div>
+        </div>
+        <nav className="review-jumps" aria-label="Jump to application section">
+          <a href="#role">Posting</a>
+          <a href="#changes">Resume changes</a>
+          {latestRun?.keywordDecisions.length ? <a href="#keywords">Keywords</a> : null}
+          {stretchLab ? <a href="#stretch-lab">Stretch Lab</a> : null}
+          <a href="#files">Files</a>
+        </nav>
+        {latestRun?.status === "SUCCEEDED" ? (
+          <div className="review-checks">
+            <span className="review-check review-check-done"><Check size={13} />Tailored</span>
+            <span className={latestRun.validationPassed ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.validationPassed ? <Check size={13} /> : <CircleAlert size={13} />}Validated</span>
+            <span className={latestRun.riskCount === 0 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.riskCount === 0 ? <Check size={13} /> : <CircleAlert size={13} />}{latestRun.riskCount} flags</span>
+            <span className={resumeArtifacts.length ? "review-check review-check-done" : "review-check review-check-warning"}>{resumeArtifacts.length ? <Check size={13} /> : <CircleAlert size={13} />}Files ready</span>
+          </div>
+        ) : null}
+      </section>
+
       <div
         className="application-detail-grid"
         style={{
@@ -103,7 +193,7 @@ export default async function ApplicationDetailPage({
       >
         <div className="application-main-stack">
           {latestRun ? (
-            <section className="panel" style={{ padding: 17 }}>
+            <section id="provenance" className="panel scroll-target" style={{ padding: 17 }}>
               <div className="panel-title">Truth and AI provenance</div>
               <p
                 className="secondary"
@@ -147,7 +237,7 @@ export default async function ApplicationDetailPage({
             </section>
           ) : null}
 
-          <section className="panel">
+          <section id="role" className="panel scroll-target">
             <div className="panel-header">
               <div>
                 <div className="panel-title">Role intelligence</div>
@@ -214,7 +304,7 @@ export default async function ApplicationDetailPage({
             </details>
           </section>
 
-          <section className="panel">
+          <section id="changes" className="panel scroll-target">
             <div className="panel-header">
               <div>
                 <div className="panel-title">Tailoring audit</div>
@@ -315,7 +405,7 @@ export default async function ApplicationDetailPage({
                         <div>
                           <span className="eyebrow">{change.section}</span>
                           <span className="muted mono" style={{ marginLeft: 9, fontSize: 10 }}>
-                            {change.paragraphId}
+                            · {paragraphLabel(change.section, change.paragraphId)}
                           </span>
                         </div>
                         <span
@@ -380,7 +470,7 @@ export default async function ApplicationDetailPage({
                       ) : null}
                       {stringList(change.evidenceIds).length ? (
                         <div className="muted mono" style={{ marginTop: 7, fontSize: 10 }}>
-                          Evidence: {stringList(change.evidenceIds).join(", ")}
+                          Evidence: {stringList(change.evidenceIds).map(humanizeReference).join(", ")}
                         </div>
                       ) : null}
                     </article>
@@ -391,14 +481,22 @@ export default async function ApplicationDetailPage({
           </section>
 
           {latestRun?.keywordDecisions.length ? (
-            <section className="panel">
+            <section id="keywords" className="panel scroll-target">
               <div className="panel-header">
                 <div>
                   <div className="panel-title">Keyword decisions</div>
                   <div className="muted" style={{ marginTop: 2, fontSize: 11 }}>
-                    Hiring importance is evaluated separately from Simplify
+                    Why each term was used, left out, or excluded by the posting
                   </div>
                 </div>
+              </div>
+              <div className="keyword-summary">
+                {[
+                  ["Used safely", latestRun.keywordDecisions.filter((item) => item.used).length, "green"],
+                  ["Transferable", latestRun.keywordDecisions.filter((item) => item.accepted && item.evidenceLevel.includes("TRANSFERABLE")).length, "cyan"],
+                  ["Needs proof", latestRun.keywordDecisions.filter((item) => item.accepted && item.evidenceLevel === "UNSUPPORTED").length, "amber"],
+                  ["Excluded", latestRun.keywordDecisions.filter((item) => !item.accepted).length, "red"],
+                ].map(([label, count, tone]) => <div key={String(label)}><span className={`summary-dot summary-dot-${tone}`} /> <strong>{String(count)}</strong><small>{String(label)}</small></div>)}
               </div>
               <div style={{ overflowX: "auto" }}>
                 <table className="data-table">
@@ -413,7 +511,10 @@ export default async function ApplicationDetailPage({
                     </tr>
                   </thead>
                   <tbody>
-                    {latestRun.keywordDecisions.map((keyword) => (
+                    {latestRun.keywordDecisions.map((keyword) => {
+                      const sources = stringList(keyword.sourceSections);
+                      const explicitlyExcluded = sources.includes("negative_context");
+                      return (
                       <tr key={keyword.id}>
                         <td style={{ fontWeight: 650 }}>{keyword.term}</td>
                         <td className="mono">{Math.round(keyword.hiringImportance)}</td>
@@ -436,7 +537,9 @@ export default async function ApplicationDetailPage({
                         </td>
                         <td>
                           {!keyword.accepted ? (
-                            <span className="muted">Rejected</span>
+                            <span style={{ color: explicitlyExcluded ? "var(--red)" : undefined }}>
+                              {explicitlyExcluded ? "Excluded by posting" : "Rejected"}
+                            </span>
                           ) : keyword.used ? (
                             <span style={{ color: "var(--green)" }}>Used</span>
                           ) : (
@@ -444,7 +547,9 @@ export default async function ApplicationDetailPage({
                           )}
                         </td>
                         <td className="secondary">
-                          {keyword.accepted ? keyword.placement || "—" : "—"}
+                          {keyword.accepted && keyword.placement
+                            ? keyword.placement.split(", ").map(humanizeReference).join(", ")
+                            : "—"}
                         </td>
                         <td className="secondary" style={{ minWidth: 230 }}>
                           <div>
@@ -454,16 +559,150 @@ export default async function ApplicationDetailPage({
                                 ? "Placed using candidate evidence."
                                 : "Not placed in the tailored resume.")}
                           </div>
-                          {stringList(keyword.sourceSections).length ? (
+                          {sources.length ? (
                             <div className="muted mono" style={{ marginTop: 4, fontSize: 9 }}>
-                              Source: {stringList(keyword.sourceSections).join(", ")}
+                              Source: {sources.join(", ")}
                             </div>
                           ) : null}
                         </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
+              </div>
+            </section>
+          ) : null}
+
+          {stretchLab ? (
+            <section id="stretch-lab" className="panel scroll-target">
+              <div className="panel-header">
+                <div>
+                  <div className="panel-title">Stretch Lab</div>
+                  <div className="muted" style={{ marginTop: 2, fontSize: 11 }}>
+                    Gap-closing ideas kept outside the application-ready resume
+                  </div>
+                </div>
+                <span className="status status-amber">Review only</span>
+              </div>
+              <div style={{ padding: 16, display: "grid", gap: 18 }}>
+                <div
+                  style={{
+                    padding: 13,
+                    border: "1px solid var(--amber)",
+                    borderRadius: 9,
+                    background: "rgba(245, 158, 11, 0.07)",
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {displayValue(
+                    stretchLab.disclaimer,
+                    "These ideas are unverified and are never exported into the resume.",
+                  )}
+                </div>
+
+                {stretchOpportunities.length ? (
+                  <div>
+                    <div className="eyebrow">Transferable opportunities to verify</div>
+                    <div style={{ display: "grid", gap: 8, marginTop: 9 }}>
+                      {stretchOpportunities.map((item, index) => (
+                        <article
+                          key={`${displayValue(item.target_term)}-${index}`}
+                          style={{ padding: 12, border: "1px solid var(--line)", borderRadius: 8 }}
+                        >
+                          <div style={{ fontWeight: 650 }}>{displayValue(item.target_term)}</div>
+                          <div className="secondary" style={{ marginTop: 5, fontSize: 11 }}>
+                            {displayValue(item.rationale)}
+                          </div>
+                          <div className="muted" style={{ marginTop: 5, fontSize: 11 }}>
+                            Review: {displayValue(item.review_question)}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {stretchGaps.length ? (
+                  <div>
+                    <div className="eyebrow">Real gaps and proof needed</div>
+                    <div className="audit-table-scroll" style={{ marginTop: 9 }}>
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            <th>Term</th>
+                            <th>Type</th>
+                            <th>Importance</th>
+                            <th>What would make it usable</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {stretchGaps.map((gap, index) => (
+                            <tr key={`${displayValue(gap.target_term)}-${index}`}>
+                              <td style={{ fontWeight: 650 }}>{displayValue(gap.target_term)}</td>
+                              <td className="secondary">{displayValue(gap.category, "other")}</td>
+                              <td className="mono">
+                                {typeof gap.hiring_importance === "number"
+                                  ? Math.round(gap.hiring_importance)
+                                  : "—"}
+                              </td>
+                              <td className="secondary" style={{ minWidth: 280 }}>
+                                <div>{displayValue(gap.why_it_matters)}</div>
+                                {stringList(gap.proof_needed).length ? (
+                                  <ul style={{ margin: "7px 0 0", paddingLeft: 18 }}>
+                                    {stringList(gap.proof_needed).map((proof) => (
+                                      <li key={proof}>{proof}</li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : null}
+
+                {stretchProjects.length ? (
+                  <div>
+                    <div className="eyebrow">Proposed projects — not completed</div>
+                    <div style={{ display: "grid", gap: 10, marginTop: 9 }}>
+                      {stretchProjects.map((project, index) => (
+                        <details
+                          key={`${displayValue(project.title)}-${index}`}
+                          style={{ padding: 13, border: "1px solid var(--line)", borderRadius: 9 }}
+                        >
+                          <summary style={{ cursor: "pointer", fontWeight: 650 }}>
+                            {displayValue(project.title, "Proposed skills project")}
+                          </summary>
+                          <div className="secondary" style={{ marginTop: 10, fontSize: 12 }}>
+                            {displayValue(project.objective)}
+                          </div>
+                          {stringList(project.target_terms).length ? (
+                            <div className="muted" style={{ marginTop: 8, fontSize: 11 }}>
+                              Targets: {stringList(project.target_terms).join(", ")}
+                            </div>
+                          ) : null}
+                          <div style={{ marginTop: 10, fontSize: 12 }}>
+                            <div className="eyebrow">Build steps</div>
+                            <ol style={{ margin: "7px 0 0", paddingLeft: 19 }}>
+                              {stringList(project.build_steps).map((step) => (
+                                <li key={step} style={{ marginTop: 4 }}>
+                                  {step}
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                          <div className="muted" style={{ marginTop: 10, fontSize: 11 }}>
+                            Resume use only after completion: {displayValue(project.resume_language_after_completion)}
+                          </div>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
               </div>
             </section>
           ) : null}
@@ -475,38 +714,44 @@ export default async function ApplicationDetailPage({
             id={application.id}
             initialStatus={application.status}
             initialUrl={application.job.sourceUrl || ""}
+            initialNotes={application.notes || ""}
+            initialFollowUpAt={application.followUpAt?.toISOString() || ""}
             hasActiveRun={hasActiveRun}
+            hasResumeFiles={Boolean(latestRun?.artifacts.length)}
           />
 
-          <div className="panel" style={{ padding: 16 }}>
-            <div className="panel-title">Resume files</div>
-            {latestRun?.artifacts.length ? (
-              <div style={{ display: "grid", gap: 7, marginTop: 14 }}>
-                {latestRun.artifacts.map((artifact) => (
+          <div id="files" className="panel scroll-target files-panel">
+            <div className="controls-heading"><div><div className="panel-title">Download files</div><div className="muted">Application-ready first; audit files below.</div></div></div>
+            {resumeArtifacts.length ? (
+              <div className="resume-downloads">
+                {resumeArtifacts.map((artifact) => (
                   <a
                     key={artifact.id}
                     href={`/api/artifacts/${artifact.id}`}
-                    className="button button-quiet"
-                    style={{ justifyContent: "space-between" }}
+                    className={artifact.kind === "DOCX" ? "resume-download resume-download-primary" : "resume-download"}
                   >
-                    <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-                      {artifact.fileName}
-                    </span>
+                    <span><strong>{artifact.kind === "DOCX" ? "Editable resume" : "Resume preview"}</strong><small>{artifact.fileName}</small></span>
                     <Download size={14} />
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="muted" style={{ margin: "9px 0 0", fontSize: 12 }}>
+              <p className="muted files-empty">
                 Files appear after a successful local run.
               </p>
             )}
+            {auditArtifacts.length ? (
+              <details className="audit-files">
+                <summary>Audit and machine-readable files ({auditArtifacts.length})</summary>
+                <div>{auditArtifacts.map((artifact) => <a key={artifact.id} href={`/api/artifacts/${artifact.id}`}><span>{artifact.fileName}</span><Download size={13} /></a>)}</div>
+              </details>
+            ) : null}
           </div>
 
           <div className="panel" style={{ padding: 16 }}>
             <div className="panel-title">Timeline</div>
             <div className="timeline-events">
-              {application.events.map((event) => (
+              {primaryEvents.map((event) => (
                 <div
                   key={event.id}
                   style={{ display: "grid", gridTemplateColumns: "8px 1fr", gap: 10 }}
@@ -540,6 +785,17 @@ export default async function ApplicationDetailPage({
                 </div>
               ))}
             </div>
+            {technicalEvents.length ? (
+              <details className="technical-timeline">
+                <summary>Show {technicalEvents.length} technical progress updates</summary>
+                <div>
+                  {technicalEvents.map((event) => {
+                    const detail = objectRecord(event.detail);
+                    return <div key={event.id}><span>{displayValue(detail?.stage, "Tailoring progress")}</span><small>{formatRelativeDate(event.occurredAt)}</small></div>;
+                  })}
+                </div>
+              </details>
+            ) : null}
           </div>
         </aside>
       </div>

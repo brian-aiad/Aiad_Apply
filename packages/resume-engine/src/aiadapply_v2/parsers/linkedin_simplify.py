@@ -16,7 +16,8 @@ OFFICIAL_JOB_SIGNAL = re.compile(
 )
 JOB_END = re.compile(
     r"^(?:Benefits found in job post|Set alert for similar jobs|"
-    r"Put your best foot forward|Show Premium Insights)\s*$",
+    r"Put your best foot forward|Show Premium Insights|Privacy Policy and Terms:?|"
+    r"Similar Jobs(?:\s*\(\d+\))?)\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 SCORE = re.compile(r"(\d+)\s+(?:out\s+of|of)\s+(\d+).*?keywords?", re.IGNORECASE)
@@ -227,6 +228,14 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
             (
                 line
                 for line in lines[:date_index]
+                if re.match(r"^(?:Raytheon\s+)?Full-time\s+.+", line, re.I)
+                and not line.casefold().endswith("page is loaded")
+            ),
+            "",
+        ) or next(
+            (
+                line
+                for line in lines[:date_index]
                 if not _looks_like_official_metadata(line)
                 and not re.fullmatch(
                     r"(?:Raytheon|RTX|Collins Aerospace|Pratt & Whitney)", line, re.I
@@ -243,6 +252,22 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
             ),
             "",
         )
+        if not company:
+            company = next(
+                (
+                    match.group(1)
+                    for line in lines[:date_index]
+                    if (
+                        match := re.match(
+                            r"^(Raytheon|Collins Aerospace|Pratt & Whitney)\s+"
+                            r"(?:Full-time|Part-time)\b",
+                            line,
+                            re.I,
+                        )
+                    )
+                ),
+                "",
+            )
         if not company:
             rtx_business = next(
                 (
@@ -323,7 +348,18 @@ def _looks_like_official_metadata(value: str) -> bool:
 def _extract_job_region(raw: str) -> tuple[str, list[str]]:
     start = JOB_START.search(raw)
     if not start:
-        return raw.strip(), []
+        if len(OFFICIAL_JOB_SIGNAL.findall(raw)) < 2:
+            return raw.strip(), []
+        official_start = re.search(r"^Date Posted:.*$", raw, re.IGNORECASE | re.MULTILINE)
+        start_index = official_start.start() if official_start else 0
+        end = JOB_END.search(raw, start_index)
+        end_index = end.start() if end else len(raw)
+        official_rejected = []
+        if start_index > 0:
+            official_rejected.append("employer_navigation_and_job_chrome")
+        if end:
+            official_rejected.append("employer_recommendations_legal_and_footer")
+        return raw[start_index:end_index].strip(), official_rejected
     end = JOB_END.search(raw, start.end())
     end_index = end.start() if end else len(raw)
     job = raw[start.end() : end_index].strip()
@@ -342,6 +378,13 @@ def _extract_location(raw: str) -> str:
         match = pattern.search(raw)
         if match:
             return match.group(1).strip()
+    narrative = re.search(
+        r"\blocated in\s+([A-Za-z][A-Za-z .'-]+,\s*[A-Z][A-Za-z ]+)(?:[.,]|$)",
+        raw,
+        re.IGNORECASE,
+    )
+    if narrative:
+        return narrative.group(1).strip()
     return ""
 
 

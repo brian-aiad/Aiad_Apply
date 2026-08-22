@@ -6,6 +6,9 @@ import {
   safeArtifactName,
   staleWorkerCutoff,
   workerAuthorized,
+  workerHeartbeatCutoff,
+  workerHeartbeatKey,
+  workerHeartbeatWriteCutoff,
   workerLeaseMilliseconds,
 } from "../../src/lib/worker-security";
 
@@ -17,6 +20,13 @@ test("worker bearer authentication fails closed and accepts either configured se
   assert.equal(workerAuthorized(request, { WORKER_SECRET: "wrong-secret" }), false);
   assert.equal(workerAuthorized(request, { WORKER_SECRET: "correct-secret" }), true);
   assert.equal(workerAuthorized(request, { CRON_SECRET: "correct-secret" }), true);
+});
+
+test("worker heartbeat helpers create isolated keys and bounded freshness windows", () => {
+  const now = new Date("2026-08-19T12:00:00Z");
+  assert.equal(workerHeartbeatKey("macbook-123"), "worker:heartbeat:macbook-123");
+  assert.equal(workerHeartbeatCutoff(now).toISOString(), "2026-08-19T11:59:40.000Z");
+  assert.equal(workerHeartbeatWriteCutoff(now).toISOString(), "2026-08-19T11:59:50.000Z");
 });
 
 test("worker lease defaults to thirty minutes and clamps unsafe values", () => {

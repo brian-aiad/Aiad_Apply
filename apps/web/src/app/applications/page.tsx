@@ -9,7 +9,7 @@ export default async function ApplicationsPage() {
   const applications = await getApplications();
   return (
     <div className="content">
-      <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between" }}>
+      <div className="page-heading" style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 16 }}>
         <div>
           <div className="eyebrow">Pipeline</div>
           <h1 className="page-title">Applications</h1>
@@ -24,7 +24,7 @@ export default async function ApplicationsPage() {
         </Link>
       </div>
       <section className="panel" style={{ marginTop: 24 }}>
-        <ApplicationTable applications={applications} />
+        <ApplicationTable applications={applications} showTools />
       </section>
     </div>
   );

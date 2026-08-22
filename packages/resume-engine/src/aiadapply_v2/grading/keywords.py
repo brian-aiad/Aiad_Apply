@@ -5,6 +5,7 @@ from collections import Counter
 
 from aiadapply_v2.schemas import (
     JobKeyword,
+    KeywordContext,
     KeywordKind,
     KeywordPriority,
     ParsedJob,
@@ -551,11 +552,16 @@ def _grade_one(
         factors["simplify_low"] += 6
         sections.append("simplify_low")
 
-    required_occurrences = _count_in_lines(job.required_qualifications, term)
-    responsibility_occurrences = _count_in_lines(job.responsibilities, term)
-    preferred_occurrences = _count_in_lines(job.preferred_qualifications, term)
+    required_occurrences = _count_positive_in_lines(job.required_qualifications, term)
+    responsibility_occurrences = _count_positive_in_lines(job.responsibilities, term)
+    preferred_occurrences = _count_positive_in_lines(job.preferred_qualifications, term)
     title_occurrences = _count_job_term(job.title, term)
     total_occurrences = _count_job_term(job.job_description, term)
+    context_snippets = _term_context_snippets(job.job_description, term)
+    negative_snippets = [
+        snippet for snippet in context_snippets if _is_negative_context(snippet, term)
+    ]
+    positive_occurrences = max(0, total_occurrences - len(negative_snippets))
     composite_inferred = normalized in {
         normalized_term(value) for value in _inferred_composite_terms(job)
     }
@@ -615,6 +621,22 @@ def _grade_one(
     ):
         factors["company_marketing_only"] -= 40
         rejection = "Term appears in company/product marketing rather than candidate requirements."
+    if (
+        negative_snippets
+        and positive_occurrences == 0
+        and not (
+            required_occurrences
+            or responsibility_occurrences
+            or preferred_occurrences
+            or title_occurrences
+        )
+    ):
+        factors["explicit_negative_context"] -= 80
+        sections.append("negative_context")
+        rejection = (
+            "The posting explicitly excludes or contrasts this phrase; it is not a target "
+            "resume keyword."
+        )
 
     score = min(100.0, max(0.0, float(sum(factors.values()))))
     accepted = score >= 6 and not rejection
@@ -626,6 +648,16 @@ def _grade_one(
             + (10 if _kind_for(term) in {KeywordKind.system, KeywordKind.action} else 0)
             - (8 if normalized in GENERIC else 0),
         ),
+    )
+    context = _keyword_context(
+        accepted=accepted,
+        negative_snippets=negative_snippets,
+        required_occurrences=required_occurrences,
+        responsibility_occurrences=responsibility_occurrences,
+        preferred_occurrences=preferred_occurrences,
+        title_occurrences=title_occurrences,
+        priority=priority,
+        positive_occurrences=positive_occurrences,
     )
     return JobKeyword(
         term=term,
@@ -639,11 +671,93 @@ def _grade_one(
         placement_utility=placement,
         accepted=accepted,
         rejection_reason=rejection,
+        context=context,
+        context_snippets=context_snippets[:3],
     )
 
 
 def _count_in_lines(lines: list[str], term: str) -> int:
     return sum(_count_job_term(line, term) for line in lines)
+
+
+def _count_positive_in_lines(lines: list[str], term: str) -> int:
+    return sum(
+        _count_job_term(line, term) for line in lines if not _is_negative_context(line, term)
+    )
+
+
+def _term_context_snippets(text: str, term: str) -> list[str]:
+    pattern = TERM_PATTERNS.get(normalized_term(term))
+    matches = (
+        list(pattern.finditer(text))
+        if pattern
+        else list(re.finditer(rf"\b{re.escape(term)}\b", text, re.IGNORECASE))
+    )
+    snippets: list[str] = []
+    for match in matches:
+        left_boundaries = [text.rfind(marker, 0, match.start()) for marker in ("\n", ".", "!", "?")]
+        right_candidates = [
+            position
+            for marker in ("\n", ".", "!", "?")
+            if (position := text.find(marker, match.end())) >= 0
+        ]
+        left = max(left_boundaries) + 1
+        right = min(right_candidates) + 1 if right_candidates else len(text)
+        snippet = " ".join(text[left:right].split())
+        if snippet and snippet not in snippets:
+            snippets.append(snippet)
+    return snippets
+
+
+def _is_negative_context(text: str, term: str) -> bool:
+    pattern = TERM_PATTERNS.get(normalized_term(term))
+    match = (
+        pattern.search(text)
+        if pattern
+        else re.search(rf"\b{re.escape(term)}\b", text, re.IGNORECASE)
+    )
+    if not match:
+        return False
+    before = text[max(0, match.start() - 100) : match.start()].casefold()
+    after = text[match.end() : match.end() + 80].casefold()
+    if re.search(r"\bnot\s+(?:only|limited\s+to)\s*$", before):
+        return False
+    negative_before = re.search(
+        r"\b(?:not|without|excluding|exclude|unlike|rather\s+than)\b"
+        r"(?:[\s\W]+[a-z0-9-]+){0,6}[\s\W]*$",
+        before,
+    )
+    negative_after = re.match(
+        r"^[\s\W]*(?:is|are|was|were)?\s*(?:not|required:\s*none|not\s+required)",
+        after,
+    )
+    return bool(negative_before or negative_after)
+
+
+def _keyword_context(
+    *,
+    accepted: bool,
+    negative_snippets: list[str],
+    required_occurrences: int,
+    responsibility_occurrences: int,
+    preferred_occurrences: int,
+    title_occurrences: int,
+    priority: KeywordPriority,
+    positive_occurrences: int,
+) -> KeywordContext:
+    if not accepted and negative_snippets and positive_occurrences == 0:
+        return KeywordContext.negative
+    if required_occurrences:
+        return KeywordContext.required
+    if responsibility_occurrences:
+        return KeywordContext.responsibility
+    if preferred_occurrences:
+        return KeywordContext.preferred
+    if title_occurrences:
+        return KeywordContext.job_title
+    if priority in {KeywordPriority.high, KeywordPriority.low} and positive_occurrences == 0:
+        return KeywordContext.scanner_only
+    return KeywordContext.positive
 
 
 def _count_job_term(text: str, term: str) -> int:

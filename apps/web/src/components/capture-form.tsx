@@ -1,8 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, CheckCircle2, FileText, LoaderCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ClipboardPaste,
+  Keyboard,
+  LoaderCircle,
+  ShieldCheck,
+} from "lucide-react";
 
 export function CaptureForm() {
   const router = useRouter();
@@ -10,6 +18,20 @@ export function CaptureForm() {
   const [sourceUrl, setSourceUrl] = useState("");
   const [loading, setLoading] = useState<"save" | "tailor" | null>(null);
   const [error, setError] = useState("");
+  const trimmed = rawPaste.trim();
+  const wordCount = useMemo(() => (trimmed ? trimmed.split(/\s+/).length : 0), [trimmed]);
+  const lineCount = useMemo(() => (trimmed ? trimmed.split(/\r?\n/).filter(Boolean).length : 0), [trimmed]);
+  const ready = trimmed.length >= 100;
+  const urlLooksValid = !sourceUrl || /^https?:\/\//i.test(sourceUrl);
+
+  useEffect(() => {
+    const guard = (event: BeforeUnloadEvent) => {
+      if (!trimmed || loading) return;
+      event.preventDefault();
+    };
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, [loading, trimmed]);
 
   async function submit(queueTailoring: boolean) {
     setLoading(queueTailoring ? "tailor" : "save");
@@ -30,7 +52,7 @@ export function CaptureForm() {
     }
   }
 
-  const disabled = loading !== null || rawPaste.trim().length < 100;
+  const disabled = loading !== null || !ready || !urlLooksValid;
 
   return (
     <div
@@ -42,7 +64,7 @@ export function CaptureForm() {
         marginTop: 24,
       }}
     >
-      <section className="panel" style={{ padding: 18 }}>
+      <section className="panel capture-editor" aria-busy={loading !== null}>
         <label className="field-label" htmlFor="job-paste">
           Complete job posting paste
         </label>
@@ -55,20 +77,24 @@ export function CaptureForm() {
           aria-describedby="job-paste-count"
           placeholder="Paste the full LinkedIn, Simplify, or employer job page here. Navigation, recommendations, and scanner keywords can remain in the text."
           autoFocus
-        />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-            marginTop: 12,
+          onKeyDown={(event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && !disabled) {
+              event.preventDefault();
+              void submit(true);
+            }
           }}
-        >
-          <span id="job-paste-count" className="muted" style={{ fontSize: 11 }}>
-            {rawPaste.length.toLocaleString()} / 500,000 characters
+        />
+        <div className="paste-diagnostics" id="job-paste-count">
+          <span>{rawPaste.length.toLocaleString()} characters</span>
+          <span>{wordCount.toLocaleString()} words</span>
+          <span>{lineCount.toLocaleString()} lines</span>
+          <span className={ready ? "paste-ready" : "paste-waiting"}>
+            {ready ? <><Check size={12} />Ready to capture</> : "Paste at least 100 characters"}
           </span>
-          <div style={{ display: "flex", gap: 8 }}>
+        </div>
+        <div className="capture-actions">
+          <span className="keyboard-hint"><Keyboard size={13} /><kbd>⌘</kbd><span>+</span><kbd>Enter</kbd> to tailor</span>
+          <div className="capture-buttons">
             <button
               className="button"
               disabled={disabled}
@@ -76,7 +102,7 @@ export function CaptureForm() {
               type="button"
             >
               {loading === "save" ? <LoaderCircle size={15} className="spin" /> : null}
-              Save for later
+              {loading === "save" ? "Saving…" : "Save only"}
             </button>
             <button
               className="button button-primary"
@@ -89,7 +115,7 @@ export function CaptureForm() {
               ) : (
                 <ArrowRight size={15} />
               )}
-              Save and tailor
+              {loading === "tailor" ? "Starting…" : "Save and tailor"}
             </button>
           </div>
         </div>
@@ -124,23 +150,35 @@ export function CaptureForm() {
             maxLength={2_000}
             placeholder="https://linkedin.com/jobs/view/…"
           />
-          <p className="muted" style={{ margin: "9px 0 0", fontSize: 11 }}>
+          {!urlLooksValid ? <p className="field-error">Start the URL with http:// or https://.</p> : null}
+          <p className="field-help">
             You can add or correct this later from the application page.
           </p>
         </div>
 
         <div className="panel" style={{ padding: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-            <FileText size={17} color="var(--violet-bright)" />
-            <span className="panel-title">What gets extracted</span>
+            <ClipboardPaste size={17} color="var(--violet-bright)" />
+            <span className="panel-title">Paste without cleaning</span>
+          </div>
+          <p className="secondary" style={{ margin: "9px 0 0", fontSize: 12, lineHeight: 1.55 }}>
+            Include the entire page. LinkedIn navigation, Simplify results, similar jobs,
+            cookie notices, and footer text help the parser identify what to ignore.
+          </p>
+        </div>
+
+        <div className="panel" style={{ padding: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+            <ShieldCheck size={17} color="var(--green)" />
+            <span className="panel-title">Before anything is exported</span>
           </div>
           <div style={{ display: "grid", gap: 11, marginTop: 16 }}>
             {[
-              "Company, role, location, and work mode",
-              "Salary range and source link",
-              "Real responsibilities and qualifications",
-              "Hiring keywords weighted independently of Simplify",
-              "Exact resume changes, evidence, and review risks",
+              "Posting noise and negative phrases are removed",
+              "Requirements are matched to protected resume evidence",
+              "Unsupported tools stay out of the exported resume",
+              "Every wording change is shown for your review",
+              "DOCX and PDF are checked before download",
             ].map((item) => (
               <div
                 key={item}
