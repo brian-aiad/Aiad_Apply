@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>AiadApply</title>
+  <path d="M11 3h30l12 12v41a5 5 0 0 1-5 5H11a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5Z" fill="#f2f0f5" stroke="#29282f" stroke-width="2"/>
+  <path d="M11 4h5v56h-5a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z" fill="#8b5cf6"/>
+  <path d="M41 3v8a4 4 0 0 0 4 4h8L41 3Z" fill="#8b5cf6"/>
+  <text x="18" y="37" fill="#17171b" font-family="'Avenir Next', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="800">A</text>
+  <text x="31" y="46" fill="#17171b" font-family="'Avenir Next', 'Segoe UI', Arial, sans-serif" font-size="24" font-weight="800">A</text>
+  <path d="M19 49h28" stroke="#8b5cf6" stroke-linecap="square" stroke-width="3"/>
+  <path d="M19 54h23" stroke="#85808d" stroke-linecap="round" stroke-width="2.5"/>
+</svg>

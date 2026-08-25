@@ -111,6 +111,13 @@ button:disabled {
   backdrop-filter: blur(18px);
 }
 
+.brand-mark {
+  display: block;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+}
+
 .main-frame {
   min-height: 100vh;
   margin-left: var(--sidebar-width);

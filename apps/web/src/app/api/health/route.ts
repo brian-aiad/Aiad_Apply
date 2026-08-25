@@ -1,4 +1,5 @@
 import { access } from "node:fs/promises";
+import path from "node:path";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import {
@@ -20,13 +21,20 @@ export async function GET() {
         },
       }),
     ]);
-    let baseResumeReady = false;
-    if (resume?.localPath) {
-      baseResumeReady = await access(resume.localPath).then(
-        () => true,
-        () => false,
-      );
-    }
+    const fallbackResume = path.resolve(
+      process.cwd(),
+      "..",
+      "..",
+      "data",
+      "resumes",
+      "Brian_Aiad_BASE.docx",
+    );
+    const resumeCandidates = [resume?.localPath, fallbackResume].filter(
+      (value): value is string => Boolean(value),
+    );
+    const baseResumeReady = await Promise.any(
+      resumeCandidates.map((candidate) => access(candidate).then(() => true)),
+    ).catch(() => false);
     return NextResponse.json({
       status: baseResumeReady && liveWorkers > 0 ? "ready" : "attention",
       database: true,

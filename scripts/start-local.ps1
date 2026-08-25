@@ -14,12 +14,33 @@ $workerLog = Join-Path $runtimeRoot "worker.log"
 $workerErrorLog = Join-Path $runtimeRoot "worker-error.log"
 $localUrl = "http://127.0.0.1:3000"
 
+function Stop-ProcessTree {
+    param([int]$RootProcessId)
+
+    $descendants = @()
+    $pending = @($RootProcessId)
+    while ($pending.Count -gt 0) {
+        $parentId = $pending[0]
+        $pending = @($pending | Select-Object -Skip 1)
+        $children = @(Get-CimInstance Win32_Process -Filter "ParentProcessId = $parentId")
+        foreach ($child in $children) {
+            $pending += [int]$child.ProcessId
+            $descendants += [int]$child.ProcessId
+        }
+    }
+    [array]::Reverse($descendants)
+    foreach ($processId in $descendants) {
+        Stop-Process -Id $processId -Force -ErrorAction SilentlyContinue
+    }
+    Stop-Process -Id $RootProcessId -Force -ErrorAction SilentlyContinue
+}
+
 foreach ($commandName in @("node", "npm", "uv")) {
     if (-not (Get-Command $commandName -ErrorAction SilentlyContinue)) {
         throw "Missing required command: $commandName"
     }
 }
-$nodeMajor = [int](& node -p 'process.versions.node.split(".")[0]')
+$nodeMajor = [int](& node -p "process.versions.node.split('.')[0]")
 if ($nodeMajor -ne 22) {
     throw "Node.js 22 is required; found $(& node --version). Run 'nvm install 22 && nvm use 22'."
 }
@@ -100,13 +121,11 @@ for ($attempt = 0; $attempt -lt 60; $attempt++) {
     catch {
         # Retry until both services have reported healthy.
     }
-    if (-not $workerReady) {
-        Start-Sleep -Milliseconds 500
-    }
+    Start-Sleep -Milliseconds 500
 }
 
 if (-not $ready) {
-    Stop-Process -Id $webProcess.Id -Force -ErrorAction SilentlyContinue
+    Stop-ProcessTree -RootProcessId $webProcess.Id
     throw "The dashboard did not become ready at $localUrl."
 }
 
@@ -131,11 +150,15 @@ for ($attempt = 0; $attempt -lt 20; $attempt++) {
         }
     }
     catch {
+        # Retry while the worker registers its first heartbeat.
+    }
+    if (-not $workerReady) {
         Start-Sleep -Milliseconds 500
     }
 }
 if (-not $workerReady) {
-    Stop-Process -Id $webProcess.Id -Force -ErrorAction SilentlyContinue
+    Stop-ProcessTree -RootProcessId $workerProcess.Id
+    Stop-ProcessTree -RootProcessId $webProcess.Id
     throw "The worker did not remain running. See $workerErrorLog."
 }
 

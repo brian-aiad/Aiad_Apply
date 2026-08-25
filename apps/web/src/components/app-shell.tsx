@@ -10,6 +10,7 @@ import {
   Plus,
   Settings,
 } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { cn } from "@/lib/cn";
 import { SystemStatus } from "@/components/system-status";
 
@@ -32,22 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="app-shell">
       <aside className="sidebar">
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span
-            style={{
-              display: "grid",
-              width: 31,
-              height: 31,
-              placeItems: "center",
-              border: "1px solid #6f46c4",
-              borderRadius: 9,
-              color: "white",
-              background: "linear-gradient(145deg, #8b5cf6, #5631a8)",
-              fontSize: 12,
-              fontWeight: 800,
-            }}
-          >
-            A
-          </span>
+          <BrandMark className="brand-mark" />
           <span>
             <span style={{ display: "block", fontWeight: 700, letterSpacing: "-0.02em" }}>
               AiadApply
