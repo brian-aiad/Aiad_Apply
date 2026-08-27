@@ -1,5 +1,8 @@
+import { DEFAULT_FOLLOW_UP_DAYS } from "@/lib/application-reminders";
+
 export const DEFAULT_TIMEZONE = "America/Los_Angeles";
 export const DEFAULT_DAILY_GOAL = 8;
+export { DEFAULT_FOLLOW_UP_DAYS };
 
 export const COMMON_TIMEZONES = [
   "America/Los_Angeles",
@@ -14,6 +17,7 @@ export const COMMON_TIMEZONES = [
 export type ProductSettings = {
   dailyGoal: number;
   timezone: string;
+  followUpDays: number;
   outputRoot?: string;
 };
 
@@ -42,10 +46,18 @@ export function readProductSettings(value: unknown): ProductSettings {
     typeof record.timezone === "string" && isValidTimezone(record.timezone)
       ? record.timezone
       : DEFAULT_TIMEZONE;
+  const followUpDays =
+    typeof record.followUpDays === "number" &&
+    Number.isInteger(record.followUpDays) &&
+    record.followUpDays >= 1 &&
+    record.followUpDays <= 30
+      ? record.followUpDays
+      : DEFAULT_FOLLOW_UP_DAYS;
 
   return {
     dailyGoal,
     timezone,
+    followUpDays,
     ...(typeof record.outputRoot === "string" ? { outputRoot: record.outputRoot } : {}),
   };
 }

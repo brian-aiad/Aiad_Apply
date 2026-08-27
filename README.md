@@ -38,6 +38,8 @@ The dashboard now guides each record through **Capture → Tailor → Review →
 - Use the review guide to jump between posting details, exact resume changes,
   keyword decisions, Stretch Lab, and downloadable files.
 - Store private notes and an optional follow-up reminder on each application.
+- Marking an application Applied automatically schedules a follow-up seven days later
+  unless a reminder already exists; the delay is configurable in Settings.
 - Change the daily goal and timezone from Settings; Today uses those preferences
   immediately.
 - The top-right health indicator verifies the database, protected base resume,
@@ -136,7 +138,8 @@ the unrelated `NEXTAUTH_URL` setting is never used for worker tracking.
 - Name, contact information, organizations, approved titles, dates, locations,
   education, certifications, numerical metrics, sections, entries, and bullet
   counts remain protected.
-- The final output basename is always `Brian_Aiad_resume`.
+- Resume DOCX/PDF filenames include the candidate, company, and role, for example
+  `Brian_Aiad_Resume_Raytheon_RF_Microwave_Antenna_Electrical_Engineer_I_Onsite`.
 
 ## Pipeline
 
@@ -220,8 +223,8 @@ uv run aiadapplyv2 transform `
 Successful transformation produces:
 
 ```text
-Brian_Aiad_resume.docx
-Brian_Aiad_resume.pdf
+Brian_Aiad_Resume_<Company>_<Role>.docx
+Brian_Aiad_Resume_<Company>_<Role>.pdf
 transformation_report.json
 transformation_report.md
 character_audit.json

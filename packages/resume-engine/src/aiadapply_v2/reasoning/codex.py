@@ -288,7 +288,10 @@ Non-negotiable output rules:
     would help close those gaps. Every stretch item must keep export_allowed false. Never
     describe a proposed project as completed, never add it to rewrite_plan, and never treat
     a project idea as evidence. Prefer one small, buildable project that covers several
-    important gaps over a list of generic courses. For language_after_confirmation and
+    important gaps over a list of generic courses. When technically coherent, prefer a
+    bounded extension to the candidate's existing Loavenly project so the proposed work has
+    real operational context; otherwise propose a standalone project. Never force a tool
+    into Loavenly when it has no credible use there. For language_after_confirmation and
     resume_language_after_completion, explain what could be added only after the candidate
     supplies real evidence. Do not propose projects for citizenship, clearance, degree,
     authorization, or other status requirements.

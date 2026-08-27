@@ -49,7 +49,7 @@ from .helpers import IdentityReasoner, identity_plan
 BASE = Path("data/resumes/Brian_Aiad_BASE.docx")
 
 
-def test_end_to_end_pipeline_exports_fixed_names_after_validation(tmp_path: Path) -> None:
+def test_end_to_end_pipeline_exports_job_specific_names_after_validation(tmp_path: Path) -> None:
     raw = """
 Home
 Jobs
@@ -87,8 +87,13 @@ LinkedIn Corporation
         progress=progress.append,
     )
 
-    assert report.output_docx.name == "Brian_Aiad_resume.docx"
-    assert report.output_pdf.name == "Brian_Aiad_resume.pdf"
+    assert (
+        report.output_docx.name
+        == "Brian_Aiad_Resume_Example_Systems_Technical_Support_Engineer.docx"
+    )
+    assert (
+        report.output_pdf.name == "Brian_Aiad_Resume_Example_Systems_Technical_Support_Engineer.pdf"
+    )
     assert report.output_docx.exists()
     assert report.output_pdf.exists()
     assert report.validation.passed

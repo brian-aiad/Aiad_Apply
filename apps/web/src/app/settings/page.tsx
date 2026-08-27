@@ -20,7 +20,11 @@ export default async function SettingsPage() {
         Current operational paths and generation defaults. Secrets remain in server
         environment variables and are never shown here.
       </p>
-      <SettingsForm initialGoal={value.dailyGoal} initialTimezone={value.timezone} />
+      <SettingsForm
+        initialGoal={value.dailyGoal}
+        initialTimezone={value.timezone}
+        initialFollowUpDays={value.followUpDays}
+      />
       <div
         className="settings-grid"
         style={{

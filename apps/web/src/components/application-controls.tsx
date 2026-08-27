@@ -11,7 +11,7 @@ const statusHelp: Record<string, string> = {
   TAILORING: "The local worker is preparing this resume.",
   REVIEW: "Tailoring finished; inspect changes and flags.",
   READY: "You reviewed the resume and it is ready to submit.",
-  APPLIED: "Application submitted.",
+  APPLIED: "Application submitted; a follow-up is scheduled automatically if this field is empty.",
   INTERVIEW: "Interview process is active.",
   CLOSED: "No further action is planned.",
 };
@@ -69,8 +69,14 @@ export function ApplicationControls({
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to save changes.");
-      setSaved({ status, sourceUrl, notes, followUpAt });
-      setMessage("Application changes saved.");
+      const savedFollowUpAt = toLocalInput(payload.followUpAt || "");
+      setFollowUpAt(savedFollowUpAt);
+      setSaved({ status, sourceUrl, notes, followUpAt: savedFollowUpAt });
+      setMessage(
+        payload.automaticallyScheduledFollowUp
+          ? "Application saved. A follow-up reminder was scheduled automatically."
+          : "Application changes saved.",
+      );
       router.refresh();
     } catch (error) {
       setIsError(true);

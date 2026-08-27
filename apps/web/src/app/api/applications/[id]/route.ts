@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { resolveFollowUpUpdate } from "@/lib/application-reminders";
+import { readProductSettings } from "@/lib/product-settings";
 
 const updateSchema = z.object({
   status: z
@@ -25,13 +27,32 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid application update." }, { status: 400 });
   }
 
-  const current = await db.application.findUnique({
-    where: { id },
-    include: { job: true },
-  });
+  const [current, setting] = await Promise.all([
+    db.application.findUnique({
+      where: { id },
+      include: { job: true },
+    }),
+    db.setting.findUnique({ where: { key: "product" } }),
+  ]);
   if (!current) {
     return NextResponse.json({ error: "Application not found." }, { status: 404 });
   }
+
+  const now = new Date();
+  const requestedFollowUpAt =
+    input.data.followUpAt === undefined
+      ? undefined
+      : input.data.followUpAt
+        ? new Date(input.data.followUpAt)
+        : null;
+  const reminder = resolveFollowUpUpdate({
+    currentStatus: current.status,
+    nextStatus: input.data.status,
+    currentFollowUpAt: current.followUpAt,
+    requestedFollowUpAt,
+    now,
+    followUpDays: readProductSettings(setting?.value).followUpDays,
+  });
 
   const application = await db.$transaction(async (transaction) => {
     if (input.data.sourceUrl !== undefined) {
@@ -45,15 +66,10 @@ export async function PATCH(
       data: {
         status: input.data.status,
         notes: input.data.notes,
-        followUpAt:
-          input.data.followUpAt === undefined
-            ? undefined
-            : input.data.followUpAt
-              ? new Date(input.data.followUpAt)
-              : null,
+        followUpAt: reminder.followUpAt,
         appliedAt:
           input.data.status === "APPLIED" && !current.appliedAt
-            ? new Date()
+            ? now
             : input.data.status && input.data.status !== "APPLIED"
               ? current.appliedAt
               : undefined,
@@ -69,8 +85,24 @@ export async function PATCH(
         },
       });
     }
+    if (reminder.automaticallyScheduled && reminder.followUpAt) {
+      await transaction.applicationEvent.create({
+        data: {
+          applicationId: id,
+          eventType: "follow_up_scheduled",
+          toValue: reminder.followUpAt.toISOString(),
+          detail: { source: "automatic_applied_transition" },
+        },
+      });
+    }
     return updated;
   });
 
-  return NextResponse.json({ id: application.id, status: application.status });
+  return NextResponse.json({
+    id: application.id,
+    status: application.status,
+    appliedAt: application.appliedAt?.toISOString() ?? null,
+    followUpAt: application.followUpAt?.toISOString() ?? null,
+    automaticallyScheduledFollowUp: reminder.automaticallyScheduled,
+  });
 }

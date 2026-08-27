@@ -4,13 +4,20 @@
     "React",
     "R",
     "Excel",
-    "Outlook"
+    "Outlook",
+    "MATLAB",
+    "Python"
   ],
   "confirmed_exposure": [
-    "Compliance"
+    "Compliance",
+    "U.S. citizenship"
   ],
   "drafting_notes": [
     "These items were explicitly confirmed by Brian and may be listed in Skills.",
-    "Do not attach a confirmed skill to a specific employer or accomplishment unless the base resume supplies that context."
+    "Do not attach a confirmed skill to a specific employer or accomplishment unless the base resume or another note in this profile supplies that context.",
+    "Brian explicitly confirmed U.S. citizenship. He has not received government-issued authorization for classified access; never state or imply that he has one.",
+    "Brian explicitly confirmed using MATLAB in college. Python is verified by the protected base resume; do not associate MATLAB with a specific Loavenly function unless completed project evidence confirms that use.",
+    "A MATLAB and Python Loavenly operations-analytics extension for anonymized distribution-demand analysis and inventory-allocation evaluation is planned, not completed. Keep it out of application-ready resume prose until Brian confirms the implementation and its artifacts.",
+    "For future role-specific technologies, prefer a small Loavenly extension in Stretch Lab when the technology has a coherent operational use; otherwise propose a standalone project. Never treat a proposed extension as completed evidence."
   ]
 }

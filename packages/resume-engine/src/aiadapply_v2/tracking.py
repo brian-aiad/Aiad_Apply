@@ -164,6 +164,7 @@ def run_worker(
             secret=secret,
             payload={"workerId": worker_id},
             allow_empty=True,
+            retry_attempts=2,
         )
         if claimed is None:
             if once:
@@ -286,8 +287,8 @@ def build_worker_payload(
         item["placement"] = ", ".join(decision.placements)
         keywords.append(item)
     files = [
-        ("DOCX", output_folder / "Brian_Aiad_resume.docx"),
-        ("PDF", output_folder / "Brian_Aiad_resume.pdf"),
+        ("DOCX", report.output_docx),
+        ("PDF", report.output_pdf),
         ("REPORT_JSON", output_folder / "transformation_report.json"),
         ("REPORT_MARKDOWN", output_folder / "transformation_report.md"),
         ("CHARACTER_AUDIT", output_folder / "character_audit.json"),

@@ -27,6 +27,7 @@ from aiadapply_v2.layout.renderer import (
     inspect_pdf,
     render_docx_to_pdf,
 )
+from aiadapply_v2.naming import resume_basename
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text, collect_claim_risks
 from aiadapply_v2.planning.stretch_lab import build_stretch_lab
@@ -63,7 +64,6 @@ from aiadapply_v2.validation.resume import (
 )
 
 PIPELINE_VERSION = "0.4.0"
-OUTPUT_BASENAME = "Brian_Aiad_resume"
 SUMMARY_STRENGTH_TERMS = {
     "critical thinking",
     "cross-functional collaboration",
@@ -134,6 +134,7 @@ def transform_resume(
     destination = Path(output_dir).resolve()
     destination.mkdir(parents=True, exist_ok=True)
     job = parse_linkedin_simplify(raw_paste)
+    output_basename = resume_basename(job.company, job.title)
     keywords = grade_job_keywords(job)
     loaded_candidate_profile = load_candidate_profile(candidate_profile)
     apply_candidate_profile_to_keywords(keywords, loaded_candidate_profile)
@@ -359,8 +360,8 @@ def transform_resume(
                 f"paragraph compression.{details}"
             )
 
-        output_docx = destination / f"{OUTPUT_BASENAME}.docx"
-        output_pdf = destination / f"{OUTPUT_BASENAME}.pdf"
+        output_docx = destination / f"{output_basename}.docx"
+        output_pdf = destination / f"{output_basename}.pdf"
         write_ats_optimized_docx(selected_docx, output_docx)
         optimized_validation = validate_candidate_docx(
             base,

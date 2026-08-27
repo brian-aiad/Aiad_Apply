@@ -7,16 +7,26 @@ import { COMMON_TIMEZONES } from "@/lib/product-settings";
 export function SettingsForm({
   initialGoal,
   initialTimezone,
+  initialFollowUpDays,
 }: {
   initialGoal: number;
   initialTimezone: string;
+  initialFollowUpDays: number;
 }) {
   const [dailyGoal, setDailyGoal] = useState(initialGoal);
   const [timezone, setTimezone] = useState(initialTimezone);
-  const [saved, setSaved] = useState({ dailyGoal: initialGoal, timezone: initialTimezone });
+  const [followUpDays, setFollowUpDays] = useState(initialFollowUpDays);
+  const [saved, setSaved] = useState({
+    dailyGoal: initialGoal,
+    timezone: initialTimezone,
+    followUpDays: initialFollowUpDays,
+  });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
-  const dirty = dailyGoal !== saved.dailyGoal || timezone !== saved.timezone;
+  const dirty =
+    dailyGoal !== saved.dailyGoal ||
+    timezone !== saved.timezone ||
+    followUpDays !== saved.followUpDays;
 
   async function save() {
     setBusy(true);
@@ -25,11 +35,11 @@ export function SettingsForm({
       const response = await fetch("/api/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dailyGoal, timezone }),
+        body: JSON.stringify({ dailyGoal, timezone, followUpDays }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to save preferences.");
-      setSaved({ dailyGoal, timezone });
+      setSaved({ dailyGoal, timezone, followUpDays });
       setMessage("Preferences saved. Your dashboard uses them immediately.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Unable to save preferences.");
@@ -62,6 +72,19 @@ export function SettingsForm({
           <p className="field-help">Count only applications you actually submit.</p>
         </div>
         <div>
+          <label className="field-label" htmlFor="follow-up-days">Automatic follow-up</label>
+          <input
+            className="input"
+            id="follow-up-days"
+            type="number"
+            min={1}
+            max={30}
+            value={followUpDays}
+            onChange={(event) => setFollowUpDays(Number(event.target.value))}
+          />
+          <p className="field-help">Days after first marking an application Applied. Default: 7.</p>
+        </div>
+        <div>
           <label className="field-label" htmlFor="timezone">Timezone</label>
           <select className="select" id="timezone" value={timezone} onChange={(event) => setTimezone(event.target.value)}>
             {COMMON_TIMEZONES.map((value) => (
@@ -75,7 +98,7 @@ export function SettingsForm({
         <span className={message.startsWith("Preferences saved") ? "save-success" : "save-error"} role="status" aria-live="polite">
           {message ? <><Check size={13} />{message}</> : null}
         </span>
-        <button className="button button-primary" type="button" disabled={!dirty || busy || dailyGoal < 1 || dailyGoal > 50} onClick={save}>
+        <button className="button button-primary" type="button" disabled={!dirty || busy || dailyGoal < 1 || dailyGoal > 50 || followUpDays < 1 || followUpDays > 30} onClick={save}>
           {busy ? <LoaderCircle size={15} className="spin" /> : <Save size={15} />}
           Save preferences
         </button>

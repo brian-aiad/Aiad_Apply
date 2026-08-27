@@ -6,13 +6,14 @@ import { isValidTimezone, readProductSettings } from "@/lib/product-settings";
 const settingsSchema = z.object({
   dailyGoal: z.number().int().min(1).max(50),
   timezone: z.string().min(1).max(100).refine(isValidTimezone),
+  followUpDays: z.number().int().min(1).max(30),
 });
 
 export async function PATCH(request: Request) {
   const input = settingsSchema.safeParse(await request.json().catch(() => null));
   if (!input.success) {
     return NextResponse.json(
-      { error: "Choose a daily goal from 1 to 50 and a valid timezone." },
+      { error: "Choose a daily goal from 1 to 50, a follow-up from 1 to 30 days, and a valid timezone." },
       { status: 400 },
     );
   }

@@ -100,6 +100,7 @@ def test_worker_reports_progress_and_records_transform_failure(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     requests: list[tuple[str, dict[str, Any]]] = []
+    claim_retry_attempts: list[int] = []
 
     def fake_request(
         url: str,
@@ -110,9 +111,10 @@ def test_worker_reports_progress_and_records_transform_failure(
         timeout_seconds: float = 60,
         retry_attempts: int = 0,
     ) -> dict[str, Any] | None:
-        del secret, allow_empty, timeout_seconds, retry_attempts
+        del secret, allow_empty, timeout_seconds
         requests.append((url, payload))
         if url.endswith("/claim"):
+            claim_retry_attempts.append(retry_attempts)
             return {
                 "runId": "run-456",
                 "applicationId": "application-456",
@@ -152,6 +154,7 @@ def test_worker_reports_progress_and_records_transform_failure(
     assert final_url == "http://web/api/worker/runs/run-456"
     assert final_payload["success"] is False
     assert final_payload["error"] == "RuntimeError: reasoner unavailable"
+    assert claim_retry_attempts == [2]
 
 
 def test_request_retries_transient_server_errors_but_not_client_errors(
