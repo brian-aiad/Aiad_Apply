@@ -30,6 +30,8 @@ export default defineConfig({
       ...process.env,
       DATABASE_URL: e2eDatabaseUrl,
       DIRECT_URL: process.env.DIRECT_URL,
+      NEXT_PUBLIC_DISABLE_DISCOVERY_AUTO_REFRESH: "1",
+      AIADAPPLY_BUILD_DIR: ".next-e2e",
     },
   },
   projects: [

@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { validatedArtifactBytes } from "@/lib/artifact-content";
 import {
   safeArtifactName,
   workerAuthorized,
@@ -150,6 +151,11 @@ export async function POST(
   if (!input.success || !workerRecordsAreValid(input.data)) {
     return NextResponse.json({ error: "Invalid worker result." }, { status: 400 });
   }
+  try {
+    for (const artifact of input.data.artifacts) validatedArtifactBytes(artifact);
+  } catch {
+    return NextResponse.json({ error: "An artifact failed its file-integrity check. Retry the upload." }, { status: 400 });
+  }
   const run = await db.tailoringRun.findUnique({ where: { id } });
   if (!run) return NextResponse.json({ error: "Run not found." }, { status: 404 });
   if (["SUCCEEDED", "FAILED"].includes(run.status) && run.workerId === input.data.workerId) {
@@ -201,7 +207,7 @@ export async function POST(
         });
       if (!error) normalized.storagePath = storagePath;
     }
-    delete normalized.contentBase64;
+    // Retain bytes until the transaction has stored a portable database copy.
     uploadedArtifacts.push(normalized);
   }
 
@@ -307,6 +313,9 @@ export async function POST(
             storagePath: artifact.storagePath ? String(artifact.storagePath) : null,
             sha256: artifact.sha256 ? String(artifact.sha256) : null,
             byteSize: artifact.byteSize ? Number(artifact.byteSize) : null,
+            ...(typeof artifact.contentBase64 === "string" && artifact.contentBase64.length > 0 ? {
+              backup: { create: { content: Buffer.from(artifact.contentBase64, "base64") } },
+            } : {}),
           },
         });
       }

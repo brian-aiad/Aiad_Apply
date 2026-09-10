@@ -1,12 +1,9 @@
-import { addDays } from "date-fns";
-import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { db } from "@/lib/db";
 import { DEFAULT_TIMEZONE, readProductSettings } from "@/lib/product-settings";
+import { applicationActivity, calendarDayBounds } from "@/lib/accountability";
 
 export function todayBounds(timezone = DEFAULT_TIMEZONE) {
-  const date = formatInTimeZone(new Date(), timezone, "yyyy-MM-dd");
-  const start = fromZonedTime(`${date}T00:00:00`, timezone);
-  return { start, end: addDays(start, 1), date };
+  return calendarDayBounds(timezone);
 }
 
 export async function getDashboard() {
@@ -23,6 +20,8 @@ export async function getDashboard() {
     tailoring,
     review,
     applied,
+    submissionDates,
+    followUps,
   ] = await Promise.all([
     db.application.findMany({
       take: 8,
@@ -40,6 +39,8 @@ export async function getDashboard() {
     db.application.count({ where: { status: "TAILORING" } }),
     db.application.count({ where: { status: "REVIEW" } }),
     db.application.count({ where: { status: { in: ["APPLIED", "INTERVIEW", "CLOSED"] } } }),
+    db.application.findMany({ where: { appliedAt: { not: null } }, select: { appliedAt: true } }),
+    db.application.findMany({ where: { status: { in: ["APPLIED", "INTERVIEW"] }, followUpAt: { lt: end } }, include: { job: true }, orderBy: { followUpAt: "asc" }, take: 8 }),
   ]);
   return {
     applications,
@@ -53,6 +54,8 @@ export async function getDashboard() {
     applied,
     goal: product.dailyGoal,
     timezone: product.timezone,
+    activity: applicationActivity(submissionDates.flatMap((a) => a.appliedAt ? [a.appliedAt] : []), product.timezone, product.dailyGoal),
+    followUps,
   };
 }
 

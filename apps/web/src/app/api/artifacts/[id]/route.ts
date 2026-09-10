@@ -80,6 +80,20 @@ export async function GET(
     }
   }
 
+  const backup = await db.artifactBackup.findUnique({ where: { artifactId: id } });
+  if (backup) {
+    const types: Record<string, string> = { PDF: "application/pdf", DOCX: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", REPORT_JSON: "application/json", CHARACTER_AUDIT: "application/json", REPORT_MARKDOWN: "text/markdown; charset=utf-8", JOB_DESCRIPTION: "text/plain; charset=utf-8" };
+    return new NextResponse(Buffer.from(backup.content), {
+      headers: {
+        "Cache-Control": "private, no-store",
+        "Content-Type": types[artifact.kind] || "application/octet-stream",
+        "Content-Length": String(backup.content.byteLength),
+        "Content-Disposition": `attachment; filename="${safeArtifactName(artifact.fileName)}"`,
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  }
+
   return NextResponse.json(
     { error: "This file is not available from the current server." },
     { status: 404 },

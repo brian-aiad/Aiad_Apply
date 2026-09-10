@@ -9,7 +9,8 @@ application dashboard.
 
 ## Daily Use
 
-Hosted dashboard: https://aiadapply-web.vercel.app
+Existing hosted dashboard: https://aiadapply-web.vercel.app (local changes are not
+live there until deployed; a hosted URL does not mean this Mac's data is synced).
 
 Start the localhost dashboard and its tailoring worker:
 
@@ -50,6 +51,92 @@ Coverage is not an ATS guarantee or interview probability. It reports how much
 of a posting can be supported by evidence already present in the protected
 candidate record. A specialized role can correctly have low coverage while its
 review-only Stretch Lab proposes honest ways to close the gap.
+
+### Discover and daily accountability
+
+**Today** prioritizes your next unfinished application, shows actual daily
+submissions against your adjustable goal, a Monday–Sunday ledger, your streak,
+and follow-ups due. Saving or tailoring a job does not count as applying.
+
+**Discover** checks 15 curated employer/staffing boards through public
+Greenhouse, Lever, Ashby, and SmartRecruiters feeds. It targets application
+support, technical support, IT operations, systems support, and software
+integrations using evidence from the protected base resume. Defaults are Seal
+Beach 90740, a maximum 30-mile radius, full-time, and $60,000/year
+(approximately $28.85/hour at 2,080 hours/year). Staffing employers are included;
+postings explicitly marked temporary, contract, or part-time are excluded.
+Remote roles are off by default and can be enabled in Preferences.
+
+- Opening Today or Discover initiates a check if the last search is at least
+  20 hours old. Refresh openings runs a manual check with a one-minute cooldown.
+  This is not a background scheduler: no searches run while the app is closed.
+- Today/this-week filters mean first discovered by this workspace, not a guessed
+  employer posting date. The feed also shows its last verification time.
+- Distances are approximate city-centre radius measurements, not driving miles
+  or verified street addresses. Check the worksite before approving.
+- Missing salary/full-time information, clearance, seniority, and specialist
+  requirements appear under **Needs closer look**, never as confirmed matches.
+  Matching is a screening aid, not a determination that you meet every requirement.
+- **Approve & save** adds a normal captured application. **Approve & tailor**
+  queues the existing validated tailoring engine. Neither submits an application.
+- Duplicate approvals are transaction-locked. Partial/failed source checks retain
+  earlier results and disclose the issue instead of pretending coverage is complete.
+- The local government, university, healthcare, and additional staffing directory
+  links are clearly manual sources; they are not claimed as automated feeds.
+
+The curated source registry is `apps/web/src/lib/discovery/sources.ts`; this is
+not an exhaustive search of the web. The compact discovery evidence file is tied
+by a regression-tested SHA-256 to `Brian_Aiad_BASE.format.json`. Refresh that
+evidence when updating the base inspection; the tailoring engine itself always
+uses the protected resume and candidate profile.
+
+### Windows, Mac, and saved resumes
+
+**Git transfers code, not pasted descriptions, application records, or generated
+resume history.** Those records live in the configured PostgreSQL database.
+At the September 10, 2026 audit, this Mac used local PostgreSQL, not shared
+Supabase. Settings now reports the configured storage mode and portable file count.
+
+Each successful worker result stores size/hash-verified artifact bytes in the
+database as well as retaining the existing local/optional Supabase paths. The
+download route can serve those bytes on another computer connected to that same
+database. All 36 existing artifacts were backed up during this upgrade. Older
+tailoring runs can now be selected from an application's Resume versions section.
+
+For automatic cross-device history, configure both installations to use the
+**same secured hosted PostgreSQL database**, after migrating the existing data.
+That infrastructure migration is not performed by this upgrade. Avoid two local
+databases if you expect automatic synchronization.
+
+For a manual transfer, download the private workspace backup in Settings. Keep
+this JSON outside Git: it contains your resume files, pasted descriptions, notes,
+and application history. On an **empty, configured destination database**, from
+`apps/web`, run:
+
+```bash
+npm run db:push
+npm run backup:restore -- --file /path/to/aiadapply-backup.json
+npm run backup:restore -- --file /path/to/aiadapply-backup.json --apply
+```
+
+Use a Windows path on Windows. The first restore command validates without writing;
+`--apply` imports transactionally and refuses to overwrite existing jobs or
+discoveries. It is a one-time transfer, not a merge/synchronization mechanism.
+Interrupted runs are cancelled on restore and can be restarted deliberately.
+
+Existing installations get the two additive tables automatically through
+`npm run dev`. For a hosted release, run `npm run db:improvements` against the
+intended database before releasing the build. This migration does not drop or
+rewrite existing application tables. To backfill older locally available files:
+
+```bash
+npm run backup:artifacts
+```
+
+The backup format excludes worker secrets and database credentials. It does not
+back up your `.env`, protected base resume, or Python dependencies; configure the
+destination installation separately. Database file copies improve portability,
+but an off-device backup is still needed to survive loss of a local database.
 
 For a bounded LinkedIn review session, open the isolated browser profile:
 

@@ -123,13 +123,16 @@ layout.
 
 ## Application Tracker
 
-The interface is a fresh Next.js App Router application. It does not reuse the
-old AIAD Apply pages or tailoring logic. It reuses the existing hosted
-infrastructure:
+The interface is a Next.js App Router application. It uses the existing Python
+tailoring engine through authenticated worker routes. Infrastructure is configurable;
+the September 2026 Mac installation uses local PostgreSQL, not shared cloud storage:
 
-- Supabase Postgres stores jobs, applications, daily goals, tailoring runs,
+- PostgreSQL (local or hosted, including Supabase) stores jobs, applications, daily goals, tailoring runs,
   keyword decisions, paragraph changes, events, and artifact metadata.
-- A private Supabase Storage bucket stores generated DOCX, PDF, and audit files.
+- An optional private Supabase Storage bucket stores generated files when configured.
+  Every successful worker upload also stores hash/size-verified bytes in
+  `artifact_backups`; downloads fall back to those portable bytes when the original
+  machine's path and optional object storage are unavailable.
 - A local Python worker claims durable database-backed tailoring runs through
   secret-protected server routes and runs the same validated resume engine used
   by the terminal.
@@ -151,7 +154,7 @@ infrastructure:
 - Analytics separates tools and domain skills that can be learned from legal,
   clearance, and degree constraints that no keyword rewrite or practice project
   can satisfy.
-- Vercel hosts the review and tracking interface. The Python/LibreOffice worker
+- The review and tracking interface can run locally or on Vercel. The Python/LibreOffice worker
   stays local because a resume run is longer and more stateful than a Vercel
   function.
 
@@ -159,6 +162,28 @@ The web application never exposes the database password or Supabase service
 role to the browser. Production pages and non-worker APIs are protected with
 HTTP Basic authentication, while worker APIs use a separate bearer secret.
 Robots are instructed not to index the site.
+
+## Discovery and portability
+
+Discovery uses fixed public board endpoints, no login scraping, arbitrary URL
+fetches, or Codex calls. Collection is bounded by per-request/overall timeouts,
+response size, source concurrency, and description limits. PostgreSQL advisory
+locks serialize refresh claims and approvals across processes. An expired refresh
+lease can be reclaimed; failed/partial sources never close previously seen jobs.
+Only explicit approval creates a normal application, optionally with one queued
+tailoring run. Existing resume policy, generation, and validation are unchanged.
+
+Matching uses a compact evidence extract with a tested fingerprint of the base
+resume inspection. It screens title family, approximate location, employment,
+pay, and evidence overlap. Unknown constraints and specialist requirements remain
+review flags. Provider status and limited source coverage are visible in Discover.
+The daily refresh is app-open triggered, not an unattended cron service.
+
+Workspace export uses a repeatable-read database snapshot and includes portable
+artifact bytes. Restore verifies file integrity and imports in one transaction
+only into an empty destination. Git does not carry application data. Two computers
+must share the same database for automatic history sync; a backup import is an
+alternative one-time transfer, not conflict-resolving synchronization.
 
 ## Deferred Infrastructure
 

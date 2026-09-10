@@ -2,6 +2,7 @@ import { access } from "node:fs/promises";
 import path from "node:path";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { storageHealth } from "@/lib/storage-health";
 import {
   workerHeartbeatCutoff,
   WORKER_HEARTBEAT_PREFIX,
@@ -42,6 +43,7 @@ export async function GET() {
       worker: liveWorkers > 0,
       workers: liveWorkers,
       activeRuns,
+      storage: storageHealth(),
       checkedAt: new Date().toISOString(),
     });
   } catch {

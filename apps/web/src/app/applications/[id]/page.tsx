@@ -55,8 +55,10 @@ function humanizeReference(value: string) {
 
 export default async function ApplicationDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ run?: string }>;
 }) {
   const { id } = await params;
   const application = await getApplication(id);
@@ -64,7 +66,10 @@ export default async function ApplicationDetailPage({
   const activeRun = application.tailoringRuns.find((run) =>
     ["QUEUED", "RUNNING"].includes(run.status),
   );
-  const latestRun = activeRun ?? application.tailoringRuns[0];
+  const { run: selectedRunId } = await searchParams;
+  const selectedRun = selectedRunId ? application.tailoringRuns.find((run) => run.id === selectedRunId) : undefined;
+  const latestRun = selectedRun ?? activeRun ?? application.tailoringRuns[0];
+  const historicalRun = Boolean(selectedRun && selectedRun.id !== application.tailoringRuns[0]?.id);
   const reportSnapshot = objectRecord(latestRun?.reportSnapshot);
   const stretchLab = objectRecord(reportSnapshot?.stretch_lab);
   const stretchOpportunities = objectList(stretchLab?.transferable_opportunities);
@@ -163,6 +168,13 @@ export default async function ApplicationDetailPage({
         <StatusPill status={application.status} />
       </div>
 
+      {application.tailoringRuns.length > 1 ? (
+        <section className="run-history panel" aria-label="Resume versions">
+          <div><strong>Resume versions</strong><span className="muted">Every run keeps its own files and review.</span></div>
+          <nav aria-label="Choose a resume version">{application.tailoringRuns.map((run) => <Link key={run.id} href={`/applications/${id}?run=${run.id}`} className={latestRun?.id === run.id ? "filter-chip filter-chip-active" : "filter-chip"} aria-current={latestRun?.id === run.id ? "page" : undefined}>Run {run.runNumber}<span>{run.status.toLowerCase()}</span></Link>)}</nav>
+          {historicalRun ? <p className="field-help">Viewing an earlier version. Application status and new tailoring actions still apply to the current application.</p> : null}
+        </section>
+      ) : null}
       <section className="review-guide" aria-labelledby="review-guide-title">
         <div className="review-guide-copy">
           {latestRun?.status === "FAILED" ? <CircleAlert size={20} color="var(--red)" /> : <Check size={20} color="var(--green)" />}
@@ -717,7 +729,7 @@ export default async function ApplicationDetailPage({
             initialNotes={application.notes || ""}
             initialFollowUpAt={application.followUpAt?.toISOString() || ""}
             hasActiveRun={hasActiveRun}
-            hasResumeFiles={Boolean(latestRun?.artifacts.length)}
+            hasResumeFiles={Boolean(application.tailoringRuns[0]?.artifacts.some((artifact) => artifact.kind === "DOCX" || artifact.kind === "PDF"))}
           />
 
           <div id="files" className="panel scroll-target files-panel">

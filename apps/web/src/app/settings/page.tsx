@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { Download, FileCheck2, FolderOpen, ShieldCheck } from "lucide-react";
 import { readProductSettings } from "@/lib/product-settings";
 import { SettingsForm } from "@/components/settings-form";
+import { storageHealth } from "@/lib/storage-health";
 
 export const dynamic = "force-dynamic";
 
@@ -11,20 +12,27 @@ export default async function SettingsPage() {
     db.resumeVersion.findFirst({ where: { active: true } }),
   ]);
   const value = readProductSettings(setting?.value);
+  const storage = storageHealth();
+  const [artifacts, portableFiles] = await Promise.all([db.artifact.count(), db.artifact.count({ where: { OR: [{ storagePath: { not: null } }, { backup: { isNot: null } }] } })]);
 
   return (
     <div className="content">
       <div className="eyebrow">Configuration</div>
       <h1 className="page-title">Settings</h1>
       <p className="page-copy">
-        Current operational paths and generation defaults. Secrets remain in server
-        environment variables and are never shown here.
+        Set your daily pace and check where your work is saved.
       </p>
       <SettingsForm
         initialGoal={value.dailyGoal}
         initialTimezone={value.timezone}
         initialFollowUpDays={value.followUpDays}
       />
+      <section className="panel storage-summary">
+        <div><h2 className="panel-title">Your data & devices</h2><span className={storage.databaseLocation === "local" ? "status status-amber" : "status status-green"}>{storage.databaseLocation === "local" ? "Saved on this computer" : storage.databaseLocation === "hosted" ? "Hosted database" : "Connection not identified"}</span></div>
+        <p className="secondary">{storage.databaseLocation === "local" ? "Your current database lives on this computer. Git pull brings over code, but does not transfer your applications. For shared Mac and Windows history, both installations must connect to the same hosted database." : "Applications are saved in the configured database. Both computers must use the same database to share history."}</p>
+        <p className="field-help">{portableFiles} of {artifacts} files have a database or object-storage copy. New completed runs save their files in the database, so they travel with your data. {storage.objectStorageConfigured ? "Supabase Storage is also configured." : "Separate object storage is not configured."}</p>
+        <a className="button button-quiet" href="/api/backup"><Download size={14} />Download workspace backup</a>
+      </section>
       <div
         className="settings-grid"
         style={{

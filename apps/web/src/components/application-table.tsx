@@ -19,17 +19,21 @@ const filters = [
   ["REVIEW", "Review"],
   ["READY", "Ready"],
   ["APPLIED", "Applied"],
+  ["INTERVIEW", "Interview"],
+  ["CLOSED", "Closed"],
 ] as const;
 
 export function ApplicationTable({
   applications,
   showTools = false,
+  initialStatus,
 }: {
   applications: Row[];
   showTools?: boolean;
+  initialStatus?: string;
 }) {
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<(typeof filters)[number][0]>("ALL");
+  const [status, setStatus] = useState<(typeof filters)[number][0]>(() => filters.find(([key]) => key === initialStatus)?.[0] ?? "ALL");
   const [sort, setSort] = useState<"UPDATED" | "COVERAGE_HIGH" | "COVERAGE_LOW">("UPDATED");
   const [renderedAt] = useState(() => Date.now());
   const normalizedQuery = query.trim().toLocaleLowerCase();

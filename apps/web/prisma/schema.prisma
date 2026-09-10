@@ -189,6 +189,7 @@ model Artifact {
   sha256        String?
   byteSize      Int?         @map("byte_size")
   createdAt     DateTime     @default(now()) @map("created_at")
+  backup        ArtifactBackup?
 
   @@index([runId, kind])
   @@map("artifacts")
@@ -236,4 +237,45 @@ model Setting {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("settings")
+}
+
+model ArtifactBackup {
+  artifactId String   @id @map("artifact_id") @db.Uuid
+  artifact   Artifact @relation(fields: [artifactId], references: [id], onDelete: Cascade)
+  content    Bytes
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("artifact_backups")
+}
+
+model DiscoveryPosting {
+  id                    String    @id
+  sourceKey             String    @map("source_key")
+  externalId            String    @map("external_id")
+  company               String
+  title                 String
+  location              String
+  sourceUrl             String    @unique @map("source_url")
+  description           String
+  employmentType        String    @map("employment_type")
+  workArrangement       String    @map("work_arrangement")
+  salaryMin             Float?    @map("salary_min")
+  salaryMax             Float?    @map("salary_max")
+  salaryText            String?   @map("salary_text")
+  distanceMiles         Float?    @map("distance_miles")
+  score                 Int
+  matchReasons          Json      @map("match_reasons")
+  cautions              Json
+  qualified             Boolean   @default(false)
+  active                Boolean   @default(true)
+  postedAt              DateTime? @map("posted_at")
+  firstSeenAt           DateTime  @default(now()) @map("first_seen_at")
+  lastSeenAt            DateTime  @default(now()) @map("last_seen_at")
+  dismissedAt           DateTime? @map("dismissed_at")
+  approvedApplicationId String?   @map("approved_application_id") @db.Uuid
+
+  @@index([sourceKey, active])
+  @@index([active, qualified, score])
+  @@index([firstSeenAt])
+  @@map("discovery_postings")
 }

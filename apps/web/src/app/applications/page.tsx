@@ -5,7 +5,8 @@ import { getApplications } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export default async function ApplicationsPage() {
+export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  const { status } = await searchParams;
   const applications = await getApplications();
   return (
     <div className="content">
@@ -24,7 +25,7 @@ export default async function ApplicationsPage() {
         </Link>
       </div>
       <section className="panel" style={{ marginTop: 24 }}>
-        <ApplicationTable applications={applications} showTools />
+        <ApplicationTable key={status || "ALL"} applications={applications} showTools initialStatus={status} />
       </section>
     </div>
   );

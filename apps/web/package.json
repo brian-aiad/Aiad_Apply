@@ -7,6 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "predev": "npm run db:improvements",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
@@ -15,6 +16,10 @@
     "test:unit": "tsx --test tests/unit/*.test.ts tests/unit/*.test.mjs",
     "test:e2e": "playwright test",
     "db:push": "prisma db push",
+    "db:improvements": "prisma db execute --file prisma/improvements.sql --schema prisma/schema.prisma && prisma generate",
+    "backup:artifacts": "tsx scripts/backup-artifacts.ts",
+    "backup:restore": "tsx scripts/restore-backup.ts",
+    "test:integration": "tsx --test tests/integration/*.test.ts",
     "db:push:unsafe": "prisma db push --accept-data-loss",
     "db:reset-old": "prisma db execute --file prisma/reset.sql --schema prisma/schema.prisma",
     "db:seed": "tsx prisma/seed.ts",

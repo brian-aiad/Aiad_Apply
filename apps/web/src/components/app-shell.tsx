@@ -9,6 +9,7 @@ import {
   FileInput,
   Plus,
   Settings,
+  Search,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { cn } from "@/lib/cn";
@@ -16,6 +17,7 @@ import { SystemStatus } from "@/components/system-status";
 
 const navigation = [
   { href: "/", label: "Today", icon: Crosshair },
+  { href: "/discover", label: "Discover", icon: Search },
   { href: "/applications", label: "Applications", icon: BriefcaseBusiness },
   { href: "/capture", label: "Capture job", icon: FileInput },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
@@ -39,7 +41,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               AiadApply
             </span>
             <span className="muted" style={{ display: "block", fontSize: 10 }}>
-              APPLICATION OPERATIONS
+              Your application workspace
             </span>
           </span>
         </Link>
@@ -63,6 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn("sidebar-link", active && "sidebar-link-active")}
+                aria-current={active ? "page" : undefined}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -70,8 +73,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   minHeight: 39,
                   padding: "0 11px",
                   borderRadius: 8,
-                  color: active ? "#f7f4fb" : "var(--text-secondary)",
-                  background: active ? "rgba(139,92,246,.12)" : "transparent",
+                  color: active ? "var(--text)" : "var(--text-secondary)",
+                  background: active ? "var(--violet-soft)" : "transparent",
                   fontSize: 13,
                   fontWeight: active ? 650 : 500,
                 }}
@@ -107,16 +110,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             Settings
           </Link>
           <div className="muted" style={{ marginTop: 15, fontSize: 10 }}>
-            LOCAL · PRIVATE
+            Brian’s workspace
           </div>
         </div>
       </aside>
-      <main className="main-frame">
+      <a href="#main-content" className="skip-link">Skip to content</a>
+      <main className="main-frame" id="main-content">
         <header className="topbar">
           <div>
             <div className="eyebrow">Brian Aiad</div>
             <div style={{ marginTop: 1, fontSize: 13, fontWeight: 600 }}>
-              Job search command center
+              One application at a time
             </div>
           </div>
           <SystemStatus />

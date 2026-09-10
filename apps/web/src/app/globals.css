@@ -1,24 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #0a0a0c;
-  --panel: #111114;
-  --panel-raised: #17171b;
-  --panel-soft: #1c1b21;
-  --line: #29282f;
-  --line-strong: #3a3842;
-  --text: #f2f0f5;
-  --text-secondary: #aaa6b3;
-  --text-muted: #85808d;
-  --violet: #8b5cf6;
-  --violet-bright: #a78bfa;
-  --violet-soft: rgba(139, 92, 246, 0.14);
+  color-scheme: dark;
+  --canvas: #101820;
+  --panel: #151f29;
+  --panel-raised: #18232e;
+  --panel-soft: #202e3b;
+  --line: #30404e;
+  --line-strong: #465c6d;
+  --text: #edf2f5;
+  --text-secondary: #b5c3cd;
+  --text-muted: #95a7b6;
+  --violet: #5b8ebc;
+  --violet-bright: #8db9df;
+  --violet-soft: rgba(122, 169, 213, 0.12);
   --green: #5fd49c;
   --amber: #f2b661;
   --red: #ef7373;
   --cyan: #67c9dc;
   --sidebar-width: 238px;
-  --font-body: "Avenir Next", "Segoe UI Variable Text", "Segoe UI", sans-serif;
+  --font-body: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Avenir Next", "Segoe UI Variable Display", "Segoe UI", sans-serif;
   --font-utility: "SFMono-Regular", "Cascadia Code", "Roboto Mono", Consolas, monospace;
 }
 
@@ -33,9 +35,7 @@ html {
 body {
   margin: 0;
   color: var(--text);
-  background:
-    radial-gradient(circle at 50% -20%, rgba(98, 63, 180, 0.12), transparent 34rem),
-    var(--canvas);
+  background: var(--canvas);
   font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.45;
@@ -61,7 +61,7 @@ a {
 
 ::selection {
   color: white;
-  background: rgba(139, 92, 246, 0.48);
+  background: rgba(122, 169, 213, 0.38);
 }
 
 ::-webkit-scrollbar {
@@ -107,7 +107,7 @@ button:disabled {
   width: var(--sidebar-width);
   padding: 24px 16px 18px;
   border-right: 1px solid var(--line);
-  background: rgba(11, 11, 14, 0.94);
+  background: #131d26;
   backdrop-filter: blur(18px);
 }
 
@@ -136,8 +136,8 @@ button:disabled {
   justify-content: space-between;
   height: 66px;
   padding: 0 30px;
-  border-bottom: 1px solid rgba(41, 40, 47, 0.82);
-  background: rgba(10, 10, 12, 0.84);
+  border-bottom: 1px solid var(--line);
+  background: rgba(16, 24, 32, 0.94);
   backdrop-filter: blur(18px);
 }
 
@@ -158,6 +158,7 @@ button:disabled {
 .page-title {
   margin: 5px 0 0;
   font-size: clamp(25px, 3vw, 34px);
+  font-family: var(--font-display);
   font-weight: 650;
   letter-spacing: -0.035em;
 }
@@ -171,8 +172,8 @@ button:disabled {
 .panel {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(23, 23, 27, 0.94), rgba(16, 16, 19, 0.94));
-  box-shadow: 0 16px 44px rgba(0, 0, 0, 0.14);
+  background: var(--panel);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .panel-header {
@@ -279,20 +280,21 @@ button:disabled {
 }
 
 .button:hover {
-  border-color: #514d5c;
-  background: #201f25;
-  transform: translateY(-1px);
+  border-color: var(--line-strong);
+  background: var(--panel-soft);
+  transform: none;
 }
 
 .button-primary {
-  border-color: #7c4be8;
-  background: linear-gradient(180deg, #8b5cf6, #7344de);
-  box-shadow: 0 6px 18px rgba(91, 45, 198, 0.22);
+  color: #0d1b28;
+  border-color: #7aa9d5;
+  background: #7aa9d5;
+  box-shadow: none;
 }
 
 .button-primary:hover {
-  border-color: #9c75ef;
-  background: linear-gradient(180deg, #9568f7, #7a4be1);
+  border-color: #a1c6e7;
+  background: #a1c6e7;
 }
 
 .button-quiet {
@@ -340,7 +342,7 @@ button:disabled {
   border-radius: 9px;
   outline: none;
   color: var(--text);
-  background: #0d0d10;
+  background: var(--canvas);
   transition: 140ms ease;
 }
 
@@ -731,7 +733,7 @@ button:disabled {
 
 .filter-chip-active {
   color: var(--text);
-  border-color: rgba(139, 92, 246, 0.38);
+  border-color: rgba(122, 169, 213, 0.38);
   background: var(--violet-soft);
 }
 

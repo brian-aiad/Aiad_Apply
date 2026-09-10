@@ -63,7 +63,7 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
 
   await page.getByRole("link", { name: "Capture job" }).first().click();
   await page.getByLabel("Complete job posting paste").fill(jpmorgan.raw);
-  await page.getByRole("button", { name: "Save for later" }).click();
+  await page.getByRole("button", { name: "Save only" }).click();
 
   await expect(page.getByRole("heading", { name: "Technology Support II" })).toBeVisible();
   await expect(page.getByText("JPMorganChase").first()).toBeVisible();
@@ -92,7 +92,7 @@ test("captures The Trade Desk posting without merging it into scanner noise", as
   const [, tradeDesk] = await fixtures();
   await page.goto("/capture");
   await page.getByLabel("Complete job posting paste").fill(tradeDesk.raw);
-  await page.getByRole("button", { name: "Save for later" }).click();
+  await page.getByRole("button", { name: "Save only" }).click();
 
   await expect(page.getByRole("heading", { name: "Support Engineer" })).toBeVisible();
   await expect(page.getByText("The Trade Desk").first()).toBeVisible();
@@ -177,7 +177,7 @@ test("captures current application-support postings with their core fields", asy
     const expected = expectations[index];
     await page.goto("/capture");
     await page.getByLabel("Complete job posting paste").fill(record.raw);
-    await page.getByRole("button", { name: "Save for later" }).click();
+    await page.getByRole("button", { name: "Save only" }).click();
 
     await expect(page.getByRole("heading", { name: expected.title })).toBeVisible();
     await expect(page.getByText(expected.company).first()).toBeVisible();
@@ -201,7 +201,7 @@ test("captures unheaded Encompass duties and nested qualification sections", asy
   const bankOfHope = records[5];
   await page.goto("/capture");
   await page.getByLabel("Complete job posting paste").fill(bankOfHope.raw);
-  await page.getByRole("button", { name: "Save for later" }).click();
+  await page.getByRole("button", { name: "Save only" }).click();
 
   await expect(page.getByRole("heading", { name: "Analyst - Encompass" })).toBeVisible();
   await expect(page.getByText("Bank of Hope").first()).toBeVisible();
@@ -304,7 +304,7 @@ test("captures supplied LinkedIn and employer postings without section leakage",
   for (const item of cases) {
     await page.goto("/capture");
     await page.getByLabel("Complete job posting paste").fill(item.record.raw);
-    await page.getByRole("button", { name: "Save for later" }).click();
+    await page.getByRole("button", { name: "Save only" }).click();
     await expect(page.getByRole("heading", { name: item.title })).toBeVisible();
     await expect(page.getByText(item.company).first()).toBeVisible();
     await expect(page.getByText(item.location, { exact: true })).toBeVisible();
@@ -442,8 +442,8 @@ test("records authenticated worker progress and displays the current stage", asy
 
   await page.goto(`/applications/${registered.applicationId}`);
   await expect(
-    page.getByText("Building candidate evidence and role transferability"),
-  ).toHaveCount(2);
+    page.locator(".review-guide").getByText("Building candidate evidence and role transferability"),
+  ).toBeVisible();
   await expect(page.getByText("Tailoring Progress")).toBeVisible();
   await expect(page.getByLabel("Status")).toHaveValue("TAILORING");
   await expect(page.getByLabel("Status")).toBeDisabled();
@@ -521,5 +521,5 @@ test("records authenticated worker progress and displays the current stage", asy
   await expect(page.getByText("Direct")).toBeVisible();
   await expect(page.getByText("Not assessed")).toBeVisible();
   await expect(page.getByText("Rejected", { exact: true })).toBeVisible();
-  await expect(page.getByText("REVIEW FLAGS").locator("..")).toContainText("2");
+  await expect(page.getByText("Review flags", { exact: true }).locator("..")).toContainText("2");
 });
