@@ -327,15 +327,20 @@ export async function POST(
           status: { in: ["QUEUED", "RUNNING"] },
         },
       });
-      await transaction.application.update({
-        where: { id: run.applicationId },
+      // Completion owns processing state, never the user's submitted/closed state.
+      const previousValidRun = !input.data.success && await transaction.tailoringRun.findFirst({
+        where: { applicationId: run.applicationId, id: { not: id }, status: "SUCCEEDED", validationPassed: true },
+        select: { id: true },
+      });
+      await transaction.application.updateMany({
+        where: { id: run.applicationId, status: "TAILORING" },
         data: {
           status:
             otherActiveRuns > 0
               ? "TAILORING"
               : input.data.success
                 ? "REVIEW"
-                : "CAPTURED",
+                : previousValidRun ? "REVIEW" : "CAPTURED",
         },
       });
       await transaction.applicationEvent.create({

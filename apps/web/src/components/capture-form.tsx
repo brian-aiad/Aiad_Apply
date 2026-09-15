@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { CapturePreview, type CapturePreviewData } from "./capture-preview";
+import type { CaptureOverrides } from "@/lib/capture-overrides";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -18,11 +20,45 @@ export function CaptureForm() {
   const [sourceUrl, setSourceUrl] = useState("");
   const [loading, setLoading] = useState<"save" | "tailor" | null>(null);
   const [error, setError] = useState("");
+  const [previewError, setPreviewError] = useState("");
+  const [preview, setPreview] = useState<{ raw: string; source: string; data: CapturePreviewData } | null>(null);
+  const [overrides, setOverrides] = useState<CaptureOverrides>({});
+  const submitting = useRef(false);
+  const pasteRef = useRef<HTMLTextAreaElement>(null);
   const trimmed = rawPaste.trim();
   const wordCount = useMemo(() => (trimmed ? trimmed.split(/\s+/).length : 0), [trimmed]);
   const lineCount = useMemo(() => (trimmed ? trimmed.split(/\r?\n/).filter(Boolean).length : 0), [trimmed]);
   const ready = trimmed.length >= 100;
   const urlLooksValid = !sourceUrl || /^https?:\/\//i.test(sourceUrl);
+  const previewKey = useMemo(
+    () => JSON.stringify([trimmed, overrides]),
+    [overrides, trimmed],
+  );
+  const currentPreview = preview?.raw === trimmed ? preview.data : null;
+  const previewIsCurrent = preview?.source === previewKey;
+
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 761px)").matches) {
+      pasteRef.current?.focus({ preventScroll: true });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      if (submitting.current) return;
+      try {
+        const response = await fetch("/api/jobs/preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rawPaste: trimmed, overrides }) });
+        if (!response.ok) throw new Error("Preview unavailable. You can still save this posting and review it there.");
+        const data: CapturePreviewData = await response.json();
+        if (!cancelled) { setPreview({ raw: trimmed, source: previewKey, data }); setPreviewError(""); }
+      } catch (caught) {
+        if (!cancelled) setPreviewError(caught instanceof Error ? caught.message : "Preview unavailable.");
+      }
+    }, 350);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [overrides, previewKey, ready, trimmed]);
 
   useEffect(() => {
     const guard = (event: BeforeUnloadEvent) => {
@@ -34,13 +70,15 @@ export function CaptureForm() {
   }, [loading, trimmed]);
 
   async function submit(queueTailoring: boolean) {
+    if (submitting.current || !ready || !urlLooksValid) return;
+    submitting.current = true;
     setLoading(queueTailoring ? "tailor" : "save");
     setError("");
     try {
       const response = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawPaste, sourceUrl, queueTailoring }),
+        body: JSON.stringify({ rawPaste, sourceUrl, queueTailoring, overrides }),
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to capture this job.");
@@ -49,6 +87,7 @@ export function CaptureForm() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to capture this job.");
       setLoading(null);
+      submitting.current = false;
     }
   }
 
@@ -69,14 +108,14 @@ export function CaptureForm() {
           Complete job posting paste
         </label>
         <textarea
+          ref={pasteRef}
           id="job-paste"
           className="textarea"
           value={rawPaste}
-          onChange={(event) => setRawPaste(event.target.value)}
+          onChange={(event) => { setRawPaste(event.target.value); setOverrides({}); setPreviewError(""); }}
           maxLength={500_000}
           aria-describedby="job-paste-count"
           placeholder="Paste the full LinkedIn, Simplify, or employer job page here. Navigation, recommendations, and scanner keywords can remain in the text."
-          autoFocus
           onKeyDown={(event) => {
             if ((event.metaKey || event.ctrlKey) && event.key === "Enter" && !disabled) {
               event.preventDefault();
@@ -93,7 +132,7 @@ export function CaptureForm() {
           </span>
         </div>
         <div className="capture-actions">
-          <span className="keyboard-hint"><Keyboard size={13} /><kbd>⌘</kbd><span>+</span><kbd>Enter</kbd> to tailor</span>
+          <span className="keyboard-hint"><Keyboard size={13} /><kbd>Ctrl</kbd><span>/</span><kbd>⌘</kbd><span>+</span><kbd>Enter</kbd> to tailor</span>
           <div className="capture-buttons">
             <button
               className="button"
@@ -148,14 +187,19 @@ export function CaptureForm() {
             value={sourceUrl}
             onChange={(event) => setSourceUrl(event.target.value)}
             maxLength={2_000}
+            aria-invalid={!urlLooksValid}
+            aria-describedby={!urlLooksValid ? "job-url-error" : undefined}
             placeholder="https://linkedin.com/jobs/view/…"
           />
-          {!urlLooksValid ? <p className="field-error">Start the URL with http:// or https://.</p> : null}
+          {!urlLooksValid ? <p id="job-url-error" className="field-error">Start the URL with http:// or https://.</p> : null}
           <p className="field-help">
             You can add or correct this later from the application page.
           </p>
         </div>
 
+        <div role="status" className="preview-status">{ready && (!currentPreview || !previewIsCurrent) && !previewError ? <><LoaderCircle size={14} className="spin" />Reading posting...</> : currentPreview ? <><Check size={14} />Preview ready</> : null}</div>
+        {previewError ? <p role="alert" className="field-error">{previewError}</p> : null}
+        {currentPreview ? <CapturePreview data={currentPreview} overrides={overrides} onOverrideChange={setOverrides} /> : <>
         <div className="panel" style={{ padding: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
             <ClipboardPaste size={17} color="var(--violet-bright)" />
@@ -196,6 +240,7 @@ export function CaptureForm() {
             ))}
           </div>
         </div>
+        </>}
       </aside>
     </div>
   );

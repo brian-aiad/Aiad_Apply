@@ -1,0 +1,64 @@
+Banner
+Back to jobs
+Technology Operations Engineer
+Newport Beach, CA
+
+What You’ll Do:
+
+The Technology Operations Engineer supports, maintains, and improves business-critical applications, integrations, and operational technologies across the organization. This role serves as a key technical resource for application support, issue resolution, system monitoring, security administration, and end-user technology services. The ideal candidate is a strong problem solver with experience supporting enterprise applications, troubleshooting production issues, and identifying opportunities to improve efficiency through automation and process improvement. Experience supporting mortgage-related applications or business processes is helpful, but not required. The ideal candidate is a quick learner, strong problem solver, and effective communicator who can work across technical and non-technical teams in a fast-paced environment.
+
+Your Key Responsibilities Include:
+
+Provide application support for business-critical systems, including troubleshooting incidents, analyzing root causes, and coordinating timely resolution.
+Monitor application health, system interfaces, scheduled jobs, and data flows to ensure reliable performance and issue prevention.
+Investigate, diagnose, and resolve application errors, data issues, and process failures across integrated systems.
+Support mortgage-related applications and operational workflows when applicable, including issue triage, user support, and coordination with technical teams.
+Troubleshoot, configure, and support the Loan Origination and Point of Sale system add-ons and related integrations to ensure stable operation and effective user support.
+Work with internal teams and third-party vendors to troubleshoot issues, coordinate fixes, support system changes, and ensure timely resolution of production and application-related problems.
+Support application deployments, release validation, hotfix implementation, and post-release monitoring.
+Push reports and related updates to production environments in accordance with established release and change management procedures.
+Provide first-level to intermediate support for desktops, printers, laptops, monitors, and other end-user hardware, including setup, troubleshooting, and replacement coordination.
+Troubleshoot hardware, connectivity, peripheral, and workstation issues to minimize downtime and maintain user productivity.
+Install, configure, and support standard desktop software, printers, and peripheral devices in alignment with company procedures.
+Coordinate new hire equipment onboarding, including preparing, configuring, and issuing laptops, monitors, peripherals, and required software access.
+Serve as the Security Officer for assigned technology and operational responsibilities, including managing user access, adding and removing users, helping enforce security practices, and coordinating security-related activities.
+Support termination-related security processes, including deprovisioning access, retrieving company equipment, and coordinating with relevant teams to ensure proper closure.
+Maintain and update business continuity and disaster recovery (BCP/DR) plans to support operational readiness and recovery objectives.
+Prepare and provide data, documentation, and support materials for quarterly IT audit activities.
+Document support procedures, known issues, troubleshooting steps, and resolution outcomes to improve operational efficiency and knowledge sharing.
+Communicate clearly with business users and technical teams regarding issue status, system impacts, and recommended solutions.
+Quickly build understanding of new applications, business processes, and subject areas while maintaining strong service and support standards.
+Provide after-hours or on-call support as needed for critical incidents, deployments, or business operations.
+
+What You Have:
+
+Working knowledge of SQL, including basic query writing and data analysis for troubleshooting.
+Experience supporting business applications, interfaces, batch jobs, reports, desktops, printers, and other end-user hardware in a production environment.
+Basic knowledge of Windows desktop environments, device setup, printer support, peripheral troubleshooting, and production support processes.
+Experience supporting report deployments, production releases, or change management activities is preferred.
+Experience preparing data or documentation for audit, compliance, or review activities is a plus.
+Strong analytical, troubleshooting, and problem-solving skills with attention to detail.
+Excellent written and verbal communication skills, with the ability to explain technical issues to non-technical users.
+Strong documentation skills and the ability to create support procedures, incident summaries, and process documentation.
+Ability to work effectively with cross-functional teams, stakeholders, and external vendors.
+Quick learner who can adapt to new systems, business processes, hardware environments, and changing priorities.
+Willingness to work flexible hours or participate in on-call support, if required.
+
+Your Education and Experience:
+
+Bachelor's degree in Computer Science, Information Systems, Business, or a related field, or equivalent work experience.
+2+ years of experience in application support, production support, systems support, desktop support, or a related technical role.
+
+About Inspire Home Loans
+
+As an affiliate of Century Communities, we strive to make homeownership a reality. We’re proud to be part of the company’s mission to create thriving, enduring neighborhoods with lasting livability, focusing on building sustainable, affordably priced homes for our customers while reducing our carbon footprint. For team members, our goal is to provide the resources, opportunities, and benefits needed to build successful, rewarding careers.
+
+Apply for this job
+First Name
+Last Name
+Resume/CV
+Attach
+Accepted file types: pdf, doc, docx, txt, rtf
+
+Official posting: https://job-boards.greenhouse.io/inspirehomeloans/jobs/4369789009
+Source checked: 2026-09-14

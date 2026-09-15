@@ -13,9 +13,18 @@ const opening: Opening = { externalId: "test", sourceKey: "lever:test", company:
 const source = (provider: Source["provider"]): Source => ({ key: `${provider}:test`, board: "test", provider, company: "Test employer", url: "https://example.com" });
 
 test("discovery evidence stays tied to the protected resume inspection", () => {
-  const bytes = readFileSync(path.resolve(process.cwd(), "../..", evidence.source));
+  const bytes = readFileSync(path.resolve(process.cwd(), "../..", evidence.source), "utf8").replace(/\r\n/g, "\n");
   assert.equal(createHash("sha256").update(bytes).digest("hex"), evidence.sourceSha256, "Refresh candidate-evidence.json when the protected resume inspection changes.");
   assert.ok(evidence.evidence.length >= 6);
+  const inspection = JSON.parse(bytes) as { document: { paragraphs: { text: string }[] } };
+  for (const excerpt of evidence.evidence) {
+    assert.ok(inspection.document.paragraphs.some((p) => p.text === excerpt), "Every discovery excerpt must exist verbatim in the protected inspection.");
+  }
+  const profileBytes = readFileSync(path.resolve(process.cwd(), "../..", evidence.profileSource), "utf8").replace(/\r\n/g, "\n");
+  assert.equal(createHash("sha256").update(profileBytes).digest("hex"), evidence.profileSha256, "Refresh candidate-evidence.json when the candidate profile changes.");
+  const profile = JSON.parse(profileBytes) as { confirmed_skills: string[]; confirmed_exposure: string[] };
+  assert.deepEqual(evidence.confirmedSkills, profile.confirmed_skills);
+  assert.deepEqual(evidence.confirmedExposure, profile.confirmed_exposure);
 });
 
 test("supports the user's exact full-time, local, $60k boundary", () => {

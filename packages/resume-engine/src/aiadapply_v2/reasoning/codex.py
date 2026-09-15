@@ -128,14 +128,34 @@ def _resolve_executable(executable: str) -> str | None:
     resolved = shutil.which(executable)
     if not resolved or os.name != "nt" or Path(resolved).suffix.lower() not in {".cmd", ".bat"}:
         return resolved
-    package_root = Path(resolved).parent / "node_modules" / "@openai" / "codex"
-    native = sorted(package_root.glob("node_modules/@openai/codex-win32-*/vendor/**/codex.exe"))
-    return str(native[0]) if native else resolved
+    # A user wrapper can precede npm on PATH. Search every launcher directory so
+    # structured execution reaches the native binary and cannot lose flags through
+    # cmd.exe or PowerShell argument parsing.
+    launchers = [Path(resolved)]
+    for directory in os.environ.get("PATH", "").split(os.pathsep):
+        if not directory:
+            continue
+        for name in ("codex.cmd", "codex.bat"):
+            candidate = Path(directory) / name
+            if candidate.is_file() and candidate not in launchers:
+                launchers.append(candidate)
+    for launcher in launchers:
+        package_root = launcher.parent / "node_modules" / "@openai" / "codex"
+        native = sorted(package_root.glob("node_modules/@openai/codex-win32-*/vendor/**/codex.exe"))
+        if native:
+            return str(native[0])
+    return resolved
 
 
 def _codex_environment() -> dict[str, str]:
     """Force interactive Codex authentication instead of inheriting AI API keys."""
-    return {key: value for key, value in os.environ.items() if key not in AI_API_KEY_VARIABLES}
+    environment = {
+        key: value for key, value in os.environ.items() if key not in AI_API_KEY_VARIABLES
+    }
+    # Transformations use an ephemeral read-only Codex working directory and must
+    # never invoke a user's repository-sync wrapper as a side effect.
+    environment["CODEX_SKIP_GIT_SYNC"] = "1"
+    return environment
 
 
 def _configured_timeout_seconds() -> int:
@@ -184,6 +204,8 @@ def _build_prompt(
     preliminary_map: TransferabilityMap,
     revision_feedback: list[str],
 ) -> str:
+    from aiadapply_v2.planning.priorities import paragraph_priorities
+
     editable = [
         {
             "paragraph_id": paragraph.paragraph_id,
@@ -215,6 +237,9 @@ def _build_prompt(
             item.model_dump(mode="json") for item in keywords if not item.accepted
         ],
         "editable_resume_paragraphs": editable,
+        "paragraph_rewrite_priorities": paragraph_priorities(
+            document, keywords, evidence_graph, preliminary_map
+        ),
         "skill_categories": skill_categories,
         "protected_metrics_by_section": document.protected_metrics_by_section,
         "evidence_graph": evidence_graph.model_dump(mode="json"),
@@ -281,6 +306,12 @@ Non-negotiable output rules:
     when a rewrite would only shorten it, remove named systems or methods, or fail to add
     meaningful role alignment. Primary text should retain the source's information density;
     only shorter_text/shorter_skills are compression fallbacks for a demonstrated overflow.
+    Use paragraph_rewrite_priorities to focus on important missing supported terms. Change
+    a paragraph only when expected_benefit exceeds rewrite_risk; preserve_original identifies
+    strong content whose metrics, concrete systems, or tight line budget outweigh a cosmetic
+    rewrite. These priorities are advisory and never override factual or layout checks. Avoid
+    repeating a bullet opening or copying an entire employer requirement. Keep distinct
+    accomplishments distinct; do not duplicate bullets to distribute keywords.
 15. If revision_feedback is non-empty, the previous candidate was rejected. Correct
     every listed issue while preserving all other constraints.
 16. Populate stretch_lab as a physically separate, review-only analysis. It may identify

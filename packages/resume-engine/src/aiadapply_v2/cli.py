@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -13,7 +14,7 @@ from typing import Annotated
 import typer
 from rich import print
 
-from aiadapply_v2.config import default_output_root
+from aiadapply_v2.config import default_output_root, default_used_resume_root
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.candidate_profile import (
     add_candidate_profile_evidence,
@@ -26,12 +27,13 @@ from aiadapply_v2.layout.renderer import (
     apply_pdf_layout_budgets,
     find_libreoffice,
     inspect_pdf,
+    libreoffice_candidates,
     render_docx_to_pdf,
 )
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.pipeline import transform_resume
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
-from aiadapply_v2.reasoning.codex import CodexReasoner
+from aiadapply_v2.reasoning.codex import CodexReasoner, _resolve_executable
 from aiadapply_v2.tracking import (
     register_terminal_run,
     run_worker,
@@ -39,24 +41,36 @@ from aiadapply_v2.tracking import (
     submit_terminal_result,
     submit_worker_progress,
 )
+from aiadapply_v2.used_resumes import archive_tailored_pdf
 
 app = typer.Typer(no_args_is_help=True, help="Reasoning-based resume transformation engine.")
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_BASE = REPOSITORY_ROOT / "data" / "resumes" / "Brian_Aiad_BASE.docx"
 DEFAULT_PROFILE = REPOSITORY_ROOT / "data" / "profile" / "Brian_Aiad_PROFILE.json"
 DEFAULT_OUTPUT_ROOT = default_output_root()
+DEFAULT_USED_RESUME_ROOT = default_used_resume_root()
 
 
 @app.command()
 def doctor() -> None:
     """Verify local prerequisites without transforming a resume."""
+    try:
+        codex = _resolve_executable("codex")
+    except FileNotFoundError:
+        codex = None
+    libreoffice = find_libreoffice()
     checks = {
         "base_resume": str(DEFAULT_BASE) if DEFAULT_BASE.exists() else None,
-        "codex": shutil.which("codex"),
-        "libreoffice": str(find_libreoffice()) if find_libreoffice() else None,
+        "codex": str(codex) if codex else None,
+        "libreoffice": str(libreoffice) if libreoffice else None,
+        "python": sys.version.split()[0],
+        "renderer": "Microsoft Word with LibreOffice fallback"
+        if os.name == "nt"
+        else "LibreOffice",
+        "libreoffice_search": [str(path) for path in libreoffice_candidates()],
     }
     print(json.dumps(checks, indent=2))
-    if not all(checks.values()):
+    if not checks["base_resume"] or not checks["codex"] or not checks["libreoffice"]:
         raise typer.Exit(code=1)
 
 
@@ -145,6 +159,9 @@ def transform(
     output_dir: Annotated[Path, typer.Option("--output-dir")],
     base_resume: Annotated[Path, typer.Option("--base-resume")] = DEFAULT_BASE,
     candidate_profile: Annotated[Path, typer.Option("--candidate-profile")] = DEFAULT_PROFILE,
+    used_resume_root: Annotated[
+        Path, typer.Option("--used-resume-root")
+    ] = DEFAULT_USED_RESUME_ROOT,
 ) -> None:
     """Run Codex review, validate, render, and export the one-page resume."""
     report = transform_resume(
@@ -155,11 +172,13 @@ def transform(
         candidate_profile=candidate_profile,
         progress=_print_progress,
     )
+    used_pdf = archive_tailored_pdf(report.output_pdf, used_resume_root)
     print(
         json.dumps(
             {
                 "docx": str(report.output_docx),
                 "pdf": str(report.output_pdf),
+                "used_pdf": str(used_pdf),
                 "pages": report.layout.page_count,
                 "keyword_coverage": report.validation.keyword_coverage,
                 "claim_risks": len(report.claim_risks),
@@ -177,6 +196,9 @@ def draft(
     api_url: Annotated[str | None, typer.Option("--api-url")] = None,
     base_resume: Annotated[Path, typer.Option("--base-resume")] = DEFAULT_BASE,
     candidate_profile: Annotated[Path, typer.Option("--candidate-profile")] = DEFAULT_PROFILE,
+    used_resume_root: Annotated[
+        Path, typer.Option("--used-resume-root")
+    ] = DEFAULT_USED_RESUME_ROOT,
 ) -> None:
     """Paste a job and immediately produce a job-specific draft resume packet."""
     raw_paste = _read_job_paste(paste_file=paste_file, clipboard=clipboard)
@@ -219,6 +241,8 @@ def draft(
             candidate_profile=candidate_profile,
             progress=report_progress,
         )
+        report_progress("Organizing PDF copy in USED_RESUME")
+        used_pdf = archive_tailored_pdf(report.output_pdf, used_resume_root)
     except Exception as error:
         if tracking is not None:
             api_url, secret, _, run_id, worker_id = tracking
@@ -255,6 +279,7 @@ def draft(
                 "title": report.job.title,
                 "docx": str(report.output_docx),
                 "pdf": str(report.output_pdf),
+                "used_pdf": str(used_pdf),
                 "pages": report.layout.page_count,
                 "keyword_coverage": report.validation.keyword_coverage,
                 "review_flags": len(report.claim_risks),
@@ -271,6 +296,9 @@ def worker(
     output_root: Annotated[Path, typer.Option("--output-root")] = DEFAULT_OUTPUT_ROOT,
     base_resume: Annotated[Path, typer.Option("--base-resume")] = DEFAULT_BASE,
     candidate_profile: Annotated[Path, typer.Option("--candidate-profile")] = DEFAULT_PROFILE,
+    used_resume_root: Annotated[
+        Path, typer.Option("--used-resume-root")
+    ] = DEFAULT_USED_RESUME_ROOT,
 ) -> None:
     """Process durable tailoring jobs created by the local or hosted dashboard."""
     run_worker(
@@ -278,6 +306,7 @@ def worker(
         base_resume=base_resume,
         candidate_profile=candidate_profile,
         output_root=output_root,
+        used_resume_root=used_resume_root,
         api_url=api_url,
         once=once,
     )

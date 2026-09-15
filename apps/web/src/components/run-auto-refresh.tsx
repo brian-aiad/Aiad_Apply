@@ -8,8 +8,15 @@ export function RunAutoRefresh({ active }: { active: boolean }) {
 
   useEffect(() => {
     if (!active) return;
-    const interval = window.setInterval(() => router.refresh(), 5_000);
-    return () => window.clearInterval(interval);
+    const refresh = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const interval = window.setInterval(refresh, 5_000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, [active, router]);
 
   return null;

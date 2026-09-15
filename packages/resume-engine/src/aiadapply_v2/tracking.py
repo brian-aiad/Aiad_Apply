@@ -13,12 +13,14 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from aiadapply_v2.config import default_output_root
+from aiadapply_v2.config import default_output_root, default_used_resume_root
 from aiadapply_v2.pipeline import Reasoner, transform_resume
 from aiadapply_v2.schemas import TransformationReport
+from aiadapply_v2.used_resumes import archive_tailored_pdf
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_OUTPUT_ROOT = default_output_root()
+DEFAULT_USED_RESUME_ROOT = default_used_resume_root()
 
 
 def load_tracking_environment() -> None:
@@ -152,6 +154,7 @@ def run_worker(
     base_resume: Path,
     candidate_profile: Path,
     output_root: Path = DEFAULT_OUTPUT_ROOT,
+    used_resume_root: Path = DEFAULT_USED_RESUME_ROOT,
     api_url: str | None = None,
     once: bool = False,
     poll_seconds: float = 3.0,
@@ -238,6 +241,8 @@ def run_worker(
                     candidate_profile=candidate_profile,
                     progress=report_progress,
                 )
+                report_progress("Organizing PDF copy in USED_RESUME")
+                archive_tailored_pdf(report.output_pdf, used_resume_root)
                 payload = build_worker_payload(
                     report=report,
                     output_folder=folder,

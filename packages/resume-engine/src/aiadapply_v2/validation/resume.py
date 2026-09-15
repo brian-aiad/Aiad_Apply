@@ -19,6 +19,139 @@ from aiadapply_v2.schemas import (
 )
 from aiadapply_v2.text import contains_term, split_skill_values
 
+QUALITY_STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "as",
+    "at",
+    "by",
+    "for",
+    "from",
+    "in",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "using",
+    "with",
+}
+WEAK_FILLER_PHRASES = (
+    "results-driven",
+    "dynamic professional",
+    "proven track record",
+    "seasoned professional",
+    "highly motivated",
+)
+
+
+def _normalized_words(value: str) -> set[str]:
+    return {
+        token
+        for token in re.findall(r"[a-z0-9+#.]+", value.casefold())
+        if token not in QUALITY_STOPWORDS and len(token) > 1
+    }
+
+
+def _meaning_similarity(left: str, right: str) -> float:
+    left_words = _normalized_words(left)
+    right_words = _normalized_words(right)
+    if min(len(left_words), len(right_words)) < 5:
+        return 0.0
+    return len(left_words & right_words) / len(left_words | right_words)
+
+
+def _opening_word(value: str) -> str:
+    match = re.search(r"[A-Za-z]+", value)
+    return match.group(0).casefold() if match else ""
+
+
+def _language_quality_issues(
+    base: ResumeDocument,
+    plan: RewritePlan,
+) -> list[ValidationIssue]:
+    """Flag safe-but-poor prose separately from factual validation failures."""
+    source_by_id = {
+        paragraph.paragraph_id: paragraph.text
+        for paragraph in base.paragraphs
+        if paragraph.kind.value == "bullet" and paragraph.editable
+    }
+    proposed = [bullet.text for bullet in plan.bullets]
+    source = [source_by_id.get(bullet.source_paragraph_id, "") for bullet in plan.bullets]
+    issues: list[ValidationIssue] = []
+
+    proposed_openings = Counter(_opening_word(text) for text in proposed)
+    source_openings = Counter(_opening_word(text) for text in source)
+    for opening, count in proposed_openings.items():
+        if opening and count >= 3 and count > source_openings[opening]:
+            issues.append(
+                ValidationIssue(
+                    code="repeated_bullet_opening",
+                    message=(
+                        f'{count} bullets begin with "{opening.title()}" after tailoring. '
+                        "Review for natural variation without weakening precise verbs."
+                    ),
+                    severity="warning",
+                )
+            )
+
+    for index, bullet in enumerate(plan.bullets):
+        original = source[index]
+        changed = " ".join(original.split()) != " ".join(bullet.text.split())
+        if not changed:
+            continue
+        if len(bullet.text) > max(240, int(len(original) * 1.25)):
+            issues.append(
+                ValidationIssue(
+                    code="long_changed_bullet",
+                    message=(
+                        f"A changed bullet is {len(bullet.text)} characters and materially longer "
+                        "than its source. Review scanability and layout pressure."
+                    ),
+                    paragraph_id=bullet.paragraph_id,
+                    severity="warning",
+                )
+            )
+        lowered = bullet.text.casefold()
+        filler = next((phrase for phrase in WEAK_FILLER_PHRASES if phrase in lowered), None)
+        if filler and filler not in original.casefold():
+            issues.append(
+                ValidationIssue(
+                    code="generic_filler_added",
+                    message=f'Tailoring introduced generic filler: "{filler}".',
+                    paragraph_id=bullet.paragraph_id,
+                    severity="warning",
+                )
+            )
+        if bullet.text.count(";") >= 3 and bullet.text.count(";") > original.count(";"):
+            issues.append(
+                ValidationIssue(
+                    code="punctuation_density",
+                    message="A changed bullet introduced three or more semicolons.",
+                    paragraph_id=bullet.paragraph_id,
+                    severity="warning",
+                )
+            )
+
+    for index, left in enumerate(proposed):
+        for other_index in range(index + 1, len(proposed)):
+            proposed_similarity = _meaning_similarity(left, proposed[other_index])
+            source_similarity = _meaning_similarity(source[index], source[other_index])
+            if proposed_similarity >= 0.78 and proposed_similarity > source_similarity + 0.12:
+                issues.append(
+                    ValidationIssue(
+                        code="semantic_bullet_repetition",
+                        message=(
+                            "Two tailored bullets now communicate substantially overlapping "
+                            "evidence. Preserve distinct accomplishments."
+                        ),
+                        paragraph_id=plan.bullets[other_index].paragraph_id,
+                        severity="warning",
+                    )
+                )
+    return issues
+
 
 def validate_rewrite_plan(
     base: ResumeDocument,
@@ -47,6 +180,22 @@ def validate_rewrite_plan(
         if paragraph.kind.value == "bullet" and paragraph.editable
     }
     actual_bullet_ids = {bullet.paragraph_id for bullet in plan.bullets}
+    source_bullets = Counter(
+        " ".join(paragraph.text.casefold().split())
+        for paragraph in base.paragraphs
+        if paragraph.kind.value == "bullet" and paragraph.editable
+    )
+    proposed_bullets = Counter(" ".join(bullet.text.casefold().split()) for bullet in plan.bullets)
+    for text, count in proposed_bullets.items():
+        if count > max(1, source_bullets[text]):
+            issues.append(
+                ValidationIssue(
+                    code="duplicate_bullet",
+                    message="Tailoring introduced duplicate bullets. Preserve the distinct source accomplishments.",
+                )
+            )
+
+    issues.extend(_language_quality_issues(base, plan))
 
     if expected_skill_ids != actual_skill_ids:
         issues.append(

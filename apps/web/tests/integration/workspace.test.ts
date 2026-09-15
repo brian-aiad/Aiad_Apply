@@ -7,14 +7,16 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import type { PrismaClient } from "@prisma/client";
+import { assertIsolatedDatabase } from "../../src/lib/test-database";
 
 const testUrl = process.env.AIADAPPLY_E2E_DATABASE_URL;
 if (!testUrl) throw new Error("AIADAPPLY_E2E_DATABASE_URL is required. Never use the normal database for these tests.");
-const target = new URL(testUrl), normal = new URL(process.env.DATABASE_URL || "postgresql://localhost/unknown");
-const identity = (url: URL) => `${url.hostname}:${url.port || "5432"}${url.pathname}?schema=${url.searchParams.get("schema") || "public"}`;
-if (identity(target) === identity(normal)) throw new Error("Integration tests require a separate database or schema.");
+assertIsolatedDatabase(testUrl, process.env.DATABASE_URL || "postgresql://localhost/unknown");
+if (process.env.AIADAPPLY_E2E_DIRECT_URL) assertIsolatedDatabase(process.env.AIADAPPLY_E2E_DIRECT_URL, process.env.DIRECT_URL || process.env.DATABASE_URL || "postgresql://localhost/unknown");
 process.env.DATABASE_URL = testUrl;
 process.env.DIRECT_URL = process.env.AIADAPPLY_E2E_DIRECT_URL || testUrl;
+// Artifact tests must never upload fixture files to the user's cloud storage.
+process.env.SUPABASE_SERVICE_ROLE_KEY = "";
 
 let db: PrismaClient;
 const jobIds: string[] = [];
@@ -34,6 +36,49 @@ async function posting(label: string) {
   const id = hash(`${prefix}:${label}`); postingIds.push(id);
   return db.discoveryPosting.create({ data: { id, sourceKey: "lever:integration", externalId: label, company: `${prefix} Employer`, title: `Application Support Engineer ${label}`, location: "Long Beach, CA", sourceUrl: `https://jobs.lever.co/integration/${id}`, description: "Support a production SaaS application. Troubleshoot customer incidents with SQL, Postman and REST APIs. Manage Microsoft 365 and Entra ID user access, write Jira escalation notes and resolve SLA incidents. Required qualifications: two years of technical support experience and strong written communication.", employmentType: "Full-time", workArrangement: "Hybrid", salaryMin: 60000, salaryMax: 90000, salaryText: "$60,000–$90,000/year", score: 85, matchReasons: ["SQL", "APIs"], cautions: [], qualified: true } });
 }
+
+test("capture saves reviewed corrections and its explainable fit snapshot", async () => {
+  const { POST } = await import("../../src/app/api/jobs/route");
+  const rawPaste = `${prefix} Raw Company
+Support Analyst ${prefix}
+Long Beach, CA
+Full-time
+Hybrid
+About the job
+Responsibilities
+Troubleshoot production SaaS incidents with SQL and Postman.
+Required Qualifications
+3+ years of application support experience.
+Bachelor's degree in Computer Science or a related technical field.`;
+  const response = await POST(new Request("http://localhost/api/jobs", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      rawPaste,
+      sourceUrl: "https://example.com/reviewed-role",
+      queueTailoring: false,
+      overrides: {
+        company: `${prefix} Corrected Company`,
+        title: "Application Support Analyst",
+        location: "Irvine, CA",
+      },
+    }),
+  }));
+  assert.equal(response.status, 201);
+  const payload = await response.json();
+  const app = await db.application.findUniqueOrThrow({
+    where: { id: payload.id },
+    include: { job: true },
+  });
+  jobIds.push(app.jobId);
+  assert.equal(app.job.company, `${prefix} Corrected Company`);
+  assert.equal(app.job.title, "Application Support Analyst");
+  assert.equal(app.job.location, "Irvine, CA");
+  assert.equal(app.job.rawPaste.trim(), rawPaste.trim());
+  const metadata = app.job.extractedMetadata as Record<string, unknown>;
+  assert.ok(metadata.captureIntelligence);
+  assert.deepEqual(metadata.correctedFields, ["company", "title", "location"]);
+});
 
 test("concurrent approval creates one application and one tailoring run", async () => {
   const { approvePosting } = await import("../../src/lib/discovery/service");
@@ -95,6 +140,40 @@ test("worker completion stores portable files, rejects corruption, and is idempo
   const download = await GET(new Request("http://localhost/api/artifacts/test"), { params: Promise.resolve({ id: stored[0].id }) });
   assert.equal(download.status, 200); assert.deepEqual(Buffer.from(await download.arrayBuffer()), bytes);
   assert.match(download.headers.get("Content-Disposition")!, /integration.pdf/);
+});
+
+test("worker completion and retries preserve submitted and closed application states", async () => {
+  const { approvePosting } = await import("../../src/lib/discovery/service");
+  const { POST: complete } = await import("../../src/app/api/worker/runs/[id]/route");
+  const { POST: queue } = await import("../../src/app/api/applications/[id]/tailor/route");
+  for (const status of ["APPLIED", "INTERVIEW", "CLOSED"] as const) {
+    const p = await posting(`preserve-${status}`);
+    const result = await approvePosting(p.id, true);
+    const app = await db.application.findUniqueOrThrow({ where: { id: result.id }, include: { tailoringRuns: true } });
+    jobIds.push(app.jobId);
+    const run = app.tailoringRuns[0];
+    await db.tailoringRun.update({ where: { id: run.id }, data: { status: "RUNNING", workerId: "integration-worker" } });
+    await db.application.update({ where: { id: app.id }, data: { status } });
+    const response = await complete(new Request("http://localhost/api/worker/runs/test", { method: "POST", headers: { Authorization: `Bearer ${process.env.WORKER_SECRET || process.env.CRON_SECRET}`, "Content-Type": "application/json" }, body: JSON.stringify({ workerId: "integration-worker", success: false, error: "Renderer unavailable" }) }), { params: Promise.resolve({ id: run.id }) });
+    assert.equal(response.status, 200);
+    assert.equal((await db.application.findUniqueOrThrow({ where: { id: app.id } })).status, status);
+    const queued = await queue(new Request("http://localhost/api/applications/test/tailor", { method: "POST" }), { params: Promise.resolve({ id: app.id }) });
+    assert.equal(queued.status, 201);
+    assert.equal((await queued.json()).applicationStatus, status);
+    assert.equal((await db.application.findUniqueOrThrow({ where: { id: app.id } })).status, status);
+  }
+});
+
+test("application updates reject unvalidated ready state and preserve notes during processing", async () => {
+  const { approvePosting } = await import("../../src/lib/discovery/service");
+  const { PATCH } = await import("../../src/app/api/applications/[id]/route");
+  const p = await posting("state-validation");
+  const result = await approvePosting(p.id, true);
+  const app = await db.application.findUniqueOrThrow({ where: { id: result.id } }); jobIds.push(app.jobId);
+  const update = (body: object) => PATCH(new Request("http://localhost/api/applications/test", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }), { params: Promise.resolve({ id: app.id }) });
+  assert.equal((await update({ status: "READY" })).status, 409);
+  assert.equal((await update({ notes: "Keep these notes while tailoring" })).status, 200);
+  assert.equal((await db.application.findUniqueOrThrow({ where: { id: app.id } })).status, "TAILORING");
 });
 
 test("backup export includes portable bytes but excludes worker settings", async () => {

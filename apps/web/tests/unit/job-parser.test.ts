@@ -186,3 +186,17 @@ test("extracts usable sections from every saved real-posting fixture", () => {
     assert.ok(parsed.requiredQualifications.length > 0, `${label}: requirements`);
   }
 });
+
+test("parses Greenhouse banner navigation and custom application-support headings", () => {
+  const parsed = parseCapture(
+    fixture("inspire_home_loans_technology_operations_engineer_2026_09_14.txt"),
+  );
+
+  assert.equal(parsed.company, "Inspire Home Loans");
+  assert.equal(parsed.title, "Technology Operations Engineer");
+  assert.equal(parsed.location, "Newport Beach, CA");
+  assert.equal(parsed.responsibilities.length, 20);
+  assert.equal(parsed.requiredQualifications.length, 11);
+  assert.equal(parsed.preferredQualifications.length, 2);
+  assert.ok(!parsed.cleanDescription.includes("Apply for this job"));
+});

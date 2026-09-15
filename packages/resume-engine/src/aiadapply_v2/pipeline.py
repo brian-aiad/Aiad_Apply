@@ -145,12 +145,24 @@ def transform_resume(
         temp = Path(temp_name)
         baseline_docx = temp / "baseline.docx"
         shutil.copy2(base.source_path, baseline_docx)
-        baseline_pdf = render_docx_to_pdf(baseline_docx, temp / "baseline-render")
+        baseline_pdf = render_docx_to_pdf(
+            baseline_docx,
+            temp / "baseline-render",
+            font_source_docx=baseline_docx,
+        )
         apply_pdf_layout_budgets(base, baseline_pdf)
         baseline_layout = inspect_pdf(baseline_pdf, document=base)
         base.baseline_page_count = baseline_layout.page_count
         base.baseline_rendered_lines = baseline_layout.rendered_lines
         if not baseline_layout.passed:
+            if baseline_layout.collapsed_tab_items:
+                raise TransformationError(
+                    "The PDF renderer collapsed a protected tab separator in the base resume "
+                    f"({', '.join(baseline_layout.collapsed_tab_items)}). The application stopped "
+                    "before tailoring so it cannot produce a visually joined employer/date line. "
+                    "On Windows, leave AIADAPPLY_RENDERER unset so Microsoft Word can render the "
+                    "document; otherwise verify that the template fonts and LibreOffice are current."
+                )
             raise TransformationError(
                 "The source resume did not establish a valid one-page paragraph baseline."
             )
@@ -311,7 +323,11 @@ def transform_resume(
                         f"Candidate failed protected-content validation: {messages}"
                     )
                 continue
-            attempt_pdf = render_docx_to_pdf(attempt_docx, attempt_dir / "rendered")
+            attempt_pdf = render_docx_to_pdf(
+                attempt_docx,
+                attempt_dir / "rendered",
+                font_source_docx=attempt_docx,
+            )
             _emit_progress(progress, f"Inspecting rendered PDF candidate {attempt}")
             layout = inspect_pdf(
                 attempt_pdf,

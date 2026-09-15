@@ -15,9 +15,12 @@ type GapSummary = {
 
 export default async function AnalyticsPage() {
   const applications = await db.application.findMany({
-    include: {
-      job: true,
+    select: {
+      status: true, appliedAt: true, createdAt: true,
+      job: { select: { company: true } },
+      events: { where: { eventType: "status_changed", toValue: "INTERVIEW" }, select: { id: true }, take: 1 },
       tailoringRuns: {
+        where: { status: "SUCCEEDED" },
         orderBy: { runNumber: "desc" },
         take: 1,
         include: { keywordDecisions: true },
@@ -26,7 +29,7 @@ export default async function AnalyticsPage() {
     orderBy: { createdAt: "asc" },
   });
   const applied = applications.filter((item) => item.appliedAt);
-  const interviews = applications.filter((item) => item.status === "INTERVIEW");
+  const interviews = applied.filter((item) => item.status === "INTERVIEW" || item.events.length > 0);
   const lastThirty = applications.filter(
     (item) => item.createdAt >= subDays(new Date(), 30),
   );
@@ -44,7 +47,7 @@ export default async function AnalyticsPage() {
   for (const application of applications) {
     const run = application.tailoringRuns[0];
     for (const decision of run?.keywordDecisions ?? []) {
-      if (!decision.accepted || decision.used || decision.hiringImportance < 25) continue;
+      if (!decision.accepted || decision.used || decision.hiringImportance < 25 || !["UNSUPPORTED", "WEAKLY_TRANSFERABLE"].includes(decision.evidenceLevel)) continue;
       const current = gaps.get(decision.normalized) ?? {
         term: decision.term,
         occurrences: 0,
@@ -78,8 +81,8 @@ export default async function AnalyticsPage() {
       "Review / ready",
       applications.filter((item) => ["REVIEW", "READY"].includes(item.status)).length,
     ],
-    ["Applied", applied.length],
-    ["Interviews", interviews.length],
+    ["Applied", applications.filter((item) => item.status === "APPLIED").length],
+    ["Interviews", applications.filter((item) => item.status === "INTERVIEW").length],
   ] as const;
   const pipelineMaximum = Math.max(1, ...pipeline.map(([, count]) => count));
 
@@ -101,7 +104,7 @@ export default async function AnalyticsPage() {
           [
             "Interview rate",
             applied.length ? `${Math.round((interviews.length / applied.length) * 100)}%` : "—",
-            "Interviews divided by applications",
+            `${interviews.length} of ${applied.length} submissions reached interview; all time`,
           ],
           [
             "Avg. evidence coverage",
@@ -152,7 +155,7 @@ export default async function AnalyticsPage() {
                       width: `${Math.round((count / pipelineMaximum) * 100)}%`,
                       height: "100%",
                       borderRadius: 6,
-                      background: "linear-gradient(90deg, #7650df, #a78bfa)",
+                      background: "var(--cyan)",
                     }}
                   />
                 </div>

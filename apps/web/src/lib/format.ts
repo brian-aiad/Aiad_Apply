@@ -3,6 +3,7 @@ export function formatMoneyRange(
   maximum: number | null,
   fallback?: string | null,
 ) {
+  if ((minimum !== null && minimum < 1000) || (maximum !== null && maximum < 1000)) return fallback || "Pay period not listed";
   if (minimum && maximum) {
     return `$${Math.round(minimum / 1000)}K–$${Math.round(maximum / 1000)}K`;
   }

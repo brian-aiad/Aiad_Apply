@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,7 @@ from aiadapply_v2.reasoning.codex import (
     _build_prompt,
     _codex_environment,
     _codex_failure_detail,
+    _resolve_executable,
     _strict_response_schema,
 )
 from aiadapply_v2.schemas import ReasoningResult
@@ -55,7 +57,37 @@ def test_codex_subprocess_never_inherits_ai_api_keys(monkeypatch) -> None:
     environment = _codex_environment()
 
     assert environment["PATH"] == "keep-this"
+    assert environment["CODEX_SKIP_GIT_SYNC"] == "1"
     assert not (AI_API_KEY_VARIABLES & environment.keys())
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows launcher resolution")
+def test_windows_codex_resolution_bypasses_an_earlier_shell_wrapper(
+    monkeypatch, tmp_path: Path
+) -> None:
+    wrapper = tmp_path / "wrapper"
+    npm = tmp_path / "npm"
+    native = (
+        npm
+        / "node_modules"
+        / "@openai"
+        / "codex"
+        / "node_modules"
+        / "@openai"
+        / "codex-win32-x64"
+        / "vendor"
+        / "target"
+        / "bin"
+        / "codex.exe"
+    )
+    wrapper.mkdir()
+    native.parent.mkdir(parents=True)
+    (wrapper / "codex.cmd").write_text("wrapper", encoding="utf-8")
+    (npm / "codex.cmd").write_text("npm", encoding="utf-8")
+    native.write_bytes(b"native")
+    monkeypatch.setenv("PATH", f"{wrapper}{os.pathsep}{npm}")
+
+    assert _resolve_executable("codex") == str(native)
 
 
 def test_codex_timeout_can_be_configured_for_slower_local_runs(monkeypatch) -> None:

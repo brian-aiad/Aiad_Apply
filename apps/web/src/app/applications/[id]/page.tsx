@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PhraseDiff } from "@/components/phrase-diff";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -11,6 +12,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { ApplicationControls } from "@/components/application-controls";
+import { ApplicationStatusPill } from "@/components/application-status-pill";
 import { RunAutoRefresh } from "@/components/run-auto-refresh";
 import { StatusPill } from "@/components/status-pill";
 import { formatMoneyRange, formatRelativeDate, titleCaseStatus } from "@/lib/format";
@@ -69,12 +71,23 @@ export default async function ApplicationDetailPage({
   const { run: selectedRunId } = await searchParams;
   const selectedRun = selectedRunId ? application.tailoringRuns.find((run) => run.id === selectedRunId) : undefined;
   const latestRun = selectedRun ?? activeRun ?? application.tailoringRuns[0];
+  const previousUsableRun = application.tailoringRuns.find(
+    (run) =>
+      run.id !== latestRun?.id &&
+      run.status === "SUCCEEDED" &&
+      run.validationPassed &&
+      run.artifacts.some((artifact) => ["DOCX", "PDF"].includes(artifact.kind)),
+  );
   const historicalRun = Boolean(selectedRun && selectedRun.id !== application.tailoringRuns[0]?.id);
   const reportSnapshot = objectRecord(latestRun?.reportSnapshot);
   const stretchLab = objectRecord(reportSnapshot?.stretch_lab);
   const stretchOpportunities = objectList(stretchLab?.transferable_opportunities);
   const stretchGaps = objectList(stretchLab?.gaps);
   const stretchProjects = objectList(stretchLab?.proposed_projects);
+  const captureMetadata = objectRecord(application.job.extractedMetadata);
+  const capturedFit = objectRecord(captureMetadata?.captureIntelligence);
+  const capturedFitDimensions = objectList(capturedFit?.dimensions);
+  const correctedCaptureFields = stringList(captureMetadata?.correctedFields);
   const visibleChanges =
     latestRun?.changes.filter((change) => change.changeType !== "unchanged") ?? [];
   const hasActiveRun = Boolean(activeRun);
@@ -113,9 +126,11 @@ export default async function ApplicationDetailPage({
   const reviewCopy = hasActiveRun
     ? progressStage || "The audit and files will appear here automatically."
     : !latestRun
-      ? "The protected base remains untouched until you start a tailoring run."
+      ? "Every tailored version is generated from your protected base. The base is never overwritten."
       : latestRun.status === "FAILED"
-        ? latestRun.errorMessage || "Read the failure details below, then try the run again."
+        ? previousUsableRun
+          ? "The new run failed. Your previous validated resume and files remain available in Resume versions."
+          : latestRun.errorMessage || "Read the failure details below, then try the run again."
         : application.status === "READY"
           ? "Download the DOCX or PDF, then update the status after you apply."
           : application.status === "APPLIED"
@@ -165,7 +180,7 @@ export default async function ApplicationDetailPage({
             <span>{application.job.workArrangement || "Work mode not listed"}</span>
           </div>
         </div>
-        <StatusPill status={application.status} />
+        <ApplicationStatusPill applicationId={application.id} initialStatus={application.status} />
       </div>
 
       {application.tailoringRuns.length > 1 ? (
@@ -189,6 +204,10 @@ export default async function ApplicationDetailPage({
         </nav>
         {latestRun?.status === "SUCCEEDED" ? (
           <div className="review-checks">
+            <span className="review-check">{visibleChanges.filter((change) => change.beforeText !== change.finalText).length} wording changes</span>
+            <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => keyword.used && keyword.accepted).length} supported terms represented</span>
+            <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => !keyword.used && keyword.evidenceLevel === "UNSUPPORTED").length} unsupported terms excluded</span>
+            <span className={latestRun.pageCount === 1 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.pageCount === 1 ? "1 page confirmed" : "Page count needs review"}</span>
             <span className="review-check review-check-done"><Check size={13} />Tailored</span>
             <span className={latestRun.validationPassed ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.validationPassed ? <Check size={13} /> : <CircleAlert size={13} />}Validated</span>
             <span className={latestRun.riskCount === 0 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.riskCount === 0 ? <Check size={13} /> : <CircleAlert size={13} />}{latestRun.riskCount} flags</span>
@@ -273,6 +292,42 @@ export default async function ApplicationDetailPage({
                 </span>
               )}
             </div>
+            {capturedFit ? (
+              <div className="saved-fit-summary">
+                <div className="saved-fit-decision">
+                  <div>
+                    <div className="eyebrow">Capture recommendation</div>
+                    <strong>{displayValue(capturedFit.recommendation, "Needs review")}</strong>
+                    {capturedFit.confidence ? (
+                      <span className="saved-fit-confidence">
+                        {displayValue(capturedFit.confidence)}
+                      </span>
+                    ) : null}
+                  </div>
+                  {correctedCaptureFields.length ? (
+                    <span className="review-check review-check-done">
+                      <Check size={13} />
+                      {correctedCaptureFields.length} corrected {correctedCaptureFields.length === 1 ? "field" : "fields"}
+                    </span>
+                  ) : null}
+                </div>
+                <p>{displayValue(capturedFit.reason, "Review the extracted requirements before tailoring.")}</p>
+                {capturedFitDimensions.length ? (
+                  <details>
+                    <summary>Why this recommendation</summary>
+                    <div className="saved-fit-dimensions">
+                      {capturedFitDimensions.map((item, index) => (
+                        <div key={displayValue(item.key, String(index))}>
+                          <span>{displayValue(item.label, "Fit factor")}</span>
+                          <strong>{displayValue(item.status, "Review")}</strong>
+                          <p>{displayValue(item.detail)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+              </div>
+            ) : null}
             <div
               className="stats-four"
               style={{
@@ -445,13 +500,13 @@ export default async function ApplicationDetailPage({
                           <div className="eyebrow" style={{ marginBottom: 6 }}>
                             Base
                           </div>
-                          <div className="diff-before">{change.beforeText}</div>
+                          <div className="diff-before"><PhraseDiff before={change.beforeText} after={change.finalText} side="before" /></div>
                         </div>
                         <div>
                           <div className="eyebrow" style={{ marginBottom: 6 }}>
                             Tailored
                           </div>
-                          <div className="diff-after">{change.finalText}</div>
+                          <div className="diff-after"><PhraseDiff before={change.beforeText} after={change.finalText} side="after" /></div>
                         </div>
                       </div>
                       {Array.isArray(change.targetTerms) && change.targetTerms.length ? (

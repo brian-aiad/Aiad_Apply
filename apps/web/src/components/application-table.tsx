@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { ExternalLink, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Application, Job, TailoringRun } from "@prisma/client";
@@ -33,6 +33,17 @@ export function ApplicationTable({
   initialStatus?: string;
 }) {
   const [query, setQuery] = useState("");
+  const searchInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (!showTools) return;
+    const focusSearch = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey || (target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)))) return;
+      event.preventDefault(); searchInput.current?.focus();
+    };
+    document.addEventListener("keydown", focusSearch);
+    return () => document.removeEventListener("keydown", focusSearch);
+  }, [showTools]);
   const [status, setStatus] = useState<(typeof filters)[number][0]>(() => filters.find(([key]) => key === initialStatus)?.[0] ?? "ALL");
   const [sort, setSort] = useState<"UPDATED" | "COVERAGE_HIGH" | "COVERAGE_LOW">("UPDATED");
   const [renderedAt] = useState(() => Date.now());
@@ -80,6 +91,7 @@ export function ApplicationTable({
             <Search size={15} />
             <span className="sr-only">Search applications</span>
             <input
+              ref={searchInput}
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}

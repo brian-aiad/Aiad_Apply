@@ -3,13 +3,16 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { resolveFollowUpUpdate } from "@/lib/application-reminders";
 import { readProductSettings } from "@/lib/product-settings";
+import { webUrl } from "@/lib/web-url";
+
+class ApplicationConflict extends Error {}
 
 const updateSchema = z.object({
   status: z
     .enum(["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED"])
     .optional(),
   notes: z.string().max(10000).optional(),
-  sourceUrl: z.string().max(2_000).url().nullable().optional().or(z.literal("")),
+  sourceUrl: webUrl.nullable().optional().or(z.literal("")),
   followUpAt: z.string().datetime().nullable().optional().or(z.literal("")),
 });
 
@@ -37,6 +40,13 @@ export async function PATCH(
   if (!current) {
     return NextResponse.json({ error: "Application not found." }, { status: 404 });
   }
+  if (input.data.status === "READY" || input.data.status === "REVIEW") {
+    const validRun = await db.tailoringRun.findFirst({
+      where: { applicationId: id, status: "SUCCEEDED", validationPassed: true, pageCount: 1, artifacts: { some: { kind: { in: ["DOCX", "PDF"] } } } },
+      select: { id: true },
+    });
+    if (!validRun) return NextResponse.json({ error: "Generate a validated resume before marking it ready for review or submission." }, { status: 409 });
+  }
 
   const now = new Date();
   const requestedFollowUpAt =
@@ -54,6 +64,7 @@ export async function PATCH(
     followUpDays: readProductSettings(setting?.value).followUpDays,
   });
 
+  try {
   const application = await db.$transaction(async (transaction) => {
     if (input.data.sourceUrl !== undefined) {
       await transaction.job.update({
@@ -61,8 +72,8 @@ export async function PATCH(
         data: { sourceUrl: input.data.sourceUrl || null },
       });
     }
-    const updated = await transaction.application.update({
-      where: { id },
+    const changed = await transaction.application.updateMany({
+      where: { id, updatedAt: current.updatedAt },
       data: {
         status: input.data.status,
         notes: input.data.notes,
@@ -75,6 +86,8 @@ export async function PATCH(
               : undefined,
       },
     });
+    if (changed.count !== 1) throw new ApplicationConflict();
+    const updated = await transaction.application.findUniqueOrThrow({ where: { id } });
     if (input.data.status && input.data.status !== current.status) {
       await transaction.applicationEvent.create({
         data: {
@@ -95,6 +108,14 @@ export async function PATCH(
         },
       });
     }
+    if (!reminder.automaticallyScheduled && requestedFollowUpAt !== undefined && current.followUpAt?.getTime() !== requestedFollowUpAt?.getTime()) {
+      await transaction.applicationEvent.create({ data: {
+        applicationId: id,
+        eventType: requestedFollowUpAt ? "follow_up_scheduled" : "follow_up_completed",
+        fromValue: current.followUpAt?.toISOString() ?? null,
+        toValue: requestedFollowUpAt?.toISOString() ?? null,
+      } });
+    }
     return updated;
   });
 
@@ -105,4 +126,8 @@ export async function PATCH(
     followUpAt: application.followUpAt?.toISOString() ?? null,
     automaticallyScheduledFollowUp: reminder.automaticallyScheduled,
   });
+  } catch (error) {
+    if (error instanceof ApplicationConflict) return NextResponse.json({ error: "This application changed while you were saving. Refresh and try again; your update was not applied." }, { status: 409 });
+    throw error;
+  }
 }

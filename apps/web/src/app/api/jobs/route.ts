@@ -3,13 +3,24 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { parseCapture, postingFingerprint } from "@/lib/job-parser";
+import { webUrl } from "@/lib/web-url";
+import { applyCaptureOverrides } from "@/lib/capture-overrides";
+import { captureIntelligence } from "@/lib/capture-intelligence";
+import { readDiscoveryPreferences } from "@/lib/discovery/types";
 
 export const runtime = "nodejs";
 
 const captureSchema = z.object({
   rawPaste: z.string().min(100).max(500_000),
-  sourceUrl: z.string().max(2_000).url().optional().or(z.literal("")),
+  sourceUrl: webUrl.optional().or(z.literal("")),
   queueTailoring: z.boolean().default(false),
+  overrides: z.object({
+    company: z.string().max(200).optional(),
+    title: z.string().max(300).optional(),
+    location: z.string().max(300).optional(),
+    workArrangement: z.string().max(80).optional(),
+    employmentType: z.string().max(80).optional(),
+  }).optional(),
 });
 
 export async function POST(request: Request) {
@@ -21,7 +32,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const parsed = parseCapture(input.data.rawPaste, input.data.sourceUrl);
+  const parsed = applyCaptureOverrides(
+    parseCapture(input.data.rawPaste, input.data.sourceUrl),
+    input.data.overrides,
+  );
+  const preference = await db.setting.findUnique({
+    where: { key: "discovery:preferences" },
+    select: { value: true },
+  });
+  const intelligence = captureIntelligence(parsed, readDiscoveryPreferences(preference?.value));
   let existing = await db.job.findUnique({
     where: { rawPasteSha256: parsed.rawPasteSha256 },
     include: { application: true },
@@ -74,6 +93,12 @@ export async function POST(request: Request) {
           responsibilities: parsed.responsibilities,
           requiredQualifications: parsed.requiredQualifications,
           preferredQualifications: parsed.preferredQualifications,
+          extractedMetadata: {
+            captureIntelligence: intelligence,
+            correctedFields: Object.keys(input.data.overrides ?? {}).filter(
+              (key) => input.data.overrides?.[key as keyof typeof input.data.overrides] !== undefined,
+            ),
+          },
         },
       });
       const application = await transaction.application.create({

@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { crossOriginMutation } from "@/lib/web-url";
 
 function unauthorized(message = "Authentication required.", status = 401) {
   return new NextResponse(message, {
@@ -28,6 +29,7 @@ export function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/api/worker/")) {
     return NextResponse.next();
   }
+  if (crossOriginMutation(request)) return unauthorized("Cross-origin changes are not allowed.", 403);
   if (process.env.NODE_ENV !== "production") {
     return NextResponse.next();
   }

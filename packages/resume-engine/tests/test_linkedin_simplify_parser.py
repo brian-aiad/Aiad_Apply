@@ -168,6 +168,23 @@ def test_parse_rtx_employer_page_without_linkedin_boundary() -> None:
     assert keywords["stem degree"].hiring_importance >= 40
 
 
+def test_parse_greenhouse_page_with_banner_navigation_and_custom_headings() -> None:
+    raw = (FIXTURES / "inspire_home_loans_technology_operations_engineer_2026_09_14.txt").read_text(
+        encoding="utf-8"
+    )
+
+    job = parse_linkedin_simplify(raw)
+
+    assert job.company == "Inspire Home Loans"
+    assert job.title == "Technology Operations Engineer"
+    assert job.location == "Newport Beach, CA"
+    assert len(job.responsibilities) == 20
+    assert len(job.required_qualifications) == 11
+    assert len(job.preferred_qualifications) == 2
+    assert "Apply for this job" not in job.job_description
+    assert "First Name" not in job.job_description
+
+
 @pytest.mark.parametrize(
     ("filename", "company", "title", "location", "family", "counts", "terms"),
     [

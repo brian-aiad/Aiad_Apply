@@ -11,13 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardPage() {
   const data = await getDashboard();
   const remaining = Math.max(0, data.goal - data.appliedToday);
-  const nextAction = data.ready
-    ? { href: "/applications?status=READY", label: "Submit a ready application", note: `${data.ready} reviewed ${data.ready === 1 ? "resume is" : "resumes are"} ready. Open the employer’s page, apply, then mark it Applied.` }
-    : data.review
-      ? { href: "/applications?status=REVIEW", label: "Review your tailored resume", note: `${data.review} ${data.review === 1 ? "application needs" : "applications need"} your review. Check the changes and files before applying.` }
-      : data.captured
-        ? { href: "/applications?status=CAPTURED", label: "Tailor a saved job", note: `${data.captured} saved ${data.captured === 1 ? "posting is" : "postings are"} waiting. Pick the best fit and prepare the resume.` }
-        : { href: "/discover", label: "Choose your next opportunity", note: "Review local openings matched to your support and IT experience. Approve a job to bring it into your workspace." };
+  const nextAction = data.nextAction;
 
   return (
     <div className="content today-page">
@@ -34,7 +28,7 @@ export default async function DashboardPage() {
           <p className="daily-remaining">{remaining ? `${remaining} more to reach today’s goal.` : "Today’s goal is complete. Nicely done."}</p>
           <Link href="/settings" className="text-link">Adjust your goal <ChevronRight size={13} /></Link>
         </div>
-        <div className="daily-next"><span className="eyebrow">Next up</span><h2>{nextAction.label}</h2><p>{nextAction.note}</p><Link className="button button-primary" href={nextAction.href}>{data.ready ? "Open ready applications" : data.review ? "Review applications" : data.captured ? "Open saved jobs" : "Explore openings"}<ArrowRight size={15} /></Link><span className="daily-footnote">Only applications you mark Applied count toward your goal.</span></div>
+        <div className="daily-next"><span className="eyebrow">Next up</span><h2>{nextAction.label}</h2><p>{nextAction.note}</p><Link className="button button-primary" href={nextAction.href}>{nextAction.actionLabel}<ArrowRight size={15} /></Link><span className="daily-footnote">Only applications you mark Applied count toward your goal.</span></div>
       </section>
       <section className="panel weekly-ledger" aria-labelledby="weekly-title">
         <div className="panel-header"><div><h2 className="panel-title" id="weekly-title">Your week</h2><p className="panel-subtitle muted">{data.activity.weekTotal} submitted · {data.activity.goalDays} days at your current goal</p></div><span className="streak-label">{data.activity.streak} {data.activity.streak === 1 ? "day" : "days"} in a row</span></div>

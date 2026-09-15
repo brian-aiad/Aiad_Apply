@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarClock, Check, LoaderCircle, Play, Save } from "lucide-react";
+import { APPLICATION_STATUS_EVENT } from "@/components/application-status-pill";
 
 const statuses = ["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED"] as const;
 
@@ -61,7 +62,7 @@ export function ApplicationControls({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          status,
+          ...(status !== saved.status && status !== "TAILORING" ? { status } : {}),
           sourceUrl,
           notes,
           followUpAt: followUpAt ? new Date(followUpAt).toISOString() : "",
@@ -72,6 +73,9 @@ export function ApplicationControls({
       const savedFollowUpAt = toLocalInput(payload.followUpAt || "");
       setFollowUpAt(savedFollowUpAt);
       setSaved({ status, sourceUrl, notes, followUpAt: savedFollowUpAt });
+      window.dispatchEvent(new CustomEvent(APPLICATION_STATUS_EVENT, {
+        detail: { applicationId: id, status: String(payload.status || status) },
+      }));
       setMessage(
         payload.automaticallyScheduledFollowUp
           ? "Application saved. A follow-up reminder was scheduled automatically."
@@ -94,6 +98,9 @@ export function ApplicationControls({
       const response = await fetch(`/api/applications/${id}/tailor`, { method: "POST" });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to queue tailoring.");
+      window.dispatchEvent(new CustomEvent(APPLICATION_STATUS_EVENT, {
+        detail: { applicationId: id, status: String(payload.applicationStatus || initialStatus) },
+      }));
       setMessage("Tailoring queued. This page will update automatically.");
       router.refresh();
     } catch (error) {

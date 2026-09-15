@@ -40,19 +40,28 @@ class RenderingError(RuntimeError):
 
 
 def find_libreoffice() -> Path | None:
-    candidates = [
-        shutil.which("soffice"),
-        shutil.which("libreoffice"),
-        r"C:\Program Files\LibreOffice\program\soffice.com",
-        r"C:\Program Files\LibreOffice\program\soffice.exe",
-        "/Applications/LibreOffice.app/Contents/MacOS/soffice",
-        "/usr/bin/libreoffice",
-        "/usr/local/bin/libreoffice",
-    ]
-    for candidate in candidates:
-        if candidate and Path(candidate).is_file():
-            return Path(candidate)
+    for candidate in libreoffice_candidates():
+        if candidate.is_file():
+            return candidate
     return None
+
+
+def libreoffice_candidates() -> list[Path]:
+    """Return the executable locations checked by local diagnostics and rendering."""
+    candidates = [shutil.which("soffice"), shutil.which("libreoffice")]
+    candidates.extend(
+        [
+            r"C:\Program Files\LibreOffice\program\soffice.com",
+            r"C:\Program Files\LibreOffice\program\soffice.exe",
+        ]
+        if os.name == "nt"
+        else [
+            "/Applications/LibreOffice.app/Contents/MacOS/soffice",
+            "/usr/bin/libreoffice",
+            "/usr/local/bin/libreoffice",
+        ]
+    )
+    return list(dict.fromkeys(Path(candidate) for candidate in candidates if candidate))
 
 
 def render_docx_to_pdf(
@@ -238,6 +247,9 @@ def inspect_pdf(
         anchors = _anchors(pdf_document[0]) if page_count else {}
         fonts = _font_inventory(pdf_document)
         bounds_issues, overlap_issues = _geometry_issues(pdf_document)
+        collapsed_tab_items = (
+            _collapsed_tab_items(pdf_document, document) if document is not None else []
+        )
     paragraph_metrics = (
         measure_pdf_paragraphs(path, document=document) if document is not None else {}
     )
@@ -303,6 +315,7 @@ def inspect_pdf(
         and not unmatched
         and not new_bounds_issues
         and not new_overlap_issues
+        and not collapsed_tab_items
         and not horizontally_drifted
     )
     return LayoutResult(
@@ -316,6 +329,7 @@ def inspect_pdf(
             *paragraph_overflow,
             *unmatched,
             *(f"horizontal:{paragraph_id}" for paragraph_id in horizontally_drifted),
+            *(f"collapsed-tab:{paragraph_id}" for paragraph_id in collapsed_tab_items),
         ],
         paragraph_line_counts={
             paragraph_id: int(metric["line_count"])
@@ -333,6 +347,7 @@ def inspect_pdf(
         font_inventory=fonts,
         out_of_bounds_items=new_bounds_issues,
         overlap_items=new_overlap_issues,
+        collapsed_tab_items=collapsed_tab_items,
         pdf_path=path,
         attempts=attempts,
     )
@@ -508,6 +523,29 @@ def _font_inventory(document: fitz.Document) -> dict[str, list[float]]:
                         round(float(span["size"]), 2)
                     )
     return {font: sorted(sizes) for font, sizes in sorted(inventory.items())}
+
+
+def _collapsed_tab_items(
+    pdf: fitz.Document,
+    document: ResumeDocument,
+) -> list[str]:
+    """Find tab-delimited fields that the PDF renderer joined into one visible word."""
+    rendered_words = [
+        "".join(_tokens(str(word[4]))) for page in pdf for word in page.get_text("words")
+    ]
+    joined = set(rendered_words)
+    issues: list[str] = []
+    for paragraph in document.paragraphs:
+        if "\t" not in paragraph.text:
+            continue
+        fields = paragraph.text.split("\t")
+        for left, right in zip(fields, fields[1:], strict=False):
+            left_tokens = _tokens(left)
+            right_tokens = _tokens(right)
+            if left_tokens and right_tokens and left_tokens[-1] + right_tokens[0] in joined:
+                issues.append(paragraph.paragraph_id)
+                break
+    return issues
 
 
 def _geometry_issues(document: fitz.Document) -> tuple[list[str], list[str]]:

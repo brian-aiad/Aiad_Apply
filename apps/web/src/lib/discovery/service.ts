@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { DISCOVERY_SOURCES } from "./sources";
 import { collectSource } from "./providers";
 import { assessOpening } from "./matching";
+import { postingFingerprint } from "../job-parser";
 import { readDiscoveryPreferences, type ScanSummary, type SourceResult } from "./types";
 
 export const SCAN_KEY = "discovery:last-scan";
@@ -100,10 +101,14 @@ export async function approvePosting(id: string, tailor: boolean) {
     }
     if (!posting.active) throw new Error("This posting is no longer listed. Refresh the search before approving it.");
     if (Date.now() - posting.lastSeenAt.getTime() > 48 * 60 * 60 * 1000) throw new Error("This listing has not been checked in two days. Refresh the search before approving it.");
-    const duplicate = await tx.job.findFirst({
+    const candidates = await tx.job.findMany({
       where: { OR: [{ sourceUrl: posting.sourceUrl }, { company: { equals: posting.company, mode: "insensitive" }, title: { equals: posting.title, mode: "insensitive" }, location: { equals: posting.location, mode: "insensitive" } }] },
       include: { application: true },
+      take: 20,
+      orderBy: { capturedAt: "desc" },
     });
+    const fingerprint = postingFingerprint({ ...posting, cleanDescription: posting.description });
+    const duplicate = candidates.find((candidate) => candidate.sourceUrl === posting.sourceUrl || postingFingerprint(candidate) === fingerprint);
     if (duplicate?.application) {
       await tx.discoveryPosting.update({ where: { id }, data: { approvedApplicationId: duplicate.application.id, dismissedAt: null } });
       return { id: duplicate.application.id, duplicate: true };

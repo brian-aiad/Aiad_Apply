@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from zipfile import ZipFile
 
+import fitz
 from aiadapply_v2.documents.formatting import DOCUMENT_PART, compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.documents.optimizer import (
@@ -11,6 +12,7 @@ from aiadapply_v2.documents.optimizer import (
 )
 from aiadapply_v2.documents.writer import write_resume_candidate
 from aiadapply_v2.layout.renderer import (
+    _collapsed_tab_items,
     apply_pdf_layout_budgets,
     inspect_pdf,
     render_docx_to_pdf,
@@ -116,6 +118,23 @@ def test_native_baseline_is_one_page_with_stable_section_anchors(tmp_path: Path)
     assert any(abs(size - 18.0) < 0.1 for size in layout.font_inventory["Calibri-Bold"])
     assert layout.protected_horizontal_deltas
     assert max(layout.protected_horizontal_deltas.values()) == 0.0
+    assert layout.collapsed_tab_items == []
+
+
+def test_layout_detects_a_renderer_joining_tab_delimited_fields(tmp_path: Path) -> None:
+    document = parse_resume_docx(BASE)
+    tabbed = next(paragraph for paragraph in document.paragraphs if "\t" in paragraph.text)
+    left, right = tabbed.text.split("\t", 1)
+    joined_boundary = f"{left.split()[-1]}{right.split()[0]}"
+    pdf_path = tmp_path / "joined.pdf"
+    pdf = fitz.open()
+    page = pdf.new_page()
+    page.insert_text((20, 40), joined_boundary)
+    pdf.save(pdf_path)
+    pdf.close()
+
+    with fitz.open(pdf_path) as rendered:
+        assert tabbed.paragraph_id in _collapsed_tab_items(rendered, document)
 
 
 def test_layout_rejects_excessive_upward_section_drift(tmp_path: Path) -> None:

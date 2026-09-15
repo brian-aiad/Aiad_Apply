@@ -63,19 +63,32 @@ class SentenceTransformerEncoder:
 
         self.model_name = model_name or os.environ.get("AIADAPPLY_EMBEDDING_MODEL", DEFAULT_MODEL)
         self._model = SentenceTransformer(self.model_name)
+        self._passages: tuple[str, ...] = ()
+        self._passage_vectors: np.ndarray | None = None
 
     def similarities(self, query: str, passages: Sequence[str]) -> list[float]:
         if not passages:
             return []
         query_text = f"Represent this sentence for searching relevant passages: {query}"
+        # Reuse only the exact evidence passages within this encoder instance.
+        # A changed resume, profile, order, or evidence annotation invalidates it.
+        passage_key = tuple(passages)
+        if self._passage_vectors is None or passage_key != self._passages:
+            self._passage_vectors = np.asarray(
+                self._model.encode(
+                    list(passages),
+                    normalize_embeddings=True,
+                    show_progress_bar=False,
+                )
+            )
+            self._passages = passage_key
         vectors = self._model.encode(
-            [query_text, *passages],
+            [query_text],
             normalize_embeddings=True,
             show_progress_bar=False,
         )
         query_vector = np.asarray(vectors[0])
-        passage_vectors = np.asarray(vectors[1:])
-        values = (passage_vectors @ query_vector).astype(float).tolist()
+        values = (self._passage_vectors @ query_vector).astype(float).tolist()
         return [float(value) for value in values]
 
 

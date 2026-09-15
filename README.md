@@ -33,6 +33,14 @@ The launcher opens `http://127.0.0.1:3000`. Use **Capture job** to paste a
 posting, optionally add or edit its URL, and either save it for later or queue
 the tailored draft immediately.
 
+Capture now previews the extracted role, requirements, documented skill overlap,
+evidence gaps, and a factor-by-factor Apply recommendation before saving. Company,
+role, location, workplace, and employment extraction can be corrected in place;
+the original paste and fingerprint remain intact. The recommendation is stored
+with the application for later review. This preliminary screening does not create
+an application or call the tailoring model. Resume review highlights individual
+changed phrases, and pressing `/` on Applications focuses its search field.
+
 The dashboard now guides each record through **Capture → Tailor → Review → Apply**:
 
 - Search, filter, and sort Applications by status or evidence-backed coverage.
@@ -54,7 +62,8 @@ review-only Stretch Lab proposes honest ways to close the gap.
 
 ### Discover and daily accountability
 
-**Today** prioritizes your next unfinished application, shows actual daily
+**Today** prioritizes due follow-ups, ready applications, resume review, failed
+runs, saved jobs, active tailoring, and curated openings. It shows actual daily
 submissions against your adjustable goal, a Monday–Sunday ledger, your streak,
 and follow-ups due. Saving or tailoring a job does not count as applying.
 
@@ -262,7 +271,11 @@ copied `.venv` directories, which otherwise makes Python 3.13 skip editable inst
 The canonical base resume is `data/resumes/Brian_Aiad_BASE.docx`. Keep that
 document factual and role-neutral; every tailored resume is derived from it.
 Outputs default to `~/Downloads/Resume_Builder/OUTPUT_RESUMES` on macOS and the
-equivalent Downloads folder on Windows. Set `AIADAPPLY_OUTPUT_ROOT` to override it.
+equivalent Downloads folder on Windows. Every successful tailor also copies its
+PDF into `Resume_Builder/USED_RESUME/YYYY-MM-DD` while retaining the complete
+per-job output folder. Repeat runs never overwrite a different PDF. Set
+`AIADAPPLY_OUTPUT_ROOT` to override the packet location or
+`AIADAPPLY_USED_RESUME_ROOT` to override the PDF library independently.
 
 ```powershell
 uv sync --extra dev

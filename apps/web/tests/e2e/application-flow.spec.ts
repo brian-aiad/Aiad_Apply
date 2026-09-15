@@ -35,7 +35,7 @@ async function fixtures() {
   return Promise.all(
     fixtureFiles.map(async (name) => {
       const raw = await readFile(path.join(fixtureRoot, name), "utf8");
-      const hash = createHash("sha256").update(raw.trim()).digest("hex");
+      const hash = createHash("sha256").update(raw.replace(/\r\n?/g, "\n").trim()).digest("hex");
       return { name, raw, hash };
     }),
   );
@@ -64,6 +64,7 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
   await page.getByRole("link", { name: "Capture job" }).first().click();
   await page.getByLabel("Complete job posting paste").fill(jpmorgan.raw);
   await page.getByRole("button", { name: "Save only" }).click();
+  await expect(page).toHaveURL(/\/applications\/[^/]+$/);
 
   await expect(page.getByRole("heading", { name: "Technology Support II" })).toBeVisible();
   await expect(page.getByText("JPMorganChase").first()).toBeVisible();
@@ -93,6 +94,7 @@ test("captures The Trade Desk posting without merging it into scanner noise", as
   await page.goto("/capture");
   await page.getByLabel("Complete job posting paste").fill(tradeDesk.raw);
   await page.getByRole("button", { name: "Save only" }).click();
+  await expect(page).toHaveURL(/\/applications\/[^/]+$/);
 
   await expect(page.getByRole("heading", { name: "Support Engineer" })).toBeVisible();
   await expect(page.getByText("The Trade Desk").first()).toBeVisible();
@@ -178,6 +180,7 @@ test("captures current application-support postings with their core fields", asy
     await page.goto("/capture");
     await page.getByLabel("Complete job posting paste").fill(record.raw);
     await page.getByRole("button", { name: "Save only" }).click();
+    await expect(page).toHaveURL(/\/applications\/[^/]+$/);
 
     await expect(page.getByRole("heading", { name: expected.title })).toBeVisible();
     await expect(page.getByText(expected.company).first()).toBeVisible();
@@ -202,6 +205,7 @@ test("captures unheaded Encompass duties and nested qualification sections", asy
   await page.goto("/capture");
   await page.getByLabel("Complete job posting paste").fill(bankOfHope.raw);
   await page.getByRole("button", { name: "Save only" }).click();
+  await expect(page).toHaveURL(/\/applications\/[^/]+$/);
 
   await expect(page.getByRole("heading", { name: "Analyst - Encompass" })).toBeVisible();
   await expect(page.getByText("Bank of Hope").first()).toBeVisible();
@@ -305,6 +309,7 @@ test("captures supplied LinkedIn and employer postings without section leakage",
     await page.goto("/capture");
     await page.getByLabel("Complete job posting paste").fill(item.record.raw);
     await page.getByRole("button", { name: "Save only" }).click();
+    await expect(page).toHaveURL(/\/applications\/[^/]+$/);
     await expect(page.getByRole("heading", { name: item.title })).toBeVisible();
     await expect(page.getByText(item.company).first()).toBeVisible();
     await expect(page.getByText(item.location, { exact: true })).toBeVisible();
@@ -518,7 +523,7 @@ test("records authenticated worker progress and displays the current stage", asy
   await page.reload();
   await expect(page.locator("span.status", { hasText: "Review" }).first()).toBeVisible();
   await expect(page.getByLabel("Status")).toHaveValue("REVIEW");
-  await expect(page.getByText("Direct")).toBeVisible();
+  await expect(page.getByText("Direct", { exact: true })).toBeVisible();
   await expect(page.getByText("Not assessed")).toBeVisible();
   await expect(page.getByText("Rejected", { exact: true })).toBeVisible();
   await expect(page.getByText("Review flags", { exact: true }).locator("..")).toContainText("2");

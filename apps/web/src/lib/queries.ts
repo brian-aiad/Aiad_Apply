@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { DEFAULT_TIMEZONE, readProductSettings } from "@/lib/product-settings";
 import { applicationActivity, calendarDayBounds } from "@/lib/accountability";
+import { chooseNextAction } from "@/lib/next-action";
+import { workerHeartbeatCutoff, WORKER_HEARTBEAT_PREFIX } from "@/lib/worker-security";
 
 export function todayBounds(timezone = DEFAULT_TIMEZONE) {
   return calendarDayBounds(timezone);
@@ -22,6 +24,9 @@ export async function getDashboard() {
     applied,
     submissionDates,
     followUps,
+    actionCandidates,
+    strongDiscoveries,
+    liveWorkers,
   ] = await Promise.all([
     db.application.findMany({
       take: 8,
@@ -41,6 +46,30 @@ export async function getDashboard() {
     db.application.count({ where: { status: { in: ["APPLIED", "INTERVIEW", "CLOSED"] } } }),
     db.application.findMany({ where: { appliedAt: { not: null } }, select: { appliedAt: true } }),
     db.application.findMany({ where: { status: { in: ["APPLIED", "INTERVIEW"] }, followUpAt: { lt: end } }, include: { job: true }, orderBy: { followUpAt: "asc" }, take: 8 }),
+    db.application.findMany({
+      where: { status: { in: ["READY", "REVIEW", "CAPTURED", "TAILORING"] } },
+      orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
+      take: 50,
+      select: {
+        id: true,
+        status: true,
+        job: { select: { company: true, title: true } },
+        tailoringRuns: {
+          take: 1,
+          orderBy: { runNumber: "desc" },
+          select: { status: true, errorMessage: true },
+        },
+      },
+    }),
+    db.discoveryPosting.count({
+      where: { active: true, qualified: true, dismissedAt: null, approvedApplicationId: null },
+    }),
+    db.setting.count({
+      where: {
+        key: { startsWith: WORKER_HEARTBEAT_PREFIX },
+        updatedAt: { gte: workerHeartbeatCutoff() },
+      },
+    }),
   ]);
   return {
     applications,
@@ -56,6 +85,12 @@ export async function getDashboard() {
     timezone: product.timezone,
     activity: applicationActivity(submissionDates.flatMap((a) => a.appliedAt ? [a.appliedAt] : []), product.timezone, product.dailyGoal),
     followUps,
+    nextAction: chooseNextAction({
+      followUps,
+      applications: actionCandidates,
+      strongDiscoveries,
+      workerAvailable: liveWorkers > 0,
+    }),
   };
 }
 

@@ -36,6 +36,7 @@ const sectionStops = [
   "Privacy Policy and Terms",
   "Similar Jobs",
   "Hiring?",
+  "Apply for this job",
 ];
 
 const locationHeader =
@@ -98,6 +99,14 @@ function findCompany(lines: string[]) {
     const following = lines[officialTitleIndex + 1];
     if (following && !looksLikeOfficialMetadata(following)) return following;
   }
+  const employerAbout = lines
+    .map((line) =>
+      line.match(
+        /^About\s+(?!the job$|this role$|the role$)([A-Za-z0-9][A-Za-z0-9 .&'/-]{1,100})$/i,
+      ),
+    )
+    .find((match) => match !== null);
+  if (employerAbout) return employerAbout[1];
   const locationIndex = lines.findIndex((line) => locationHeader.test(line));
   if (locationIndex >= 2) return lines[locationIndex - 2];
   const about = lines.indexOf("About the job");
@@ -111,6 +120,18 @@ function findTitle(lines: string[], company: string) {
     if (officialTitleIndex >= 0) {
       return lines[officialTitleIndex].replace(/^(?:Raytheon\s+)?Full-time\s+/i, "");
     }
+  }
+  const locationIndex = lines.findIndex((line) => locationHeader.test(line));
+  const hasJobBoardNavigation = lines.some((line) => /^Back to jobs$/i.test(line));
+  if (hasJobBoardNavigation && locationIndex > 0) {
+    const preceding = lines
+      .slice(Math.max(0, locationIndex - 5), locationIndex)
+      .filter(
+        (line) =>
+          !/^(?:Banner|Back to jobs|Save|Apply)$/i.test(line) &&
+          line.toLocaleLowerCase() !== company.toLocaleLowerCase(),
+      );
+    if (preceding.length > 0) return preceding.at(-1) ?? "Untitled role";
   }
   const companyIndex = lines.findIndex(
     (line) => line.toLocaleLowerCase() === company.toLocaleLowerCase(),
@@ -182,11 +203,13 @@ function extractJobSections(lines: string[]) {
   const expandedResponsibilityHeading =
     /^(?:Core Responsibilities|Your Responsibilities|Technical Support Engineer Key Responsibilities|You Will|Your Team Will|In This Role, You Will|Essential Functions & Responsibilities):?$/i;
   const officialResponsibilityHeading = /^What You Will Do:?$/i;
+  const greenhouseResponsibilityHeading = /^Your Key Responsibilities Include:?$/i;
   const expandedRequiredHeading =
     /^(?:Basic Requirements|Minimum Qualifications|Required Experience|Necessary Skills\/Abilities|Qualifications & Experience|Who This Role Is For|About You|Your Profile):?$/i;
   const expandedPreferredHeading =
     /^(?:Preferred Skills|Strongly Preferred|Nice(?:-| )To(?:-| )Have(?: Requirements| But Not Required)?):?$/i;
   const officialRequiredHeading = /^Qualifications You Must Have:?$/i;
+  const greenhouseRequiredHeading = /^(?:What You Have|Your Education and Experience):?$/i;
   const officialPreferredHeading = /^Qualifications We Prefer:?$/i;
   const qualificationSubheading =
     /^(?:Education(?:\/| and )Credentials|Prior Experience|Technical Skills|Experience):?$/i;
@@ -212,7 +235,8 @@ function extractJobSections(lines: string[]) {
     if (
       responsibilityHeading.test(line) ||
       expandedResponsibilityHeading.test(line) ||
-      officialResponsibilityHeading.test(line)
+      officialResponsibilityHeading.test(line) ||
+      greenhouseResponsibilityHeading.test(line)
     ) {
       current = "responsibilities";
       continue;
@@ -220,7 +244,8 @@ function extractJobSections(lines: string[]) {
     if (
       requiredHeading.test(line) ||
       expandedRequiredHeading.test(line) ||
-      officialRequiredHeading.test(line)
+      officialRequiredHeading.test(line) ||
+      greenhouseRequiredHeading.test(line)
     ) {
       current = "requiredQualifications";
       qualificationsStarted = true;

@@ -24,8 +24,17 @@ export async function POST(
     ["QUEUED", "RUNNING"].includes(run.status),
   );
   if (active) {
-    return NextResponse.json({ runId: active.id, duplicate: true });
+    return NextResponse.json({
+      runId: active.id,
+      duplicate: true,
+      applicationStatus: application.status,
+    });
   }
+  const applicationStatus = ["APPLIED", "INTERVIEW", "CLOSED"].includes(
+    application.status,
+  )
+    ? application.status
+    : "TAILORING";
   try {
     const run = await db.$transaction(async (transaction) => {
       const created = await transaction.tailoringRun.create({
@@ -35,8 +44,8 @@ export async function POST(
           status: "QUEUED",
         },
       });
-      await transaction.application.update({
-        where: { id },
+      await transaction.application.updateMany({
+        where: { id, status: { in: ["CAPTURED", "REVIEW", "READY", "TAILORING"] } },
         data: { status: "TAILORING" },
       });
       await transaction.applicationEvent.create({
@@ -48,7 +57,10 @@ export async function POST(
       });
       return created;
     });
-    return NextResponse.json({ runId: run.id, duplicate: false }, { status: 201 });
+    return NextResponse.json(
+      { runId: run.id, duplicate: false, applicationStatus },
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
       const competingRun = await db.tailoringRun.findFirst({
@@ -56,7 +68,15 @@ export async function POST(
         orderBy: { runNumber: "desc" },
       });
       if (competingRun) {
-        return NextResponse.json({ runId: competingRun.id, duplicate: true });
+        const currentApplication = await db.application.findUnique({
+          where: { id },
+          select: { status: true },
+        });
+        return NextResponse.json({
+          runId: competingRun.id,
+          duplicate: true,
+          applicationStatus: currentApplication?.status ?? application.status,
+        });
       }
     }
     throw error;

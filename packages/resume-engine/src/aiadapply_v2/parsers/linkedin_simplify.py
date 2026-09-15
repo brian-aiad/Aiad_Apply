@@ -6,7 +6,7 @@ from aiadapply_v2.schemas import ParsedJob
 from aiadapply_v2.text import dedupe, normalize_text, sha256_text
 
 JOB_START = re.compile(
-    r"^(?:About the job|Job Description|About (?:This|The) Role)\s*$",
+    r"^(?:About the job|Job Description|About (?:This|The) Role|What You['\u2019]ll Do:?)\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 OFFICIAL_JOB_SIGNAL = re.compile(
@@ -17,7 +17,7 @@ OFFICIAL_JOB_SIGNAL = re.compile(
 JOB_END = re.compile(
     r"^(?:Benefits found in job post|Set alert for similar jobs|"
     r"Put your best foot forward|Show Premium Insights|Privacy Policy and Terms:?|"
-    r"Similar Jobs(?:\s*\(\d+\))?)\s*$",
+    r"Similar Jobs(?:\s*\(\d+\))?|Apply for this job)\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 SCORE = re.compile(r"(\d+)\s+(?:out\s+of|of)\s+(\d+).*?keywords?", re.IGNORECASE)
@@ -53,6 +53,7 @@ HEADINGS = {
         "essential job duties and responsibilities",
         "essential functions",
         "key responsibilities",
+        "your key responsibilities include",
         "operational support",
         "required duties",
         "functions and duties of this role include, but not limited to",
@@ -82,6 +83,7 @@ HEADINGS = {
         "requirements",
         "job qualifications/requirements",
         "what you bring",
+        "what you have",
         "who you are",
         "who this role is for",
         "about you",
@@ -89,6 +91,7 @@ HEADINGS = {
         "qualifications & experience",
         "competencies",
         "education",
+        "your education and experience",
         "technical knowledge",
         "additionally, it support analyst is expected to demonstrate",
     ),
@@ -157,11 +160,7 @@ def parse_linkedin_simplify(raw: str) -> ParsedJob:
     normalized = normalize_text(raw)
     if len(normalized) < 500:
         raise ValueError("Paste is too short; paste the complete LinkedIn or Simplify page.")
-    if (
-        "about the job" not in normalized.lower()
-        and "job description" not in normalized.lower()
-        and len(OFFICIAL_JOB_SIGNAL.findall(normalized)) < 2
-    ):
+    if not JOB_START.search(normalized) and len(OFFICIAL_JOB_SIGNAL.findall(normalized)) < 2:
         raise ValueError("Paste does not contain a recognizable job-description boundary.")
 
     title, company = _extract_title_company(normalized)
@@ -204,6 +203,7 @@ def parse_linkedin_simplify(raw: str) -> ParsedJob:
 
 def _extract_title_company(raw: str) -> tuple[str, str]:
     lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    location_title = ""
     for index, line in enumerate(lines):
         match = re.match(r"^Company\s*(?:logo for,|,)\s*(.+?)\.?$", line, re.IGNORECASE)
         if not match:
@@ -289,25 +289,45 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
 
     start = JOB_START.search(raw)
     prefix = raw[: start.start()] if start else raw[:2000]
-    lines = [line.strip() for line in prefix.splitlines() if line.strip()]
-    for index, line in enumerate(lines):
+    prefix_lines = [line.strip() for line in prefix.splitlines() if line.strip()]
+    for index, line in enumerate(prefix_lines):
         if not (LOCATION.match(line) or REMOTE_LOCATION.match(line)):
             continue
         candidates = [
             value
-            for value in lines[max(0, index - 4) : index]
+            for value in prefix_lines[max(0, index - 4) : index]
             if not _is_navigation(value)
             and not re.match(r"^Company\s*(?:logo for,|,)", value, re.IGNORECASE)
         ]
         if len(candidates) >= 2:
             return _strip_verified_suffix(candidates[-1]), candidates[-2]
-    for index, line in enumerate(lines):
+        if candidates:
+            location_title = _strip_verified_suffix(candidates[-1])
+    for index, line in enumerate(prefix_lines):
         if re.search(r"\b(?:full-time|part-time|hybrid|remote|on-site)\b", line, re.I):
             previous = [
-                value for value in lines[max(0, index - 5) : index] if not _is_navigation(value)
+                value
+                for value in prefix_lines[max(0, index - 5) : index]
+                if not _is_navigation(value)
             ]
             if len(previous) >= 2:
                 return _strip_verified_suffix(previous[-2]), previous[-1]
+    about_company = next(
+        (
+            match.group(1).strip()
+            for line in lines
+            if (
+                match := re.fullmatch(
+                    r"About\s+(?!the job$|this role$|the role$)([A-Za-z0-9][A-Za-z0-9 .&'/-]{1,100})",
+                    line,
+                    re.I,
+                )
+            )
+        ),
+        "",
+    )
+    if location_title and about_company:
+        return location_title, about_company
     return "", ""
 
 
@@ -329,6 +349,8 @@ def _is_navigation(value: str) -> bool:
         "me",
         "for business",
         "learning",
+        "banner",
+        "back to jobs",
         "apply",
         "save",
     }

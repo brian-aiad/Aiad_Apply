@@ -371,6 +371,7 @@ class LayoutResult(StrictModel):
     font_inventory: dict[str, list[float]] = Field(default_factory=dict)
     out_of_bounds_items: list[str] = Field(default_factory=list)
     overlap_items: list[str] = Field(default_factory=list)
+    collapsed_tab_items: list[str] = Field(default_factory=list)
     pdf_path: Path | None = None
     attempts: int = 1
 

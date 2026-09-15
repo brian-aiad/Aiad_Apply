@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Check, ChevronDown, ExternalLink, LoaderCircle, MapPin, RefreshCw, Search, SlidersHorizontal, X } from "lucide-react";
 import { DISCOVERY_SOURCES, LOCAL_SEARCHES } from "@/lib/discovery/sources";
@@ -16,6 +17,7 @@ export type DiscoveryData = { postings: Posting[]; preferences: DiscoveryPrefere
 type Tab = "all" | "matches" | "review" | "approved" | "dismissed";
 
 export function DiscoveryBoard({ initial }: { initial: DiscoveryData }) {
+  const router = useRouter();
   const [data, setData] = useState(initial);
   const [tab, setTab] = useState<Tab>("all");
   const [period, setPeriod] = useState("active");
@@ -32,6 +34,7 @@ export function DiscoveryBoard({ initial }: { initial: DiscoveryData }) {
   useEffect(() => {
     // Observe searches started on Today or another device; server remains authoritative.
     const timer = window.setInterval(async () => {
+      if (document.visibilityState !== "visible") return;
       try {
         const response = await fetch("/api/discovery", { cache: "no-store" });
         if (response.ok) { setData(await response.json()); setNow(new Date()); }
@@ -62,6 +65,10 @@ export function DiscoveryBoard({ initial }: { initial: DiscoveryData }) {
       const response = await fetch(`/api/discovery/${posting.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, tailor }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Could not save this decision.");
+      if (action === "approve" && tailor && result.id) {
+        router.push(`/applications/${result.id}`);
+        return;
+      }
       await reload();
       setMessage(action === "approve" ? result.duplicate ? "This job is already in Applications. No duplicate was created." : tailor ? "Approved. Tailoring is queued; the local worker will process it when running." : "Approved and saved to Applications. You can tailor it when ready." : action === "dismiss" ? "Hidden from your feed. You can restore it from Dismissed." : "Restored to your feed.");
     } catch (e) { setError(e instanceof Error ? e.message : "Could not save your decision."); }
@@ -80,11 +87,12 @@ export function DiscoveryBoard({ initial }: { initial: DiscoveryData }) {
 
   const assessed = data.postings;
   const eligible = assessed.filter((p) => p.active && !p.excluded && !p.dismissedAt && !p.approvedApplicationId);
+  const eligibleIds = new Set(eligible.map((p) => p.id));
   const tabCounts = { all: eligible.length, matches: eligible.filter((p) => p.qualified).length, review: eligible.filter((p) => !p.qualified).length, approved: assessed.filter((p) => p.approvedApplicationId).length, dismissed: assessed.filter((p) => p.dismissedAt).length };
   const today = formatInTimeZone(now, "America/Los_Angeles", "yyyy-MM-dd");
   const weekStart = shiftDate(today, -((new Date(`${today}T12:00:00Z`).getUTCDay() + 6) % 7));
   const visible = assessed.filter((p) => {
-    if (tab === "dismissed" ? !p.dismissedAt : tab === "approved" ? !p.approvedApplicationId : !eligible.some((e) => e.id === p.id)) return false;
+    if (tab === "dismissed" ? !p.dismissedAt : tab === "approved" ? !p.approvedApplicationId : !eligibleIds.has(p.id)) return false;
     if (tab === "matches" && !p.qualified || tab === "review" && p.qualified) return false;
     if (query && !`${p.company} ${p.title} ${p.location}`.toLowerCase().includes(query.toLowerCase())) return false;
     if (period === "today" && formatInTimeZone(new Date(p.firstSeenAt), "America/Los_Angeles", "yyyy-MM-dd") !== today) return false;

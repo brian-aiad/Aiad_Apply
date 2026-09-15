@@ -56,7 +56,15 @@ try {
         Write-Host "Repairing the local Python environment..."
         & uv sync --extra dev
         if ($LASTEXITCODE -ne 0) {
-            throw "uv sync failed."
+            $venvPath = [IO.Path]::GetFullPath((Join-Path $repositoryRoot ".venv"))
+            $users = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
+                $_.CommandLine -and $_.CommandLine.IndexOf($venvPath, [StringComparison]::OrdinalIgnoreCase) -ge 0
+            })
+            if ($users.Count -gt 0) {
+                $processes = ($users | ForEach-Object { "$($_.Name) (PID $($_.ProcessId))" }) -join ", "
+                throw "uv could not repair .venv because it is in use by: $processes. Stop those Python/editor tools and run scripts\start-local.ps1 again."
+            }
+            throw "uv sync failed while repairing .venv. Run 'uv sync --extra dev' from $repositoryRoot to see the complete dependency error."
         }
         & uv run python -c "import aiadapply_v2"
         if ($LASTEXITCODE -ne 0) {
