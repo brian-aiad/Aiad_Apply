@@ -3,7 +3,32 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { resolveFollowUpUpdate } from "@/lib/application-reminders";
 import { readProductSettings } from "@/lib/product-settings";
-import { webUrl } from "@/lib/web-url";
+import { webUrl, crossOriginMutation } from "@/lib/web-url";
+import { deleteApplicationPermanently, DeletionError } from "@/lib/application-deletion";
+import { removeDeletedJobLocalFiles } from "@/lib/deleted-job-files";
+
+export const runtime = "nodejs";
+
+export async function DELETE(request: Request, context: { params: Promise<{ id: string }> }) {
+  if (crossOriginMutation(request)) return NextResponse.json({ error: "Cross-origin changes are not allowed." }, { status: 403 });
+  const parameters = z.object({ id: z.string().uuid() }).safeParse(await context.params);
+  if (!parameters.success) return NextResponse.json({ error: "Invalid application identifier." }, { status: 400 });
+  const confirmation = await request.json().catch(() => null);
+  if (confirmation?.confirm !== "DELETE") return NextResponse.json({ error: "Explicit permanent-deletion confirmation is required." }, { status: 400 });
+  try {
+    const runs = await deleteApplicationPermanently(db, parameters.data.id);
+    let localFiles = { removed: 0, unavailable: 0 };
+    try {
+      const hashes = runs.flatMap(run => run.artifacts.flatMap(a => a.sha256 ? [a.sha256] : []));
+      const sharedFiles = await db.artifact.findMany({ where: { sha256: { in: hashes } }, select: { sha256: true } });
+      localFiles = await removeDeletedJobLocalFiles(runs, sharedFiles.flatMap(a => a.sha256 ? [a.sha256] : []));
+    } catch { localFiles.unavailable++; }
+    return NextResponse.json({ deleted: true, localFiles, note: "Removed from the shared app. Other devices' local files, manual downloads, and older backups are not erased." });
+  } catch (error) {
+    if (error instanceof DeletionError) return NextResponse.json({ error: error.message }, { status: error.status });
+    return NextResponse.json({ error: "Permanent deletion could not be completed. Refresh and retry; some cloud files may already have been removed." }, { status: 503 });
+  }
+}
 
 class ApplicationConflict extends Error {}
 

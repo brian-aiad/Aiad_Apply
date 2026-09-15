@@ -10,7 +10,9 @@ application dashboard.
 ## Daily Use
 
 Existing hosted dashboard: https://aiadapply-web.vercel.app (local changes are not
-live there until deployed; a hosted URL does not mean this Mac's data is synced).
+live there until deployed). The Mac and Windows localhost dashboards now use the
+same verified Supabase database; the Vercel deployment is separate and must use
+that same configuration to show the same records.
 
 Start the localhost dashboard and its tailoring worker:
 
@@ -101,21 +103,44 @@ uses the protected resume and candidate profile.
 
 ### Windows, Mac, and saved resumes
 
+Open a job and choose **Permanently delete job** under Application details. Type
+`DELETE` to confirm. This hard-deletes the posting, application, notes, all runs,
+decisions, changes, events, database artifact bytes, and linked Discover record
+from the shared database. It does not retain a deleted-job history or recycle bin.
+Cloud artifacts are removed through the Supabase Storage API before deleting the
+database rows; devices deleting older cloud-backed jobs need the server-only
+`SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SUPABASE_URL`. Failed cloud deletion
+keeps the database job for retry (some cloud objects may already have been removed).
+Active RUNNING tailoring must finish first; queued runs can be deleted.
+
+The initiating device also removes exact hash-verified files in its configured
+output folder and matching USED_RESUME PDFs, protecting files still referenced by
+another job. Other computers' local output folders, user-added files, manual
+downloads, old exported backups, and database-provider recovery backups cannot be
+erased by this action. A deleted posting may be rediscovered from its employer's
+public feed later; no blacklist/tombstone is retained. Refresh another device's
+dashboard to see the deletion. The protected base resume is never deleted.
+
 **Git transfers code, not pasted descriptions, application records, or generated
 resume history.** Those records live in the configured PostgreSQL database.
-At the September 10, 2026 audit, this Mac used local PostgreSQL, not shared
-Supabase. Settings now reports the configured storage mode and portable file count.
+On September 14, 2026, Windows and Mac were verified against the same secured
+Supabase database: 9 jobs/applications, 18 tailoring runs, and 90 artifacts with
+90 size/hash-verified database file copies. Both devices' own workers and
+status/notes synchronization passed verification. These are migration-baseline
+counts, not fixed limits. Refresh the other dashboard after saving a change.
+Settings reports the configured storage mode and portable file count.
 
 Each successful worker result stores size/hash-verified artifact bytes in the
 database as well as retaining the existing local/optional Supabase paths. The
 download route can serve those bytes on another computer connected to that same
-database. All 36 existing artifacts were backed up during this upgrade. Older
+database. All 90 baseline artifact downloads were verified on both computers. Older
 tailoring runs can now be selected from an application's Resume versions section.
 
-For automatic cross-device history, configure both installations to use the
-**same secured hosted PostgreSQL database**, after migrating the existing data.
-That infrastructure migration is not performed by this upgrade. Avoid two local
-databases if you expect automatic synchronization.
+The existing Mac and Windows installations use the **same secured hosted
+PostgreSQL database**. For a new installation, transfer the private shared
+configuration outside Git and preserve its own resume/output paths. Never import
+a local workspace into this populated shared database using the empty-destination
+restore command below. Avoid two local databases if you expect automatic sync.
 
 For a manual transfer, download the private workspace backup in Settings. Keep
 this JSON outside Git: it contains your resume files, pasted descriptions, notes,

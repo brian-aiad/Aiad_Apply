@@ -8,6 +8,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import type { PrismaClient } from "@prisma/client";
 import { assertIsolatedDatabase } from "../../src/lib/test-database";
+import { deleteApplicationPermanently, DeletionError } from "../../src/lib/application-deletion";
 
 const testUrl = process.env.AIADAPPLY_E2E_DATABASE_URL;
 if (!testUrl) throw new Error("AIADAPPLY_E2E_DATABASE_URL is required. Never use the normal database for these tests.");
@@ -23,6 +24,53 @@ const jobIds: string[] = [];
 const postingIds: string[] = [];
 const prefix = `integration-${randomUUID()}`;
 const hash = (s: string) => createHash("sha256").update(s).digest("hex");
+
+test("permanent deletion cascades every job record, cloud file and discovery reference without a tombstone", async () => {
+  const label = `${prefix}-purge`;
+  const job = await db.job.create({ data: { company: label, title: "Deletion fixture", rawPaste: label, rawPasteSha256: hash(label), application: { create: { notes: "private fixture", events: { create: { eventType: "fixture" } }, tailoringRuns: { create: { status: "SUCCEEDED", reportSnapshot: { private: "fixture" }, keywordDecisions: { create: { term: "SQL", normalized: "sql", kind: "technical", priority: "required", hiringImportance: 1, placementUtility: 1, accepted: true, used: true, evidenceLevel: "DIRECT" } }, changes: { create: { paragraphId: "skills.1", section: "skills", paragraphKind: "skills", beforeText: "before", proposedText: "after", finalText: "after", changeType: "reframed" } }, artifacts: { create: { kind: "PDF", fileName: "fixture.pdf", storagePath: `${label}/fixture.pdf`, sha256: hash("fixture"), byteSize: 7, backup: { create: { content: Buffer.from("fixture") } } } } } } } } }, include: { application: { include: { tailoringRuns: { include: { artifacts: true } } } } } });
+  jobIds.push(job.id);
+  const app = job.application!;
+  const runId = app.tailoringRuns[0].id;
+  const artifactId = app.tailoringRuns[0].artifacts[0].id;
+  const p = await posting("purge");
+  await db.discoveryPosting.update({ where: { id: p.id }, data: { approvedApplicationId: app.id } });
+  const unrelated = await posting("purge-unrelated");
+  const removed: string[][] = [];
+  await deleteApplicationPermanently(db, app.id, async paths => { removed.push(paths); });
+  assert.deepEqual(removed, [[`${label}/fixture.pdf`]]);
+  assert.equal(await db.job.count({ where: { id: job.id } }), 0);
+  assert.equal(await db.application.count({ where: { id: app.id } }), 0);
+  assert.equal(await db.tailoringRun.count({ where: { id: runId } }), 0);
+  assert.equal(await db.keywordDecision.count({ where: { runId } }), 0);
+  assert.equal(await db.resumeChange.count({ where: { runId } }), 0);
+  assert.equal(await db.artifact.count({ where: { id: artifactId } }), 0);
+  assert.equal(await db.artifactBackup.count({ where: { artifactId } }), 0);
+  assert.equal(await db.applicationEvent.count({ where: { applicationId: app.id } }), 0);
+  assert.equal(await db.discoveryPosting.count({ where: { id: p.id } }), 0);
+  assert.equal(await db.discoveryPosting.count({ where: { id: unrelated.id } }), 1);
+  await assert.rejects(deleteApplicationPermanently(db, app.id, async () => {}), error => error instanceof DeletionError && error.status === 404);
+});
+
+test("active tailoring and failed cloud deletion preserve the job", async () => {
+  const label = `${prefix}-purge-blocked`;
+  const job = await db.job.create({ data: { company: label, title: label, rawPaste: label, rawPasteSha256: hash(label), application: { create: { tailoringRuns: { create: { status: "RUNNING", artifacts: { create: { kind: "PDF", fileName: "fixture.pdf", storagePath: `${label}/fixture.pdf` } } } } } } }, include: { application: { include: { tailoringRuns: true } } } });
+  jobIds.push(job.id);
+  let called = false;
+  await assert.rejects(deleteApplicationPermanently(db, job.application!.id, async () => { called = true; }), error => error instanceof DeletionError && error.status === 409);
+  assert.equal(called, false);
+  await db.tailoringRun.update({ where: { id: job.application!.tailoringRuns[0].id }, data: { status: "FAILED" } });
+  await assert.rejects(deleteApplicationPermanently(db, job.application!.id, async () => { throw new DeletionError("Fixture storage failure", 502); }), error => error instanceof DeletionError && error.status === 502);
+  assert.equal(await db.job.count({ where: { id: job.id } }), 1);
+  assert.equal(await db.artifact.count({ where: { run: { applicationId: job.application!.id } } }), 1);
+});
+
+test("DELETE requires explicit confirmation and rejects cross-origin requests", async () => {
+  const { DELETE } = await import("../../src/app/api/applications/[id]/route");
+  const context = { params: Promise.resolve({ id: randomUUID() }) };
+  assert.equal((await DELETE(new Request("http://localhost/api/applications/fixture", { method: "DELETE" }), context)).status, 400);
+  assert.equal((await DELETE(new Request("http://localhost/api/applications/fixture", { method: "DELETE", headers: { "Origin": "https://evil.example", "Content-Type": "application/json" }, body: JSON.stringify({ confirm: "DELETE" }) }), context)).status, 403);
+  assert.equal((await DELETE(new Request("http://localhost/api/applications/fixture", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: "DELETE" }) }), context)).status, 404);
+});
 
 before(async () => { db = (await import("../../src/lib/db")).db; });
 after(async () => {
