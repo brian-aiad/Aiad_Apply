@@ -3,7 +3,7 @@ revision = 3
 requires-python = "==3.13.*"
 
 [[package]]
-name = "aiadapplyv2"
+name = "aiad-apply"
 version = "0.4.0"
 source = { editable = "." }
 dependencies = [

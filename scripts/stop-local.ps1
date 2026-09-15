@@ -35,7 +35,7 @@ function Assert-AiadApplyProcess {
         $repositoryRoot,
         [StringComparison]::OrdinalIgnoreCase
     ) -ge 0
-    $hasExpectedCommand = $commandLine -match "npm\s+run\s+dev|aiadapplyv2\s+worker"
+    $hasExpectedCommand = $commandLine -match "npm\s+run\s+dev|aiadapply(?:v2)?\s+worker"
     if (-not $belongsToRepository -or -not $hasExpectedCommand) {
         throw "Refusing to stop PID $ProcessId because it is not an AIAD Apply process from this repository."
     }

@@ -3,7 +3,7 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "aiadapplyv2"
+name = "Aiad_Apply"
 version = "0.4.0"
 description = "Evidence-based resume transformation engine."
 readme = "README.md"
@@ -32,6 +32,7 @@ docs = [
 ]
 
 [project.scripts]
+aiadapply = "aiadapply_v2.cli:app"
 aiadapplyv2 = "aiadapply_v2.cli:app"
 
 [tool.setuptools.packages.find]

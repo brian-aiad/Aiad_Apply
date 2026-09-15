@@ -137,7 +137,7 @@ if (-not $ready) {
     throw "The dashboard did not become ready at $localUrl."
 }
 
-$workerCommand = "Set-Location -LiteralPath '$($repositoryRoot.Replace("'", "''"))'; uv run aiadapplyv2 worker --api-url $localUrl"
+$workerCommand = "Set-Location -LiteralPath '$($repositoryRoot.Replace("'", "''"))'; uv run aiadapply worker --api-url $localUrl"
 $workerProcess = Start-Process powershell.exe `
     -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $workerCommand) `
     -WindowStyle Hidden `

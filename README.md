@@ -1,6 +1,11 @@
-# aiadapplyV2
+# Aiad_Apply
 
 Resume tailoring and application tracking for Brian Aiad.
+
+This is the retained V2 implementation, renamed to **Aiad_Apply**. The canonical
+repository is `https://github.com/brian-aiad/Aiad_Apply`. The new terminal command
+is `aiadapply`; `aiadapplyv2` remains a compatibility alias. The internal
+`aiadapply_v2` Python module is unchanged.
 
 The system accepts a noisy LinkedIn, Simplify, or employer-page paste, extracts the real role,
 tailors the finalized base resume, exports a validated one-page DOCX/PDF, and

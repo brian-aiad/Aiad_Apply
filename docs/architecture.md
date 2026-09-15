@@ -1,4 +1,4 @@
-# aiadapplyV2 Architecture
+# Aiad_Apply Architecture
 
 ## Boundaries
 

@@ -125,7 +125,7 @@ if [[ $ready -ne 1 ]]; then
   false
 fi
 
-(cd "$repository_root" && exec nohup uv run aiadapplyv2 worker --api-url "$local_url") \
+(cd "$repository_root" && exec nohup uv run aiadapply worker --api-url "$local_url") \
   >"$worker_log" 2>&1 &
 worker_pid=$!
 worker_ready=0
