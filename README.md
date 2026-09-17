@@ -216,6 +216,11 @@ Local Codex calls allow up to 15 minutes by default so a correction pass can
 finish on slower machines. Set `AIADAPPLY_CODEX_TIMEOUT_SECONDS` to a value from
 60 through 1800 seconds when a different bound is needed.
 
+Tailoring is pinned to `gpt-5.6-sol` with `low` reasoning by default so Discover,
+Capture, Mac, and Windows produce consistent results without inheriting a changing
+interactive Codex selection. Override these defaults with `AIADAPPLY_CODEX_MODEL`
+and `AIADAPPLY_CODEX_REASONING_EFFORT` when intentionally evaluating another model.
+
 The hosted dashboard is protected by `AIADAPPLY_PASSWORD` using HTTP Basic
 authentication; the optional username defaults to `brian`.
 
@@ -300,8 +305,9 @@ copied `.venv` directories, which otherwise makes Python 3.13 skip editable inst
 
 The canonical base resume is `data/resumes/Brian_Aiad_BASE.docx`. Keep that
 document factual and role-neutral; every tailored resume is derived from it.
-Outputs default to `~/Downloads/Resume_Builder/OUTPUT_RESUMES` on macOS and the
-equivalent Downloads folder on Windows. Every successful tailor also copies its
+Outputs prefer `~/Library/CloudStorage/OneDrive-Personal/Downloads/Resume_Builder/OUTPUT_RESUMES`
+on macOS when OneDrive is installed, and OneDrive Downloads on Windows. Otherwise
+they use local Downloads. `AIADAPPLY_BASE_RESUME` sets the base document path. Every successful tailor also copies its
 PDF into `Resume_Builder/USED_RESUME/YYYY-MM-DD` while retaining the complete
 per-job output folder. Repeat runs never overwrite a different PDF. Set
 `AIADAPPLY_OUTPUT_ROOT` to override the packet location or

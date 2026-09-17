@@ -12,6 +12,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { ApplicationControls } from "@/components/application-controls";
+import { EvidenceDecision } from "@/components/evidence-decision";
 import { ApplicationStatusPill } from "@/components/application-status-pill";
 import { RunAutoRefresh } from "@/components/run-auto-refresh";
 import { StatusPill } from "@/components/status-pill";
@@ -224,8 +225,9 @@ export default async function ApplicationDetailPage({
       >
         <div className="application-main-stack">
           {latestRun ? (
-            <section id="provenance" className="panel scroll-target" style={{ padding: 17 }}>
-              <div className="panel-title">Truth and AI provenance</div>
+            <section id="provenance" className="panel scroll-target provenance-panel">
+              <details>
+              <summary><span className="panel-title">Truth and AI provenance</span><span className="muted">Verified safeguards and run details</span></summary>
               <p
                 className="secondary"
                 style={{ margin: "7px 0 0", fontSize: 12, lineHeight: 1.65 }}
@@ -265,6 +267,7 @@ export default async function ApplicationDetailPage({
                   </div>
                 ))}
               </div>
+              </details>
             </section>
           ) : null}
 
@@ -417,9 +420,9 @@ export default async function ApplicationDetailPage({
                 </div>
               </div>
             ) : (
-              <div style={{ padding: 16 }}>
+              <div className="tailoring-audit-body">
                 <div
-                  className="stats-four"
+                  className="stats-four audit-metrics"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
@@ -452,12 +455,7 @@ export default async function ApplicationDetailPage({
                   {visibleChanges.map((change) => (
                     <article
                       key={change.id}
-                      style={{
-                        padding: 14,
-                        border: "1px solid var(--line)",
-                        borderRadius: 10,
-                        background: "#0e0e11",
-                      }}
+                      className="change-card"
                     >
                       <div
                         className="diff-grid"
@@ -509,14 +507,7 @@ export default async function ApplicationDetailPage({
                           <div className="diff-after"><PhraseDiff before={change.beforeText} after={change.finalText} side="after" /></div>
                         </div>
                       </div>
-                      {Array.isArray(change.targetTerms) && change.targetTerms.length ? (
-                        <div
-                          className="muted"
-                          style={{ marginTop: 9, fontSize: 11 }}
-                        >
-                          Targeted: {change.targetTerms.join(", ")}
-                        </div>
-                      ) : null}
+                      {Array.isArray(change.targetTerms) && change.targetTerms.length ? <div className="change-targets">Targeted: {change.targetTerms.join(", ")}</div> : null}
                       {change.proposedText !== change.finalText ? (
                         <details style={{ marginTop: 10 }}>
                           <summary
@@ -530,16 +521,7 @@ export default async function ApplicationDetailPage({
                           </div>
                         </details>
                       ) : null}
-                      {change.explanation ? (
-                        <div className="secondary" style={{ marginTop: 9, fontSize: 11 }}>
-                          Why: {change.explanation}
-                        </div>
-                      ) : null}
-                      {stringList(change.evidenceIds).length ? (
-                        <div className="muted mono" style={{ marginTop: 7, fontSize: 10 }}>
-                          Evidence: {stringList(change.evidenceIds).map(humanizeReference).join(", ")}
-                        </div>
-                      ) : null}
+                      {change.explanation || stringList(change.evidenceIds).length ? <details className="change-evidence"><summary>Why this changed</summary>{change.explanation ? <div className="secondary">{change.explanation}</div> : null}{stringList(change.evidenceIds).length ? <div className="muted mono">Evidence: {stringList(change.evidenceIds).map(humanizeReference).join(", ")}</div> : null}</details> : null}
                     </article>
                   ))}
                 </div>
@@ -685,6 +667,7 @@ export default async function ApplicationDetailPage({
                           <div className="muted" style={{ marginTop: 5, fontSize: 11 }}>
                             Review: {displayValue(item.review_question)}
                           </div>
+                          <EvidenceDecision term={displayValue(item.target_term)} />
                         </article>
                       ))}
                     </div>
@@ -723,6 +706,7 @@ export default async function ApplicationDetailPage({
                                     ))}
                                   </ul>
                                 ) : null}
+                                <EvidenceDecision term={displayValue(gap.target_term)} category={displayValue(gap.category, "other")} />
                               </td>
                             </tr>
                           ))}

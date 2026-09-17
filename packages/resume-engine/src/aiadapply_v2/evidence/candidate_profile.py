@@ -55,6 +55,11 @@ def apply_candidate_profile_to_keywords(
     for keyword in keywords:
         if not keyword.accepted:
             continue
+        if any(contains_term(value, keyword.term) for value in profile.rejected_terms):
+            keyword.accepted = False
+            keyword.rejection_reason = "Candidate previously confirmed they do not have this experience."
+            keyword.scoring_factors["candidate_rejected"] = -100.0
+            continue
         if not any(
             contains_term(value, keyword.term) or contains_term(keyword.term, value)
             for value in confirmed

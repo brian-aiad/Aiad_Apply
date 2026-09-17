@@ -2,9 +2,9 @@
   "source": "data/resumes/Brian_Aiad_BASE.format.json",
   "sourceSha256": "a59c48e2ec1acf6822ceee37998b0b98cf9ad0fc532dad5f39b78c45987c4f4a",
   "profileSource": "data/profile/Brian_Aiad_PROFILE.json",
-  "profileSha256": "c796fca49d5d0bd50b397172c9ae8c8dd03dcd0fda0de184b3a37395a712cc27",
+  "profileSha256": "9ad89d9584a187afa5e652118cbbb50bd117767c0c444e9028500e50afcf3006",
   "confirmedSkills": ["React", "R", "Excel", "Outlook", "MATLAB", "Python"],
-  "confirmedExposure": ["Compliance", "U.S. citizenship"],
+  "confirmedExposure": ["Compliance", "U.S. citizenship", "problem-solving", "service desk", "interpersonal skills", "cross-functional collaboration", "customer service", "end-user support"],
   "evidence": [
     "Application Support Engineer with 3+ years across application support and IT operations, including production SaaS, Microsoft 365, and internal integrations. Resolved 200+ tickets with sub-90-minute average resolution and built Loavenly, a production multi-tenant SaaS platform, specializing in SQL, log analysis, API debugging, and root cause analysis.",
     "Technical Support:       Production Support, Troubleshooting, Incident Response, Root Cause Analysis, SLA Management",

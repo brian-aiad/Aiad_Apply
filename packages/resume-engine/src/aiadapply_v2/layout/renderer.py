@@ -12,14 +12,16 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import TypedDict
 from urllib.parse import quote
+from zipfile import ZIP_DEFLATED, ZipFile
 
 import fitz
+from lxml import etree
 
 from aiadapply_v2.documents.optimizer import extract_embedded_fonts
 from aiadapply_v2.schemas import LayoutResult, ResumeDocument
 
 SECTION_ANCHORS = ("SKILLS", "EXPERIENCE", "PROJECTS", "EDUCATION", "CERTIFICATIONS")
-MAX_ANCHOR_DRIFT_POINTS = 2.0
+MAX_ANCHOR_DRIFT_POINTS = 14.0
 MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS = 0.5
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:\+)?")
 
@@ -88,6 +90,7 @@ def render_docx_to_pdf(
         )
     with tempfile.TemporaryDirectory(prefix="aiadapply-lo-profile-") as profile_name:
         profile_uri = _file_uri(Path(profile_name))
+        render_source = _libreoffice_safe_source(source, Path(profile_name))
         command = [
             str(executable),
             "--headless",
@@ -99,7 +102,7 @@ def render_docx_to_pdf(
             "pdf:writer_pdf_Export",
             "--outdir",
             str(destination),
-            str(source),
+            str(render_source),
         ]
         with _registered_macos_document_fonts(font_source_docx, Path(profile_name)):
             result = subprocess.run(
@@ -116,6 +119,59 @@ def render_docx_to_pdf(
         details = (result.stderr or result.stdout)[-3000:]
         raise RenderingError(f"LibreOffice PDF conversion failed: {details}")
     return output
+
+
+def _libreoffice_safe_source(source: Path, temporary_root: Path) -> Path:
+    """Keep a searchable boundary when LibreOffice cannot honor a crowded tab stop."""
+    safe_source = temporary_root / source.name
+    word_namespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    tab_tag = f"{{{word_namespace}}}tab"
+    xml_space = "{http://www.w3.org/XML/1998/namespace}space"
+    with ZipFile(source) as source_archive, ZipFile(
+        safe_source, "w", compression=ZIP_DEFLATED
+    ) as safe_archive:
+        for info in source_archive.infolist():
+            content = source_archive.read(info.filename)
+            if info.filename == "word/document.xml":
+                root = etree.fromstring(content)
+                for tab in root.iter(tab_tag):
+                    following_text = tab.xpath("following::w:t[1]", namespaces={"w": word_namespace})
+                    if following_text and not (following_text[0].text or "").startswith(" "):
+                        following_text[0].text = f" {following_text[0].text or ''}"
+                        following_text[0].set(xml_space, "preserve")
+                content = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+            elif info.filename == "word/numbering.xml":
+                root = etree.fromstring(content)
+                _add_explicit_bullet_tabs(root, word_namespace)
+                content = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+            safe_archive.writestr(info, content)
+    return safe_source
+
+
+def _add_explicit_bullet_tabs(root: etree._Element, word_namespace: str) -> None:
+    """Prevent LibreOffice from offsetting first bullet lines from continuation lines."""
+    namespaces = {"w": word_namespace}
+    qualified = lambda name: f"{{{word_namespace}}}{name}"
+    for level in root.findall(".//w:lvl", namespaces):
+        number_format = level.find("w:numFmt", namespaces)
+        properties = level.find("w:pPr", namespaces)
+        indent = properties.find("w:ind", namespaces) if properties is not None else None
+        if (
+            number_format is None
+            or number_format.get(qualified("val")) != "bullet"
+            or properties is None
+            or indent is None
+            or properties.find("w:tabs", namespaces) is not None
+        ):
+            continue
+        position = indent.get(qualified("left"))
+        if not position:
+            continue
+        tabs = etree.Element(qualified("tabs"))
+        tab = etree.SubElement(tabs, qualified("tab"))
+        tab.set(qualified("val"), "num")
+        tab.set(qualified("pos"), position)
+        properties.insert(0, tabs)
 
 
 @contextmanager

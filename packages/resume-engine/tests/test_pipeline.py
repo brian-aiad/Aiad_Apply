@@ -1052,6 +1052,57 @@ def test_new_skill_terms_are_relocated_out_of_incorrect_model_categories() -> No
     assert "Compliance" not in tools.skills
 
 
+def test_existing_base_skill_is_not_duplicated_into_another_category() -> None:
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/trade_desk_support_engineer_full.txt").read_text(encoding="utf-8")
+    )
+    keywords = grade_job_keywords(job)
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    apis = next(
+        line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity"
+    )
+    tools.skills.append("Postman")
+
+    _fuse_skill_inventory(plan, document, keywords)
+
+    assert "Postman" in apis.skills
+    assert "Postman" not in tools.skills
+
+
+def test_confirmed_support_vocabulary_gets_natural_experience_placement() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    terms = {"end-user support", "customer service", "service desk"}
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/trade_desk_support_engineer_full.txt").read_text(encoding="utf-8")
+    )
+    keywords = grade_job_keywords(job)
+    by_term = {item.normalized: item for item in keywords}
+
+    for term in terms:
+        keyword = by_term.get(term)
+        if keyword is None:
+            from aiadapply_v2.schemas import JobKeyword, KeywordKind, KeywordPriority
+
+            keyword = JobKeyword(
+                term=term,
+                normalized=term,
+                kind=KeywordKind.action,
+                priority=KeywordPriority.low,
+                hiring_importance=25,
+                placement_utility=35,
+                accepted=True,
+            )
+        _place_direct_category_keyword(plan, keyword)
+
+    bullets = {item.paragraph_id: item.text for item in plan.bullets}
+    assert "end-user support" in bullets["experience.csulb.bullet.1"]
+    assert "customer service" in bullets["experience.wehelp.bullet.2"]
+    assert "service desk" in bullets["experience.original_insurance.bullet.1"]
+
+
 def test_skill_display_is_professional_and_preserves_product_casing() -> None:
     assert _display_skill("technical support") == "Technical Support"
     assert _display_skill("cross-functional collaboration") == "Cross-Functional Collaboration"

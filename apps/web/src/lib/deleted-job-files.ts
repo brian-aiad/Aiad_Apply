@@ -17,6 +17,10 @@ export async function removeDeletedJobLocalFiles(runs: RunFiles[], protectedHash
   const expand = (value: string) => value.startsWith("~/") ? path.join(os.homedir(), value.slice(2)) : path.resolve(/* turbopackIgnore: true */ value);
   const homeDownloads = path.join(os.homedir(), "Downloads", "Resume_Builder");
   let outputRoot = process.env.AIADAPPLY_OUTPUT_ROOT;
+  if (!outputRoot && process.platform === "darwin") {
+    const oneDrive = path.join(os.homedir(), "Library", "CloudStorage", "OneDrive-Personal");
+    try { await lstat(oneDrive); outputRoot = path.join(oneDrive, "Downloads", "Resume_Builder", "OUTPUT_RESUMES"); } catch { /* Standard Downloads below. */ }
+  }
   if (!outputRoot && process.platform === "win32") {
     try { await lstat(path.join(os.homedir(), "OneDrive", "Downloads")); outputRoot = path.join(os.homedir(), "OneDrive", "Downloads", "Resume_Builder", "OUTPUT_RESUMES"); } catch { /* Standard Downloads below. */ }
   }

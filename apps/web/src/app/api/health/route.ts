@@ -1,5 +1,6 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
+import os from "node:os";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { storageHealth } from "@/lib/storage-health";
@@ -30,11 +31,11 @@ export async function GET() {
       "resumes",
       "Brian_Aiad_BASE.docx",
     );
-    const resumeCandidates = [resume?.localPath, fallbackResume].filter(
+    const resumeCandidates = [process.env.AIADAPPLY_BASE_RESUME, resume?.localPath, fallbackResume].filter(
       (value): value is string => Boolean(value),
     );
     const baseResumeReady = await Promise.any(
-      resumeCandidates.map((candidate) => access(candidate).then(() => true)),
+      resumeCandidates.map((candidate) => access(candidate.startsWith("~/") ? path.join(os.homedir(), candidate.slice(2)) : candidate).then(() => true)),
     ).catch(() => false);
     return NextResponse.json({
       status: baseResumeReady && liveWorkers > 0 ? "ready" : "attention",

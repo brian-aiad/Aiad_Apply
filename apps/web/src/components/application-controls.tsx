@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarClock, Check, LoaderCircle, Play, Save, Trash2 } from "lucide-react";
+import { CalendarClock, Check, ChevronDown, LoaderCircle, Play, Save, Trash2 } from "lucide-react";
 import { APPLICATION_STATUS_EVENT } from "@/components/application-status-pill";
 
 const statuses = ["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED"] as const;
@@ -133,7 +133,8 @@ export function ApplicationControls({
         {dirty ? <span className="status status-amber">Unsaved</span> : null}
       </div>
       <div className="controls-fields">
-        <div>
+        <div className="control-status-row">
+          <div>
           <label className="field-label" htmlFor="application-status">Status</label>
           <select id="application-status" className="select" value={status} onChange={(event) => setStatus(event.target.value)} disabled={hasActiveRun}>
             {visibleStatuses.map((item) => (
@@ -143,8 +144,22 @@ export function ApplicationControls({
             ))}
           </select>
           <p className="field-help">{statusHelp[status]}</p>
+          </div>
+          <div className="control-actions control-actions-primary">
+            <button className="button" type="button" onClick={save} disabled={busy !== null || !dirty}>
+              {busy === "save" ? <LoaderCircle size={15} className="spin" /> : <Save size={15} />}
+              Save
+            </button>
+            <button className="button button-primary" type="button" onClick={tailor} disabled={busy !== null || hasActiveRun}>
+              {busy === "tailor" ? <LoaderCircle size={15} className="spin" /> : <Play size={15} />}
+              {hasActiveRun ? "Tailoring…" : hasResumeFiles ? "Tailor again" : "Tailor resume"}
+            </button>
+          </div>
         </div>
-        <div>
+        <details className="control-disclosure">
+          <summary><span>Notes, URL & follow-up</span><ChevronDown size={15} /></summary>
+          <div className="control-disclosure-fields">
+          <div>
           <label className="field-label" htmlFor="source-url">Job posting URL</label>
           <input id="source-url" className="input" type="url" placeholder="https://…" value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} maxLength={2_000} />
         </div>
@@ -156,18 +171,12 @@ export function ApplicationControls({
           <label className="field-label" htmlFor="application-notes">Private notes</label>
           <textarea id="application-notes" className="textarea textarea-compact" value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={10_000} placeholder="Contact, next step, interview detail, or anything you want to remember…" />
           <div className="field-count">{notes.length.toLocaleString()} / 10,000</div>
-        </div>
-        <div className="control-actions">
-          <button className="button" type="button" onClick={save} disabled={busy !== null || !dirty}>
-            {busy === "save" ? <LoaderCircle size={15} className="spin" /> : <Save size={15} />}
-            Save changes
-          </button>
-          <button className="button button-primary" type="button" onClick={tailor} disabled={busy !== null || hasActiveRun}>
-            {busy === "tailor" ? <LoaderCircle size={15} className="spin" /> : <Play size={15} />}
-            {hasActiveRun ? "Tailoring…" : hasResumeFiles ? "Tailor again" : "Tailor resume"}
-          </button>
-        </div>
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+          </div>
+          </div>
+        </details>
+        <details className="control-disclosure control-disclosure-danger">
+          <summary><span>Delete this job</span><ChevronDown size={15} /></summary>
+          <div className="control-disclosure-fields">
           {!confirmingDelete ? <button className="button" type="button" onClick={() => setConfirmingDelete(true)} disabled={busy !== null} style={{ color: "#ef4444" }}><Trash2 size={15} /> Permanently delete job</button> : (
             <div role="group" aria-label="Permanent job deletion">
               <p className="field-help">Permanently removes this job, notes, all resume versions, files, and history from the shared app on both devices. No undo or deleted-job history. Active tailoring must finish first. Local files on other computers, manual downloads, and older backups are not erased.</p>
@@ -179,7 +188,8 @@ export function ApplicationControls({
               </div>
             </div>
           )}
-        </div>
+          </div>
+        </details>
         {message ? <div className={isError ? "inline-message inline-message-error" : "inline-message inline-message-success"} role="status" aria-live="polite"><Check size={13} />{message}</div> : null}
       </div>
     </div>

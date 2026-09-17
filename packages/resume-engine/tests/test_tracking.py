@@ -157,6 +157,37 @@ def test_worker_reports_progress_and_records_transform_failure(
     assert claim_retry_attempts == [2]
 
 
+def test_worker_keeps_polling_after_tracking_api_recovers(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    calls = 0
+    sleeps: list[float] = []
+
+    def recovering_request(*args: Any, **kwargs: Any) -> None:
+        nonlocal calls
+        del args, kwargs
+        calls += 1
+        if calls == 1:
+            raise RuntimeError("temporary database outage")
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(tracking, "tracking_configuration", lambda _: ("http://web", "secret"))
+    monkeypatch.setattr(tracking, "_request_json", recovering_request)
+    monkeypatch.setattr(tracking.time, "sleep", sleeps.append)
+
+    with pytest.raises(KeyboardInterrupt):
+        run_worker(
+            reasoner=IdentityReasoner(),
+            base_resume=tmp_path / "base.docx",
+            candidate_profile=tmp_path / "profile.json",
+            output_root=tmp_path,
+            poll_seconds=0.25,
+        )
+
+    assert calls == 2
+    assert sleeps == [0.25]
+
+
 def test_request_retries_transient_server_errors_but_not_client_errors(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ExternalLink, Search, SlidersHorizontal, X } from "lucide-react";
 import type { Application, Job, TailoringRun } from "@prisma/client";
 import { formatMoneyRange, formatRelativeDate, formatShortDate } from "@/lib/format";
@@ -32,6 +33,7 @@ export function ApplicationTable({
   showTools?: boolean;
   initialStatus?: string;
 }) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -157,7 +159,20 @@ export function ApplicationTable({
                 const followUp = application.followUpAt ? new Date(application.followUpAt) : null;
                 const followUpOverdue = followUp ? followUp.getTime() < renderedAt : false;
                 return (
-                  <tr key={application.id}>
+                  <tr
+                    key={application.id}
+                    className="application-row-link"
+                    tabIndex={0}
+                    role="link"
+                    aria-label={`Open ${application.job.title} at ${application.job.company}`}
+                    onClick={(event) => {
+                      if ((event.target as HTMLElement).closest("a, button, input, select")) return;
+                      router.push(`/applications/${application.id}`);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") router.push(`/applications/${application.id}`);
+                    }}
+                  >
                     <td data-label="Role">
                       <Link href={`/applications/${application.id}`} className="application-role-link">
                         {application.job.title}

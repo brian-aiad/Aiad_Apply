@@ -89,3 +89,11 @@ def test_used_resume_root_honors_its_own_override(tmp_path: Path) -> None:
         )
         == configured
     )
+
+
+def test_macos_onedrive_output_and_day_library(tmp_path: Path) -> None:
+    cloud = tmp_path / "Library" / "CloudStorage" / "OneDrive-Personal"
+    cloud.mkdir(parents=True)
+    root = cloud / "Downloads" / "Resume_Builder"
+    assert default_output_root(home=tmp_path, platform="darwin", environment={}) == root / "OUTPUT_RESUMES"
+    assert default_used_resume_root(home=tmp_path, platform="darwin", environment={}) == root / "USED_RESUME"

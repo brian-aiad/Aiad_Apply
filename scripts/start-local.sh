@@ -76,14 +76,26 @@ record = json.load(open(sys.argv[1], encoding="utf-8"))
 print(record.get("repository", ""), record.get("webPid", ""), record.get("workerPid", ""), sep="\t")
 PY
   )
-  if [[ "$recorded_root" == "$repository_root" ]] && \
-    kill -0 "$web_pid" 2>/dev/null && kill -0 "$worker_pid" 2>/dev/null; then
-    echo "AIAD Apply is already running at $local_url"
-    if [[ $open_browser -eq 1 ]] && command -v open >/dev/null 2>&1; then open "$local_url"; fi
-    exit 0
+  if [[ "$recorded_root" != "$repository_root" ]]; then
+    echo "The process record does not belong to this repository." >&2
+    exit 1
   fi
-  echo "A stale or partial process record exists. Run bash scripts/stop-local.sh first." >&2
-  exit 1
+  web_running=0
+  worker_running=0
+  kill -0 "$web_pid" 2>/dev/null && web_running=1
+  kill -0 "$worker_pid" 2>/dev/null && worker_running=1
+  if [[ $web_running -eq 1 && $worker_running -eq 1 ]] && \
+    curl --silent --fail --max-time 2 "$local_url/api/health" | grep -q '"status":"ready"'; then
+      echo "AIAD Apply is already running at $local_url"
+      if [[ $open_browser -eq 1 ]] && command -v open >/dev/null 2>&1; then open "$local_url"; fi
+      exit 0
+  fi
+  if [[ $web_running -eq 1 || $worker_running -eq 1 ]]; then
+    echo "Recovering an incomplete AIAD Apply start..."
+    bash "$repository_root/scripts/stop-local.sh"
+  else
+    rm -f "$process_file"
+  fi
 fi
 
 web_pid=""

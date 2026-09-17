@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -10,10 +11,13 @@ import {
   Plus,
   Settings,
   Search,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { cn } from "@/lib/cn";
 import { SystemStatus } from "@/components/system-status";
+import { QuickAnswers } from "@/components/quick-answers";
 
 const navigation = [
   { href: "/", label: "Today", icon: Crosshair },
@@ -30,13 +34,26 @@ const mobileNavigation = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem("aiadapply:sidebar-collapsed");
+    queueMicrotask(() => setCollapsed(stored === null ? window.innerWidth < 1280 : stored === "true"));
+  }, []);
+
+  function toggleSidebar() {
+    setCollapsed((current) => {
+      window.localStorage.setItem("aiadapply:sidebar-collapsed", String(!current));
+      return !current;
+    });
+  }
 
   return (
-    <div className="app-shell">
+    <div className={cn("app-shell", collapsed && "sidebar-collapsed")}>
       <aside className="sidebar">
-        <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Link href="/" className="sidebar-brand" aria-label="AiadApply home">
           <BrandMark className="brand-mark" />
-          <span>
+          <span className="sidebar-brand-copy">
             <span style={{ display: "block", fontWeight: 700, letterSpacing: "-0.02em" }}>
               AiadApply
             </span>
@@ -49,10 +66,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link
           href="/capture"
           className="button button-primary"
+          aria-label="Capture job"
+          title="Capture job"
           style={{ width: "100%", marginTop: 28 }}
         >
           <Plus size={15} />
-          Capture job
+          <span className="sidebar-link-label">Capture job</span>
         </Link>
 
         <nav aria-label="Primary navigation" style={{ display: "grid", gap: 4, marginTop: 25 }}>
@@ -65,6 +84,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn("sidebar-link", active && "sidebar-link-active")}
+                aria-label={item.label}
+                title={item.label}
                 aria-current={active ? "page" : undefined}
                 style={{
                   display: "flex",
@@ -80,24 +101,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 }}
               >
                 <Icon size={16} strokeWidth={1.8} />
-                {item.label}
+                <span className="sidebar-link-label">{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        <div
-          style={{
-            position: "absolute",
-            right: 16,
-            bottom: 18,
-            left: 16,
-            paddingTop: 16,
-            borderTop: "1px solid var(--line)",
-          }}
-        >
+        <div className="sidebar-footer">
           <Link
             href="/settings"
+            aria-label="Settings"
+            title="Settings"
             style={{
               display: "flex",
               alignItems: "center",
@@ -107,9 +121,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             }}
           >
             <Settings size={16} />
-            Settings
+            <span className="sidebar-link-label">Settings</span>
           </Link>
-          <div className="muted" style={{ marginTop: 15, fontSize: 10 }}>
+          <div className="muted sidebar-footer-copy" style={{ marginTop: 15, fontSize: 10 }}>
             Brian’s workspace
           </div>
         </div>
@@ -117,13 +131,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <main className="main-frame" id="main-content">
         <header className="topbar">
-          <div>
-            <div className="eyebrow">Brian Aiad</div>
-            <div style={{ marginTop: 1, fontSize: 13, fontWeight: 600 }}>
-              One application at a time
+          <div className="topbar-workspace">
+            <button className="sidebar-toggle" type="button" onClick={toggleSidebar} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>
+              {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+            </button>
+            <div>
+              <div className="eyebrow">Brian Aiad</div>
+              <div className="topbar-tagline">
+                One application at a time
+              </div>
             </div>
           </div>
-          <SystemStatus />
+          <div className="topbar-actions"><QuickAnswers /><SystemStatus /></div>
         </header>
         {children}
       </main>

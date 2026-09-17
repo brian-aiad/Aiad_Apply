@@ -14,7 +14,7 @@ from typing import Annotated
 import typer
 from rich import print
 
-from aiadapply_v2.config import default_output_root, default_used_resume_root
+from aiadapply_v2.config import default_base_resume, default_output_root, default_used_resume_root
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.candidate_profile import (
     add_candidate_profile_evidence,
@@ -45,7 +45,7 @@ from aiadapply_v2.used_resumes import archive_tailored_pdf
 
 app = typer.Typer(no_args_is_help=True, help="Reasoning-based resume transformation engine.")
 REPOSITORY_ROOT = Path(__file__).resolve().parents[4]
-DEFAULT_BASE = REPOSITORY_ROOT / "data" / "resumes" / "Brian_Aiad_BASE.docx"
+DEFAULT_BASE = default_base_resume()
 DEFAULT_PROFILE = REPOSITORY_ROOT / "data" / "profile" / "Brian_Aiad_PROFILE.json"
 DEFAULT_OUTPUT_ROOT = default_output_root()
 DEFAULT_USED_RESUME_ROOT = default_used_resume_root()

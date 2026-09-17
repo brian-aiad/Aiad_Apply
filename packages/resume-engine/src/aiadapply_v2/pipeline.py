@@ -856,6 +856,84 @@ def _supported_placement_keywords(keywords: list[JobKeyword]) -> list[JobKeyword
 
 def _place_direct_category_keyword(plan: RewritePlan, keyword: JobKeyword) -> None:
     """Express exact category vocabulary through an established concrete technology."""
+    if keyword.normalized == "end-user support":
+        bullet = next(
+            (
+                item
+                for item in plan.bullets
+                if item.paragraph_id == "experience.csulb.bullet.1"
+            ),
+            None,
+        )
+        if bullet and not contains_term(bullet.text, keyword.term):
+            for field in ("text", "shorter_text"):
+                value = getattr(bullet, field)
+                setattr(
+                    bullet,
+                    field,
+                    re.sub(
+                        r"\bfirst-line application support\b",
+                        "first-line end-user support",
+                        value,
+                        count=1,
+                        flags=re.IGNORECASE,
+                    ),
+                )
+            if keyword.term.casefold() not in {term.casefold() for term in bullet.target_terms}:
+                bullet.target_terms.append(keyword.term)
+        return
+    if keyword.normalized == "customer service":
+        bullet = next(
+            (
+                item
+                for item in plan.bullets
+                if item.paragraph_id == "experience.wehelp.bullet.2"
+            ),
+            None,
+        )
+        if bullet and not contains_term(bullet.text, keyword.term):
+            for field in ("text", "shorter_text"):
+                value = getattr(bullet, field)
+                setattr(
+                    bullet,
+                    field,
+                    re.sub(
+                        r"\bby managing user access\b",
+                        "with customer service, user access management",
+                        value,
+                        count=1,
+                        flags=re.IGNORECASE,
+                    ),
+                )
+            if keyword.term.casefold() not in {term.casefold() for term in bullet.target_terms}:
+                bullet.target_terms.append(keyword.term)
+        return
+    if keyword.normalized == "service desk":
+        bullet = next(
+            (
+                item
+                for item in plan.bullets
+                if item.paragraph_id == "experience.original_insurance.bullet.1"
+            ),
+            None,
+        )
+        if bullet and not contains_term(bullet.text, keyword.term):
+            for field in ("text", "shorter_text"):
+                value = getattr(bullet, field)
+                setattr(
+                    bullet,
+                    field,
+                    re.sub(
+                        r"\bproduction support tickets\b",
+                        "service desk and production support tickets",
+                        value,
+                        count=1,
+                        flags=re.IGNORECASE,
+                    ),
+                )
+            if keyword.term.casefold() not in {term.casefold() for term in bullet.target_terms}:
+                bullet.target_terms.append(keyword.term)
+        return
     if keyword.normalized == "account management":
         bullet = next(
             (
@@ -1241,11 +1319,17 @@ def _fuse_skill_inventory(
         and keyword.normalized not in unsupported_normalized
         and keyword.normalized not in ineligible_normalized
     ]
+    all_base_skills = [skill for values in base_lines.values() for skill in values]
     relocated: dict[str, list[str]] = {}
     for line in plan.skills.lines:
         original = base_lines.get(line.paragraph_id, [])
         for value in line.skills:
             if any(_same_skill(value, base_value) for base_value in original):
+                continue
+            # A model may repeat an established skill in another category to make a
+            # keyword look newly targeted. Keep the protected category instead of
+            # recording a cosmetic relocation as a resume improvement.
+            if any(_same_skill(value, base_value) for base_value in all_base_skills):
                 continue
             keyword = next(
                 (item for item in credible_new if _matches_any_keyword(value, [item])),

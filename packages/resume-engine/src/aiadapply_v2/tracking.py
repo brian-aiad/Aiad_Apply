@@ -161,14 +161,25 @@ def run_worker(
 ) -> None:
     url, secret = tracking_configuration(api_url)
     worker_id = f"{socket.gethostname()}-{os.getpid()}"
+    claim_failure_reported = False
     while True:
-        claimed = _request_json(
-            f"{url}/api/worker/claim",
-            secret=secret,
-            payload={"workerId": worker_id},
-            allow_empty=True,
-            retry_attempts=2,
-        )
+        try:
+            claimed = _request_json(
+                f"{url}/api/worker/claim",
+                secret=secret,
+                payload={"workerId": worker_id},
+                allow_empty=True,
+                retry_attempts=2,
+            )
+            claim_failure_reported = False
+        except Exception as error:
+            if once:
+                raise
+            if not claim_failure_reported:
+                print(f"Tracking API unavailable; worker will keep retrying: {error}")
+            claim_failure_reported = True
+            time.sleep(poll_seconds)
+            continue
         if claimed is None:
             if once:
                 return

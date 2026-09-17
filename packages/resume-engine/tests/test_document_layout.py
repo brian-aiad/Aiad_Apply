@@ -71,6 +71,17 @@ def test_no_edit_docx_round_trip_preserves_structure_metrics_and_hyperlinks(tmp_
                 assert base_zip.read(member) == output_zip.read(member)
 
 
+def test_export_rebalances_postman_without_changing_the_template(tmp_path: Path) -> None:
+    document = parse_resume_docx(BASE)
+    output = write_resume_candidate(document, identity_plan(document), tmp_path / "balanced.docx")
+    rendered = parse_resume_docx(output)
+    by_id = {paragraph.paragraph_id: paragraph.text for paragraph in rendered.paragraphs}
+
+    assert "Postman" in by_id["skills.apis_identity"]
+    assert "Postman" not in by_id["skills.tools"]
+    assert compare_format_integrity(base_path=BASE, candidate_path=output) == []
+
+
 def test_ats_optimizer_removes_only_embedded_fonts(tmp_path: Path) -> None:
     optimized = write_ats_optimized_docx(BASE, tmp_path / "optimized.docx")
 

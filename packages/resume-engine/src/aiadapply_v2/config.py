@@ -47,6 +47,10 @@ def default_output_root(
 
     user_home = Path.home() if home is None else home
     current_platform = sys.platform if platform is None else platform
+    if current_platform == "darwin":
+        one_drive = user_home / "Library" / "CloudStorage" / "OneDrive-Personal"
+        if one_drive.is_dir():
+            return one_drive / "Downloads" / "Resume_Builder" / "OUTPUT_RESUMES"
     if current_platform == "win32":
         one_drive_downloads = user_home / "OneDrive" / "Downloads"
         if one_drive_downloads.is_dir():
@@ -71,3 +75,13 @@ def default_used_resume_root(
         environment=environment,
     )
     return output_root.parent / "USED_RESUME"
+
+
+def default_base_resume() -> Path:
+    configured = _configured_path("AIADAPPLY_BASE_RESUME", environment=None)
+    if configured:
+        return Path(configured).expanduser()
+    synced = default_output_root().parent / "Brian_Aiad_BASE.docx"
+    if synced.is_file():
+        return synced
+    return REPOSITORY_ROOT / "data" / "resumes" / "Brian_Aiad_BASE.docx"

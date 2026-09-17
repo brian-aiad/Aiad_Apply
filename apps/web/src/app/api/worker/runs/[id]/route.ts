@@ -351,7 +351,7 @@ export async function POST(
           detail: input.data.error ? { error: input.data.error } : undefined,
         },
       });
-    });
+    }, { maxWait: 10_000, timeout: 30_000 });
   } catch (error) {
     if (error instanceof RunOwnershipError) {
       return NextResponse.json(

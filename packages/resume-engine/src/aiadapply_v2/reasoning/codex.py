@@ -36,9 +36,23 @@ AI_API_KEY_VARIABLES = {
 class CodexReasoner:
     name = "codex-cli"
 
-    def __init__(self, executable: str = "codex", timeout_seconds: int | None = None) -> None:
+    def __init__(
+        self,
+        executable: str = "codex",
+        timeout_seconds: int | None = None,
+        model: str | None = None,
+        reasoning_effort: str | None = None,
+    ) -> None:
         self.executable = executable
         self.timeout_seconds = timeout_seconds or _configured_timeout_seconds()
+        self.model = model or os.environ.get("AIADAPPLY_CODEX_MODEL", "gpt-5.6-sol")
+        self.reasoning_effort = reasoning_effort or os.environ.get(
+            "AIADAPPLY_CODEX_REASONING_EFFORT", "low"
+        )
+        if self.reasoning_effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+            raise ValueError(
+                "AIADAPPLY_CODEX_REASONING_EFFORT must be none, low, medium, high, xhigh, or max."
+            )
 
     def reason(
         self,
@@ -84,6 +98,10 @@ class CodexReasoner:
                 "read-only",
                 "--skip-git-repo-check",
                 "--ignore-user-config",
+                "--model",
+                self.model,
+                "--config",
+                f'model_reasoning_effort="{self.reasoning_effort}"',
                 "--ignore-rules",
                 "--color",
                 "never",
@@ -302,6 +320,10 @@ Non-negotiable output rules:
 13. Write concise ATS-readable prose, no first-person pronouns, no raw keyword dumps.
     Prefer embedding role actions and outcomes in evidence-backed experience bullets;
     use Skills primarily for real tools, technologies, methods, and support disciplines.
+    Straightforward evidence-backed support vocabulary such as customer service,
+    end-user support, and service desk belongs naturally in relevant experience prose;
+    do not omit it merely because it is broadly applicable. Never move or duplicate an
+    existing base skill into another skill category and present that move as tailoring.
 14. Tailoring is selective, not mandatory paraphrasing. Preserve the exact base paragraph
     when a rewrite would only shorten it, remove named systems or methods, or fail to add
     meaningful role alignment. Primary text should retain the source's information density;

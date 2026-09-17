@@ -49,6 +49,7 @@ def write_resume_candidate(
     )
 
     proposed_skills = {line.paragraph_id: line for line in plan.skills.lines}
+    selected_skill_values: dict[str, list[str]] = {}
     for paragraph_id, proposed_skill in proposed_skills.items():
         meta = by_id[paragraph_id]
         selected_skills = (
@@ -64,6 +65,10 @@ def write_resume_candidate(
             )
             else proposed_skill.skills
         )
+        selected_skill_values[paragraph_id] = selected_skills
+
+    for paragraph_id, selected_skills in selected_skill_values.items():
+        meta = by_id[paragraph_id]
         prefix_match = re.match(r"^.*?:\s*", meta.text)
         fixed_prefix = (
             prefix_match.group(0) if prefix_match else f"{meta.text.split(':', 1)[0].strip()}: "

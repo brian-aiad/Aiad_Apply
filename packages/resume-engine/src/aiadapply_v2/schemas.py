@@ -213,6 +213,8 @@ class CandidateProfile(StrictModel):
     confirmed_skills: list[str] = Field(default_factory=list)
     confirmed_exposure: list[str] = Field(default_factory=list)
     drafting_notes: list[str] = Field(default_factory=list)
+    rejected_terms: list[str] = Field(default_factory=list)
+    review_history: list[dict[str, str]] = Field(default_factory=list)
 
 
 class EvidenceMatch(StrictModel):

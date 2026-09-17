@@ -103,6 +103,26 @@ def test_codex_timeout_rejects_out_of_range_values(monkeypatch) -> None:
         CodexReasoner()
 
 
+def test_codex_uses_stable_efficient_tailoring_defaults(monkeypatch) -> None:
+    monkeypatch.delenv("AIADAPPLY_CODEX_MODEL", raising=False)
+    monkeypatch.delenv("AIADAPPLY_CODEX_REASONING_EFFORT", raising=False)
+
+    reasoner = CodexReasoner()
+
+    assert reasoner.model == "gpt-5.6-sol"
+    assert reasoner.reasoning_effort == "low"
+
+
+def test_codex_model_and_reasoning_effort_can_be_configured(monkeypatch) -> None:
+    monkeypatch.setenv("AIADAPPLY_CODEX_MODEL", "gpt-5.6-terra")
+    monkeypatch.setenv("AIADAPPLY_CODEX_REASONING_EFFORT", "medium")
+
+    reasoner = CodexReasoner()
+
+    assert reasoner.model == "gpt-5.6-terra"
+    assert reasoner.reasoning_effort == "medium"
+
+
 def test_job_prompt_injection_remains_serialized_as_untrusted_data() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/floqast_full.txt").read_text(encoding="utf-8")

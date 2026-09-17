@@ -10,7 +10,81 @@
   ],
   "confirmed_exposure": [
     "Compliance",
-    "U.S. citizenship"
+    "U.S. citizenship",
+    "problem-solving",
+    "service desk",
+    "interpersonal skills",
+    "cross-functional collaboration",
+    "customer service",
+    "end-user support"
+  ],
+  "rejected_terms": [
+    "Zendesk",
+    "PLM",
+    "MES",
+    "ERP"
+  ],
+  "review_history": [
+    {
+      "term": "problem-solving",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:48.995Z"
+    },
+    {
+      "term": "service desk",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:50.248Z"
+    },
+    {
+      "term": "interpersonal skills",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:53.298Z"
+    },
+    {
+      "term": "cross-functional collaboration",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:56.236Z"
+    },
+    {
+      "term": "customer service",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:57.931Z"
+    },
+    {
+      "term": "end-user support",
+      "category": "other",
+      "decision": "confirmed",
+      "reviewed_at": "2026-09-17T02:52:58.981Z"
+    },
+    {
+      "term": "Zendesk",
+      "category": "technology",
+      "decision": "rejected",
+      "reviewed_at": "2026-09-17T02:53:26.008Z"
+    },
+    {
+      "term": "PLM",
+      "category": "technology",
+      "decision": "rejected",
+      "reviewed_at": "2026-09-17T02:53:26.913Z"
+    },
+    {
+      "term": "MES",
+      "category": "technology",
+      "decision": "rejected",
+      "reviewed_at": "2026-09-17T02:53:28.041Z"
+    },
+    {
+      "term": "ERP",
+      "category": "technology",
+      "decision": "rejected",
+      "reviewed_at": "2026-09-17T02:53:31.291Z"
+    }
   ],
   "drafting_notes": [
     "These items were explicitly confirmed by Brian and may be listed in Skills.",
