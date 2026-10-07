@@ -520,8 +520,8 @@ require employer-issued credentials, so the app does not pretend to submit throu
 
 ## Moving to another device (October 7, 2026)
 
-Pull the latest `main` from the configured origin (this checkout uses
-`https://github.com/brian-aiad/aiadapplyV2.git`). Read `AGENTS.md`, the latest entries
+Pull the latest `main` from `https://github.com/brian-aiad/Aiad_Apply.git`
+(the former aiadapplyV2 URL redirects there). Read `AGENTS.md`, the latest entries
 in `HANDOFF.txt`, and `docs/application-automation.md` before continuing development.
 
 Transfer these privately, outside Git:
