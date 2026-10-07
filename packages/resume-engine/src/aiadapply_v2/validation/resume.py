@@ -7,6 +7,7 @@ from aiadapply_v2.documents.formatting import compare_format_integrity
 from aiadapply_v2.documents.model import parse_resume_docx
 from aiadapply_v2.evidence.loaders import SYSTEM_TERMS
 from aiadapply_v2.grading.keywords import NON_PROSE_QUALIFICATIONS, important_keywords
+from aiadapply_v2.planning.quality import demonstrates_ordinary_capability
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text
 from aiadapply_v2.schemas import (
     EvidenceStrength,
@@ -17,7 +18,7 @@ from aiadapply_v2.schemas import (
     ValidationIssue,
     ValidationResult,
 )
-from aiadapply_v2.text import contains_term, split_skill_values
+from aiadapply_v2.text import contains_term, preserves_source_term, split_skill_values
 
 QUALITY_STOPWORDS = {
     "a",
@@ -161,6 +162,7 @@ def validate_rewrite_plan(
     *,
     forbidden_terms: list[str] | None = None,
     coverage_keywords: list[JobKeyword] | None = None,
+    required_keywords: list[JobKeyword] | None = None,
 ) -> ValidationResult:
     issues: list[ValidationIssue] = []
     expected_skill_ids = {
@@ -174,6 +176,12 @@ def validate_rewrite_plan(
         for paragraph in base.paragraphs
         if paragraph.kind.value == "skill_line"
     }
+    established_skills = [
+        skill
+        for paragraph in base.paragraphs
+        if paragraph.kind.value == "skill_line"
+        for skill in split_skill_values(paragraph.text.split(":", 1)[-1])
+    ]
     expected_bullet_ids = {
         paragraph.paragraph_id
         for paragraph in base.paragraphs
@@ -219,28 +227,26 @@ def validate_rewrite_plan(
                     paragraph_id=line.paragraph_id,
                 )
             )
-        source_skill_line = next(
-            (
-                paragraph.text
-                for paragraph in base.paragraphs
-                if paragraph.paragraph_id == line.paragraph_id
-            ),
-            "",
-        )
-        source_skills = split_skill_values(source_skill_line.split(":", 1)[-1])
-        missing_base_skills = [
+        unsupported_skills = [
             skill
-            for skill in source_skills
-            if not any(contains_term(value, skill) for value in line.skills)
+            for skill in line.skills
+            if not any(
+                contains_term(skill, value) or contains_term(value, skill)
+                for value in established_skills
+            )
+            and not any(
+                keyword.accepted
+                and (contains_term(skill, keyword.term) or contains_term(keyword.term, skill))
+                for keyword in keywords
+            )
         ]
-        if missing_base_skills:
+        if unsupported_skills:
             issues.append(
                 ValidationIssue(
-                    code="base_skill_removed",
+                    code="unsupported_skill_inserted",
                     message=(
-                        "Tailoring removed verified base skills: "
-                        + ", ".join(missing_base_skills)
-                        + ". Preserve them in this skill category."
+                        "Skills must come from established candidate evidence or an accepted, "
+                        "evidence-supported job term: " + ", ".join(unsupported_skills)
                     ),
                     paragraph_id=line.paragraph_id,
                 )
@@ -273,19 +279,30 @@ def validate_rewrite_plan(
                     paragraph_id=bullet.paragraph_id,
                 )
             )
+        source_text = next(
+            (p.text for p in base.paragraphs if p.paragraph_id == bullet.source_paragraph_id), ""
+        )
+        preserved_source = bullet.text == source_text and bullet.shorter_text == source_text
         boundary_enforced = any(not risk.export_allowed for risk in bullet.claim_risks)
         invalid_shorter = (
             not bullet.shorter_text
             or len(bullet.shorter_text) > len(bullet.text)
-            or (not boundary_enforced and len(bullet.shorter_text) == len(bullet.text))
+            or (
+                not boundary_enforced
+                and not preserved_source
+                and bullet.shorter_text != bullet.text
+                and len(bullet.shorter_text) == len(bullet.text)
+            )
         )
         if invalid_shorter:
             issues.append(
                 ValidationIssue(
                     code="invalid_shorter_candidate",
                     message=(
-                        "shorter_text must be present and shorter than the primary bullet, "
-                        "unless an export boundary already selected that fallback."
+                        "shorter_text must be present and shorter than or identical to the primary bullet, "
+                        "unless an export boundary already selected that fallback. "
+                        f"Primary has {len(bullet.text)} characters; fallback has "
+                        f"{len(bullet.shorter_text)}."
                     ),
                     paragraph_id=bullet.paragraph_id,
                 )
@@ -301,7 +318,7 @@ def validate_rewrite_plan(
         missing_systems = [
             term
             for term in SYSTEM_TERMS
-            if contains_term(source, term) and not contains_term(bullet.text, term)
+            if contains_term(source, term) and not preserves_source_term(bullet.text, term)
         ]
         if missing_systems:
             issues.append(
@@ -324,6 +341,9 @@ def validate_rewrite_plan(
         or len(plan.summary.shorter_text) > len(plan.summary.text)
         or (
             not summary_boundary_enforced
+            and plan.summary.text
+            != next((p.text for p in base.paragraphs if p.paragraph_id == "summary"), "")
+            and plan.summary.shorter_text != plan.summary.text
             and len(plan.summary.shorter_text) == len(plan.summary.text)
         )
     )
@@ -332,7 +352,7 @@ def validate_rewrite_plan(
             ValidationIssue(
                 code="invalid_shorter_summary",
                 message=(
-                    "The summary fallback must be shorter than the primary summary, unless an "
+                    "The summary fallback must be shorter than or identical to the primary summary, unless an "
                     "export boundary already selected that fallback."
                 ),
                 paragraph_id="summary",
@@ -430,10 +450,22 @@ def validate_rewrite_plan(
                     message=f"Remove unsupported target term from resume prose: {term}.",
                 )
             )
-    for keyword in important_keywords(keywords):
-        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not contains_term(
+    # Exact placement is a hard invariant only for terms backed by direct evidence.
+    # Strongly transferable terms remain valuable coverage opportunities, but making
+    # each one mandatory can reject a truthful resume over a generic phrase that has
+    # no safe deterministic insertion (for example, "end-to-end").
+    placement_requirements = keywords if required_keywords is None else required_keywords
+    source_texts = {paragraph.paragraph_id: paragraph.text for paragraph in base.paragraphs}
+    for keyword in important_keywords(placement_requirements):
+        demonstrated = any(
+            demonstrates_ordinary_capability(
+                keyword.term, source_texts.get(bullet.paragraph_id, ""), bullet.text
+            )
+            for bullet in plan.bullets
+        )
+        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not preserves_source_term(
             resume_text, keyword.term
-        ):
+        ) and not demonstrated:
             issues.append(
                 ValidationIssue(
                     code="important_keyword_missing",
@@ -581,14 +613,22 @@ def validate_candidate_docx(
             )
         )
 
+    source_by_id = {paragraph.paragraph_id: paragraph.text for paragraph in base.paragraphs}
     for keyword in important_keywords(keywords):
-        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not contains_term(
+        demonstrated = any(
+            ".bullet." in paragraph.paragraph_id
+            and demonstrates_ordinary_capability(
+                keyword.term, source_by_id.get(paragraph.paragraph_id, ""), paragraph.text
+            )
+            for paragraph in candidate.paragraphs
+        )
+        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not preserves_source_term(
             candidate_text, keyword.term
-        ):
+        ) and not demonstrated:
             issues.append(
                 ValidationIssue(
-                    code="important_keyword_missing_after_compression",
-                    message=(f"Compression removed an important accepted keyword: {keyword.term}."),
+                    code="important_keyword_not_represented",
+                    message=f"An important accepted keyword is not represented in the final document: {keyword.term}.",
                     severity="warning",
                 )
             )

@@ -32,6 +32,9 @@ Active security clearance and U.S. citizenship required.`));
   assert.ok(fit.confirmedFacts.some((fact) => /citizenship/i.test(fact)));
   assert.ok(fit.checks.some((line) => /clearance/i.test(line)));
   assert.ok(!fit.matches.some((m) => m.term === "ServiceNow"));
+  const tailoring = fit.dimensions.find((item) => item.key === "tailoring");
+  assert.match(JSON.stringify(tailoring), /drafted into Loavenly with review flags/);
+  assert.doesNotMatch(JSON.stringify(tailoring), /must stay out/);
 });
 
 test("fit dimensions explain decisions without treating normal experience as a blocker", () => {
@@ -57,6 +60,16 @@ Required Qualifications
   assert.equal(fit.recommendation, "Needs Review");
   assert.ok(fit.checks.some((line) => /6-8 years/i.test(line)));
   assert.equal(fit.dimensions.find((item) => item.key === "experience")?.status, "Material gap");
+});
+
+test("zero-to-four years is an explicit entry-level requirement, not missing data", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}\n0–4 years of experience in enterprise IT.`));
+  const experience = fit.dimensions.find((item) => item.key === "experience");
+  assert.equal(experience?.status, "Supported");
+  assert.match(experience?.detail ?? "", /no prior years/);
+  assert.ok(fit.confirmedFacts.some((fact) => /3\+ years/.test(fact)));
+  const unspecified = captureIntelligence(parseCapture(posting));
+  assert.equal(unspecified.dimensions.find((item) => item.key === "experience")?.status, "Not explicit");
 });
 
 test("preferred tools remain preferences and posting repetitions do not inflate overlap", () => {
@@ -87,6 +100,55 @@ Troubleshoot applications.`));
   assert.equal(fit.recommendation, "Needs Review");
 });
 
+test("capture previews software drafts without upgrading them to candidate evidence", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}
+Use Java and Kubernetes to support production services.
+Preferred Qualifications
+MATLAB, DuckDB, FastAPI and Apache Spark experience preferred.`));
+  for (const term of ["Java", "Kubernetes", "MATLAB", "DuckDB", "FastAPI", "Apache Spark"]) {
+    assert.ok(fit.draftTechnologies.some(item => item.term === term), term);
+    assert.ok(!fit.matches.some(item => item.term === term), term);
+    const gap = fit.gaps.find(item => item.term === term);
+    if (gap) assert.match(gap.reason, /editable DOCX/);
+  }
+  assert.equal(fit.draftTechnologies.find(item => item.term === "MATLAB")?.importance, "Preferred");
+  // Existing Skills knowledge is preserved; proposed project usage remains a draft.
+  assert.ok(!fit.gaps.some(item => item.term === "MATLAB"));
+  assert.match(fit.reason, /generate an editable draft now/);
+});
+
+test("credential-only requests and eligibility remain evidence checks", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}
+ServiceNow certification is required.
+ITIL certification is required.
+Active security clearance is required.`));
+  assert.equal(fit.recommendation, "Needs Review");
+  assert.deepEqual(fit.draftTechnologies, []);
+  assert.ok(fit.checks.some(line => /ServiceNow certification/.test(line)));
+  assert.ok(fit.checks.some(line => /clearance/.test(line)));
+  assert.match(fit.dimensions.find(item => item.key === "tailoring")?.detail ?? "", /project drafting does not establish/);
+});
+
+test("software use alongside a credential can be drafted without claiming the credential", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}
+Administer ServiceNow incident workflows.
+ServiceNow certification is required.`));
+  assert.ok(fit.draftTechnologies.some(item => item.term === "ServiceNow"));
+  assert.ok(fit.checks.some(line => /certification/.test(line)));
+  assert.ok(!fit.confirmedFacts.some(line => /ServiceNow/.test(line)));
+});
+
+test("negated and unrelated technologies do not leak into the draft preview", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}
+JavaScript skills are required.
+No prior MATLAB experience required.
+Preferred Qualifications
+DuckDB experience preferred.`));
+  assert.ok(!fit.draftTechnologies.some(item => ["Java", "MATLAB"].includes(item.term)));
+  assert.ok(fit.draftTechnologies.some(item => item.term === "DuckDB"));
+  assert.equal(fit.dimensions.find(item => item.key === "tailoring")?.status, "Project draft");
+});
+
 test("phrase diff preserves both texts and highlights separate edits", () => {
   const before = "Resolved customer tickets with SQL and wrote notes.";
   const after = "Resolved production tickets with SQL and wrote documentation.";
@@ -99,4 +161,17 @@ test("phrase diff preserves both texts and highlights separate edits", () => {
     assert.equal(result.before.map((p) => p.text).join(""), a);
     assert.equal(result.after.map((p) => p.text).join(""), b);
   }
+});
+
+test("support years do not automatically satisfy engineering years or a different degree", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}\n2 years of embedded software development experience.\nBachelor degree in mechanical engineering.`));
+  assert.equal(fit.dimensions.find((d) => d.key === "experience")?.status, "Different field");
+  assert.ok(fit.checks.some((line) => line.includes("embedded")));
+  assert.ok(!fit.confirmedFacts.includes("B.S. in Computer Science"));
+});
+
+test("capture previews C++ and C# as separate unverified draft technologies", () => {
+  const fit = captureIntelligence(parseCapture(`${posting}\nExperience building integrations with C++ and C#.`));
+  assert.ok(fit.draftTechnologies.some((item) => item.term === "C++"));
+  assert.ok(fit.draftTechnologies.some((item) => item.term === "C#"));
 });

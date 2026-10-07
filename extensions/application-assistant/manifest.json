@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "AiadApply Assistant",
+  "version": "0.1.0",
+  "description": "Preview and fill contact fields with the reviewed resume for one AiadApply application. You submit.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": { "default_popup": "popup.html", "default_title": "AiadApply Assistant" }
+}

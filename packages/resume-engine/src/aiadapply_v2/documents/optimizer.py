@@ -40,7 +40,12 @@ def write_ats_optimized_docx(source_path: str | Path, output_path: str | Path) -
     return output_path
 
 
-def font_deembedded_equivalent(base_path: str | Path, candidate_path: str | Path) -> bool:
+def font_deembedded_equivalent(
+    base_path: str | Path,
+    candidate_path: str | Path,
+    *,
+    allow_compact_bullet_numbering: bool = False,
+) -> bool:
     """Verify that immutable package differences are exactly the approved font removal."""
     with ZipFile(base_path) as base, ZipFile(candidate_path) as candidate:
         expected_names = {name for name in base.namelist() if not _is_embedded_font_part(name)}
@@ -50,6 +55,12 @@ def font_deembedded_equivalent(base_path: str | Path, candidate_path: str | Path
             if name == "word/document.xml":
                 continue
             expected = _optimized_part(name, base.read(name))
+            if name == "word/numbering.xml" and allow_compact_bullet_numbering:
+                # Local import avoids making the low-level optimizer depend on the
+                # package-integrity module during import initialization.
+                from aiadapply_v2.documents.formatting import compact_bullet_numbering
+
+                expected = compact_bullet_numbering(expected)
             if candidate.read(name) != expected:
                 return False
     return True

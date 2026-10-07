@@ -1,0 +1,231 @@
+{
+  "source": "https://www.onetcenter.org/dl_files/database/db_31_0_json/sample_of_reported_titles.json",
+  "version": "31.0",
+  "attribution": "O*NET OnLine / U.S. Department of Labor, Employment and Training Administration. Adapted under CC BY 4.0: https://creativecommons.org/licenses/by/4.0/",
+  "titles": [
+    {
+      "code": "15-1211.00",
+      "title": "Applications Analyst"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Business Systems Analyst"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Computer Analyst"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Computer Systems Analyst"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Computer Systems Consultant"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Information Systems Analyst (ISA)"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "IT Analyst (Information Technology Analyst)"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "IT Systems Analyst (Information Technology Systems Analyst)"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Programmer Analyst"
+    },
+    {
+      "code": "15-1211.00",
+      "title": "Systems Analyst"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Computer Network Specialist"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "IT Consultant (Information Technology Consultant)"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Network Specialist"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Network Support Specialist"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Network Technical Analyst"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Network Technician"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Personal Computer Network Analyst"
+    },
+    {
+      "code": "15-1231.00",
+      "title": "Systems Specialist"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Computer Support Specialist"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Computer Tech (Computer Technician)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Desktop Support Technician (Desktop Support Tech)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Help Desk Analyst"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Help Desk Tech (Help Desk Technician)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "IS Tech (Information Systems Technician)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "IT Specialist (Information Technology Specialist)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "IT Support Specialist (Information Technology Support Specialist)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "IT Tech (Information Technology Technician)"
+    },
+    {
+      "code": "15-1232.00",
+      "title": "Technical Support Specialist"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Administration Manager"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Administrator (DBA)"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Analyst"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Coordinator"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Engineer"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Database Manager"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Development and Database Administration Manager"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "IS Admin (Information Systems Administrator)"
+    },
+    {
+      "code": "15-1242.00",
+      "title": "Systems Administrator (Systems Admin)"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "LAN Administrator (Local Area Network Administrator)"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "LAN Specialist (Local Area Network Specialist)"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Administrator (Network Admin)"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Analyst"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Coordinator"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Engineer"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Manager"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Network Specialist"
+    },
+    {
+      "code": "15-1244.00",
+      "title": "Systems Engineer"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Automation Tester"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Information Technology Analyst (IT Analyst)"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Quality Assurance Analyst (QA Analyst)"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Quality Assurance Engineer (QA Engineer)"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Quality Engineer"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Software Quality Assurance Analyst (SQA Analyst)"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Software Quality Assurance Engineer (SQA Engineer)"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Software Quality Engineer"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Software Test Engineer"
+    },
+    {
+      "code": "15-1253.00",
+      "title": "Test Engineer"
+    }
+  ]
+}

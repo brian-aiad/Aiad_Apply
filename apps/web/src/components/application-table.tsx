@@ -1,5 +1,6 @@
 "use client";
 
+import { formatJobLocation } from "@/lib/format";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -170,7 +171,7 @@ export function ApplicationTable({
                       router.push(`/applications/${application.id}`);
                     }}
                     onKeyDown={(event) => {
-                      if (event.key === "Enter") router.push(`/applications/${application.id}`);
+                      if (event.target === event.currentTarget && event.key === "Enter") router.push(`/applications/${application.id}`);
                     }}
                   >
                     <td data-label="Role">
@@ -181,7 +182,7 @@ export function ApplicationTable({
                     </td>
                     <td data-label="Status"><StatusPill status={application.status} /></td>
                     <td data-label="Location" className="secondary application-location">
-                      {application.job.location || "Not listed"}
+                      {formatJobLocation(application.job.location)}
                     </td>
                     <td data-label="Salary" className="secondary">
                       {formatMoneyRange(application.job.salaryMin, application.job.salaryMax, application.job.salaryText)}
@@ -196,7 +197,7 @@ export function ApplicationTable({
                       {followUp ? <span className={followUpOverdue ? "follow-up follow-up-overdue" : "follow-up"}>Follow up {formatShortDate(followUp)}</span> : null}
                     </td>
                     <td className="application-open-cell">
-                      <Link href={`/applications/${application.id}`} aria-label={`Open ${application.job.title}`} className="icon-link">
+                      <Link href={`/applications/${application.id}${application.status === "READY" ? "?tab=apply" : ""}`} aria-label={`Open ${application.job.title}`} className="icon-link">
                         <ExternalLink size={15} />
                       </Link>
                     </td>

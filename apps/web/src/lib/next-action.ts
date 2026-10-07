@@ -45,9 +45,9 @@ export function chooseNextAction({
   if (ready) {
     return {
       kind: "apply",
-      href: `/applications/${ready.id}`,
+      href: `/applications/${ready.id}?tab=apply`,
       label: `Apply to ${ready.job.company}`,
-      note: `${ready.job.title}. The resume is reviewed and ready to download.`,
+      note: `${ready.job.title}. Open the reviewed resume and application handoff.`,
       actionLabel: "Open ready application",
     };
   }

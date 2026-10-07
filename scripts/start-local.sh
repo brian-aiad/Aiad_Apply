@@ -3,6 +3,8 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "$0")/.." && pwd -P)"
 web_root="$repository_root/apps/web"
+# Import reliably even when Finder marks editable-install .pth files hidden.
+export PYTHONPATH="$repository_root/packages/resume-engine/src${PYTHONPATH:+:$PYTHONPATH}"
 runtime_root="$repository_root/.runtime"
 process_file="$runtime_root/processes.json"
 web_log="$runtime_root/web.log"
@@ -85,8 +87,9 @@ PY
   kill -0 "$web_pid" 2>/dev/null && web_running=1
   kill -0 "$worker_pid" 2>/dev/null && worker_running=1
   if [[ $web_running -eq 1 && $worker_running -eq 1 ]] && \
-    curl --silent --fail --max-time 2 "$local_url/api/health" | grep -q '"status":"ready"'; then
+    curl --silent --fail --max-time 10 "$local_url/api/health" | grep -q '"status":"ready"'; then
       echo "AIAD Apply is already running at $local_url"
+      bash "$repository_root/scripts/application-worker.sh" start
       if [[ $open_browser -eq 1 ]] && command -v open >/dev/null 2>&1; then open "$local_url"; fi
       exit 0
   fi
@@ -108,7 +111,33 @@ cleanup_failed_start() {
 }
 trap cleanup_failed_start ERR INT TERM
 
-if curl --silent --fail --max-time 2 "$local_url" >/dev/null 2>&1; then
+# A background job can be terminated when the terminal that launched this script
+# closes. Start each service in its own session so the app remains available after
+# Start AiadApply.command or an unattended terminal finishes.
+start_detached() {
+  local working_dir="$1" log_path="$2"
+  shift 2
+  python3 - "$working_dir" "$log_path" "$@" <<'PY'
+import os
+import subprocess
+import sys
+
+working_dir, log_path, *command = sys.argv[1:]
+with open(log_path, "w", encoding="utf-8") as log:
+    process = subprocess.Popen(
+        command,
+        cwd=working_dir,
+        stdin=subprocess.DEVNULL,
+        stdout=log,
+        stderr=subprocess.STDOUT,
+        env=os.environ.copy(),
+        start_new_session=True,
+    )
+print(process.pid)
+PY
+}
+
+if curl --silent --fail --max-time 10 "$local_url" >/dev/null 2>&1; then
   web_pid="$(lsof -nP -iTCP:3000 -sTCP:LISTEN -t 2>/dev/null | head -n 1)"
   web_cwd="$(lsof -a -p "$web_pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
   if [[ -z "$web_pid" || "$web_cwd" != "$web_root" ]]; then
@@ -117,15 +146,13 @@ if curl --silent --fail --max-time 2 "$local_url" >/dev/null 2>&1; then
   fi
   echo "Reusing the existing AIAD Apply dashboard on port 3000."
 else
-  (cd "$web_root" && exec nohup npm run dev -- --hostname 127.0.0.1 --port 3000) \
-    >"$web_log" 2>&1 &
-  web_pid=$!
+  web_pid="$(start_detached "$web_root" "$web_log" npm run dev -- --hostname 127.0.0.1 --port 3000)"
   started_web=1
 fi
 
 ready=0
 for _ in $(seq 1 60); do
-  if curl --silent --fail --max-time 2 "$local_url" >/dev/null; then
+  if curl --silent --fail --max-time 10 "$local_url" >/dev/null; then
     ready=1
     break
   fi
@@ -137,13 +164,11 @@ if [[ $ready -ne 1 ]]; then
   false
 fi
 
-(cd "$repository_root" && exec nohup uv run aiadapply worker --api-url "$local_url") \
-  >"$worker_log" 2>&1 &
-worker_pid=$!
+worker_pid="$(start_detached "$repository_root" "$worker_log" uv run aiadapply worker --api-url "$local_url")"
 worker_ready=0
 for _ in $(seq 1 20); do
   if ! kill -0 "$worker_pid" 2>/dev/null; then break; fi
-  if curl --silent --fail --max-time 2 "$local_url/api/health" | grep -q '"status":"ready"'; then
+  if curl --silent --fail --max-time 10 "$local_url/api/health" | grep -q '"status":"ready"'; then
     worker_ready=1
     break
   fi
@@ -168,6 +193,7 @@ with open(path, "w", encoding="utf-8") as handle:
 PY
 
 trap - ERR INT TERM
+bash "$repository_root/scripts/application-worker.sh" start
 echo "AIAD Apply is running at $local_url"
 echo "Logs: $web_log and $worker_log"
 echo "Stop it with: bash scripts/stop-local.sh"

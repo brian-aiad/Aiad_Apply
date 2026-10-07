@@ -27,6 +27,10 @@ LOCATION = re.compile(
     r"^([A-Za-z][A-Za-z .'-]+,\s*[A-Z]{2})(?:\s*[|·]\s*|\s*$)",
     re.MULTILINE,
 )
+WORKDAY_LOCATION = re.compile(
+    r"^([A-Za-z][A-Za-z .'-]+\s+[A-Z]{2}-\d+)(?:\s*[|·]\s*|\s*$)",
+    re.MULTILINE,
+)
 REMOTE_LOCATION = re.compile(
     r"^((?:United States|USA|US)\s*\(Remote\)|Remote(?:,\s*(?:US|USA|United States))?)"
     r"(?:\s*[|·]\s*|\s*$)",
@@ -39,12 +43,15 @@ OFFICIAL_LOCATION = re.compile(
 HEADINGS = {
     "responsibilities": (
         "what you'll do",
+        "what you'll get to do",
+        "how you'll help move us forward",
         "what you will do",
         "what you'll be doing",
         "you will",
         "your team will",
         "in this role, you will",
         "responsibilities",
+        "roles and responsibilities",
         "core responsibilities",
         "job responsibilities",
         "your responsibilities",
@@ -63,7 +70,10 @@ HEADINGS = {
     ),
     "required": (
         "what you'll bring",
+        "you'll bring these qualifications",
+        "the experience you bring",
         "required qualifications",
+        "required skills",
         "qualifications you must have",
         "required qualifications, capabilities and skills",
         "required technical experience (must)",
@@ -92,6 +102,8 @@ HEADINGS = {
         "competencies",
         "education",
         "your education and experience",
+        "education and experience",
+        "technical competencies (knowledge, skills & abilities)",
         "technical knowledge",
         "additionally, it support analyst is expected to demonstrate",
     ),
@@ -111,6 +123,8 @@ HEADINGS = {
         "bonus traits",
         "preferred skills",
         "strongly preferred",
+        "these qualifications would be nice to have",
+        "what makes you stand out",
     ),
 }
 QUALIFICATION_SUBHEADINGS = {
@@ -171,6 +185,8 @@ def parse_linkedin_simplify(raw: str) -> ParsedJob:
     score_match = SCORE.search(normalized)
     url_match = LINKEDIN_URL.search(normalized)
     official_url_match = OFFICIAL_URL.search(normalized)
+    header = JOB_START.split(normalized, maxsplit=1)[0]
+    header_url = re.search(r"^https?://[^\s]+$", "\n".join(header.splitlines()[:20]), re.MULTILINE)
 
     return ParsedJob(
         company=company,
@@ -183,6 +199,8 @@ def parse_linkedin_simplify(raw: str) -> ParsedJob:
             if official_url_match
             else url_match.group(0)
             if url_match
+            else header_url.group(0)
+            if header_url
             else None
         ),
         linkedin_url=url_match.group(0) if url_match else None,
@@ -291,7 +309,10 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
     prefix = raw[: start.start()] if start else raw[:2000]
     prefix_lines = [line.strip() for line in prefix.splitlines() if line.strip()]
     for index, line in enumerate(prefix_lines):
-        if not (LOCATION.match(line) or REMOTE_LOCATION.match(line)):
+        if not (
+            LOCATION.match(line) or OFFICIAL_LOCATION.match(line)
+            or WORKDAY_LOCATION.match(line) or REMOTE_LOCATION.match(line)
+        ):
             continue
         candidates = [
             value
@@ -396,7 +417,7 @@ def _extract_job_region(raw: str) -> tuple[str, list[str]]:
 def _extract_location(raw: str) -> str:
     # Employer pages may put a title ending in a state abbreviation before the
     # full city/state/country location. Prefer that explicit official location.
-    for pattern in (OFFICIAL_LOCATION, LOCATION, REMOTE_LOCATION):
+    for pattern in (OFFICIAL_LOCATION, LOCATION, WORKDAY_LOCATION, REMOTE_LOCATION):
         match = pattern.search(raw)
         if match:
             return match.group(1).strip()
@@ -407,10 +428,22 @@ def _extract_location(raw: str) -> str:
     )
     if narrative:
         return narrative.group(1).strip()
+    encoded = re.search(r"(?m)^US-([A-Z]{2})-([A-Z][A-Z ]+?)-[A-Z0-9]+(?:\s*~|$)", raw)
+    if encoded:
+        return f"{encoded.group(2).title()}, {encoded.group(1)}"
     return ""
 
 
 def _extract_work_arrangement(raw: str) -> str:
+    explicit = re.search(
+        r"Position Role Type:\s*(Onsite|On-site|Hybrid|Remote)\b", raw, re.IGNORECASE
+    )
+    if explicit:
+        return (
+            "On-site"
+            if explicit.group(1).lower() in {"onsite", "on-site"}
+            else explicit.group(1).title()
+        )
     job_start = JOB_START.search(raw)
     prefix = raw[: job_start.start()] if job_start else raw[:2000]
     job_description = raw[job_start.end() :] if job_start else raw
@@ -456,6 +489,7 @@ def _split_job_sections(job_description: str) -> dict[str, list[str]]:
     result: dict[str, list[str]] = {"responsibilities": [], "required": [], "preferred": []}
     current = ""
     qualifications_started = False
+    short_required_skills = False
     all_headers = {header: group for group, values in HEADINGS.items() for header in values}
     for raw_line in job_description.splitlines():
         line = raw_line.strip(" \t-*•")
@@ -466,28 +500,33 @@ def _split_job_sections(job_description: str) -> dict[str, list[str]]:
         normalized = line.rstrip(":").casefold().replace("\u2019", "'").replace("\u2018", "'")
         if normalized in all_headers:
             current = all_headers[normalized]
+            short_required_skills = normalized == "required skills"
             if current in {"required", "preferred"}:
                 qualifications_started = True
             continue
         if normalized in RESPONSIBILITY_SUBHEADINGS:
             current = "responsibilities"
+            short_required_skills = False
             continue
         if normalized in QUALIFICATION_SUBHEADINGS:
             current = "required"
+            short_required_skills = False
             qualifications_started = True
             continue
         if _ends_hiring_sections(normalized):
             current = ""
+            short_required_skills = False
             continue
         if _looks_like_new_header(line):
             current = ""
+            short_required_skills = False
             continue
         if _looks_malformed(line):
             continue
         if not current and not qualifications_started and _looks_like_unheaded_responsibility(line):
             result["responsibilities"].append(line)
             continue
-        if current and 15 <= len(line) <= 500:
+        if current and (15 <= len(line) <= 500 or short_required_skills and len(line) <= 500):
             destination = (
                 "preferred"
                 if current == "required"
@@ -529,6 +568,8 @@ def _looks_like_new_header(line: str) -> bool:
 
 
 def _ends_hiring_sections(normalized: str) -> bool:
+    if normalized.startswith("why ") and normalized.endswith("?") and len(normalized.split()) <= 8:
+        return True
     prefixes = (
         "about ",
         "benefits",

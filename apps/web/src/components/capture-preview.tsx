@@ -103,6 +103,13 @@ export function CapturePreview({
         </div>
       </details>
 
+      <div className="preview-recommendation" aria-label="Editable draft plan">
+        <p className="eyebrow">Your editable draft</p>
+        <p>Save and tailor will adapt this posting to your one-page resume. Relevant software technologies can be written into natural Loavenly implementation bullets for you to review and edit.</p>
+        {fit.draftTechnologies.length > 0 ? <p><strong>Potential project additions:</strong> {fit.draftTechnologies.map(item => `${item.term}${item.importance === "Preferred" ? " (preferred)" : ""}`).join(", ")}.</p> : null}
+        <small>The full tailoring pass checks the complete posting. Final review shows exact placements, unverified assumptions, and any terms that could not fit. Credentials and employer history still require evidence.</small>
+      </div>
+
       <div className="preview-recommendation">
         <p className="eyebrow">Preliminary recommendation</p>
         <h3>{fit.recommendation}</h3>

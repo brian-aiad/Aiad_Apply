@@ -31,18 +31,67 @@ def _markdown(report: TransformationReport) -> str:
     match_by_term = {
         match.target_term.casefold(): match for match in report.transferability_map.matches
     }
+    supported_rows = [
+        (item, placements)
+        for item, placements in placement_rows
+        if (match := match_by_term.get(item.normalized)) is not None
+        and match.strength.value in {"direct", "strongly_transferable"}
+    ]
+    critical_supported = [row for row in supported_rows if row[0].hiring_importance >= 60]
+    important_supported = [row for row in supported_rows if 25 <= row[0].hiring_importance < 60]
+    useful_supported = [row for row in supported_rows if row[0].hiring_importance < 25]
+    unsupported = [
+        item
+        for item in accepted
+        if (match := match_by_term.get(item.normalized)) is not None
+        and match.strength.value == "unsupported"
+    ]
     lines = [
         "# Resume Transformation Report",
         "",
         f"- Company: {report.job.company}",
         f"- Target role: {report.job.title}",
         f"- Professional identity: {report.role_profile.professional_identity}",
-        f"- Evidence-backed job coverage: {report.validation.keyword_coverage:.2f}%",
+        f"- Exact job keyword coverage: {report.validation.keyword_coverage:.2f}%",
+        f"- Tailoring mode: {report.tailoring_mode}",
+        "- Draft technology assumptions (review before applying): "
+        + (", ".join(item.term for item in report.draft_technologies) or "None"),
         f"- Output pages: {report.layout.page_count}",
         f"- Structural validation: {'PASS' if report.validation.structure_passed else 'FAIL'}",
         f"- Protected content: {'PASS' if report.validation.protected_fields_passed else 'FAIL'}",
         f"- Metrics: {'PASS' if report.validation.metrics_passed else 'FAIL'}",
         f"- Accepted keywords used: {used_count} of {len(accepted)}",
+        f"- Codex model calls: {report.model_calls}",
+        f"- Model input tokens: {_usage_total(report, 'input_tokens')}",
+        f"- Cached input tokens (included above): {_usage_total(report, 'cached_input_tokens')}",
+        f"- Model output tokens: {_usage_total(report, 'output_tokens')}",
+        f"- Model elapsed seconds: {sum(call.duration_seconds for call in report.model_usage):.1f}",
+        f"- Document candidates: {report.document_candidates}",
+        f"- Substantive bullet rewrites: {report.tailoring_summary.substantive_bullets_rewritten} "
+        f"of {report.tailoring_summary.relevant_bullets} relevant opportunities "
+        f"(minimum {report.tailoring_summary.minimum_substantive_rewrites})",
+        f"- Experience bullets changed: {report.tailoring_summary.experience_bullets_changed}",
+        f"- Project bullets changed: {report.tailoring_summary.project_bullets_changed}",
+        f"- Skills rows changed: {report.tailoring_summary.skills_rows_changed}",
+        f"- Newly represented terms: {', '.join(report.tailoring_summary.newly_represented_terms) or 'None'}",
+        f"- Supported terms already in base: {', '.join(report.tailoring_summary.already_present_terms) or 'None'}",
+        f"- Critical supported represented: {sum(bool(row[1]) for row in critical_supported)} of {len(critical_supported)}",
+        f"- Important supported represented: {sum(bool(row[1]) for row in important_supported)} of {len(important_supported)}",
+        f"- Useful supported represented: {sum(bool(row[1]) for row in useful_supported)} of {len(useful_supported)}",
+        f"- Unsupported requirements excluded: {sum(not _keyword_placements(report, item.term) for item in unsupported)} of {len(unsupported)}",
+        "",
+        "## Layout Acceptance",
+        "",
+        f"- Visual layout: {'PASS' if report.layout.passed else 'FAIL'}",
+        f"- Skills rows: {'PASS' if not any(item.startswith('skills.') for item in report.layout.overflow_paragraph_ids) else 'FAIL'}",
+        f"- Summary line budget: {'PASS' if 'summary' not in report.layout.overflow_paragraph_ids else 'FAIL'}",
+        f"- Bullet geometry: {'PASS' if not report.layout.bullet_alignment_issues else 'FAIL'}",
+        f"- Employer and section geometry: {'PASS' if not report.layout.employer_heading_issues and not report.layout.section_geometry_issues else 'FAIL'}",
+        f"- Page boundaries and density: {'PASS' if not report.layout.boundary_issues else 'FAIL'}",
+        f"- Font inventory: {'PASS' if not report.layout.font_inventory_changed else 'FAIL'}",
+        "- Layout repair trace:",
+        *(f"  - {item}" for item in report.layout_repairs),
+        *([] if report.layout_repairs else ["  - None"]),
         "",
         "## Keyword Placement Audit",
         "",
@@ -68,6 +117,20 @@ def _markdown(report: TransformationReport) -> str:
         f"({risk.selected_placement}): {risk.explanation}"
         for risk in report.claim_risks
     )
+    if report.keyword_coverage:
+        lines.extend(
+            [
+                "## Technology and method coverage",
+                "",
+                "| Term | Status | Final placement |",
+                "| --- | --- | --- |",
+            ]
+        )
+        for row in report.keyword_coverage:
+            lines.append(
+                f"| {row.term} | {row.status} | {', '.join(row.placements) or row.explanation} |"
+            )
+        lines.append("")
     lines.extend(["", "## Exact Resume Changes", ""])
     for change in report.changes:
         if change.change_type == "unchanged":
@@ -80,6 +143,7 @@ def _markdown(report: TransformationReport) -> str:
                 f"- Risk: {change.risk_level.value}",
                 f"- Compressed after layout validation: {'yes' if change.compressed else 'no'}",
                 f"- Target terms: {', '.join(change.target_terms) or 'none'}",
+                f"- Exact keywords added to this paragraph: {', '.join(change.added_terms) or 'none'}",
                 f"- Before: {change.before_text}",
                 f"- After: {change.final_text}",
                 "",
@@ -173,3 +237,9 @@ def _placement_decision(item: object, placements: list[str], match: object | Non
     if importance < 25:
         return "omitted as a lower-priority or scanner-only term"
     return "omitted to preserve stronger existing evidence and document space"
+
+
+def _usage_total(report: TransformationReport, field: str) -> str:
+    if not report.model_usage or any(getattr(call, field) is None for call in report.model_usage):
+        return "Not available for all calls"
+    return str(sum(getattr(call, field) for call in report.model_usage))

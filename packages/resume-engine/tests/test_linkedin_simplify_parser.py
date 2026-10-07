@@ -9,6 +9,31 @@ from aiadapply_v2.profiling.role_profile import build_target_role_profile
 FIXTURES = Path("data/fixtures")
 
 
+def test_techaxis_required_skills_are_parsed_as_qualifications() -> None:
+    job = parse_linkedin_simplify(
+        (FIXTURES / "techaxis_l3_production_support_engineer_2026_09_24.txt").read_text()
+    )
+    requirements = " ".join(job.required_qualifications)
+    assert "Python" in requirements
+    assert "AWS ECR" in requirements
+    assert "Harness" in requirements
+    assert "Contact Details" not in requirements
+
+
+def test_live_workday_posting_preserves_office_location_and_role() -> None:
+    job = parse_linkedin_simplify(
+        (FIXTURES / "pacific_life_platform_engineer_ii_live_2026_09_21.txt").read_text()
+    )
+    assert job.company == "Pacific Life"
+    assert job.title == "Platform Engineer II"
+    assert job.location == "Newport Beach CA-700"
+    assert job.source_url and job.source_url.endswith("Platform-Engineer-II_R17313")
+    assert len(job.responsibilities) == 6
+    assert len(job.required_qualifications) == 6
+    assert len(job.preferred_qualifications) == 4
+    assert "$113,490.00" in job.compensation
+
+
 def test_every_saved_real_posting_produces_a_usable_role_profile() -> None:
     fixture_paths = sorted(FIXTURES.rglob("*.txt"))
     assert len(fixture_paths) >= 35
@@ -801,3 +826,91 @@ def test_live_linkedin_keyword_grading_rejects_prose_and_title_fragments() -> No
     crossover = parse_linkedin_simplify(crossover_path.read_text(encoding="utf-8"))
     crossover_terms = {item.normalized for item in grade_job_keywords(crossover) if item.accepted}
     assert "usd" not in crossover_terms
+
+
+def test_employer_branded_section_headings_preserve_role_requirements() -> None:
+    job = parse_linkedin_simplify(
+        "Platform Engineer II\nPacific Life\nNewport Beach, CA · Full-time\n"
+        "About the job\nHow You'll Help Move Us Forward\n"
+        "Build, test, deploy, and maintain reusable workflows and automations.\n"
+        "Develop operational scripts and API integrations using secure controls.\n"
+        "The Experience You Bring\n"
+        "Foundational experience using PowerShell, Python, and HTTP-based calls.\n"
+        "Familiarity with access management, documentation, and platform administration.\n"
+        "What Makes You Stand Out\n"
+        "Experience creating dashboards and operational metrics.\n"
+        + ("Support enterprise platforms and improve end-user service delivery. " * 12)
+    )
+
+    assert any("reusable workflows" in line for line in job.responsibilities)
+    assert any("PowerShell" in line for line in job.required_qualifications)
+    assert any("dashboards" in line for line in job.preferred_qualifications)
+
+
+def test_mendix_hiring_sections_exclude_benefits_and_ai_disclosure():
+    from aiadapply_v2.grading.keywords import grade_job_keywords
+
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/mendix_application_support_engineer_2026_09_22.txt").read_text()
+    )
+    assert job.company == "Mendix"
+    assert job.title == "Application Support Engineer"
+    requirements = " ".join(job.required_qualifications + job.preferred_qualifications)
+    assert "JavaScript" in requirements
+    assert "Kubernetes" in requirements
+    assert "Comprehensive Benefits" not in requirements
+    assert "hiring process" not in requirements
+    keywords = {k.normalized: k for k in grade_job_keywords(job)}
+    assert not keywords["ai"].accepted
+    assert keywords["javascript"].accepted
+    assert keywords["service level agreements"].accepted
+    assert keywords["mendix"].accepted
+    assert keywords["low-code"].accepted
+
+
+def test_rtx_encoded_office_and_official_header_link() -> None:
+    raw = """Company logo for, Raytheon
+Raytheon
+Software Engineer I
+US-CA-EL SEGUNDO-R01 ~ 2000 E Imperial Hwy
+https://globalhr.wd5.myworkdayjobs.com/REC_RTX_Ext_Gateway/job/example/01878759
+About the job
+Position Role Type:
+Onsite
+Develop software using C++ and collaborate with the software engineering team.
+"""
+    job = parse_linkedin_simplify(
+        raw
+        + "Experience developing reliable software and testing systems with cross-functional teams. "
+        * 4
+    )
+    assert job.location == "El Segundo, CA"
+    assert job.work_arrangement == "On-site"
+    assert job.source_url.endswith("/01878759")
+
+
+def test_plain_employer_header_with_full_state_name_keeps_company_out_of_location():
+    from aiadapply_v2.parsers.linkedin_simplify import _extract_title_company
+
+    header = "Anduril\nIT Systems Engineer\nCosta Mesa, California, United States\nFull-time\nAbout the job\nResponsibilities"
+    assert _extract_title_company(header) == ("IT Systems Engineer", "Anduril")
+
+
+def test_workday_competency_and_education_sections():
+    job = parse_linkedin_simplify("""TravisMathew
+Business Strategy Analyst
+Huntington Beach, CA
+About the job
+ROLES AND RESPONSIBILITIES:
+Build dashboards for commercial reporting. Partner with commercial teams to validate operational datasets and prepare recurring reports that explain consumer trends, data quality issues, and changes in business performance.
+TECHNICAL COMPETENCIES (Knowledge, Skills & Abilities):
+Proficiency with SQL and Tableau.
+EDUCATION AND EXPERIENCE:
+Bachelor's degree and 2-4 years of analytics experience.
+Preferred Qualifications:
+Experience with SPSS.
+""")
+    assert any("dashboards" in x for x in job.responsibilities)
+    assert any("SQL" in x for x in job.required_qualifications)
+    assert any("2-4 years" in x for x in job.required_qualifications)
+    assert any("SPSS" in x for x in job.preferred_qualifications)

@@ -9,7 +9,7 @@ import { annualPay, employmentType, payFromText, safeExternalUrl, textFromHtml }
 import { normalizeOpening } from "../../src/lib/discovery/providers";
 import { DEFAULT_DISCOVERY_PREFERENCES as prefs, readDiscoveryPreferences, type Opening, type Source } from "../../src/lib/discovery/types";
 
-const opening: Opening = { externalId: "test", sourceKey: "lever:test", company: "Test employer", title: "Application Support Engineer", location: "Long Beach, CA", sourceUrl: "https://jobs.lever.co/test/test", description: "Troubleshoot SaaS production incidents using SQL, Jira, REST APIs and Postman. Support Microsoft 365 and Entra ID users. Work with incident escalations and SLA commitments.", employmentType: "Full-time", workArrangement: "Hybrid", salaryMin: 60000, salaryMax: 90000, salaryText: "$60,000–$90,000/year", postedAt: null };
+const opening: Opening = { externalId: "test", sourceKey: "lever:test", company: "Test employer", title: "Application Support Engineer", location: "Long Beach, CA", sourceUrl: "https://jobs.lever.co/test/test", description: "Required Qualifications\n2 years of support experience.\nTroubleshoot SaaS production incidents using SQL, Jira, REST APIs and Postman. Support Microsoft 365 and Entra ID users. Work with incident escalations and SLA commitments.", employmentType: "Full-time", workArrangement: "Hybrid", salaryMin: 60000, salaryMax: 90000, salaryText: "$60,000–$90,000/year", postedAt: null };
 const source = (provider: Source["provider"]): Source => ({ key: `${provider}:test`, board: "test", provider, company: "Test employer", url: "https://example.com" });
 
 test("discovery evidence stays tied to the protected resume inspection", () => {
@@ -105,4 +105,19 @@ test("preserves descriptions and metadata for all four public providers", () => 
 test("preferences cannot silently widen the agreed 30-mile, $60k constraints", () => {
   assert.deepEqual(readDiscoveryPreferences({ radiusMiles: 100, minimumSalary: 20000 }), prefs);
   assert.deepEqual(readDiscoveryPreferences({ radiusMiles: 10, minimumSalary: 70000, includeRemote: true }), { radiusMiles: 10, minimumSalary: 70000, includeRemote: true });
+});
+
+test("multi-office listings retain a local option without claiming a confirmed local worksite", () => {
+  const assessment = assessOpening({ ...opening, location: "Irvine, CA, Austin, TX, San Francisco Bay Area, CA, Denver, CO" }, prefs);
+  assert.equal(assessment.excluded, false);
+  assert.equal(assessment.distanceMiles, null);
+  assert.equal(assessment.qualified, false);
+  assert.ok(assessment.cautions.some((c) => c.includes("worksite")));
+  assert.equal(assessOpening({ ...opening, location: "Austin, TX, Denver, CO" }, prefs).excluded, true);
+});
+
+test("current entry/support preferences exclude senior and experienced engineering recommendations", () => {
+  assert.equal(assessOpening({ ...opening, title: "Senior Network Engineer" }, prefs).excluded, true);
+  assert.equal(assessOpening({ ...opening, title: "Systems Engineer II" }, prefs).excluded, true);
+  assert.equal(assessOpening({ ...opening, description: `${opening.description}\nActive Secret security clearance required before starting.` }, { ...prefs, clearance: "none" }).excluded, true);
 });

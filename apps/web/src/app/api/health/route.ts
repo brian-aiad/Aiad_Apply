@@ -1,8 +1,7 @@
-import { access } from "node:fs/promises";
-import path from "node:path";
-import os from "node:os";
+import { stat } from "node:fs/promises";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { baseResumePath } from "@/lib/base-resume";
 import { storageHealth } from "@/lib/storage-health";
 import {
   workerHeartbeatCutoff,
@@ -13,8 +12,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const [resume, activeRuns, liveWorkers] = await Promise.all([
-      db.resumeVersion.findFirst({ where: { active: true } }),
+    const [activeRuns, liveWorkers] = await Promise.all([
       db.tailoringRun.count({ where: { status: { in: ["QUEUED", "RUNNING"] } } }),
       db.setting.count({
         where: {
@@ -23,20 +21,8 @@ export async function GET() {
         },
       }),
     ]);
-    const fallbackResume = path.resolve(
-      process.cwd(),
-      "..",
-      "..",
-      "data",
-      "resumes",
-      "Brian_Aiad_BASE.docx",
-    );
-    const resumeCandidates = [process.env.AIADAPPLY_BASE_RESUME, resume?.localPath, fallbackResume].filter(
-      (value): value is string => Boolean(value),
-    );
-    const baseResumeReady = await Promise.any(
-      resumeCandidates.map((candidate) => access(candidate.startsWith("~/") ? path.join(os.homedir(), candidate.slice(2)) : candidate).then(() => true)),
-    ).catch(() => false);
+    const baseResumeReady = await stat(await baseResumePath())
+      .then((entry) => entry.isFile()).catch(() => false);
     return NextResponse.json({
       status: baseResumeReady && liveWorkers > 0 ? "ready" : "attention",
       database: true,

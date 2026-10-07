@@ -36,3 +36,14 @@ export function formatShortDate(date: Date) {
     minute: "2-digit",
   }).format(date);
 }
+
+/** Compact display only; preserve the full employer worksite in stored data. */
+export function formatJobLocation(value: string | null | undefined) {
+  if (!value) return "Location not listed";
+  return value.split(/;\s*/).map((part) => {
+    const remote = part.match(/^US-([A-Z]{2})-REMOTE$/i);
+    if (remote) return `${remote[1].toUpperCase()} · Remote`;
+    const office = part.match(/^US-([A-Z]{2})-([A-Z][A-Z ]+?)-[A-Z0-9]+(?:\s*~|$)/i);
+    return office ? `${office[2].toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())}, ${office[1].toUpperCase()}` : part;
+  }).join("; ");
+}

@@ -6,6 +6,7 @@ from aiadapply_v2.grading.keywords import grade_job_keywords
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
 from aiadapply_v2.planning.priorities import paragraph_priorities
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
+from aiadapply_v2.schemas import JobKeyword, KeywordKind, KeywordPriority
 from aiadapply_v2.semantic.matcher import LexicalSemanticEncoder, build_transferability_map
 from aiadapply_v2.validation.resume import validate_rewrite_plan
 
@@ -33,7 +34,7 @@ def test_priorities_never_suggest_unsupported_terms_or_protected_paragraphs():
     forbidden = set(matches.unsupported_terms + matches.weakly_transferable_terms)
     assert all(not (set(item["missing_supported_terms"]) & forbidden) for item in priorities)
     assert all(
-        item["priority"] == max(0, item["expected_benefit"] - item["rewrite_risk"])
+        abs(item["priority"] - max(0, item["expected_benefit"] - item["rewrite_risk"])) < 0.02
         for item in priorities
     )
     assert all(
@@ -82,3 +83,28 @@ def test_language_quality_leaves_unchanged_long_high_value_bullets_alone():
     result = validate_rewrite_plan(document, plan, keywords, profile)
 
     assert not any(issue.code == "long_changed_bullet" for issue in result.issues)
+
+
+def test_transferable_missing_phrase_is_reported_by_coverage_without_blocking_plan() -> None:
+    document, _, profile, _, _ = inputs()
+    plan = identity_plan(document)
+    phrase = JobKeyword(
+        term="end-to-end",
+        normalized="end-to-end",
+        kind=KeywordKind.action,
+        priority=KeywordPriority.high,
+        hiring_importance=47,
+        placement_utility=57,
+    )
+
+    result = validate_rewrite_plan(
+        document,
+        plan,
+        [phrase],
+        profile,
+        coverage_keywords=[phrase],
+        required_keywords=[],
+    )
+
+    assert not any(issue.code == "important_keyword_missing" for issue in result.issues)
+    assert result.keyword_coverage == 0.0

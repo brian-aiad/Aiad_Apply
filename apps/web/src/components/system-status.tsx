@@ -72,7 +72,7 @@ export function SystemStatus() {
       aria-live="polite"
     >
       {health.status === "ready" ? <span className="health-dot" /> : <CircleAlert size={12} />}
-      {label}
+      <span className="health-label">{label}</span>
     </span>
   );
 }

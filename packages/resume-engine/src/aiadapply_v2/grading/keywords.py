@@ -13,6 +13,69 @@ from aiadapply_v2.schemas import (
 from aiadapply_v2.text import count_term, dedupe, normalized_term
 
 TERM_CATALOG: dict[str, KeywordKind] = {
+    "Excel": KeywordKind.system,
+    "PowerPoint": KeywordKind.system,
+    "Microsoft Word": KeywordKind.system,
+    "dbt": KeywordKind.system,
+    "R": KeywordKind.system,
+    "C": KeywordKind.system,
+    "Go": KeywordKind.system,
+    "Rust": KeywordKind.system,
+    "Kotlin": KeywordKind.system,
+    "Swift": KeywordKind.system,
+    "Scala": KeywordKind.system,
+    "Ruby": KeywordKind.system,
+    "PHP": KeywordKind.system,
+    "Perl": KeywordKind.system,
+    "Dart": KeywordKind.system,
+    "Elixir": KeywordKind.system,
+    "Haskell": KeywordKind.system,
+    "Lua": KeywordKind.system,
+    "Groovy": KeywordKind.system,
+    "Objective-C": KeywordKind.system,
+    "Terraform": KeywordKind.system,
+    "Helm": KeywordKind.system,
+    "Scrum": KeywordKind.environment,
+    "Kanban": KeywordKind.environment,
+    "acceptance criteria": KeywordKind.action,
+    "Work Breakdown Structures": KeywordKind.action,
+    "Earned Value Management": KeywordKind.action,
+    "Estimate at Completion": KeywordKind.action,
+    "application testing": KeywordKind.action,
+    "backlog management": KeywordKind.action,
+    "Foundry": KeywordKind.system,
+    "Mendix": KeywordKind.system,
+    "low-code": KeywordKind.environment,
+    "knowledge articles": KeywordKind.action,
+    "process mapping": KeywordKind.action,
+    "release validation": KeywordKind.action,
+    "requirements elicitation": KeywordKind.action,
+    "runbooks": KeywordKind.action,
+    "stakeholder management": KeywordKind.action,
+    "support readiness": KeywordKind.action,
+    "Tier 2 support": KeywordKind.action,
+    "user stories": KeywordKind.action,
+    "access management": KeywordKind.action,
+    "automation": KeywordKind.action,
+    "background jobs": KeywordKind.action,
+    "dashboards": KeywordKind.action,
+    "data feeds": KeywordKind.action,
+    "deployment": KeywordKind.action,
+    "digital workplace": KeywordKind.environment,
+    "enterprise IT": KeywordKind.environment,
+    "integrations": KeywordKind.action,
+    "lifecycle management": KeywordKind.action,
+    "operational controls": KeywordKind.action,
+    "platform administration": KeywordKind.action,
+    "platform health": KeywordKind.outcome,
+    "reporting": KeywordKind.action,
+    "role-based access": KeywordKind.action,
+    "scripts": KeywordKind.action,
+    "self-service": KeywordKind.action,
+    "service performance": KeywordKind.outcome,
+    "workflow improvement": KeywordKind.outcome,
+    "workflows": KeywordKind.action,
+    ".NET": KeywordKind.system,
     "Active Directory": KeywordKind.system,
     "Abrigo": KeywordKind.system,
     "account management": KeywordKind.action,
@@ -25,8 +88,10 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "Ansible": KeywordKind.system,
     "AWS": KeywordKind.system,
     "AWS EKS": KeywordKind.system,
+    "AWS ECR": KeywordKind.system,
     "AWS RDS": KeywordKind.system,
     "AWS S3": KeywordKind.system,
+    "AWS SNS": KeywordKind.system,
     "Azure": KeywordKind.system,
     "Azure DevOps": KeywordKind.system,
     "Baker Hill": KeywordKind.system,
@@ -39,6 +104,13 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "build updates": KeywordKind.action,
     "C#": KeywordKind.system,
     "C++": KeywordKind.system,
+    "Ada": KeywordKind.system,
+    "Software Development Processes": KeywordKind.environment,
+    "Radar Technology": KeywordKind.environment,
+    "Verification": KeywordKind.action,
+    "Validation": KeywordKind.action,
+    "Continuous Integration": KeywordKind.environment,
+    "Test-Driven Development Methodologies": KeywordKind.environment,
     "CloudWatch": KeywordKind.system,
     "Cognito": KeywordKind.system,
     "CAD": KeywordKind.system,
@@ -71,6 +143,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "D365 F&O": KeywordKind.system,
     "D365": KeywordKind.system,
     "DevOps": KeywordKind.environment,
+    "debugging": KeywordKind.action,
     "diagnostics": KeywordKind.action,
     "document management": KeywordKind.action,
     "documentation": KeywordKind.action,
@@ -150,10 +223,12 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "VPN": KeywordKind.system,
     "Windows": KeywordKind.system,
     "nCino": KeywordKind.system,
+    "Node.js": KeywordKind.system,
     "NVIDIA GPUs": KeywordKind.system,
     "OAuth": KeywordKind.system,
     "Oracle": KeywordKind.system,
     "observability": KeywordKind.action,
+    "monitoring": KeywordKind.action,
     "oscilloscope": KeywordKind.system,
     "operational availability": KeywordKind.outcome,
     "operational efficiency": KeywordKind.outcome,
@@ -164,6 +239,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "Palantir Foundry": KeywordKind.system,
     "Postman": KeywordKind.system,
     "PowerShell": KeywordKind.system,
+    "PL/SQL": KeywordKind.system,
     "Power BI": KeywordKind.system,
     "problem-solving": KeywordKind.action,
     "Prometheus": KeywordKind.system,
@@ -173,6 +249,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "product support": KeywordKind.action,
     "production support": KeywordKind.action,
     "Python": KeywordKind.system,
+    "React": KeywordKind.system,
     "regression": KeywordKind.action,
     "regression testing": KeywordKind.action,
     "regulatory compliance": KeywordKind.environment,
@@ -210,6 +287,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "SQL": KeywordKind.system,
     "SSO": KeywordKind.system,
     "system logs": KeywordKind.action,
+    "scripting": KeywordKind.action,
     "telephony": KeywordKind.system,
     "system integration": KeywordKind.action,
     "systems integration": KeywordKind.action,
@@ -239,6 +317,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "UNIX": KeywordKind.system,
     "workflow documentation": KeywordKind.action,
     "workflow management": KeywordKind.action,
+    "XML": KeywordKind.system,
     "vendor interfaces": KeywordKind.action,
     "use cases": KeywordKind.action,
     "U.S. citizenship": KeywordKind.qualification,
@@ -307,7 +386,7 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "Six Sigma": KeywordKind.action,
     "SPC": KeywordKind.action,
     "statistical techniques": KeywordKind.action,
-    "tooling": KeywordKind.system,
+    "tooling": KeywordKind.vocabulary,
     "U.S. Person": KeywordKind.qualification,
     "VNA": KeywordKind.system,
     "wet etch": KeywordKind.system,
@@ -329,12 +408,36 @@ TERM_CATALOG: dict[str, KeywordKind] = {
     "Electrical Engineering": KeywordKind.qualification,
 }
 TERM_PATTERNS: dict[str, re.Pattern[str]] = {
+    "ada": re.compile(
+        r"\bAda\b(?=[^\n.]{0,60}(?:programming|language|tools|applications))|(?:C\+\+|software|programming)[^\n.]{0,60}\bADA\b",
+        re.I,
+    ),
+    "r": re.compile(r"(?<!(?i:Terran ))(?<![\w&])R(?![\w&])"),
+    "c": re.compile(r"(?<!(?i:subpart-))(?<![\w.])C(?![\w+#])"),
+    "go": re.compile(
+        r"\b(?:Golang|Go(?=\s+(?:programming|language|services?|applications?|development)))\b|\bGo(?=\s*[,/)])|(?<=[,(])\s*Go\b"
+    ),
+    "lifecycle management": re.compile(r"\blifecycle[- ]management\b", re.I),
+    "root cause analysis": re.compile(r"\broot[- ]cause analysis\b", re.I),
+    "stakeholder management": re.compile(r"\bstakeholder[- ]management\b", re.I),
+    "user stories": re.compile(r"\buser stor(?:ies|y writing)\b", re.I),
+    "automation": re.compile(r"\bautomations?\b", re.I),
+    "background jobs": re.compile(r"\bbackground jobs?\b", re.I),
+    "dashboards": re.compile(r"\bdashboards?\b", re.I),
+    "data feeds": re.compile(r"\bdata feeds?\b", re.I),
+    "integrations": re.compile(r"\bintegrations?\b", re.I),
+    "role-based access": re.compile(r"\brole[- ]based (?:access|permissions)\b", re.I),
+    "scripts": re.compile(r"\bscripts?\b", re.I),
+    "workflows": re.compile(r"\bworkflows?\b", re.I),
+    "net": re.compile(r"(?<!\w)\.NET(?!\w)", re.I),
     "connected devices": re.compile(r"\bconnected devices?\b|\bIoT systems?\b", re.I),
     "device management": re.compile(r"\bdevice management\b", re.I),
     "kiosk": re.compile(r"\bkiosks?\b", re.I),
     "network connectivity": re.compile(r"\bnetwork(?:/VPN)? connectivity\b", re.I),
     "database": re.compile(r"\bdatabases?\b", re.I),
-    "log analysis": re.compile(r"\b(?:log analysis|read(?:ing)? logs?|analy[sz](?:e|ing) logs?|logs?)\b", re.I),
+    "log analysis": re.compile(
+        r"\b(?:log analysis|read(?:ing)? logs?|analy[sz](?:e|ing) logs?|logs?)\b", re.I
+    ),
     "product support": re.compile(r"\bproduct support\b", re.I),
     "remote troubleshooting tools": re.compile(r"\bremote troubleshooting tools?\b", re.I),
     "vpn": re.compile(r"\bVPNs?\b", re.I),
@@ -380,6 +483,11 @@ TERM_PATTERNS: dict[str, re.Pattern[str]] = {
         r"hardware.{0,40}\bintegration)\b",
         re.I,
     ),
+    "microsoft word": re.compile(
+        r"\b(?:Microsoft|MS|Office)\s+Word\b|"
+        r"\b(?:Microsoft Excel|PowerPoint)[^\n.]{0,80}\bWord\b",
+        re.I,
+    ),
     "outlook": re.compile(
         r"\b(?:Microsoft|MS|Office 365|M365)\s+Outlook\b|"
         r"\bMicrosoft Office.{0,30}\bOutlook\b|"
@@ -403,7 +511,9 @@ TERM_PATTERNS: dict[str, re.Pattern[str]] = {
     ),
     "epic certification": re.compile(r"\bEpic certification\b", re.I),
     "help desk": re.compile(r"\bhelp desk\b", re.I),
-    "loan origination system": re.compile(r"\b(?:loan origination systems?|LOS)\b", re.I),
+    "loan origination system": re.compile(
+        r"(?i:\bloan origination systems?\b)|\bLOS\b(?!\s+(?i:Angeles|Alamitos)\b)"
+    ),
     "root cause and corrective action": re.compile(
         r"\broot cause and corrective action(?: processes?)?\b", re.I
     ),
@@ -517,21 +627,33 @@ TITLE_TERM_STOPWORDS = {
 }
 
 
-def grade_job_keywords(job: ParsedJob) -> list[JobKeyword]:
+def grade_job_keywords(
+    job: ParsedJob, *, additional_technologies: list[str] | None = None
+) -> list[JobKeyword]:
     simplify_high = {normalized_term(value) for value in job.high_priority_keywords}
     simplify_low = {normalized_term(value) for value in job.low_priority_keywords}
+    technologies = dedupe([*(additional_technologies or []), *_posting_technologies(job)])
     candidates = dedupe(
         [
             *job.high_priority_keywords,
             *job.low_priority_keywords,
             *(term for term in TERM_CATALOG if _count_job_term(job.job_description, term)),
+            *(term for term in technologies if _count_job_term(job.job_description, term)),
             *_inferred_composite_terms(job),
             *_extract_title_terms(job.title),
         ]
     )
 
     graded = [
-        _grade_one(job, term, simplify_high=simplify_high, simplify_low=simplify_low)
+        _grade_one(
+            job,
+            term,
+            simplify_high=simplify_high,
+            simplify_low=simplify_low,
+            kind_override=KeywordKind.system
+            if not _catalog_key(normalized_term(term)) and term in technologies
+            else None,
+        )
         for term in candidates
     ]
     return sorted(
@@ -555,8 +677,10 @@ def _grade_one(
     *,
     simplify_high: set[str],
     simplify_low: set[str],
+    kind_override: KeywordKind | None = None,
 ) -> JobKeyword:
     normalized = normalized_term(term)
+    kind = kind_override or _kind_for(term)
     factors: Counter[str] = Counter()
     sections: list[str] = []
     priority = KeywordPriority.inferred
@@ -595,7 +719,7 @@ def _grade_one(
     if required_occurrences:
         factors["required_qualification"] += 25
         sections.append("required")
-        if _kind_for(term) in {KeywordKind.system, KeywordKind.action}:
+        if kind in {KeywordKind.system, KeywordKind.action}:
             factors["required_technical_core"] += 10
     if responsibility_occurrences:
         factors["responsibility"] += 18
@@ -607,7 +731,6 @@ def _grade_one(
     if title_occurrences:
         factors["title"] += 15
         sections.append("title")
-    kind = _kind_for(term)
     if (
         total_occurrences
         and not (required_occurrences or responsibility_occurrences or preferred_occurrences)
@@ -615,20 +738,42 @@ def _grade_one(
     ):
         factors["technical_role_summary"] += 6
         sections.append("job_description")
-    if TERM_CATALOG.get(term, TERM_CATALOG.get(_catalog_key(normalized))) == KeywordKind.system:
+    if kind == KeywordKind.system:
         factors["specific_system"] += 10
     if total_occurrences >= 2:
         factors["posting_repetition"] += min(8, total_occurrences * 2)
 
     rejection = ""
-    if MALFORMED.search(term.strip()) or len(normalized) < 2:
+    if (
+        normalized == "saas"
+        and total_occurrences
+        and not (required_occurrences or responsibility_occurrences or preferred_occurrences)
+    ):
+        factors["posting_platform_context"] += 8
+        sections.append("job_description")
+    if normalized not in {"r", "c"} and (MALFORMED.search(term.strip()) or len(normalized) < 2):
         factors["malformed"] -= 50
         rejection = "Malformed or truncated keyword."
     if normalized in BOILERPLATE_ONLY:
         factors["legal_or_company_boilerplate"] -= 50
         rejection = "Legal or company boilerplate, not a hiring requirement."
     if (
+        context_snippets
+        and not (required_occurrences or responsibility_occurrences or preferred_occurrences)
+        and all(
+            re.search(
+                r"\b(?:hiring process|recruitment team|application materials|hiring decisions)\b",
+                snippet,
+                re.I,
+            )
+            for snippet in context_snippets
+        )
+    ):
+        factors["hiring_process_disclosure"] -= 50
+        rejection = "Describes the employer's hiring process, not candidate experience."
+    if (
         normalized in GENERIC
+        and normalized != "saas"
         and priority != KeywordPriority.high
         and not (required_occurrences or responsibility_occurrences or preferred_occurrences)
     ):
@@ -663,7 +808,7 @@ def _grade_one(
         max(
             0.0,
             score
-            + (10 if _kind_for(term) in {KeywordKind.system, KeywordKind.action} else 0)
+            + (10 if kind in {KeywordKind.system, KeywordKind.action} else 0)
             - (8 if normalized in GENERIC else 0),
         ),
     )
@@ -681,7 +826,7 @@ def _grade_one(
         term=term,
         normalized=normalized,
         priority=priority,
-        kind=_kind_for(term) if accepted else KeywordKind.noise,
+        kind=kind if accepted else KeywordKind.noise,
         occurrences=total_occurrences,
         source_sections=dedupe(sections),
         scoring_factors=dict(factors),
@@ -788,6 +933,119 @@ def _catalog_key(normalized: str) -> str:
         (term for term in TERM_CATALOG if normalized_term(term) == normalized),
         "",
     )
+
+
+def _posting_technologies(job: ParsedJob) -> list[str]:
+    """Read explicit stack lists without requiring a pre-existing candidate skill.
+
+    Restrict discovery to duties/qualifications and named technical lists. Unknown
+    names become evidence gaps, never evidence of candidate experience.
+    """
+    terms: list[str] = []
+    employer_names = {
+        normalized_term(job.company),
+        "raytheon",
+        "rtx",
+        "collins aerospace",
+        "pratt & whitney",
+    }
+    non_technology_names = {
+        "bau",
+        "rca",
+        "sla",
+        "slas",
+        "kpi",
+        "kpis",
+        "sop",
+        "sops",
+        "communication",
+        "leadership",
+        "teamwork",
+        "collaboration",
+        "adaptability",
+        "creativity",
+        "initiative",
+        "empathy",
+        "organization",
+        "reliability",
+        "attention to detail",
+        "time management",
+        "customer service",
+        "problem solving",
+        "critical thinking",
+        "interpersonal skills",
+        "written communication",
+        "verbal communication",
+        "presentation skills",
+        "analytical skills",
+        "electrical work",
+        "welding",
+        "soldering",
+        "carpentry",
+        "drilling",
+        "integrated air",
+        "it engineering",
+    }
+    label = re.compile(
+        r"\b(?:programming languages?|languages?|frameworks?|databases?|technologies|"
+        r"technical stack|tech stack|tools?|platforms?)\s*"
+        r"(?:include|including|such as|e\.g\.|:|\()\s*([^\n;]+)",
+        re.I,
+    )
+    named = re.compile(
+        r"\b(?:experience|proficiency|proficient|familiarity|familiar|knowledge)\s+"
+        r"(?:with|in|of)\s+([^\n;]+)",
+        re.I,
+    )
+    relevant_lines = [
+        *job.responsibilities,
+        *job.required_qualifications,
+        *job.preferred_qualifications,
+    ]
+
+    def add_names(value: str) -> None:
+        for item in re.split(r",|\s+(?:and|or)\s+", value):
+            item = re.sub(r"\s*\([^)]*\)", "", item).strip(" .:()•-*")
+            item = re.sub(
+                r"\s+(?:is |are )?(?:preferred|required|a plus)\.?$", "", item, flags=re.I
+            )
+            if "/" in item and not _catalog_key(normalized_term(item)):
+                # SQL/PLSQL is a combined spelling, not a third technology.
+                continue
+            # Multiword product names are allowed; ordinary prose is not a stack.
+            if not re.fullmatch(
+                r"[A-Z][A-Za-z0-9.+#/-]{1,39}(?: [A-Z][A-Za-z0-9.+#/-]{0,39}){0,3}",
+                item,
+            ):
+                continue
+            if normalized_term(item) in (
+                GENERIC
+                | TITLE_TERM_STOPWORDS
+                | BOILERPLATE_ONLY
+                | non_technology_names
+                | employer_names
+            ):
+                continue
+            terms.append(item)
+
+    for line in relevant_lines:
+        for pattern in (label, named):
+            for match in pattern.finditer(line):
+                add_names(match.group(1))
+
+    in_stack = False
+    for line in job.job_description.splitlines():
+        line = line.strip()
+        if re.fullmatch(
+            r"(?:Required|Preferred|Technical) Skills:?|Tech(?:nical)? Stack:?", line, re.I
+        ):
+            in_stack = True
+            continue
+        if in_stack and line in relevant_lines:
+            add_names(line)
+        elif line:
+            in_stack = False
+    return dedupe(terms)
 
 
 def _kind_for(term: str) -> KeywordKind:

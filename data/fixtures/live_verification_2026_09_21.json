@@ -1,0 +1,22 @@
+[
+  {
+    "fixture": "mccarthy_product_analyst_ii_foundry_2026_09_21.txt",
+    "company": "McCarthy Holdings, Inc.",
+    "title": "Product Analyst II \u2013 Foundry Applications",
+    "source_url": "https://jobs.hireheroesusa.org/jobs/600016733-product-analyst-ii-foundry-applications-at-mccarthy-building-companies-inc",
+    "posted_date": "2026-09-17",
+    "verified_at": "2026-09-22T01:49:11.253524+00:00",
+    "sha256": "8e792c431bf57385d8e7833fc6407ceba2e128cf76ed1caf24d8bfea1ba40ccd",
+    "capture_note": "Existing user paste reverified against the dated full posting; employer availability was not independently confirmed."
+  },
+  {
+    "fixture": "pacific_life_platform_engineer_ii_live_2026_09_21.txt",
+    "company": "Pacific Life",
+    "title": "Platform Engineer II",
+    "source_url": "https://pacificlife.wd1.myworkdayjobs.com/PacificLifeCareers/job/Newport-Beach-CA-700/Platform-Engineer-II_R17313",
+    "posted_date": "2026-09-18",
+    "verified_at": "2026-09-22T01:49:11.254054+00:00",
+    "sha256": "e41157b8267daa425853228945075b253073ffa306df2794d9b53938c6bceec6",
+    "capture_note": "Fresh employer Workday API capture. posted=true and canApply=true. Original office label preserved; HTML converted to plain text with block boundaries."
+  }
+]

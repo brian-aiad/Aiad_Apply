@@ -96,6 +96,27 @@ def test_progress_and_failure_requests_are_bearer_authenticated(
     assert failure_timeout == 60
 
 
+def test_progress_message_fits_api_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: list[urllib.request.Request] = []
+
+    def fake_urlopen(request: urllib.request.Request, timeout: float) -> _JsonResponse:
+        captured.append(request)
+        return _JsonResponse()
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    submit_worker_progress(
+        api_url="https://tracker.example",
+        secret="worker-secret",
+        run_id="run-123",
+        stage="Layout correction: " + "many details; " * 30,
+        worker_id="worker-123",
+    )
+
+    payload = json.loads(captured[0].data or b"{}")
+    assert payload["stage"].startswith("Layout correction: ")
+    assert len(payload["stage"]) == 200
+
+
 def test_worker_reports_progress_and_records_transform_failure(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -125,6 +146,7 @@ def test_worker_reports_progress_and_records_transform_failure(
         return {"ok": True}
 
     def failed_transform(**kwargs: Any) -> None:
+        assert kwargs["aggressive_draft"] is False
         kwargs["progress"]("Parsing and grading the job posting")
         raise RuntimeError("reasoner unavailable")
 
@@ -219,3 +241,20 @@ def test_request_retries_transient_server_errors_but_not_client_errors(
     ) == {"ok": True}
     assert attempts == 2
     assert sleeps == [0.5]
+
+
+def test_failed_run_retains_only_its_model_usage_and_bounds_error(tmp_path):
+    from types import SimpleNamespace
+    from aiadapply_v2.schemas import ModelCallUsage
+
+    reasoner = SimpleNamespace(usage=[
+        ModelCallUsage(model="earlier-run", input_tokens=999),
+        ModelCallUsage(model="this-run", input_tokens=123, output_tokens=45, duration_seconds=2.5),
+    ])
+    report = tracking.save_failure_report(reasoner, 1, tmp_path, RuntimeError("x" * 6000))
+    assert report["model_calls"] == 1
+    assert report["model_usage"][0]["input_tokens"] == 123
+    assert report["model_usage"][0]["output_tokens"] == 45
+    assert report["validation"]["passed"] is False
+    assert len(report["error"]) == 5000
+    assert json.loads((tmp_path / "failure-report.json").read_text()) == report

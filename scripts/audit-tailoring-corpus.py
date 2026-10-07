@@ -6,6 +6,8 @@ import re
 from pathlib import Path
 
 from aiadapply_v2.documents.model import parse_resume_docx
+from aiadapply_v2.planning.draft import draft_distribution_feedback
+from aiadapply_v2.schemas import DraftTechnology
 from aiadapply_v2.text import contains_term, split_skill_values
 
 BASE_RESUME = Path("data/resumes/Brian_Aiad_BASE.docx")
@@ -26,13 +28,31 @@ AWKWARD_PATTERNS = {
 
 def audit_run(run_dir: Path) -> dict[str, object]:
     report_path = run_dir / "transformation_report.json"
-    docx_path = run_dir / "Brian_Aiad_resume.docx"
-    pdf_path = run_dir / "Brian_Aiad_resume.pdf"
     errors: list[str] = []
-    if not report_path.is_file() or not docx_path.is_file() or not pdf_path.is_file():
+    if not report_path.is_file():
         return {"run": str(run_dir), "passed": False, "errors": ["missing output artifact"]}
 
     report = json.loads(report_path.read_text(encoding="utf-8"))
+    docx_path = (
+        run_dir
+        / str(report.get("output_docx", "Brian_Aiad_resume.docx"))
+        .replace("\\", "/")
+        .rsplit("/", 1)[-1]
+    )
+    pdf_path = (
+        run_dir
+        / str(report.get("output_pdf", "Brian_Aiad_resume.pdf"))
+        .replace("\\", "/")
+        .rsplit("/", 1)[-1]
+    )
+    if not docx_path.is_file() or not pdf_path.is_file():
+        return {"run": str(run_dir), "passed": False, "errors": ["missing output artifact"]}
+    draft_mode = report.get("tailoring_mode") == "aggressive_draft"
+    drafts = (
+        [DraftTechnology.model_validate(t) for t in report.get("draft_technologies", [])]
+        if draft_mode
+        else []
+    )
     validation = report["validation"]
     layout = report["layout"]
     if not validation["passed"]:
@@ -64,7 +84,7 @@ def audit_run(run_dir: Path) -> dict[str, object]:
         missing = [
             skill for skill in original if skill.casefold() not in {x.casefold() for x in candidate}
         ]
-        if missing:
+        if missing and not draft_mode:
             errors.append(f"{paragraph_id} removed base skills: {', '.join(missing)}")
 
     final_text = "\n".join(item.text for item in final.paragraphs)
@@ -77,8 +97,38 @@ def audit_run(run_dir: Path) -> dict[str, object]:
         if not match or match["strength"] not in {"unsupported", "weakly_transferable"}:
             continue
         term = keyword["term"]
+        permitted = next((t for t in drafts if t.term.casefold() == term.casefold()), None)
+        if permitted:
+            placements = [p for p in final.paragraphs if contains_term(p.text, term)]
+            for p in placements:
+                if contains_term(base_by_id[p.paragraph_id].text, term):
+                    continue
+                if p.paragraph_id not in permitted.paragraph_ids and not p.paragraph_id.startswith(
+                    "skills."
+                ):
+                    errors.append(
+                        f"draft technology outside allowed scope: {term} in {p.paragraph_id}"
+                    )
+                elif not any(
+                    risk["claim"].casefold() == term.casefold()
+                    and risk["selected_placement"] == p.paragraph_id
+                    and risk["export_allowed"]
+                    for risk in report["claim_risks"]
+                ):
+                    errors.append(
+                        f"draft technology missing review flag: {term} in {p.paragraph_id}"
+                    )
+            continue
         if contains_term(final_text, term) and not contains_term(base_text, term):
             errors.append(f"non-exportable term leaked into final resume: {term}")
+
+    texts = {p.paragraph_id: p.text for p in final.paragraphs}
+    errors.extend(draft_distribution_feedback(drafts, texts))
+    for target in drafts:
+        if target.required and not any(
+            contains_term(texts.get(pid, ""), target.term) for pid in target.paragraph_ids
+        ):
+            errors.append(f"required project technology missing: {target.term}")
 
     for label, pattern in AWKWARD_PATTERNS.items():
         if pattern.search(final_text):

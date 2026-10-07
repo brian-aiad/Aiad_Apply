@@ -73,11 +73,13 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
   await expect(page.getByText("URL can be added later")).toBeVisible();
 
   await page.getByLabel("Status").selectOption("APPLIED");
+  await page.getByText("Notes, URL & follow-up", { exact: true }).click();
   await page.getByLabel("Private notes").fill("Follow up with the recruiting team.");
   await page.getByLabel("Follow-up reminder").fill("2026-08-25T09:30");
-  await page.getByRole("button", { name: "Save changes" }).click();
+  await page.getByRole("button", { name: "Save", exact: true }).click();
   await expect(page.locator("span.status", { hasText: "Applied" })).toBeVisible();
   await page.reload();
+  await page.getByText("Notes, URL & follow-up", { exact: true }).click();
   await expect(page.getByLabel("Private notes")).toHaveValue(
     "Follow up with the recruiting team.",
   );
@@ -526,5 +528,5 @@ test("records authenticated worker progress and displays the current stage", asy
   await expect(page.getByText("Direct", { exact: true })).toBeVisible();
   await expect(page.getByText("Not assessed")).toBeVisible();
   await expect(page.getByText("Rejected", { exact: true })).toBeVisible();
-  await expect(page.getByText("Review flags", { exact: true }).locator("..")).toContainText("2");
+  await expect(page.getByText("2 flags", { exact: true })).toBeVisible();
 });

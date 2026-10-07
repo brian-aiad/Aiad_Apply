@@ -3,6 +3,7 @@ set -euo pipefail
 
 repository_root="$(cd "$(dirname "$0")/.." && pwd -P)"
 process_file="$repository_root/.runtime/processes.json"
+bash "$repository_root/scripts/application-worker.sh" stop
 
 if [[ ! -f "$process_file" ]]; then
   echo "No AIAD Apply local process record was found."

@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from typing import Literal
 
+from aiadapply_v2.evidence.loaders import supports_automatic_context
 from aiadapply_v2.schemas import (
     EvidenceStrength,
     JobKeyword,
@@ -58,6 +59,8 @@ def build_stretch_lab(
     for keyword in sorted(accepted.values(), key=lambda item: item.hiring_importance, reverse=True):
         match = matches.get(keyword.normalized)
         if not match or match.strength != EvidenceStrength.strongly_transferable:
+            continue
+        if (match.evidence_id or "").startswith(("evidence.experience.", "evidence.projects.")) and supports_automatic_context(keyword.term, match.source_text):
             continue
         opportunity_model = proposed_opportunities.get(keyword.normalized)
         opportunities.append(
@@ -160,6 +163,16 @@ def _gap_reason(keyword: JobKeyword, requirement: str) -> str:
 
 
 def _proof_needed(keyword: JobKeyword) -> list[str]:
+    if keyword.normalized in {"ai", "artificial intelligence", "ai-powered support tools"}:
+        return [
+            "General AI familiarity can be described only at its confirmed scope.",
+            "For a work or project bullet, identify the actual AI tool, your task, and its result; ordinary automation is not proof of AI use.",
+        ]
+    if keyword.normalized == "crud":
+        return [
+            "CRUD means create, read, update, and delete records.",
+            "A documented implementation or admin workflow covering those operations; SQL, APIs, and inventory tracking alone do not establish all four.",
+        ]
     if keyword.kind == KeywordKind.system:
         return [
             f"A completed hands-on example using {keyword.term}",

@@ -85,6 +85,39 @@ async function posting(label: string) {
   return db.discoveryPosting.create({ data: { id, sourceKey: "lever:integration", externalId: label, company: `${prefix} Employer`, title: `Application Support Engineer ${label}`, location: "Long Beach, CA", sourceUrl: `https://jobs.lever.co/integration/${id}`, description: "Support a production SaaS application. Troubleshoot customer incidents with SQL, Postman and REST APIs. Manage Microsoft 365 and Entra ID user access, write Jira escalation notes and resolve SLA incidents. Required qualifications: two years of technical support experience and strong written communication.", employmentType: "Full-time", workArrangement: "Hybrid", salaryMin: 60000, salaryMax: 90000, salaryText: "$60,000–$90,000/year", score: 85, matchReasons: ["SQL", "APIs"], cautions: [], qualified: true } });
 }
 
+test("automatic drafts enforce the daily cap under concurrent approval", async () => {
+  const { approvePosting, AUTOMATION_KEY, PREFS_KEY } = await import("../../src/lib/discovery/service");
+  const { DEFAULT_DISCOVERY_PREFERENCES } = await import("../../src/lib/discovery/types");
+  const keys = [AUTOMATION_KEY, PREFS_KEY];
+  const originals = await db.setting.findMany({ where: { key: { in: keys } } });
+  try {
+    for (const [key, value] of [[AUTOMATION_KEY, { scheduledSearch: true, intervalHours: 6, autoTailor: true, dailyLimit: 1, minimumScore: 80 }], [PREFS_KEY, DEFAULT_DISCOVERY_PREFERENCES]] as const) {
+      await db.setting.upsert({ where: { key }, create: { key, value }, update: { value } });
+    }
+    const postings = await Promise.all([posting("automatic-one"), posting("automatic-two")]);
+    for (const p of postings) await db.discoveryPosting.update({ where: { id: p.id }, data: { postedAt: new Date(), lastSeenAt: new Date() } });
+    const results = await Promise.allSettled(postings.map(p => approvePosting(p.id, true, true)));
+    const apps = await db.application.findMany({ where: { job: { sourceUrl: { in: postings.map(p => p.sourceUrl) } } } });
+    jobIds.push(...apps.map(a => a.jobId));
+    assert.equal(results.filter(r => r.status === "fulfilled").length, 1);
+    const failure = results.find(r => r.status === "rejected") as PromiseRejectedResult;
+    assert.match(failure.reason.message, /Daily automatic tailoring limit/);
+    assert.equal(apps.length, 1);
+    assert.equal(await db.applicationEvent.count({ where: { applicationId: apps[0].id, eventType: "automatic_tailoring_queued" } }), 1);
+  } finally {
+    for (const key of keys) {
+      const original = originals.find(s => s.key === key);
+      if (original) await db.setting.upsert({ where: { key }, create: { key, value: original.value! }, update: { value: original.value! } });
+      else await db.setting.deleteMany({ where: { key } });
+    }
+  }
+});
+
+test("worker discovery endpoint requires authentication", async () => {
+  const { POST } = await import("../../src/app/api/worker/discovery/route");
+  assert.equal((await POST(new Request("http://localhost/api/worker/discovery", { method: "POST" }))).status, 401);
+});
+
 test("capture saves reviewed corrections and its explainable fit snapshot", async () => {
   const { POST } = await import("../../src/app/api/jobs/route");
   const rawPaste = `${prefix} Raw Company
@@ -202,8 +235,12 @@ test("worker completion and retries preserve submitted and closed application st
     const run = app.tailoringRuns[0];
     await db.tailoringRun.update({ where: { id: run.id }, data: { status: "RUNNING", workerId: "integration-worker" } });
     await db.application.update({ where: { id: app.id }, data: { status } });
-    const response = await complete(new Request("http://localhost/api/worker/runs/test", { method: "POST", headers: { Authorization: `Bearer ${process.env.WORKER_SECRET || process.env.CRON_SECRET}`, "Content-Type": "application/json" }, body: JSON.stringify({ workerId: "integration-worker", success: false, error: "Renderer unavailable" }) }), { params: Promise.resolve({ id: run.id }) });
+    const response = await complete(new Request("http://localhost/api/worker/runs/test", { method: "POST", headers: { Authorization: `Bearer ${process.env.WORKER_SECRET || process.env.CRON_SECRET}`, "Content-Type": "application/json" }, body: JSON.stringify({ workerId: "integration-worker", success: false, error: "Renderer unavailable", report: { validation: { passed: false }, model_calls: 1, model_usage: [{ input_tokens: 123, output_tokens: 45 }] } }) }), { params: Promise.resolve({ id: run.id }) });
     assert.equal(response.status, 200);
+    const failed = await db.tailoringRun.findUniqueOrThrow({ where: { id: run.id } });
+    assert.equal(failed.status, "FAILED");
+    assert.equal(failed.validationPassed, false);
+    assert.deepEqual(failed.reportSnapshot, { validation: { passed: false }, model_calls: 1, model_usage: [{ input_tokens: 123, output_tokens: 45 }] });
     assert.equal((await db.application.findUniqueOrThrow({ where: { id: app.id } })).status, status);
     const queued = await queue(new Request("http://localhost/api/applications/test/tailor", { method: "POST" }), { params: Promise.resolve({ id: app.id }) });
     assert.equal(queued.status, 201);
@@ -231,7 +268,7 @@ test("backup export includes portable bytes but excludes worker settings", async
   const data = await response.json();
   assert.equal(data.version, 1); assert.equal(data.format, "aiadapply-workspace");
   assert.ok(data.backups.length > 0);
-  assert.ok(data.settings.every((s: { key: string }) => ["product", "discovery:preferences"].includes(s.key)));
+  assert.ok(data.settings.every((s: { key: string }) => ["product", "discovery:preferences", "application-profile"].includes(s.key)));
   assert.ok(!JSON.stringify(data).includes(process.env.WORKER_SECRET || "NEVER_EXPORTED_SECRET"));
 });
 
@@ -295,4 +332,58 @@ test("backup can be restored into an empty schema without overwriting existing w
     await db.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schema}" CASCADE`);
     await rm(folder, { recursive: true });
   }
+});
+
+test("download ignores a modified local file and rejects a modified backup", async () => {
+  const folder = await mkdtemp(path.join(tmpdir(), "aiad-download-"));
+  const bytes = Buffer.from("%PDF-1.4 verified final resume");
+  const label = `${prefix}-verified-download`;
+  const localPath = path.join(folder, "resume.pdf");
+  await writeFile(localPath, "outdated local file");
+  const job = await db.job.create({ data: {
+    company: label, title: label, rawPaste: label, rawPasteSha256: hash(label),
+    application: { create: { tailoringRuns: { create: {
+      status: "SUCCEEDED", outputFolder: folder,
+      artifacts: { create: { kind: "PDF", fileName: "resume.pdf", localPath,
+        sha256: hash(bytes.toString()), byteSize: bytes.length,
+        backup: { create: { content: bytes } } } },
+    } } } },
+  }, include: { application: { include: { tailoringRuns: { include: { artifacts: true } } } } } });
+  jobIds.push(job.id);
+  const id = job.application!.tailoringRuns[0].artifacts[0].id;
+  const { GET } = await import("../../src/app/api/artifacts/[id]/route");
+  const download = () => GET(new Request(`http://localhost/api/artifacts/${id}`), { params: Promise.resolve({ id }) });
+  try {
+    let response = await download();
+    assert.equal(response.status, 200);
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), bytes);
+    assert.equal(response.headers.get("X-Artifact-SHA256"), hash(bytes.toString()));
+    await db.artifactBackup.update({ where: { artifactId: id }, data: { content: Buffer.from("corrupt backup") } });
+    assert.equal((await download()).status, 409);
+    await writeFile(localPath, bytes);
+    response = await download();
+    assert.equal(response.status, 200);
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()), bytes);
+  } finally {
+    await rm(folder, { recursive: true, force: true });
+  }
+});
+
+test("batch tailoring preserves partial success and deduplicates retries", async () => {
+  const { POST } = await import("../../src/app/api/discovery/batch/route");
+  const p = await posting("batch-approved");
+  const invoke = (ids: string[]) => POST(new Request("http://localhost/api/discovery/batch", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids, tailor: true }) }));
+  const response = await invoke([p.id, p.id, "not-found"]);
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.results.length, 2);
+  assert.equal(body.results[0].duplicate, false);
+  assert.match(body.results[1].error, /not found/);
+  const app = await db.application.findUniqueOrThrow({ where: { id: body.results[0].id }, include: { tailoringRuns: true } });
+  jobIds.push(app.jobId);
+  assert.equal(app.tailoringRuns.length, 1);
+  const retry = await (await invoke([p.id])).json();
+  assert.equal(retry.results[0].duplicate, true);
+  assert.equal(await db.tailoringRun.count({ where: { applicationId: app.id } }), 1);
+  assert.equal((await invoke(Array.from({ length: 11 }, () => p.id))).status, 400);
 });

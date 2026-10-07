@@ -39,7 +39,7 @@ async function main() {
       await tx.dailyGoal.createMany({ data: value.dailyGoals as Prisma.DailyGoalCreateManyInput[], skipDuplicates: true });
       await tx.discoveryPosting.createMany({ data: value.discoveries as Prisma.DiscoveryPostingCreateManyInput[] });
       for (const setting of value.settings as Prisma.SettingCreateManyInput[]) {
-        if (!["product", "discovery:preferences"].includes(setting.key)) continue;
+        if (!["product", "discovery:preferences", "application-profile"].includes(setting.key)) continue;
         await tx.setting.upsert({ where: { key: setting.key }, create: setting, update: { value: setting.value } });
       }
     }, { timeout: 60_000 });

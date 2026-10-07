@@ -40,7 +40,7 @@ const sectionStops = [
 ];
 
 const locationHeader =
-  /^(?:[A-Za-z][A-Za-z .'-]+,\s*[A-Z]{2}|United States|USA|US|Remote(?:,\s*(?:US|USA|United States))?)(?:\s*(?:Â·|·)\s*|$)/i;
+  /^(?:[A-Za-z][A-Za-z .'-]+,\s*[A-Za-z ]+,\s*United States(?: of America)?|[A-Za-z][A-Za-z .'-]+,\s*[A-Z]{2}|[A-Za-z][A-Za-z .'-]+\s+[A-Z]{2}-\d+|United States|USA|US|Remote(?:,\s*(?:US|USA|United States))?)(?:\s*(?:Â·|·)\s*|$)/i;
 
 function cleanLines(raw: string) {
   return raw
@@ -102,7 +102,7 @@ function findCompany(lines: string[]) {
   const employerAbout = lines
     .map((line) =>
       line.match(
-        /^About\s+(?!the job$|this role$|the role$)([A-Za-z0-9][A-Za-z0-9 .&'/-]{1,100})$/i,
+        /^About\s+(?!us$|the company$|the job$|this role$|the role$)([A-Za-z0-9][A-Za-z0-9 .&'/-]{1,100})$/i,
       ),
     )
     .find((match) => match !== null);
@@ -194,23 +194,24 @@ function extractJobSections(lines: string[]) {
   };
   let current: keyof typeof result | null = null;
   let qualificationsStarted = false;
+  let shortRequiredSkills = false;
   const responsibilityHeading =
-    /^(?:Responsibilities|Job Responsibilities|What You(?:'|’|â€™)ll (?:Do|Be Doing|Accomplish)|Essential Job Duties and Responsibilities|Essential Functions(?: & Responsibilities)?|Key Responsibilities|Required Duties|Accountabilities|Your Impact|Functions and duties of this role include, but not limited to):?$/i;
+    /^(?:Responsibilities|Roles and Responsibilities|Job Responsibilities|What You(?:'|’|â€™)ll (?:Do|Be Doing|Accomplish)|Essential Job Duties and Responsibilities|Essential Functions(?: & Responsibilities)?|Key Responsibilities|Required Duties|Accountabilities|Your Impact|Functions and duties of this role include, but not limited to):?$/i;
   const requiredHeading =
-    /^(?:Required Qualifications(?:, Capabilities And Skills)?|Required Technical Experience \(MUST\)|Required Education\/Credentials\/Qualifications|Requirements|Qualifications|Minimum Requirements|Job Qualifications\/Requirements|Who You Are|What We Require|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities):?$/i;
+    /^(?:Required Qualifications(?:, Capabilities And Skills)?|Required Skills|Required Technical Experience \(MUST\)|Required Education\/Credentials\/Qualifications|Requirements|Qualifications|Minimum Requirements|Job Qualifications\/Requirements|Who You Are|What We Require|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities|Education and Experience|Technical Competencies \(Knowledge, Skills & Abilities\)):?$/i;
   const preferredHeading =
     /^(?:Preferred|Preferred Qualifications(?:, Capabilities And Skills)?|Nice To Have|Bonus Points If You Have|Experience That Would Be Helpful):?$/i;
   const expandedResponsibilityHeading =
     /^(?:Core Responsibilities|Your Responsibilities|Technical Support Engineer Key Responsibilities|You Will|Your Team Will|In This Role, You Will|Essential Functions & Responsibilities):?$/i;
-  const officialResponsibilityHeading = /^What You Will Do:?$/i;
+  const officialResponsibilityHeading = /^(?:What You Will Do|How You['’]ll Help Move Us Forward):?$/i;
   const greenhouseResponsibilityHeading = /^Your Key Responsibilities Include:?$/i;
   const expandedRequiredHeading =
     /^(?:Basic Requirements|Minimum Qualifications|Required Experience|Necessary Skills\/Abilities|Qualifications & Experience|Who This Role Is For|About You|Your Profile):?$/i;
   const expandedPreferredHeading =
     /^(?:Preferred Skills|Strongly Preferred|Nice(?:-| )To(?:-| )Have(?: Requirements| But Not Required)?):?$/i;
-  const officialRequiredHeading = /^Qualifications You Must Have:?$/i;
+  const officialRequiredHeading = /^(?:Qualifications You Must Have|The Experience You Bring):?$/i;
   const greenhouseRequiredHeading = /^(?:What You Have|Your Education and Experience):?$/i;
-  const officialPreferredHeading = /^Qualifications We Prefer:?$/i;
+  const officialPreferredHeading = /^(?:Qualifications We Prefer|What Makes You Stand Out):?$/i;
   const qualificationSubheading =
     /^(?:Education(?:\/| and )Credentials|Prior Experience|Technical Skills|Experience):?$/i;
   const responsibilitySubheading =
@@ -219,7 +220,7 @@ function extractJobSections(lines: string[]) {
     /^(?:Client Support & Issue Resolution|Onboarding & Implementation Execution|Account Maintenance & Accuracy|Systems, Tools & Process Improvement|Product & Customer Support|Field Responsibilities):?$/i;
   const expandedEndHeading =
     /^(?:Additional Information|Why |Our Offer|What You Won|What This Role Is|Role Basics|Attributes|About )/i;
-  const officialEndHeading = /^(?:What You Will Learn|What We Offer):?$/i;
+  const officialEndHeading = /^(?:What You Will Learn|What We Offer|Base Pay Range):?$/i;
   const endHeading =
     /^(?:Benefits|Perks|What We Give|Work Environment|Why You(?:'|’|â€™)ll Love|Why Join|About Us|The pay|The salary|The annual|Salary range|Compensation|US Salary|Equal Opportunity|Bank of Hope is an equal|GoFundMe is proud)/i;
   const unheadedResponsibility =
@@ -239,6 +240,7 @@ function extractJobSections(lines: string[]) {
       greenhouseResponsibilityHeading.test(line)
     ) {
       current = "responsibilities";
+      shortRequiredSkills = false;
       continue;
     }
     if (
@@ -248,6 +250,7 @@ function extractJobSections(lines: string[]) {
       greenhouseRequiredHeading.test(line)
     ) {
       current = "requiredQualifications";
+      shortRequiredSkills = /^Required Skills:?$/i.test(line);
       qualificationsStarted = true;
       continue;
     }
@@ -257,11 +260,13 @@ function extractJobSections(lines: string[]) {
       officialPreferredHeading.test(line)
     ) {
       current = "preferredQualifications";
+      shortRequiredSkills = false;
       qualificationsStarted = true;
       continue;
     }
     if (qualificationSubheading.test(line)) {
       current = "requiredQualifications";
+      shortRequiredSkills = false;
       continue;
     }
     if (responsibilitySubheading.test(line) || expandedResponsibilitySubheading.test(line)) continue;
@@ -271,6 +276,7 @@ function extractJobSections(lines: string[]) {
       officialEndHeading.test(line)
     ) {
       current = null;
+      shortRequiredSkills = false;
       continue;
     }
     if (
@@ -282,13 +288,14 @@ function extractJobSections(lines: string[]) {
       result.responsibilities.push(line);
       continue;
     }
-    if (!current || line.length < 15 || line.length > 500) continue;
+    if (!current || (line.length < 15 && !shortRequiredSkills) || line.length > 500) continue;
     if (
       (line.endsWith(":") || line === line.toLocaleUpperCase()) &&
       /^[A-Z][A-Za-z &/,\-]{2,45}:?$/.test(line) &&
       line.split(/\s+/).length <= 7
     ) {
       current = null;
+      shortRequiredSkills = false;
       continue;
     }
     const destination =
@@ -333,6 +340,7 @@ export function parseCapture(
         line,
       ),
     ) ??
+    nearbyHeaderLines.find((line) => /^[A-Za-z][A-Za-z .'-]+\s+[A-Z]{2}-\d+(?:\s*·|$)/.test(line)) ??
     nearbyHeaderLines.find((line) =>
       /,\s*(?:[A-Z]{2}|[A-Z][A-Za-z ]+)\b|^(?:United States|USA|US)\s*\(Remote\)|^Remote(?:,\s*(?:US|USA|United States))?/i.test(
         line,
@@ -341,9 +349,11 @@ export function parseCapture(
   const narrativeLocation = normalized.match(
     /\blocated in\s+([A-Za-z][A-Za-z .'-]+,\s*[A-Z][A-Za-z ]+)(?:[.,]|$)/i,
   );
+  const encodedLocation = normalized.match(/^US-([A-Z]{2})-([A-Z][A-Z ]+?)-[A-Z0-9]+(?:\s*~|$)/m);
   const location =
     locationLine?.split(/\s*(?:Â·|·)\s*/)[0]?.trim() ??
     narrativeLocation?.[1]?.trim() ??
+    (encodedLocation ? `${encodedLocation[2].toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())}, ${encodedLocation[1]}` : null) ??
     null;
   const postedText =
     locationLine?.match(
@@ -398,8 +408,9 @@ export function parseCapture(
   const linkedInUrl = normalized.match(
     /https?:\/\/(?:www\.)?linkedin\.com\/jobs\/(?:view\/)?[^\s)]+/i,
   );
+  const headerUrl = lines.slice(0, Math.min(descriptionStart, 20)).find((line) => /^https?:\/\/[^\s]+$/.test(line));
   const sourceUrl =
-    suppliedUrl?.trim() || officialUrl?.[1] || linkedInUrl?.[0] || null;
+    suppliedUrl?.trim() || officialUrl?.[1] || linkedInUrl?.[0] || headerUrl || null;
   const headerArrangement = lines.some((line) => /^On-?site$/i.test(line))
     ? "On-site"
     : ["Hybrid", "Remote"].find((item) =>

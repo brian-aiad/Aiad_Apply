@@ -10,6 +10,7 @@ from aiadapply_v2.schemas import (
     ResumeEvidenceGraph,
     TransferabilityMap,
 )
+from aiadapply_v2.semantic.matcher import _direct_match, _strength, _transferable_match
 from aiadapply_v2.text import contains_term
 
 
@@ -29,7 +30,8 @@ def paragraph_priorities(
     graph: ResumeEvidenceGraph,
     matches: TransferabilityMap,
 ) -> list[ParagraphPriority]:
-    evidence = {item.evidence_id: item for item in graph.evidence}
+    evidence = {item.paragraph_id: item for item in graph.evidence}
+    keyword_kinds = {item.term.casefold(): item.kind for item in keywords}
     important = {
         item.term.casefold(): item.hiring_importance
         for item in keywords
@@ -40,19 +42,42 @@ def paragraph_priorities(
         if not paragraph.editable:
             continue
         missing: dict[str, float] = {}
+        source = evidence.get(paragraph.paragraph_id)
         for match in matches.matches:
-            source = evidence.get(match.evidence_id or "")
             importance = important.get(match.target_term.casefold(), 0)
             if (
                 not source
-                or source.paragraph_id != paragraph.paragraph_id
                 or match.strength
                 not in {EvidenceStrength.direct, EvidenceStrength.strongly_transferable}
                 or not importance
                 or contains_term(paragraph.text, match.target_term)
             ):
                 continue
-            strength = 1.0 if match.strength == EvidenceStrength.direct else 0.7
+            # A term can have several defensible placements. The single best
+            # semantic retrieval result must not freeze every other paragraph.
+            scoped_confirmation = any(
+                item.section == "candidate_profile"
+                and item.claim_scope == "source_specific"
+                and item.source_reference in {paragraph.section, paragraph.paragraph_id}
+                and _direct_match(match.target_term, item)
+                for item in graph.evidence
+            )
+            direct = _direct_match(match.target_term, source) or scoped_confirmation
+            transferable = _transferable_match(match.target_term, source)
+            if not (direct or transferable or match.evidence_id == source.evidence_id):
+                continue
+            # A global Skills/general-exposure confirmation cannot upgrade a weak
+            # local bridge into an employer claim (documentation != knowledge base).
+            local_strength = _strength(
+                match.target_term,
+                keyword_kinds[match.target_term.casefold()],
+                direct,
+                transferable,
+                match.semantic_score if match.evidence_id == source.evidence_id else 0.0,
+            )
+            if local_strength not in {EvidenceStrength.direct, EvidenceStrength.strongly_transferable}:
+                continue
+            strength = 1.0 if direct else 0.7
             missing[match.target_term] = importance * strength
         visibility = 1.25 if paragraph.kind.value == "summary" else 1.0
         # Layout slack changes priority only; it never grants permission to overflow.
@@ -95,7 +120,9 @@ def paragraph_priorities(
                     "Preserve the original: its metrics, concrete systems, or tight line budget "
                     "make the expected rewrite risk at least as high as the alignment benefit."
                     if preserve_original and missing
-                    else "Consider a natural wording change using the cited evidence."
+                    else "Rewrite around the most relevant supported requirements, preserving "
+                    "the concrete action, systems, context, and result. Integrate one or two "
+                    "terms naturally; do not append a keyword list."
                     if missing
                     else "Keep the original unless a specific readability improvement is justified."
                 ),

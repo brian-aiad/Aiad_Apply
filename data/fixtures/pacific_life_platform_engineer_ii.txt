@@ -1,0 +1,37 @@
+Pacific Life
+Platform Engineer II
+Newport Beach, CA · Full-time
+On-site
+$113,490.00 - $138,710.00
+About the job
+Job Description
+
+Pacific Life is actively seeking a Platform Engineer to join its enterprise technology team. The role supports enterprise end-user service and digital workplace platforms that improve self-service, reduce avoidable incidents and service requests, and enhance the end-user experience.
+
+How You'll Help Move Us Forward
+
+Help build, test, deploy, and maintain reusable workflows, automations, orchestration patterns, and AI-enabled or knowledge-driven solutions that reduce manual effort and improve consistency.
+Develop and maintain operational scripts, actions, and API-based interactions under guidance, following established security, code review, certificate, and access controls.
+Support platform administration by helping maintain access models, role-based permissions, configuration standards, integrations, data feeds, and operational controls.
+Contribute to deployment, configuration, lifecycle management, and continuous improvement of platform components across the environment.
+Develop and maintain metrics, dashboards, and reporting solutions that measure platform health, service performance, operational trends, user adoption, and business outcomes.
+Translate technical activity and reporting into actionable insights, training materials, and interpretive support that help teams improve operational performance and demonstrate business value.
+
+The Experience You Bring
+
+Bachelor's degree in Information Systems, Computer Science, Engineering, or a related field, or equivalent relevant experience.
+0-4 years of experience in enterprise IT supporting end-user services, digital workplace capabilities, platform administration, automation, analytics, or platform-based service delivery, including internships, co-ops, or relevant academic and project work.
+Exposure to enterprise platforms, including configuration, access management, integrations, operational controls, lifecycle management, or service-dependent components such as agents, connectors, background jobs, or supporting services.
+Foundational experience building or maintaining scripts, API integrations, workflows, or service interactions using tools or languages such as PowerShell, Python, HTTP-based calls, or similar methods.
+Familiarity with enterprise identity, access, and governance concepts, including role-based access, operational controls, documentation, and secure administration practices.
+Strong analytical, problem-solving, collaboration, and communication skills, with the ability to translate data and technical findings into clear updates and recommendations.
+
+What Makes You Stand Out
+
+Hands-on experience with digital workplace platforms, enterprise service management tools, automation platforms, or operational analytics solutions.
+Experience creating dashboards, metrics, or data feeds that support service performance, adoption, incident trends, or operational decision-making.
+Curiosity and initiative to identify opportunities for automation, self-service, workflow improvement, and reduction of manual support demand.
+Interest in AI-enabled, knowledge-driven, or orchestration-based solutions that improve technology operations and the employee experience.
+
+Base Pay Range
+$113,490.00 - $138,710.00

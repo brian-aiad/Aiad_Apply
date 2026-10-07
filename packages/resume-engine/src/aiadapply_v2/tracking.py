@@ -25,8 +25,8 @@ DEFAULT_USED_RESUME_ROOT = default_used_resume_root()
 
 def load_tracking_environment() -> None:
     candidates = [
-        REPOSITORY_ROOT / "apps" / "web" / ".env",
         REPOSITORY_ROOT / "apps" / "web" / ".env.local",
+        REPOSITORY_ROOT / "apps" / "web" / ".env",
     ]
     for candidate in candidates:
         if not candidate.exists():
@@ -50,6 +50,21 @@ def tracking_configuration(
     if not secret:
         raise RuntimeError("WORKER_SECRET or CRON_SECRET is required for tracking.")
     return url, secret
+
+
+def queue_terminal_paste(
+    *, raw_paste: str, api_url: str | None = None, tailor: bool = True
+) -> dict[str, Any]:
+    """Capture via the normal deduplicating queue without invoking the reasoner."""
+    url, secret = tracking_configuration(api_url)
+    result = _request_json(
+        f"{url}/api/jobs",
+        secret=secret,
+        payload={"rawPaste": raw_paste, "queueTailoring": tailor},
+    )
+    if result is None or not result.get("id"):
+        raise RuntimeError("Capture returned no application.")
+    return {**result, "application_url": f"{url}/applications/{result['id']}"}
 
 
 def register_terminal_run(
@@ -103,7 +118,7 @@ def submit_worker_progress(
     _request_json(
         f"{api_url}/api/worker/runs/{run_id}/progress",
         secret=secret,
-        payload={"stage": stage, "workerId": worker_id},
+        payload={"stage": stage[:200], "workerId": worker_id},
         timeout_seconds=10,
     )
 
@@ -123,6 +138,22 @@ def submit_worker_heartbeat(
     )
 
 
+def save_failure_report(
+    reasoner: Reasoner, usage_start: int, output_folder: Path, error: BaseException
+) -> dict[str, Any]:
+    """Retain this attempt's measured usage even when no resume is accepted."""
+    usage = [entry.model_dump(mode="json") for entry in getattr(reasoner, "usage", [])[usage_start:]]
+    report = {
+        "validation": {"passed": False},
+        "model_calls": len(usage),
+        "model_usage": usage,
+        "error": f"{type(error).__name__}: {error}"[:5000],
+    }
+    output_folder.mkdir(parents=True, exist_ok=True)
+    (output_folder / "failure-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return report
+
+
 def submit_terminal_failure(
     *,
     api_url: str,
@@ -131,6 +162,7 @@ def submit_terminal_failure(
     error: BaseException,
     output_folder: Path,
     worker_id: str,
+    report: dict[str, Any] | None = None,
 ) -> None:
     _request_json(
         f"{api_url}/api/worker/runs/{run_id}",
@@ -138,7 +170,8 @@ def submit_terminal_failure(
         payload={
             "workerId": worker_id,
             "success": False,
-            "error": f"{type(error).__name__}: {error}",
+            "error": f"{type(error).__name__}: {error}"[:5000],
+            **({"report": report} if report is not None else {}),
             "outputFolder": str(output_folder),
             "keywords": [],
             "changes": [],
@@ -157,135 +190,174 @@ def run_worker(
     used_resume_root: Path = DEFAULT_USED_RESUME_ROOT,
     api_url: str | None = None,
     once: bool = False,
-    poll_seconds: float = 3.0,
+    poll_seconds: float = 5.0,
 ) -> None:
     url, secret = tracking_configuration(api_url)
     worker_id = f"{socket.gethostname()}-{os.getpid()}"
+    scheduler_stop = threading.Event()
+    scheduler: threading.Thread | None = None
     claim_failure_reported = False
-    while True:
-        try:
-            claimed = _request_json(
-                f"{url}/api/worker/claim",
-                secret=secret,
-                payload={"workerId": worker_id},
-                allow_empty=True,
-                retry_attempts=2,
+    try:
+        while True:
+            try:
+                claimed = _request_json(
+                    f"{url}/api/worker/claim",
+                    secret=secret,
+                    payload={"workerId": worker_id},
+                    allow_empty=True,
+                    retry_attempts=2,
+                )
+                claim_failure_reported = False
+                if not once and scheduler is None:
+                    scheduler = threading.Thread(
+                        target=_scheduled_discovery,
+                        args=(url, secret, scheduler_stop),
+                        name="aiadapply-discovery",
+                        daemon=True,
+                    )
+                    scheduler.start()
+            except Exception as error:
+                if once:
+                    raise
+                if not claim_failure_reported:
+                    print(f"Tracking API unavailable; worker will keep retrying: {error}")
+                claim_failure_reported = True
+                time.sleep(poll_seconds)
+                continue
+            if claimed is None:
+                if once:
+                    return
+                time.sleep(poll_seconds)
+                continue
+            run_id = str(claimed["runId"])
+            application_id = str(claimed["applicationId"])
+            raw_paste = str(claimed["rawPaste"])
+            company = str(claimed["company"])
+            title = str(claimed["title"])
+            folder = output_root / (
+                f"{date.today().isoformat()}_{_slug(company)}_{_slug(title)}_run_{run_id[:8]}"
             )
-            claim_failure_reported = False
-        except Exception as error:
-            if once:
-                raise
-            if not claim_failure_reported:
-                print(f"Tracking API unavailable; worker will keep retrying: {error}")
-            claim_failure_reported = True
-            time.sleep(poll_seconds)
-            continue
-        if claimed is None:
-            if once:
-                return
-            time.sleep(poll_seconds)
-            continue
-        run_id = str(claimed["runId"])
-        application_id = str(claimed["applicationId"])
-        raw_paste = str(claimed["rawPaste"])
-        company = str(claimed["company"])
-        title = str(claimed["title"])
-        folder = output_root / (
-            f"{date.today().isoformat()}_{_slug(company)}_{_slug(title)}_run_{run_id[:8]}"
-        )
-        folder.mkdir(parents=True, exist_ok=True)
-        (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
-        progress_sync_available = True
-        heartbeat_stop = threading.Event()
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
+            progress_sync_available = True
+            heartbeat_stop = threading.Event()
 
-        def keep_run_alive(
-            *,
-            current_run_id: str = run_id,
-            stop_event: threading.Event = heartbeat_stop,
-        ) -> None:
-            failure_reported = False
-            while not stop_event.wait(10):
+            def keep_run_alive(
+                *,
+                current_run_id: str = run_id,
+                stop_event: threading.Event = heartbeat_stop,
+            ) -> None:
+                failure_reported = False
+                while not stop_event.wait(10):
+                    try:
+                        submit_worker_heartbeat(
+                            api_url=url,
+                            secret=secret,
+                            worker_id=worker_id,
+                            run_id=current_run_id,
+                        )
+                        failure_reported = False
+                    except Exception as error:
+                        if not failure_reported:
+                            print(f"Worker heartbeat unavailable; continuing locally: {error}")
+                        failure_reported = True
+
+            heartbeat_thread = threading.Thread(
+                target=keep_run_alive,
+                name=f"aiadapply-heartbeat-{run_id[:8]}",
+                daemon=True,
+            )
+            heartbeat_thread.start()
+
+            def report_progress(message: str, *, current_run_id: str = run_id) -> None:
+                nonlocal progress_sync_available
+                print(f"[{time.strftime('%H:%M:%S')}] {message}", flush=True)
+                if not progress_sync_available:
+                    return
                 try:
-                    submit_worker_heartbeat(
+                    submit_worker_progress(
                         api_url=url,
                         secret=secret,
-                        worker_id=worker_id,
                         run_id=current_run_id,
+                        stage=message,
+                        worker_id=worker_id,
                     )
-                    failure_reported = False
                 except Exception as error:
-                    if not failure_reported:
-                        print(f"Worker heartbeat unavailable; continuing locally: {error}")
-                    failure_reported = True
+                    progress_sync_available = False
+                    print(f"Progress sync unavailable; continuing locally: {error}")
 
-        heartbeat_thread = threading.Thread(
-            target=keep_run_alive,
-            name=f"aiadapply-heartbeat-{run_id[:8]}",
-            daemon=True,
-        )
-        heartbeat_thread.start()
-
-        def report_progress(message: str, *, current_run_id: str = run_id) -> None:
-            nonlocal progress_sync_available
-            print(f"[{time.strftime('%H:%M:%S')}] {message}")
-            if not progress_sync_available:
-                return
+            usage_start = len(getattr(reasoner, "usage", []))
             try:
-                submit_worker_progress(
-                    api_url=url,
+                try:
+                    report = transform_resume(
+                        raw_paste=raw_paste,
+                        base_resume=base_resume,
+                        output_dir=folder,
+                        reasoner=reasoner,
+                        aggressive_draft=False,
+                        candidate_profile=candidate_profile,
+                        progress=report_progress,
+                    )
+                    report_progress("Organizing PDF copy in USED_RESUME")
+                    archive_tailored_pdf(report.output_pdf, used_resume_root)
+                    payload = build_worker_payload(
+                        report=report,
+                        output_folder=folder,
+                        application_id=application_id,
+                        worker_id=worker_id,
+                    )
+                except Exception as error:
+                    payload = {
+                        "workerId": worker_id,
+                        "success": False,
+                        "error": f"{type(error).__name__}: {error}"[:5000],
+                        "report": save_failure_report(reasoner, usage_start, folder, error),
+                        "outputFolder": str(folder),
+                        "keywords": [],
+                        "changes": [],
+                        "artifacts": [],
+                    }
+            finally:
+                heartbeat_stop.set()
+                heartbeat_thread.join(timeout=1)
+            try:
+                _request_json(
+                    f"{url}/api/worker/runs/{run_id}",
                     secret=secret,
-                    run_id=current_run_id,
-                    stage=message,
-                    worker_id=worker_id,
+                    payload=payload,
+                    retry_attempts=2,
                 )
             except Exception as error:
-                progress_sync_available = False
-                print(f"Progress sync unavailable; continuing locally: {error}")
-
-        try:
-            try:
-                report = transform_resume(
-                    raw_paste=raw_paste,
-                    base_resume=base_resume,
-                    output_dir=folder,
-                    reasoner=reasoner,
-                    candidate_profile=candidate_profile,
-                    progress=report_progress,
-                )
-                report_progress("Organizing PDF copy in USED_RESUME")
-                archive_tailored_pdf(report.output_pdf, used_resume_root)
-                payload = build_worker_payload(
-                    report=report,
-                    output_folder=folder,
-                    application_id=application_id,
-                    worker_id=worker_id,
-                )
-            except Exception as error:
-                payload = {
-                    "workerId": worker_id,
-                    "success": False,
-                    "error": f"{type(error).__name__}: {error}",
-                    "outputFolder": str(folder),
-                    "keywords": [],
-                    "changes": [],
-                    "artifacts": [],
-                }
-        finally:
-            heartbeat_stop.set()
-            heartbeat_thread.join(timeout=1)
-        try:
-            _request_json(
-                f"{url}/api/worker/runs/{run_id}",
-                secret=secret,
-                payload=payload,
-                retry_attempts=2,
-            )
-        except Exception as error:
-            print(f"Final result sync failed; the run will be recovered by its lease: {error}")
+                print(f"Final result sync failed; the run will be recovered by its lease: {error}")
+                if once:
+                    raise
             if once:
-                raise
-        if once:
-            return
+                return
+    finally:
+        scheduler_stop.set()
+        if scheduler is not None:
+            scheduler.join(timeout=1)
+
+
+def _scheduled_discovery(url: str, secret: str, stop: threading.Event) -> None:
+    """The server owns the shared schedule and caps across Mac/Windows workers."""
+    failure_reported = False
+    while not stop.is_set():
+        try:
+            result = _request_json(
+                f"{url}/api/worker/discovery",
+                secret=secret,
+                payload={},
+                timeout_seconds=120,
+            )
+            failure_reported = False
+            if result and result.get("queued"):
+                print(f"Discover queued {result['queued']} strong matches for review.")
+        except Exception:
+            if not failure_reported:
+                print("Scheduled discovery unavailable; retrying in 15 minutes.")
+            failure_reported = True
+        stop.wait(900)
 
 
 def build_worker_payload(

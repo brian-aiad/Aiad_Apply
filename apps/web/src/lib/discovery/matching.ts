@@ -1,3 +1,6 @@
+import { clearanceRequirement, experienceRequirement, requiredQualifications, roleConditions } from "./requirements";
+import { rtxFit } from "./rtx-fit";
+import occupationTitles from "./occupation-titles.json";
 import resumeEvidence from "./candidate-evidence.json";
 import type { DiscoveryPreferences, Opening } from "./types";
 
@@ -16,12 +19,23 @@ const skillDefinitions: [string, RegExp, string][] = [
   ["SaaS support", /\b(?:SaaS|application support|software support)\b/i, "saas"],
 ];
 
+export function excludedTitle(title: string) {
+  return /\b(?:director|head of|vice president|vp|intern|internship|principal|staff engineer|mechanical|electrical|aerospace|avionics|payload|fluid|environmental test|mission|manufacturing|weld|life support|logistics|subcontracts|field service|sales|RF|propulsion|weapons?|missiles?|maritime|flight|air vehicles|robotics|electronic warfare|precision engagement|advanced effects|edge compute)\b/i.test(title);
+}
+
 export function roleFamily(title: string): "core" | "adjacent" | null {
-  if (/\b(?:director|head of|vice president|vp|intern|internship|principal|staff engineer)\b/i.test(title)) return null;
-  if (/\b(?:mechanical|electrical|aerospace|avionics|payload|fluid|environmental test|mission|manufacturing|weld|life support|logistics|subcontracts|field service|sales|RF|propulsion|weapons?|missiles?|maritime|flight|air vehicles|robotics|electronic warfare|precision engagement|advanced effects|edge compute)\b/i.test(title)) return null;
-  if (/\b(?:application|technical|production|software|product|IT|IS|desktop|systems?)\s+support\b|\bsupport\s+(?:engineer|analyst|specialist|technician)\b|\b(?:service|help)[ -]?desk\b/i.test(title)) return "core";
+  if (excludedTitle(title)) return null;
+  if (/\b(?:application|technical|technology|production|software|product|IT|IS|desktop|systems?)\s+support\b|\bsupport\s+(?:engineer|analyst|specialist|technician|representative|rep)\b|\b(?:service|help)[ -]?desk\b/i.test(title)) return "core";
   if (/\b(?:implementation|integration|integrations)\s+(?:analyst|specialist|engineer|consultant)\b|\b(?:business|IT|information)\s+systems\b|\bsystems?\s+administrator\b|\bIT\s+(?:operations|analyst|specialist|technician)\b/i.test(title)) return "adjacent";
+  if (/\b(?:applications?|business|systems?|business systems|information systems|technical|integration|data operations|data quality|implementation|reporting|identity|access|IAM|IT)\s+(?:analyst|administrator|specialist|consultant)\b|\b(?:QA|quality assurance|software test|API test)\s+(?:analyst|engineer|tester)\b/i.test(title)) return "adjacent";
+  if (/\b(?:business strategy|consumer insights|business intelligence|reporting|data quality|data operations)\b.*\banalyst\b/i.test(title)) return "adjacent";
+  const normalized = title.toLowerCase().replace(/\b(?:junior|jr|senior|sr|associate|ii|iii|iv|1|2|3)\b/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+  if (occupationTitles.titles.some((item) => item.title.toLowerCase().split(" (")[0] === normalized)) return "adjacent";
   return null;
+}
+
+export function couldBeRelevant(title: string) {
+  return !excludedTitle(title) && (roleFamily(title) !== null || /\b(?:analyst|specialist|administrator|support|technician|consultant)\b/i.test(title));
 }
 
 // Approximate city centres; the UI explicitly distinguishes radius from road miles.
@@ -69,21 +83,35 @@ export function localDistance(location: string): number | null {
   return Math.round(3958.8 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)) * 10) / 10;
 }
 
+export function hasLocalLocationOption(location: string, radiusMiles: number) {
+  // Multi-office postings stay reviewable; never label a faraway office as local.
+  return [...location.matchAll(/([A-Za-z ]+),\s*(?:CA|California)\b/g)].some((match) => {
+    const distance = localDistance(`${match[1].trim()}, CA`);
+    return distance !== null && distance <= radiusMiles;
+  });
+}
+
 export function assessOpening(opening: Opening, preferences: DiscoveryPreferences) {
-  const family = roleFamily(opening.title);
+  let family = roleFamily(opening.title);
   const distanceMiles = localDistance(opening.location);
   const remote = opening.workArrangement === "Remote";
   const text = opening.description;
-  const matchReasons = skillDefinitions.filter(([, pattern, evidence]) => baseEvidence.includes(evidence) && pattern.test(text)).map(([label]) => label);
+  const positiveText = text.split(/\n|(?<=[.!?])\s+/).filter((line) => !/\b(?:not required|no (?:prior )?experience (?:with|in)|does not require)\b/i.test(line)).join("\n");
+  const matchReasons = skillDefinitions.filter(([, pattern, evidence]) => baseEvidence.includes(evidence) && pattern.test(positiveText)).map(([label]) => label);
+  if (opening.sourceKey === "rtx:california") return rtxFit(opening, distanceMiles, matchReasons, new Date(), preferences);
   const cautions: string[] = [];
-  let excluded = !family;
+  if (!family && couldBeRelevant(opening.title) && matchReasons.length >= 4) {
+    family = "adjacent";
+    cautions.push("Related duties found under an unfamiliar title; review the role scope.");
+  }
+  let excluded = !family || /\b(?:software|systems?|electrical|mechanical|manufacturing|test)\s+engineer\s*(?:II|2|III|3)\b/i.test(opening.title) && !/\b(?:IT|support)\b/i.test(opening.title);
   if (remote && !preferences.includeRemote) excluded = true;
   if (remote && !/\b(?:United States|USA|US|California|CA)\b/i.test(opening.location)) {
     cautions.push("Confirm this remote role hires in California.");
   }
   if (!remote && distanceMiles === null) {
-    if (!/^(?:California|CA|Orange County)(?:,|$)/i.test(opening.location)) excluded = true;
-    cautions.push("Confirm the worksite is within 30 miles of Seal Beach.");
+    if (!/^(?:California|CA|Orange County)(?:,|$)/i.test(opening.location) && !hasLocalLocationOption(opening.location, preferences.radiusMiles)) excluded = true;
+    cautions.push(`Confirm the worksite is within ${preferences.radiusMiles} miles of Seal Beach.`);
   }
   if (!remote && distanceMiles !== null && distanceMiles > preferences.radiusMiles) excluded = true;
   if (opening.employmentType === "Other") excluded = true;
@@ -92,11 +120,42 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   if (opening.salaryMin === null) cautions.push("Salary is not confirmed; ask for the base-pay range.");
   else if (opening.salaryMin < preferences.minimumSalary) cautions.push("The posted range starts below your salary target.");
   const senior = /\b(?:senior|sr\.?|lead|manager|supervisor|staff)\b/i.test(opening.title);
-  if (senior) cautions.push("Check seniority and leadership requirements against your experience.");
-  if (/\b(?:security clearance|active clearance|SECRET|TS\/SCI)\b/i.test(`${opening.title}\n${text}`)) cautions.push("Clearance mentioned: check whether it is required and confirm your eligibility; your resume does not establish clearance.");
-  if ([...text.matchAll(/\b(\d{1,2})(?:\s*[-–—]\s*\d{1,2})?\+?\s*(?:years|yrs)\b[^\n.]{0,100}\bexperience\b/gi)].some((m) => Number(m[1]) > 3)) cautions.push("The experience requirement may exceed the 3+ years on your base resume.");
+  if (senior) { excluded = true; cautions.push("Senior or leadership role is outside your current entry/support target."); }
+  const requiredLines = requiredQualifications(text);
+  const experience = experienceRequirement(requiredLines);
+  if (experience && experience.years > 3) {
+    cautions.push(`Required experience: ${experience.years}+ years; your documented background is 3+ years. ${experience.years >= 5 ? "Outside your current target." : "Review this stretch before tailoring."}`);
+    if (experience.years >= 5) excluded = true;
+  }
+  const clearance = clearanceRequirement(text);
+  if (clearance === "existing") {
+    cautions.push(preferences.clearance === "none" ? "Existing clearance required; you confirmed no active clearance." : "Existing clearance required; confirm the level and transferability.");
+    if (preferences.clearance === "none") excluded = true;
+  } else if (clearance) cautions.push(clearance === "obtainable" ? "The posting allows obtaining clearance; confirm the eligibility and timeline." : "Clearance requirement is unclear; check the employer posting.");
   if (/\b(?:CAD|NX|TeamCenter|AV|Workday|security officer|security manager)\b/i.test(opening.title)) cautions.push("Specialist platform or domain experience is not established by your base resume; review the requirements carefully.");
-  if (matchReasons.length < 2) cautions.push("Limited overlap with the skills documented in your base resume.");
-  const score = Math.max(0, Math.min(100, (family === "core" ? 38 : family ? 25 : 0) + Math.min(48, matchReasons.length * 7) + (distanceMiles !== null && distanceMiles <= 15 ? 6 : 0) - (senior ? 16 : 0)));
-  return { excluded, distanceMiles, score, matchReasons, cautions, qualified: !excluded && cautions.length === 0 && matchReasons.length >= 2 };
+  if (/\b(?:software|systems?) engineer\b/i.test(opening.title) && !/\b(?:IT|support)\b/i.test(opening.title)) excluded = true;
+  const specialtyDomains = [...new Set(requiredLines.filter(line => /experience|background|proficien/i.test(line)).flatMap(line =>
+    [...line.matchAll(/\b(?:IT engineering|embedded|radar|RF|hardware (?:design|test)|manufacturing|supply chain|defense logistics|financial analysis|business analytics|consumer insights|market research)\b/gi)].map(match => match[0].toLowerCase())
+  ))];
+  if (specialtyDomains.length) {
+    cautions.push(`Required ${specialtyDomains.slice(0, 3).join(" / ")} experience is not established by your support/IT background.`);
+  }
+  if (!requiredLines.length) cautions.push("Required qualifications were not clearly identified; review the full posting.");
+  cautions.push(...roleConditions(`${opening.title}\n${text}`).map(condition => `Work schedule: ${condition}.`));
+  const specialistRequirements = ["ServiceNow", "Salesforce", "SAP", "Workday", "Epic", "Cerner", "CISSP", "CCNP", "Kubernetes", "Terraform", "Oracle ERP", "Odoo"];
+  for (const term of specialistRequirements) {
+    if (!baseEvidence.includes(term.toLowerCase()) && requiredLines.some((line) => new RegExp(`\\b${term}\\b`, "i").test(line) && !(/e\.g\.|such as|\bor\b/i.test(line) && /\b(?:Jira|Python|SQL|Microsoft 365)\b/i.test(line)))) {
+      cautions.push(`Required ${term} experience or credential is not established in your base resume.`);
+    }
+  }
+  if (opening.sourceKey.startsWith("adzuna:")) cautions.push("Adzuna supplies a description excerpt. Open the source and capture the full posting before tailoring.");
+  if (opening.sourceKey.startsWith("usajobs:")) cautions.push("Federal opening: verify hiring eligibility, specialized experience and the announcement's resume requirements.");
+  if (matchReasons.length < 3) cautions.push("Limited overlap with the duties documented in your base resume.");
+  const score = Math.max(0, Math.min(100, (family === "core" ? 32 : family ? 28 : 0)
+    + Math.min(49, matchReasons.length * 7)
+    + (distanceMiles !== null && distanceMiles <= 15 ? 6 : 0)
+    + (opening.salaryMin !== null && opening.salaryMin >= preferences.minimumSalary ? 5 : 0)
+    + (opening.employmentType === "Full-time" ? 4 : 0)
+    - (senior ? 16 : 0) - (cautions.some((c) => c.startsWith("Required ")) ? 18 : 0)));
+  return { excluded, distanceMiles, score, matchReasons: [...(family === "core" ? ["Support duties align with your IT / application support background"] : family === "adjacent" ? ["Adjacent systems, analyst or operations route"] : []), ...matchReasons], cautions, qualified: !excluded && cautions.length === 0 && matchReasons.length >= 3 && score >= 65 };
 }

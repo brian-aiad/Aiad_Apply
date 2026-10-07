@@ -1,6 +1,9 @@
 from pathlib import Path
 
+import pytest
+from aiadapply_v2 import pipeline
 from aiadapply_v2.documents.model import parse_resume_docx
+from aiadapply_v2.documents.writer import write_resume_candidate
 from aiadapply_v2.evidence.loaders import build_evidence_graph
 from aiadapply_v2.grading.keywords import NON_PROSE_QUALIFICATIONS, grade_job_keywords
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
@@ -17,15 +20,21 @@ from aiadapply_v2.pipeline import (
     _normalize_acronym_redundancy,
     _normalize_claim_risk_placements,
     _normalize_prose_collocations,
+    _order_rewrite_variants,
     _place_direct_category_keyword,
     _prune_absent_claim_risks,
     _prune_direct_evidence_risks,
     _prune_resolved_nonexportable_risks,
+    _remove_unproven_reproduction,
+    _repair_equal_length_fallbacks,
+    _repair_skill_row_overflow,
     _restore_unjustified_shortening,
     _sanitize_shorter_fallbacks,
     _select_compression_candidate,
     _select_expansion_candidate,
+    _select_overflow_reversion_candidate,
     _supported_keywords,
+    _use_rendered_skill_rows,
     transform_resume,
 )
 from aiadapply_v2.planning.rewrite_plan import all_proposed_text
@@ -34,6 +43,9 @@ from aiadapply_v2.schemas import (
     ClaimRisk,
     EvidenceMatch,
     EvidenceStrength,
+    JobKeyword,
+    KeywordKind,
+    KeywordPriority,
     LayoutResult,
     ReasoningResult,
     RiskLevel,
@@ -49,7 +61,26 @@ from .helpers import IdentityReasoner, identity_plan
 BASE = Path("data/resumes/Brian_Aiad_BASE.docx")
 
 
-def test_end_to_end_pipeline_exports_job_specific_names_after_validation(tmp_path: Path) -> None:
+def test_project_api_wording_survives_plural_only_rewrite() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(
+        item for item in plan.bullets if item.paragraph_id == "projects.loavenly.bullet.2"
+    )
+    source = bullet.text
+    assert "API," in source
+    bullet.text = source.replace("API,", "APIs,")
+    bullet.shorter_text = bullet.text
+
+    _restore_unjustified_shortening(plan, document, [])
+
+    assert bullet.text == source
+
+
+@pytest.mark.parametrize("corrupt_optimized_text", [False, True])
+def test_end_to_end_pipeline_exports_job_specific_names_after_validation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, corrupt_optimized_text: bool
+) -> None:
     raw = """
 Home
 Jobs
@@ -78,6 +109,35 @@ Accessibility
 LinkedIn Corporation
 """ + ("navigation noise " * 20)
     progress: list[str] = []
+    # This identity-plan fixture tests render/export integrity, not model writing.
+    # Broad rewrite enforcement has its own unit cases and real-listing verification.
+    monkeypatch.setattr(pipeline, "tailoring_feedback", lambda *args, **kwargs: [])
+    if corrupt_optimized_text:
+        from docx import Document
+
+        original_optimizer = pipeline.write_ats_optimized_docx
+
+        def corrupt_optimizer(source: Path, destination: Path) -> Path:
+            result = original_optimizer(source, destination)
+            document = Document(result)
+            for paragraph in document.paragraphs:
+                for run in paragraph.runs:
+                    run.text = run.text.replace("SQL", "spreadsheets")
+            document.save(result)
+            return result
+
+        monkeypatch.setattr(pipeline, "write_ats_optimized_docx", corrupt_optimizer)
+        with pytest.raises(pipeline.TransformationError, match="changed the validated resume text"):
+            transform_resume(
+                raw_paste=raw,
+                base_resume=BASE,
+                output_dir=tmp_path,
+                reasoner=IdentityReasoner(),
+                semantic_encoder=LexicalSemanticEncoder(),
+                aggressive_draft=False,
+            )
+        assert not (tmp_path / "transformation_report.json").exists()
+        return
     report = transform_resume(
         raw_paste=raw,
         base_resume=BASE,
@@ -85,6 +145,7 @@ LinkedIn Corporation
         reasoner=IdentityReasoner(),
         semantic_encoder=LexicalSemanticEncoder(),
         progress=progress.append,
+        aggressive_draft=False,
     )
 
     assert (
@@ -195,6 +256,37 @@ def test_deterministic_direct_evidence_fills_incomplete_reasoner_map() -> None:
     assert len(reasoning.transferability_map.matches) == len(
         [keyword for keyword in keywords if keyword.accepted]
     )
+
+
+def test_model_cannot_promote_formal_foundry_requirements_without_source_evidence() -> None:
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/mccarthy_product_analyst_ii_foundry_2026_09_21.txt").read_text()
+    )
+    keywords = grade_job_keywords(job)
+    document = parse_resume_docx(BASE)
+    profile = build_target_role_profile(job, keywords)
+    preliminary = build_transferability_map(
+        profile, keywords, build_evidence_graph(document, keywords), LexicalSemanticEncoder()
+    )
+    protected = {"runbooks", "acceptance criteria", "user stories", "tier 2 support", "foundry"}
+    promoted = [
+        match.model_copy(update={"strength": EvidenceStrength.direct})
+        for match in preliminary.matches
+        if match.target_term.casefold() in protected
+    ]
+    assert len(promoted) == len(protected)
+    reasoning = ReasoningResult(
+        role_profile=profile,
+        transferability_map=TransferabilityMap(matches=promoted),
+        rewrite_plan=identity_plan(document),
+    )
+    _merge_transferability_map(reasoning, preliminary, keywords)
+    for match in reasoning.transferability_map.matches:
+        if match.target_term.casefold() in protected:
+            assert match.strength in {
+                EvidenceStrength.weakly_transferable,
+                EvidenceStrength.unsupported,
+            }
 
 
 def test_curated_transfer_bridge_is_stable_when_reasoner_downgrades_it() -> None:
@@ -399,7 +491,8 @@ def test_supported_stretch_role_actions_are_placed_in_existing_investigation_evi
         for bullet in reasoning.rewrite_plan.bullets
         if bullet.paragraph_id == "experience.original_insurance.bullet.2"
     )
-    assert "problem-solving" in investigation.text
+    assert investigation.text.startswith("Investigated production incidents")
+    assert "Applied problem-solving" not in investigation.text
     assert "root cause and corrective action" in investigation.text
 
 
@@ -465,7 +558,29 @@ def test_direct_web_services_category_is_placed_through_existing_webhook_evidenc
     assert "webhook-based web services" in bullet.shorter_text
 
 
-def test_business_analysis_is_placed_without_removing_project_evidence() -> None:
+def test_monitoring_does_not_mechanically_rewrite_an_investigation() -> None:
+    monitoring = JobKeyword(
+        term="monitoring",
+        normalized="monitoring",
+        kind=KeywordKind.action,
+        priority=KeywordPriority.high,
+        hiring_importance=70,
+        placement_utility=75,
+    )
+    plan = identity_plan(parse_resume_docx(BASE))
+
+    _place_direct_category_keyword(plan, monitoring)
+
+    bullet = next(
+        item
+        for item in plan.bullets
+        if item.paragraph_id == "experience.original_insurance.bullet.2"
+    )
+    assert bullet.text.startswith("Investigated production incidents")
+    assert "using log analysis, SQL queries, and API debugging" in bullet.text
+
+
+def test_business_analysis_is_not_mechanically_prefixed_to_a_project() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/niagara_it_systems_functional_i_2026_08_06.txt").read_text(
             encoding="utf-8"
@@ -481,7 +596,7 @@ def test_business_analysis_is_placed_without_removing_project_evidence() -> None
     bullet = next(
         item for item in plan.bullets if item.paragraph_id == "experience.wehelp.bullet.1"
     )
-    assert bullet.text.startswith("Applied business analysis to identify the need")
+    assert bullet.text.startswith("Identified the need")
     assert "independently built, tested, and deployed Loavenly" in bullet.text
     assert "staff and volunteers" in bullet.text
 
@@ -698,7 +813,7 @@ def test_literal_keyword_collocations_are_rewritten_as_natural_prose() -> None:
     )
 
 
-def test_supported_tier_one_soft_skills_are_placed_in_concrete_evidence() -> None:
+def test_soft_skills_do_not_replace_concrete_action_verbs() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/niagara_it_systems_functional_i_2026_08_06.txt").read_text(
             encoding="utf-8"
@@ -717,7 +832,7 @@ def test_supported_tier_one_soft_skills_are_placed_in_concrete_evidence() -> Non
 
     proposed_text = "\n".join(all_proposed_text(reasoning.rewrite_plan)).casefold()
     for term in soft_terms:
-        assert term in proposed_text
+        assert term not in proposed_text
     incident = next(
         item
         for item in reasoning.rewrite_plan.bullets
@@ -728,11 +843,11 @@ def test_supported_tier_one_soft_skills_are_placed_in_concrete_evidence() -> Non
         for item in reasoning.rewrite_plan.bullets
         if item.paragraph_id == "experience.original_insurance.bullet.1"
     )
-    assert "critical thinking and problem-solving" in incident.text.casefold()
-    assert "task prioritization" in ticket.text.casefold()
+    assert incident.text.startswith("Investigated production incidents")
+    assert ticket.text.startswith("Resolved 200+")
 
 
-def test_communication_terms_survive_the_shorter_evidence_candidate() -> None:
+def test_communication_keywords_do_not_force_filler_into_evidence() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/liquid_iv_d365_technical_analyst_2026_08_12.txt").read_text(
             encoding="utf-8"
@@ -761,8 +876,8 @@ def test_communication_terms_survive_the_shorter_evidence_candidate() -> None:
         if item.paragraph_id == "experience.csulb.bullet.3"
     )
     for text in (bullet.text, bullet.shorter_text):
-        assert "cross-functional collaboration" in text.casefold()
-        assert "verbal communication" in text.casefold()
+        assert "coordinating with campus IT and third-party vendors" in text
+        assert "while using verbal communication" not in text
 
 
 def test_encompass_role_separates_platform_gaps_from_transferable_support_work() -> None:
@@ -983,6 +1098,7 @@ def test_export_boundary_uses_safe_fallback_for_blocked_bullet_claim() -> None:
         if paragraph.paragraph_id == bullet.paragraph_id
     )
     bullet.text = f"{safe_text} and documented an unsupported workflow."
+    bullet.shorter_text = f"{safe_text} Unsupported workflow."
     bullet.claim_risks.append(
         ClaimRisk(
             claim="Documented an unsupported workflow",
@@ -998,10 +1114,44 @@ def test_export_boundary_uses_safe_fallback_for_blocked_bullet_claim() -> None:
     _enforce_export_boundaries(plan, document)
 
     assert bullet.text == safe_text
+    assert bullet.shorter_text == safe_text
     assert bullet.claim_risks[0].export_allowed is False
 
 
-def test_important_omitted_term_does_not_displace_verified_base_skills() -> None:
+def test_export_boundary_removes_unsafe_summary_and_global_bullet_fallbacks() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    source_by_id = {paragraph.paragraph_id: paragraph.text for paragraph in document.paragraphs}
+    bullet = plan.bullets[0]
+    for placement, proposal in (("summary", plan.summary), (bullet.paragraph_id, bullet)):
+        proposal.text += " Administered Foundry applications."
+        proposal.shorter_text = proposal.text
+        plan.claim_risks.append(
+            ClaimRisk(
+                claim="Foundry",
+                target_requirement="Foundry",
+                strength=EvidenceStrength.unsupported,
+                risk_level=RiskLevel.high,
+                explanation="No candidate evidence for this platform.",
+                selected_placement=placement,
+                export_allowed=False,
+            )
+        )
+
+    _enforce_export_boundaries(plan, document)
+
+    assert plan.summary.text == plan.summary.shorter_text == source_by_id["summary"]
+    assert bullet.text == bullet.shorter_text == source_by_id[bullet.paragraph_id]
+    profile = TargetRoleProfile(
+        title="Application Support Engineer",
+        normalized_role_family="application_support",
+        professional_identity="Application Support Engineer",
+    )
+    result = validate_rewrite_plan(document, plan, [], profile, forbidden_terms=["Foundry"])
+    assert not any(issue.code.startswith("invalid_shorter") for issue in result.issues)
+
+
+def test_important_supported_term_can_displace_lower_value_base_skill() -> None:
     job = parse_linkedin_simplify(Path("data/fixtures/hanmi_full.txt").read_text(encoding="utf-8"))
     keywords = grade_job_keywords(job)
     document = parse_resume_docx(BASE)
@@ -1025,11 +1175,13 @@ def test_important_omitted_term_does_not_displace_verified_base_skills() -> None
         if paragraph.paragraph_id == "skills.cloud_systems"
     )
     base_skills = split_skill_values(base_cloud.text.split(":", 1)[1])
-    assert all(skill in cloud.skills for skill in base_skills)
-    assert all(skill in cloud.shorter_skills for skill in base_skills)
+    assert "Operating Systems" in cloud.skills
+    assert "CI/CD (GitHub Actions)" not in cloud.skills
+    assert len(cloud.skills) == len(base_skills)
+    assert cloud.shorter_skills == cloud.skills
 
 
-def test_new_skill_terms_are_relocated_out_of_incorrect_model_categories() -> None:
+def test_generic_environment_terms_do_not_displace_concrete_support_skills() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/liquid_iv_d365_technical_analyst_2026_08_12.txt").read_text(
             encoding="utf-8"
@@ -1048,8 +1200,9 @@ def test_new_skill_terms_are_relocated_out_of_incorrect_model_categories() -> No
     technical = next(
         line for line in plan.skills.lines if line.paragraph_id == "skills.technical_support"
     )
-    assert "Compliance" in technical.skills
+    assert "Compliance" not in technical.skills
     assert "Compliance" not in tools.skills
+    assert "Production Support" in technical.skills
 
 
 def test_existing_base_skill_is_not_duplicated_into_another_category() -> None:
@@ -1060,9 +1213,7 @@ def test_existing_base_skill_is_not_duplicated_into_another_category() -> None:
     document = parse_resume_docx(BASE)
     plan = identity_plan(document)
     tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
-    apis = next(
-        line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity"
-    )
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
     tools.skills.append("Postman")
 
     _fuse_skill_inventory(plan, document, keywords)
@@ -1111,7 +1262,67 @@ def test_skill_display_is_professional_and_preserves_product_casing() -> None:
     assert _display_skill("OAuth 2.0") == "OAuth 2.0"
 
 
-def test_skill_fusion_preserves_base_tools_and_drops_weak_panel_noise() -> None:
+def test_supported_profile_skill_can_replace_lower_value_base_skill() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    react = JobKeyword(
+        term="React",
+        normalized="react",
+        kind=KeywordKind.system,
+        priority=KeywordPriority.high,
+        occurrences=4,
+        hiring_importance=92,
+        placement_utility=88,
+    )
+    reasoning = ReasoningResult(
+        role_profile=TargetRoleProfile(
+            title="Frontend Support Engineer",
+            normalized_role_family="application_support_engineering",
+            professional_identity="Application Support Engineer",
+        ),
+        transferability_map=TransferabilityMap(direct_terms=["React"]),
+        rewrite_plan=plan,
+    )
+
+    _fuse_skill_inventory(plan, document, [react])
+    _ensure_important_keyword_placement(reasoning, [react], document)
+
+    languages = next(
+        line for line in plan.skills.lines if line.paragraph_id == "skills.languages_dbs"
+    )
+    assert "React" in languages.skills
+    assert len(languages.skills) == len(
+        split_skill_values(
+            next(
+                paragraph.text
+                for paragraph in document.paragraphs
+                if paragraph.paragraph_id == "skills.languages_dbs"
+            ).split(":", 1)[1]
+        )
+    )
+
+
+def test_rewrite_validation_rejects_skill_without_candidate_evidence() -> None:
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/trade_desk_support_engineer_full.txt").read_text(encoding="utf-8")
+    )
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    tools.skills[-1] = "Rust"
+
+    validation = validate_rewrite_plan(
+        document,
+        plan,
+        [],
+        build_target_role_profile(job, grade_job_keywords(job)),
+    )
+
+    assert not validation.passed
+    assert any(issue.code == "unsupported_skill_inserted" for issue in validation.issues)
+
+
+def test_skill_fusion_prioritizes_supported_job_tools_and_drops_weak_panel_noise() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/anduril_rotation_full.txt").read_text(encoding="utf-8")
     )
@@ -1124,8 +1335,8 @@ def test_skill_fusion_preserves_base_tools_and_drops_weak_panel_noise() -> None:
 
     _fuse_skill_inventory(plan, document, keywords)
 
-    assert tools.skills[:3] == ["Jira", "Confluence", "Excel"]
     assert "Project Management" in tools.skills
+    assert len(tools.skills) <= 7
     assert "Compliance" not in tools.skills
     assert "AI" not in tools.skills
     assert "Computer Vision" not in tools.skills
@@ -1171,7 +1382,8 @@ def test_skill_fusion_drops_unverified_additions_and_keeps_base_inventory_size()
         if paragraph.paragraph_id == "skills.technical_support"
     )
     base_skills = [value.strip() for value in base_technical.text.split(":", 1)[1].split(",")]
-    assert all(skill in technical.skills for skill in base_skills)
+    assert 1 <= len(technical.skills) <= len(base_skills)
+    assert "Troubleshooting" in technical.skills
 
 
 def test_skill_budget_uses_measured_spare_width_without_changing_the_fallback_inventory() -> None:
@@ -1190,6 +1402,225 @@ def test_skill_budget_uses_measured_spare_width_without_changing_the_fallback_in
 
     assert budget > tools.character_budget
     assert budget <= round(tools.character_budget * 1.5)
+
+
+def test_skill_row_overflow_drops_low_value_tail_without_adding_a_row() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    apis.skills = [
+        "Microsoft 365",
+        "Entra ID",
+        "MFA",
+        "RBAC",
+        "SSO",
+        "Microsoft Graph API",
+        "REST APIs",
+        "Webhooks",
+        "OAuth 2.0",
+        "SAML",
+        "Postman",
+    ]
+    apis.shorter_skills = list(apis.skills)
+    changed = _repair_skill_row_overflow(plan, document, [], {apis.paragraph_id: 2})
+    assert changed
+    assert "Postman" not in apis.skills
+    assert len(apis.skills) == 10
+
+
+def test_wrapped_skill_row_is_repaired_even_when_baseline_also_wraps() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    original = list(apis.skills)
+
+    changed = _repair_skill_row_overflow(
+        plan,
+        document,
+        [],
+        {apis.paragraph_id: 2},
+        {apis.paragraph_id: 2},
+    )
+
+    assert changed
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    assert "Postman" not in apis.skills
+    assert "Postman" in tools.skills
+    assert set(apis.skills + tools.skills) >= set(original)
+
+
+def test_high_value_postman_can_move_to_tools_instead_of_being_dropped() -> None:
+    document = parse_resume_docx(BASE)
+    for paragraph in document.paragraphs:
+        if paragraph.kind.value == "skill_line":
+            paragraph.rendered_max_width_points = 560.0
+    tools_meta = next(
+        paragraph for paragraph in document.paragraphs if paragraph.paragraph_id == "skills.tools"
+    )
+    tools_meta.rendered_max_width_points = 400.0
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    keywords = [
+        JobKeyword(
+            term=value,
+            normalized=value.casefold(),
+            priority=KeywordPriority.high,
+            kind=KeywordKind.system,
+            occurrences=2,
+            hiring_importance=60 if value == "Postman" else 80,
+            placement_utility=80,
+        )
+        for value in apis.skills
+    ]
+
+    changed = _repair_skill_row_overflow(plan, document, keywords, {apis.paragraph_id: 2})
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+
+    assert changed
+    assert "Postman" not in apis.skills
+    assert "Postman" in tools.skills
+
+
+def test_postman_relocation_preserves_other_skills_and_shorter_variant() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    before = list(apis.skills)
+    apis.shorter_skills = ["Postman", "REST APIs"]
+    keywords = [
+        JobKeyword(
+            term="Postman",
+            normalized="postman",
+            priority=KeywordPriority.high,
+            kind=KeywordKind.system,
+            occurrences=2,
+            hiring_importance=99,
+            placement_utility=99,
+        )
+    ]
+    assert _repair_skill_row_overflow(plan, document, keywords, {apis.paragraph_id: 2})
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    assert apis.skills == [value for value in before if value != "Postman"]
+    assert apis.shorter_skills == ["REST APIs"]
+    assert "Postman" in tools.skills
+    assert "Postman" in tools.shorter_skills
+
+
+def test_postman_displaced_before_rendering_is_retained_in_tools() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    apis.skills.remove("Postman")
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/pacific_life_platform_engineer_ii_live_2026_09_21.txt").read_text()
+    )
+    reasoning = ReasoningResult(
+        role_profile=build_target_role_profile(job, []),
+        transferability_map=TransferabilityMap(),
+        rewrite_plan=plan,
+    )
+    for _ in range(2):
+        _ensure_important_keyword_placement(reasoning, [], document)
+        tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+        assert tools.skills.count("Postman") == 1
+        assert tools.shorter_skills.count("Postman") == 1
+
+
+def test_equal_length_model_fallback_uses_shorter_source_without_changing_primary() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = plan.bullets[0]
+    source = bullet.text
+    bullet.text = source[:-1] + " and service performance."
+    bullet.shorter_text = source[:-1] + " for service performance."
+    primary = bullet.text
+    assert len(bullet.text) == len(bullet.shorter_text)
+    _repair_equal_length_fallbacks(plan, document)
+    assert bullet.text == primary
+    assert bullet.shorter_text == source
+    bullet.text = "Diagnosed incidents."
+    bullet.shorter_text = bullet.text
+    _repair_equal_length_fallbacks(plan, document)
+    assert bullet.shorter_text == "Diagnosed incidents."
+
+
+def test_postman_does_not_bounce_back_after_destination_overflows() -> None:
+    document = parse_resume_docx(BASE)
+    for paragraph in document.paragraphs:
+        if paragraph.kind.value == "skill_line":
+            paragraph.character_budget = 500  # Simulate optimistic width estimates.
+    plan = identity_plan(document)
+    apis = next(line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity")
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    keywords = [
+        JobKeyword(
+            term="Postman",
+            normalized="postman",
+            priority=KeywordPriority.high,
+            kind=KeywordKind.system,
+            occurrences=2,
+            hiring_importance=99,
+            placement_utility=99,
+        )
+    ]
+    moved: set[str] = set()
+    assert _repair_skill_row_overflow(
+        plan,
+        document,
+        keywords,
+        {apis.paragraph_id: 2, tools.paragraph_id: 1},
+        relocated_skills=moved,
+    )
+    assert moved == {"postman"}
+    assert _repair_skill_row_overflow(
+        plan,
+        document,
+        keywords,
+        {apis.paragraph_id: 1, tools.paragraph_id: 2},
+        relocated_skills=moved,
+    )
+    assert "Postman" in tools.skills
+    assert "Postman" not in apis.skills
+
+
+def test_skill_repair_uses_exported_compressed_and_restored_values(tmp_path: Path) -> None:
+    document = parse_resume_docx(BASE)
+    for mode in ("compressed", "restored"):
+        plan = identity_plan(document)
+        apis = next(
+            line for line in plan.skills.lines if line.paragraph_id == "skills.apis_identity"
+        )
+        apis.skills = ["REST APIs"]
+        apis.shorter_skills = ["Microsoft Graph API", "Postman"]
+        candidate = write_resume_candidate(
+            document,
+            plan,
+            tmp_path / f"{mode}.docx",
+            compressed_paragraph_ids={apis.paragraph_id} if mode == "compressed" else set(),
+            reverted_paragraph_ids={apis.paragraph_id} if mode == "restored" else set(),
+        )
+        _use_rendered_skill_rows(plan, parse_resume_docx(candidate))
+        assert "Postman" in apis.skills
+        assert _repair_skill_row_overflow(plan, document, [], {apis.paragraph_id: 2})
+        final = write_resume_candidate(document, plan, tmp_path / f"{mode}-repaired.docx")
+        actual = {p.paragraph_id: p.text for p in parse_resume_docx(final).paragraphs}
+        assert "Postman" not in actual[apis.paragraph_id]
+        assert "Postman" in actual["skills.tools"]
+
+
+def test_reversed_model_variants_are_ordered_before_factual_validation() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = plan.bullets[0]
+    original = bullet.text
+    bullet.shorter_text = original + " Extra context."
+    _order_rewrite_variants(plan)
+    assert bullet.text == original + " Extra context."
+    assert bullet.shorter_text == original
+    # Reordering is not an exemption from the source evidence checks.
+    bullet.text = bullet.text.replace("Microsoft 365", "a different tool")
+    _restore_unjustified_shortening(plan, document, [])
+    assert bullet.text == original
 
 
 def test_unjustified_or_severe_shortening_restores_source_bullet() -> None:
@@ -1293,7 +1724,7 @@ def test_absent_transferable_claim_is_removed_from_review_flags() -> None:
     assert plan.claim_risks == []
 
 
-def test_rewrite_validation_rejects_removal_of_a_verified_base_skill() -> None:
+def test_rewrite_validation_allows_removal_of_a_verified_base_skill() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/pds_health_epic_analyst_full_2026_08_06.txt").read_text(
             encoding="utf-8"
@@ -1313,8 +1744,8 @@ def test_rewrite_validation_rejects_removal_of_a_verified_base_skill() -> None:
         build_target_role_profile(job, grade_job_keywords(job)),
     )
 
-    assert not validation.passed
-    assert any(issue.code == "base_skill_removed" for issue in validation.issues)
+    assert validation.passed
+    assert not any(issue.code == "base_skill_removed" for issue in validation.issues)
 
 
 def test_layout_fallbacks_preserve_source_evidence_instead_of_overcompressing() -> None:
@@ -1332,6 +1763,43 @@ def test_layout_fallbacks_preserve_source_evidence_instead_of_overcompressing() 
     source_by_id = {item.paragraph_id: item.text for item in document.paragraphs}
     assert plan.summary.shorter_text == source_by_id["summary"]
     assert volunteer.shorter_text == source_by_id["experience.wehelp.bullet.2"]
+
+
+def test_draft_project_fallback_can_fit_without_erasing_new_technology() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    project = next(
+        item for item in plan.bullets if item.paragraph_id == "projects.loavenly.bullet.2"
+    )
+    compact = (
+        "Configured RBAC and Java API; fixed authentication, synchronization, "
+        "and permission issues in production."
+    )
+    assert len(compact) < 0.90 * len(project.text)
+    assert len(compact) >= 0.75 * len(project.text)
+    project.text = compact
+    project.shorter_text = compact
+
+    _sanitize_shorter_fallbacks(plan, document, draft_terms={"java"})
+
+    assert project.shorter_text == compact
+
+
+def test_unproven_issue_reproduction_is_kept_as_investigation() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    insurance = next(
+        item
+        for item in plan.bullets
+        if item.paragraph_id == "experience.original_insurance.bullet.2"
+    )
+    insurance.text = "Reproduced and resolved production issues."
+    insurance.shorter_text = "Reproducing production issues."
+
+    _remove_unproven_reproduction(plan, document)
+
+    assert insurance.text == "Investigated and resolved production issues."
+    assert insurance.shorter_text == "Investigating production issues."
 
 
 def test_primary_summary_cannot_drop_a_named_source_system() -> None:
@@ -1409,6 +1877,47 @@ def test_expansion_restores_shortened_paragraph_before_shifted_anchor() -> None:
     assert selected == paragraph_id
 
 
+def test_overflow_reversion_restores_only_the_changed_paragraph_that_still_overflows() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    paragraph_id = "projects.loavenly.bullet.2"
+    bullet = next(item for item in plan.bullets if item.paragraph_id == paragraph_id)
+    bullet.text = f"{bullet.text} with additional platform configuration detail"
+    layout = LayoutResult(
+        passed=False,
+        page_count=1,
+        rendered_lines=61,
+        overflow_paragraph_ids=[paragraph_id, "bottom-edge"],
+        paragraph_line_counts={paragraph_id: 3},
+        baseline_paragraph_line_counts={paragraph_id: 2},
+    )
+
+    selected = _select_overflow_reversion_candidate(document, plan, layout, set())
+
+    assert selected == paragraph_id
+
+
+def test_overflow_reversion_uses_shifted_section_when_bottom_edge_is_only_signal() -> None:
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    paragraph_id = "projects.loavenly.bullet.1"
+    bullet = next(item for item in plan.bullets if item.paragraph_id == paragraph_id)
+    bullet.text = f"{bullet.text} with additional workflow automation detail"
+    layout = LayoutResult(
+        passed=False,
+        page_count=1,
+        rendered_lines=61,
+        overflow_paragraph_ids=["bottom-edge"],
+        section_anchor_deltas={"EDUCATION": 12.8},
+        paragraph_line_counts={paragraph_id: 3},
+        baseline_paragraph_line_counts={paragraph_id: 2},
+    )
+
+    selected = _select_overflow_reversion_candidate(document, plan, layout, set())
+
+    assert selected == paragraph_id
+
+
 def test_dense_erp_keywords_are_balanced_across_fixed_skill_rows() -> None:
     job = parse_linkedin_simplify(
         Path("data/fixtures/liquid_iv_full.txt").read_text(encoding="utf-8")
@@ -1428,4 +1937,305 @@ def test_dense_erp_keywords_are_balanced_across_fixed_skill_rows() -> None:
         paragraph = by_id[line.paragraph_id]
         _label, values = paragraph.text.split(":", 1)
         base_items = split_skill_values(values)
-        assert len(line.skills) >= len(base_items)
+        assert len(line.skills) <= len(base_items)
+        assert line.skills
+
+
+def test_added_keywords_use_final_bullet_text_not_model_annotations():
+    from aiadapply_v2.pipeline import _build_change_manifest
+    from aiadapply_v2.schemas import ResumeDocument
+
+    base = parse_resume_docx(BASE)
+    plan = identity_plan(base)
+    final = ResumeDocument.model_validate(base.model_dump())
+    key = "experience.original_insurance.bullet.3"
+    paragraph = next(p for p in final.paragraphs if p.paragraph_id == key)
+    paragraph.text = paragraph.text.replace(
+        "a Python reconciliation script", "Python reconciliation automation"
+    )
+    bullet = next(b for b in plan.bullets if b.paragraph_id == key)
+    bullet.target_terms = ["Kubernetes", "SQL"]
+    keywords = grade_job_keywords(
+        parse_linkedin_simplify(
+            Path("data/fixtures/mendix_application_support_engineer_2026_09_22.txt")
+            .read_text()
+            .replace(
+                "What You'll Be Doing",
+                "What You'll Be Doing\nBuild Python automation and monitor ETL jobs using SQL and Kubernetes.",
+            )
+        )
+    )
+    changes = _build_change_manifest(base, final, plan, set(), keywords)
+    change = next(c for c in changes if c.paragraph_id == key)
+    assert change.added_terms == ["automation"]
+    assert all(not c.added_terms for c in changes if c.paragraph_id != key)
+
+
+def test_action_inflection_without_new_requirement_coverage_is_restored():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "projects.loavenly.bullet.2")
+    bullet.text = bullet.text.replace("resolved", "troubleshot")
+    bullet.target_terms = ["troubleshooting"]
+    expected = next(p.text for p in document.paragraphs if p.paragraph_id == bullet.paragraph_id)
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/mendix_application_support_engineer_2026_09_22.txt").read_text()
+    )
+    _restore_unjustified_shortening(plan, document, grade_job_keywords(job))
+    assert bullet.text == expected
+
+
+def test_soft_skill_ranking_cannot_displace_technical_skills_or_sla_management():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    line = next(
+        line for line in plan.skills.lines if line.paragraph_id == "skills.technical_support"
+    )
+    line.skills = [
+        "Problem-Solving",
+        "Troubleshooting",
+        "Incident Response",
+        "Root Cause Analysis",
+        "Service Level Agreements",
+    ]
+    job = parse_linkedin_simplify(
+        Path("data/fixtures/mendix_application_support_engineer_2026_09_22.txt").read_text()
+    )
+    keywords = grade_job_keywords(job)
+    _fuse_skill_inventory(plan, document, keywords)
+    reasoning = ReasoningResult(
+        role_profile=build_target_role_profile(job, keywords),
+        transferability_map=TransferabilityMap(),
+        rewrite_plan=plan,
+    )
+    _ensure_important_keyword_placement(
+        reasoning, [k for k in keywords if k.normalized == "problem-solving"], document
+    )
+    assert "Problem-Solving" not in line.skills
+    assert "SLA Management" in line.skills
+    assert "Incident Response" in line.skills
+
+
+def test_rearranged_existing_claim_without_new_role_value_is_restored():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.1")
+    bullet.text = "Handled agency management SaaS, internal integrations, and Microsoft 365 incidents through Jira; resolved 200+ production support tickets while maintaining sub-90-minute average resolution."
+    bullet.target_terms = []
+    expected = next(p.text for p in document.paragraphs if p.paragraph_id == bullet.paragraph_id)
+    job = parse_linkedin_simplify(Path("data/fixtures/mendix_application_support_engineer_2026_09_22.txt").read_text())
+    feedback = _restore_unjustified_shortening(plan, document, grade_job_keywords(job))
+    assert bullet.text == expected
+    assert any(bullet.paragraph_id in message for message in feedback)
+
+
+def test_restoration_explains_lost_context_to_correction_model():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.4")
+    original = bullet.text
+    bullet.text = original.replace("license management", "other administration")
+    feedback = _restore_unjustified_shortening(plan, document, [])
+    assert bullet.text == original
+    assert any(bullet.paragraph_id in message and "license management" in message for message in feedback)
+
+
+def test_rest_api_project_rewrite_keeps_generic_api_evidence():
+    from aiadapply_v2.text import preserves_source_term, contains_term
+    assert preserves_source_term("Configured REST APIs", "API")
+    assert not contains_term("Configured REST APIs", "API")
+    assert not preserves_source_term("Configured an API", "Microsoft Graph API")
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "projects.loavenly.bullet.2")
+    bullet.text = "Configured RBAC; fixed REST APIs, Webhooks, authentication, synchronization, and permission issues in live production operations."
+    bullet.shorter_text = bullet.text
+    expected = bullet.text
+    feedback = _restore_unjustified_shortening(plan, document, [], draft_terms={"rest apis", "webhooks"})
+    assert bullet.text == expected
+    assert not any("dropped protected phrases: API" in item for item in feedback)
+    _sanitize_shorter_fallbacks(plan, document, draft_terms={"rest apis", "webhooks"})
+    assert bullet.shorter_text == expected
+
+
+def test_floqast_cosmetic_reframes_are_restored_in_both_variants():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    examples = {
+        "experience.csulb.bullet.3": "Coordinated with campus IT and third-party vendors on incidents, maintaining documentation, escalation notes, and tracking of recurring issues.",
+        "experience.wehelp.bullet.2": "Keep Loavenly ready for live Wednesday and Saturday distributions through production troubleshooting, user access management, update validation, and training staff and volunteers.",
+        "projects.loavenly.bullet.1": "Enabled client intake, inventory tracking, reporting, and RBAC across three food bank locations by building, deploying, and operating a production multi-tenant SaaS platform.",
+    }
+    source = {p.paragraph_id: p.text for p in document.paragraphs}
+    for bullet in plan.bullets:
+        if bullet.paragraph_id in examples:
+            bullet.text = examples[bullet.paragraph_id]
+            bullet.shorter_text = examples[bullet.paragraph_id]
+            bullet.target_terms = ["IT", "documentation", "troubleshooting", "SaaS"]
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    _restore_unjustified_shortening(plan, document, grade_job_keywords(job))
+    for bullet in plan.bullets:
+        if bullet.paragraph_id in examples:
+            assert bullet.text == source[bullet.paragraph_id]
+            assert bullet.shorter_text == source[bullet.paragraph_id]
+
+
+def test_skill_ranking_preserves_python_and_troubleshooting_source_order():
+    from aiadapply_v2.pipeline import _rank_skill_lines
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    original = {line.paragraph_id: list(line.skills) for line in plan.skills.lines}
+    for line in plan.skills.lines:
+        line.skills.reverse()
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    keywords = grade_job_keywords(job)
+    _fuse_skill_inventory(plan, document, keywords)
+    _rank_skill_lines(plan, document, keywords)
+    for line in plan.skills.lines:
+        assert line.skills == original[line.paragraph_id]
+
+
+def test_supported_ticketing_term_survives_without_rewrite_quota():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.1")
+    bullet.text = bullet.text.replace("via Jira", "through Jira ticketing")
+    expected = bullet.text
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    _restore_unjustified_shortening(plan, document, grade_job_keywords(job))
+    assert bullet.text == expected
+
+
+def test_inflection_only_keyword_does_not_license_full_bullet_rearrangement():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    keywords = grade_job_keywords(job)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.csulb.bullet.2")
+    original = bullet.text
+    bullet.text = "Reproduced access and scheduling errors to diagnose configuration and permission issues, reset user access, and escalated complex incidents to campus IT for further investigation."
+    bullet.shorter_text = bullet.text
+    _restore_unjustified_shortening(plan, document, keywords)
+    assert bullet.text == original.replace("configurations", "configuration")
+    assert bullet.shorter_text == bullet.text
+    project = next(b for b in plan.bullets if b.paragraph_id == "projects.loavenly.bullet.2")
+    original_project = project.text
+    project.text = "Resolved live production API, authentication, synchronization, and permission issues alongside hands-on RBAC configuration."
+    project.shorter_text = project.text
+    _restore_unjustified_shortening(plan, document, keywords)
+    assert project.text == original_project
+    assert project.shorter_text == original_project
+
+
+def test_cosmetic_shorter_fallback_cannot_bypass_meaningful_edit_guard():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.1")
+    original = bullet.text
+    bullet.shorter_text = original.replace("via Jira", "in Jira")
+    _restore_unjustified_shortening(plan, document, [])
+    assert bullet.text == original
+    assert bullet.shorter_text == original
+
+
+def test_soft_skill_appendix_is_restored_without_blocking_real_ticket_context():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.2")
+    original = bullet.text
+    bullet.text = original.rstrip(".") + ", demonstrating critical thinking."
+    bullet.shorter_text = bullet.text
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    _restore_unjustified_shortening(plan, document, grade_job_keywords(job))
+    assert bullet.text == original
+    assert bullet.shorter_text == original
+
+
+def _scoped_risk_fixture(term, placement, evidence_id, strength=EvidenceStrength.direct):
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    risk = ClaimRisk(claim=term, target_requirement=term, strength=EvidenceStrength.weakly_transferable,
+                     risk_level=RiskLevel.medium, explanation="Check source scope", selected_placement=placement, export_allowed=False)
+    plan.claim_risks.append(risk)
+    reasoning = ReasoningResult(
+        role_profile=TargetRoleProfile(title="Support", normalized_role_family="technical_support_integrations", professional_identity="Technical Support Engineer"),
+        transferability_map=TransferabilityMap(matches=[EvidenceMatch(
+            target_term=term, target_requirement=term, evidence_id=evidence_id,
+            source_text="", semantic_score=1, action_compatibility=1, system_compatibility=1,
+            environment_compatibility=1, outcome_compatibility=1, strength=strength,
+            reasoning="fixture", suggested_placement=placement)]),
+        rewrite_plan=plan)
+    return document, reasoning
+
+
+def test_global_profile_does_not_clear_employer_knowledge_base_risk():
+    _, reasoning = _scoped_risk_fixture("knowledge base", "experience.csulb.bullet.3", "evidence.candidate_profile.knowledge_base")
+    _prune_direct_evidence_risks(reasoning)
+    assert len(reasoning.rewrite_plan.claim_risks) == 1
+
+
+def test_actual_ticket_context_clears_unnecessary_case_management_question():
+    from aiadapply_v2.evidence.loaders import build_evidence_graph
+    document, reasoning = _scoped_risk_fixture("case management", "experience.original_insurance.bullet.1", "evidence.experience.original_insurance.bullet.1", EvidenceStrength.strongly_transferable)
+    _prune_direct_evidence_risks(reasoning, build_evidence_graph(document, []))
+    assert reasoning.rewrite_plan.claim_risks == []
+
+
+def test_restored_fallback_longer_than_meaningful_primary_reuses_primary():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    bullet = next(b for b in plan.bullets if b.paragraph_id == "experience.original_insurance.bullet.1")
+    source = bullet.text
+    primary = source.replace("tickets via Jira", "cases via Jira ticketing").replace(", maintaining", ";")
+    bullet.text = primary
+    bullet.shorter_text = source.replace("via Jira", "in Jira")
+    job = parse_linkedin_simplify(Path("data/fixtures/floqast_full.txt").read_text())
+    keywords = grade_job_keywords(job)
+    assert len(primary) < len(source)
+    _restore_unjustified_shortening(plan, document, keywords)
+    assert bullet.text == primary
+    assert bullet.shorter_text == primary
+    result = validate_rewrite_plan(document, plan, keywords, build_target_role_profile(job, keywords))
+    assert not any(issue.code == "invalid_shorter_candidate" and issue.paragraph_id == bullet.paragraph_id for issue in result.issues)
+
+
+def test_unchanged_skills_manifest_does_not_claim_reordering():
+    from aiadapply_v2.pipeline import _build_change_manifest
+    document = parse_resume_docx(BASE)
+    changes = _build_change_manifest(document, document, identity_plan(document), set())
+    skills = [change for change in changes if change.paragraph_id.startswith("skills.")]
+    assert len(skills) == 5
+    assert all(change.change_type == "unchanged" for change in skills)
+    assert all(change.explanation == "Kept the original skills and their order." for change in skills)
+
+
+def test_confirmed_generic_ai_survives_skills_normalization_and_layout_selection():
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    ai = JobKeyword(term="AI", normalized="ai", kind="environment", hiring_importance=55, placement_utility=55)
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    tools.skills.append("AI")
+    tools.shorter_skills.append("AI")
+    _fuse_skill_inventory(plan, document, [ai], unsupported_terms=[])
+    assert "AI" in tools.skills and "AI" in tools.shorter_skills
+    reasoning = ReasoningResult(role_profile=TargetRoleProfile(title="Analyst", normalized_role_family="product_operations", professional_identity="Application Support Specialist"), transferability_map=TransferabilityMap(), rewrite_plan=plan)
+    _ensure_important_keyword_placement(reasoning, [ai], document)
+    assert "AI" in tools.skills and "AI" in tools.shorter_skills
+    assert all("AI" not in line.skills for line in plan.skills.lines if line.paragraph_id != "skills.tools")
+
+
+def test_ai_skill_allowance_does_not_allow_unsupported_ai_or_named_tool_bundles():
+    document = parse_resume_docx(BASE)
+    ai = JobKeyword(term="AI", normalized="ai", kind="environment", hiring_importance=55, placement_utility=55)
+    for value, unsupported in (("AI", ["AI"]), ("AI (Qualtrics, Zendesk)", [])):
+        plan = identity_plan(document)
+        tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+        tools.skills.append(value)
+        _fuse_skill_inventory(plan, document, [ai], unsupported_terms=unsupported)
+        assert not any("AI" in item or "Qualtrics" in item or "Zendesk" in item for line in plan.skills.lines for item in line.skills)
+    ai.accepted = False
+    plan = identity_plan(document)
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    tools.skills.append("AI")
+    _fuse_skill_inventory(plan, document, [ai])
+    assert "AI" not in tools.skills

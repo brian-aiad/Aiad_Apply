@@ -1,0 +1,195 @@
+AIADAPPLY ACCOUNT-SWITCH HANDOFF — 2026-10-05
+
+Workspace: /Users/brianaiad/Desktop/aiadapplyV2
+All code changes are saved locally. Working tree has substantial pre-existing and session changes; do not discard/reset it or assume all changes belong to this session. No git commit or push was made.
+Read AGENTS.md and docs/resume-export-rules.md before modifying tailoring.
+
+COMPLETED
+- Logo toggles sidebar, old toggle removed; tab alignment fixed.
+- Delete uses click confirmation, no typing DELETE.
+- In-app validated PDF preview, including selected historical version.
+- Resume review organized top-to-bottom, full original/final paragraphs, purple inline keyword boxes matching chips; responsive with VS Code beside browser.
+- Tailoring uses gpt-6-astra with high reasoning. Removed forced rewrite quotas, cosmetic Skills sorting and synonym/word-order churn. Useful unchanged bullets remain unchanged.
+- Preserve factual evidence, employer/project context, metrics and one-page export. Unsupported tools cannot become hypothetical completed project implementations.
+- Ordinary transferable skills inferred from concrete work without repeated questions; literal keyword coverage distinguished from demonstrated capability.
+- Stretch Lab organized by requirements. Saved review is specific to posting/version; saved evidence is shared across future tailoring on this installation. Past artifacts remain intact.
+- Fixed false compression warnings; unchanged Skills audit describes preserved order.
+- Fixed generic profile-supported AI being stripped from Skills because its keyword category was environment/domain. Allows AI in Tools, not unsupported named-tool bundles or invented implementations.
+
+VERIFIED VERSIONS
+FloQast: application 6f67ce97-d0c1-4fc0-a35f-269d8a5d9879
+Accepted run 9: 068d26d4-c7e1-4137-b887-9a7fc4ee61bf
+http://127.0.0.1:3000/applications/6f67ce97-d0c1-4fc0-a35f-269d8a5d9879?run=068d26d4-c7e1-4137-b887-9a7fc4ee61bf&tab=changes
+Summary, Jira ticketing and CSULB case management edits. Skills/project order preserved. Revalidated downloaded DOCX zero issues; actual PDF and DOCX rerender one page, aligned, no overflow. User had marked application APPLIED; do not change that or infer submission from downloads.
+
+TravisMathew Business Strategy & Consumer Insights Analyst:
+Application 71fed79e-c9d5-4818-81af-49b390949667
+Accepted run 3: a839d2ba-c540-4943-829a-569434a669c2
+http://127.0.0.1:3000/applications/71fed79e-c9d5-4818-81af-49b390949667?run=a839d2ba-c540-4943-829a-569434a669c2&tab=changes
+Summary emphasizes data reconciliation; OIS bullet names Python reconciliation automation; Tools adds AI in place of VS Code. Loavenly stays grounded/original, no hypothetical BI/survey tools. Validation zero issues. Download hashes verified; actual PDF and DOCX rerender one page, no overflow/alignment problems. Previous failed run 2 diagnosed AI normalization bug and fixed; previous aggressive run 1 intentionally intact.
+
+TESTS
+Full web unit suite 149 passed; typecheck/scoped lint passed. Focused engine pipeline, quality, schema, evidence, ordinary-skill and AI regressions passed. Browser review/Stretch widths 1000,750,390 no horizontal overflow; purple keyword highlighting and PDF preview verified.
+Verification artifacts: output/playwright/meaningful-resume/ and output/playwright/travismathew-new-system/.
+
+LOCAL SERVICES AND BACKUP
+App/worker left running at http://127.0.0.1:3000.
+Start: bash scripts/start-local.sh --no-browser
+Stop: bash scripts/stop-local.sh
+Logs: .runtime/web.log, .runtime/worker.log
+Latest save directory is recorded in .runtime/latest-session-save.txt.
+Save includes source archive (tracked and nonignored untracked files), binary git diff, git status, and application-backup.json from the app backup endpoint with embedded artifact backups. Local secrets/env files and dependencies are excluded from source archive; existing local configuration is left in place.
+No outstanding requested work. User switching account; read this file to resume context. Account chat history is not copied by this save; local workspace/data are preserved.
+
+UPDATE — EVERYDAY TOOL POLICY, 2026-10-05
+- User's latest instruction: assume his basic Office, Google productivity and AI
+  assistant knowledge without repeated confirmation; Tableau is college coursework.
+- Persisted named tools and everyday_tools authorization in the shared profile;
+  updated Discover's evidence snapshot, AGENTS.md and resume-export-rules.md.
+- Evidence engine derives explicitly marked routine-tool contexts from matching
+  documented duties. These are optional paragraph placements, not confirmed
+  historical implementations and not rewrite quotas. Preserve original systems,
+  metrics and outcomes; no advanced features, integrations or invented deliverables.
+- Salesforce remains rejected; CAD, Power BI, Qualtrics, SPSS and Google Cloud are
+  not inferred. Tableau stays classroom/Skills knowledge, not employer dashboards.
+- Review now loads shared decisions on reopen. Known tools missing from historical
+  exports say "Known · not in this version"; saved exports/audits are unchanged.
+- No new live resume generation or application submission in this session.
+- Verification: focused evidence/coverage/quality/prompt/pipeline suites passed;
+  150 web unit tests passed; TypeScript and scoped ESLint/Ruff passed. Browser
+  verified saved everyday decisions and specialized-tool confirmation controls.
+- Local web and worker restarted idle to load the new policy; health ready.
+
+UPDATE — ACCOUNT RESUME AND USER CLARIFICATION, 2026-10-05
+This update supersedes the prior optional-classroom and mandatory-placement notes.
+- User clarified: basic school/everyday knowledge such as Excel should be inferred
+  without asking again. Use relevant tools naturally in bullets as needed for the
+  pasted posting; not every mentioned tool has to appear. Specialized systems
+  such as Salesforce still require evidence. Do not infer advanced deployments.
+- Updated AGENTS.md, export rules, candidate profile, discovery snapshot and model
+  prompt. Office suite names are included in authorized ordinary-use contexts.
+- Removed mandatory routine-tool coverage groups and corresponding quality gate.
+  Optional absent tools report "available", not missing supported coverage.
+  Actual source-specific technology coverage and rejection checks remain enforced.
+- Added real DOCX/PDF export regression for natural Tableau placement and optional
+  omission during layout fallback. Both produce validated single-page artifacts.
+  Added web review regression: available everyday tools are not required omissions.
+- All changes remain local; preserve the large pre-existing worktree. No historical
+  application artifacts rewritten and no application submitted.
+- Final verification: 157 engine tests passed (1 existing skipped), 151 web unit
+  tests passed; TypeScript, scoped Ruff/ESLint and git diff --check passed.
+  App and worker restarted with updated policy; /api/health reports ready and idle.
+  No paid/live model generation was used for verification; export regressions used
+  deterministic test reasoning and the real document renderer.
+
+UPDATE — DISCOVER STRESS TEST COMPLETE, 2026-10-05 18:17 PACIFIC
+- Ten jobs from the current local Discover view tailored with GPT-6 Astra.
+- All ten latest versions SUCCEEDED; browser-downloaded DOCX/PDF hashes verified,
+  downloaded DOCX independently rerendered, pixels match PDF, one-page protected
+  layout and source facts validated. All visually/editorially reviewed.
+- Exact latest-version review links and individual findings:
+  output/playwright/discover-stress-2026-10-05/RESULTS.txt (and RESULTS.json).
+- Fixed false R/C/domain keyword extraction, natural morphology preservation,
+  continuous-integration evidence scope, plan/final refined-map consistency,
+  ordinary-tool prompt wording, and responsive review-panel overflow.
+- Full engine 301 passed / 1 skipped; web151 passed; typecheck/scoped lint passed.
+- Temporary queue drain removed. Local app/worker ready, zero active runs.
+- No historical exports rewritten or applications submitted. FloQast remains APPLIED.
+- User requested wrap-up to manually review. Stress-test work complete; leave
+  current versions available, do not begin extra tailoring without a new request.
+
+UPDATE — OPEN-ENDED AUTOMATIC TECHNICAL POLICY COMPLETE (2026-10-05 evening)
+LATEST USER REQUIREMENT SUPERSEDES THE PREVIOUS NARROW TOOL LIST:
+- Apply broad judgment to EVERY future pasted posting, including previously unseen
+  coding tools/languages/frameworks. No tool-by-tool confirmation for common CS/
+  development skills, AWS/REST APIs/CI/CD, Go/Rust or ordinary communication.
+- Rank posting importance and weave common technologies into matching real duties;
+  broad concrete work wording, not Skills-only. Do not rewrite the entire Loavenly
+  stack, invent outcomes, or force CAD/advanced/specialized products into unrelated work.
+- CandidateProfile automatic_technical_policy is enabled. Named established_technologies
+  are examples/fast paths, not a whitelist. Per-posting technology_assessments judge
+  common_development / specialized_or_advanced / unrelated with duty IDs and usage boundary.
+- Newly discovered names literally present in posting receive normal deterministic
+  grading/importance; authorized work contexts are required in primary/shorter/final.
+  Assessments stay with the run and never become invented historical profile facts.
+- Technical review marks common tools automatic; no repeated confirmation. Correct-this
+  disclosure supports overrides. Explicit rejections (including aliases) still win.
+- Current real reviewed Anduril IT Systems version7 runf10df8fb-1374-4d1b-8bd7-c9f58cd0f797
+  includes AWS, APIs/REST APIs/Webhooks, Python, Go/Rust, CI/CD and dynamically assessed DevOps
+  in relevant bullets. No claim risks or validation issues. Actual browser downloads
+  hash-verified, DOCX independently rerendered, identical pixels/one page, visually reviewed.
+- Live synthetic future-paste fixture identified unlisted HTTPie/Ruff/DuckDB and placed
+  them in OIS duties; advanced FPGA excluded. Not an actual application. Independent
+  export audit/visual inspection passed. New names get normal importance scoring.
+- Engine336 passed1Windows-only skipped; web155passed; TypeScript, scopedRuff/ESLint,
+  diffcheck and bash syntax passed. start-local.sh response timeout raised2->10seconds
+  after actual slow database-backed startup; actual app/worker ready and idle.
+- Results and exact review link: output/playwright/established-technical-policy/RESULTS.txt
+  and RESULTS.json. Prior failed diagnostic versions and historical exports retained.
+- No submissions, commits or pushes. Preserve all preexisting working-tree changes.
+- Work is complete. Future changes should use the open-ended policy, not regress
+  to a finite whitelist or a blanket Skills-only restriction.
+
+
+October 6, 2026 — approved-resume automatic application workflow
+See docs/application-automation.md and output/playwright/application-automation/RESULTS.txt.
+New application browser worker runs alongside web and tailoring worker. Approval is job/run/artifact-hash/destination specific; old review flags do not authorize submission. The user explicitly wants one resume approval, then automatic filling/submission, then an honest result and question summary.
+Anduril v7 was approved through UI during this build; worker paused (not submitted) for missing citizenship/clearance eligibility, employer history and screening consent. Three questions are pending in the conversation. Save supplied answers before resuming; never infer them.
+
+October 6, 2026 — application audit and recovery fixes verified
+See output/playwright/application-automation-audit/RESULTS.json and RESULTS.txt.
+Latest Anduril attempt 2dd1b8d7-f493-46b9-9e6e-94d318075698 is BLOCKED, preparation-only, exact v7 upload verified; nine known answers filled, zero confirmed submissions. Missing personal facts and screening consent remain unanswered. Do not infer them or mark Applied.
+Greenhouse Attach/input replacement bugs reproduced and fixed; real retry finished without browser error. Worker running with OS-exclusive lock and durable claim/result recovery. Read-only Playwright MCP installed. Tests:164unit/8backend/9browser/1live mock passed. Typecheck/scoped lint/diff check passed. No commits/pushes.
+
+October 6, 2026 — clean filenames and live submission verification step
+ACTIVE goal: finish approved-resume Discover/tailor/apply workflow and verify Anduril.
+Latest user clarification: manually approve each tailor, then Auto apply fills and
+submits. Do not enable automatic submission of future unreviewed resumes.
+Anduril history clarified explicitly: never applied; this is the first. Other form
+facts and routine screening consent saved in profile/private onboarding. Pasted
+source Google job search and voluntary Male/Hispanic Yes/non-veteran confirmed.
+Latest live attempt 5c285710-25c4-422b-91fc-2e0dddfda9f2 reached SUBMITTING with the
+clean Brian_Aiad_Resume_Anduril_IT_Systems_Engineer.pdf, exact v7 hash verified.
+It is now UNKNOWN because Greenhouse asks for an 8-character emailed code to
+csbrianaiad@gmail.com. No receipt; NEVER resubmit/requeue this attempt blindly.
+The dedicated Chrome tab remains open in the existing application worker process.
+Gmail plugin found and suggested (not yet connected); user asks about future email
+access. Explained assistant plugin vs separate local-worker OAuth connection.
+Do not restart the current worker until the open verification is resolved: restart
+would close that browser. New code on disk (not loaded in current worker) adds
+read-only late-receipt observation, native Autofill with resume preference, and
+recorded employer submission history. Server duplicate checks and UI hot-loaded.
+Tests:9 isolated backend,13 deterministic browser +5 recovery, typecheck/scoped
+lint/diff pass. Earlier live model mock passed. Clean-name receipt binding uses
+actual byte proof plus bound widget or observed server attachment URL, not filename.
+Goal remains active; actual employer confirmation is still required. No commits.
+
+Goal continuation — verification still pending
+Revalidated API UNKNOWN/no receipt, live worker PID84900, and original Anduril Chrome
+tab. Read-only AppleScript URL inspection works; DOM JavaScript is disabled. Do not
+change that setting or restart Chrome just to inspect the verification. Gmail tools
+remain unavailable/unconnected; user needs OAuth or complete emailed-code step.
+New live Codex model test PASSED native Autofill with resume -> exact upload -> parsed
+answers -> guarded mock submission -> observed receipt (27 seconds). UI now clearly
+labels Email verification needed / submission unconfirmed. Typecheck/lint/diff passed.
+Browser late-receipt observer is tested but still awaits worker restart after current
+verification resolves. Active goal remains incomplete; do not declare actual submission.
+
+Latest continuation: free-only requirement saved in AGENTS, application profile and private onboarding. User reports Gmail connected and authorizes relevant verification/receipt reads for future approved applications. Plugin installed=true, but no Gmail reading/search tool exposed in this session. Anduril attempt 5c285710-25c4-422b-91fc-2e0dddfda9f2 remains UNKNOWN; exact approved v7 PDF upload and final attachment verified in attempt record. Read-only Chrome URL check found no job5239480007 tab. Do not retry before checking employer receipt/current state; no new submission made.
+
+User explicitly requested retry/fill/submit after being told prior Anduril result
+was unconfirmed. Added separately acknowledged retry_unconfirmed API action with
+exact approval revalidation and immutable prior-attempt audit. Typecheck and all
+10 isolated backend integration tests passed. Original Anduril tab not found by
+Chrome URL inspection; worker restarted to load tested native autofill/history/
+late-receipt observer. New authorized attempt b9dbf60e-f029-46d8-9c52-beab12972642
+queued with the same approved v7 resume and is RUNNING. Original UNKNOWN record
+retained. Gmail reading tools remain unavailable in this session.
+
+ANDURIL SUBMISSION VERIFIED: attempt 94f2decd-716a-484f-a876-93ddb12a8c41 is SUBMITTED. App APPLIED with one application_submitted event. Employer confirmation URL https://job-boards.greenhouse.io/andurilindustries/jobs/5239480007/confirmation. Exact approved v7 clean-name PDF and final attachment verified; 21 fields reported, no unresolved questions. Evidence output/playwright/anduril-submission/RESULTS.json and confirmation.png. Saved dated prior-application Yes for future Anduril applications; prior No preserved as historical. Fixed optional MyGreenhouse login detour and conditional-next-sentence receipt false negative. No email tools needed for this successful attempt. Never resubmit this job.
+
+Lower-token form-plan implementation: deterministic routine contacts, model-batched guarded custom-dropdown choices, scoped readback/ref refresh, pre-model receipt observation, numeric-only usage telemetry. Tests passing including actual-model isolated mock. User explicitly authorized applying to Product Support Engineer after this implementation and tailoring. Validated one-page v2 run c936279a-3c9f-404a-ae79-e688836e27a5 PDF hash 1e978ad7c1304d5e1b31b56eef4636f0ed16f0970f366e0e1c24b6fdbde5a2d3. Worker restarted after confirming no RUNNING/SUBMITTING attempt. Real attempt 33201f05-ed79-43b2-b15f-b2aa0821152b queued under app41b4010e-c575-4b99-9be1-7574264d42be; still needs employer outcome verification.
+
+LOWER-TOKEN IMPLEMENTATION TESTED AND LOADED. 26 deterministic tests passed plus actual-model mock: 2 model decisions, 41947 input/335 output tokens (no comparable baseline => no percentage claims). Product Support Engineer tailored v2 validated/hash verified, but live original job5238763007 redirects to careers and ATS API404. User asked search: old third-party copies remain; only exact-title live role in Australia, Costa Mesa specialty variants are different jobs. No replacement authorized. Added tested Greenhouse preflight: newest attempt af3b10a7-1467-42f8-8581-f02d84ef94a3 BLOCKED with explicit expired-posting reason, zero model calls/uploads/submissions. App not Applied. Evidence output/playwright/lower-token-application/RESULTS.json. Goal incomplete only because requested job unavailable; do not submit another role without choice/new tailoring. Worker running latest changes.
+
+DEVICE HANDOFF: user requested committing/pushing the entire current project. README now includes a private configuration and onboarding transfer checklist. Do not commit secrets or runtime browser state. Shared Supabase retains application/profile/artifact data. No model API key required; new machine needs its own Codex login. Native Windows auto-apply worker still requires a port. Product Support Engineer goal remains blocked on unavailable exact posting.

@@ -1,5 +1,9 @@
+import { collectWorkday } from "./workday";
+import { collectRtx } from "./rtx";
+import { fetchPublicJson } from "./public-fetch";
+import { collectExternalSource } from "./external-providers";
 import { annualPay, employmentType, payFromText, safeExternalUrl, textFromHtml, workArrangement } from "./normalization";
-import { localDistance, roleFamily } from "./matching";
+import { localDistance, couldBeRelevant, hasLocalLocationOption } from "./matching";
 import type { DiscoveryPreferences, Opening, Source } from "./types";
 
 type RecordValue = Record<string, unknown>;
@@ -12,31 +16,6 @@ const date = (v: unknown): Date | null => {
   return Number.isFinite(d.getTime()) ? d : null;
 };
 
-export async function fetchPublicJson(url: string, signal?: AbortSignal): Promise<unknown> {
-  // Callers construct URLs from the fixed registry, never from a posting or user input.
-  const response = await fetch(url, {
-    headers: { Accept: "application/json", "User-Agent": "AiadApply/2.0 (personal job discovery)" },
-    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(12_000)]) : AbortSignal.timeout(12_000),
-    redirect: "error", cache: "no-store",
-  });
-  if (!response.ok) throw new Error(`Source returned HTTP ${response.status}.`);
-  const limit = 16 * 1024 * 1024;
-  if (Number(response.headers.get("content-length")) > limit) throw new Error("Source response exceeds the collection limit.");
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error("Source returned no content.");
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > limit) throw new Error("Source response exceeds the collection limit.");
-      chunks.push(value);
-    }
-  } finally { await reader.cancel().catch(() => {}); }
-  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-}
 
 export function normalizeOpening(source: Source, raw: unknown): Opening | null {
   const j = record(raw);
@@ -92,11 +71,24 @@ export function normalizeOpening(source: Source, raw: unknown): Opening | null {
 }
 
 export async function collectSource(source: Source, prefs: DiscoveryPreferences, signal?: AbortSignal) {
+  if (source.provider === "rtx") return collectRtx(signal);
+  if (source.provider === "workday") return collectWorkday(source, prefs, signal);
+  if (["adzuna", "usajobs", "jobicy"].includes(source.provider)) return collectExternalSource(source, prefs, signal);
   const board = encodeURIComponent(source.board);
   let listing: RecordValue[] = [];
   let complete = true;
+  let greenhouseDetails = false;
   if (source.provider === "greenhouse") {
-    const data = record(await fetchPublicJson(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs`, signal));
+    let data: RecordValue;
+    try {
+      // These large boards exceed the response cap with every description included.
+      greenhouseDetails = ["andurilindustries", "spacex"].includes(source.board);
+      data = record(await fetchPublicJson(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs${greenhouseDetails ? "" : "?content=true"}`, signal));
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes("collection limit")) throw error;
+      greenhouseDetails = true;
+      data = record(await fetchPublicJson(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs`, signal));
+    }
     if (!Array.isArray(data.jobs)) throw new Error("Source changed its job-list format.");
     listing = records(data.jobs);
   } else if (source.provider === "lever") {
@@ -118,22 +110,23 @@ export async function collectSource(source: Source, prefs: DiscoveryPreferences,
   }
   const liveIds = listing.map((j) => String(j.id));
   const candidates = listing.filter((j) => {
-    if (!roleFamily(string(j.title || j.text || j.name))) return false;
+    if (!couldBeRelevant(string(j.title || j.text || j.name))) return false;
     const loc = typeof j.location === "string" ? j.location : string(record(j.location).name || record(j.location).fullLocation || record(j.location).city || record(j.categories).location);
-    const mode = workArrangement(j.workplaceType || loc);
+    const mode = workArrangement(j.workplaceType || (j.isRemote || record(j.location).remote ? "Remote" : loc));
     if (mode === "Remote") return prefs.includeRemote;
     const distance = localDistance(loc);
     // Collection remains local. Ambiguous California-only locations are reviewable.
-    return distance !== null ? distance <= prefs.radiusMiles : /^(?:California|CA|Orange County)(?:,|$)/i.test(loc);
+    return distance !== null ? distance <= prefs.radiusMiles : /^(?:California|CA|Orange County)(?:,|$)/i.test(loc) || hasLocalLocationOption(loc, prefs.radiusMiles);
   });
   const openings: Opening[] = [];
   let failures = 0;
-  // Each board is bounded; do not issue hundreds of full-description requests.
-  if (candidates.length > 35) complete = false;
-  for (let offset = 0; offset < Math.min(35, candidates.length); offset += 4) {
+  // Full Greenhouse descriptions arrive in one request. Other detail requests
+  // remain bounded by concurrency and the shared deadline, never a first-35 cutoff.
+  for (let offset = 0; offset < candidates.length; offset += 4) {
+    if (signal?.aborted) { complete = false; break; }
     const batch = await Promise.allSettled(candidates.slice(offset, offset + 4).map(async (j) => {
       const id = encodeURIComponent(String(j.id));
-      const detail = source.provider === "greenhouse" ? await fetchPublicJson(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs/${id}?pay_transparency=true`, signal)
+      const detail = greenhouseDetails ? { ...j, ...record(await fetchPublicJson(`https://boards-api.greenhouse.io/v1/boards/${board}/jobs/${id}?pay_transparency=true`, signal)) }
         : source.provider === "smartrecruiters" ? { ...j, ...record(await fetchPublicJson(`https://api.smartrecruiters.com/v1/companies/${board}/postings/${id}`, signal)) } : j;
       return normalizeOpening(source, detail);
     }));
@@ -142,5 +135,5 @@ export async function collectSource(source: Source, prefs: DiscoveryPreferences,
       else openings.push(item.value);
     }
   }
-  return { openings, liveIds, complete: complete && failures === 0, checked: listing.length, failures };
+  return { openings, liveIds, complete: complete && failures === 0, authoritative: true, checked: listing.length, failures };
 }

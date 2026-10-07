@@ -1,0 +1,57 @@
+Techaxis, Inc.
+L3 Production Support Engineer
+Irvine, CA · On-site · Full-time
+
+About the job
+About the Role
+Tower Lead (L3 Production Support Engineer), Irvine, CA.
+Provide advanced technical and operational support for business-critical data and analytics applications. Hands-on experience with Python, R, Alteryx, SQL/PLSQL, AWS, Airflow, Kubernetes, and Harness, along with production incident resolution, root cause analysis, preventive fixes, BAU support, and application enhancements.
+
+Responsibilities
+Provide L3 production support for critical data, analytics, and application platforms, ensuring system availability, stability, and performance.
+Investigate and resolve complex production incidents involving applications, data pipelines, database procedures, infrastructure components, and system integrations.
+Develop, troubleshoot, and optimize applications, automation scripts, and analytical workflows using Python and R.
+Design, maintain, monitor, and support data preparation and analytics workflows developed using Alteryx.
+Write and optimize complex SQL and PL/SQL queries, stored procedures, functions, packages, and scripts for production troubleshooting and data validation.
+Support application data storage, file processing, archival, and recovery activities using AWS S3.
+Monitor and troubleshoot application notifications and event-driven integrations implemented using AWS SNS.
+Manage, maintain, and troubleshoot container images and repositories hosted in AWS Elastic Container Registry (ECR).
+Monitor, support, and troubleshoot batch and data-processing workflows orchestrated through Apache Airflow, including DAG failures, scheduling issues, dependencies, and performance bottlenecks.
+Support containerized applications deployed on Kubernetes, including troubleshooting pods, deployments, services, configurations, resource utilization, and application logs.
+Use Harness to support CI/CD pipelines, application deployments, release validation, rollback activities, and production deployment monitoring.
+Perform detailed Root Cause Analysis (RCA) for critical and recurring incidents, document findings, and coordinate corrective actions with engineering and infrastructure teams.
+Identify recurring production issues and implement preventive and permanent fixes to improve platform reliability and reduce incident volume.
+Handle Business-as-Usual (BAU) activities, including daily health checks, batch monitoring, job reruns, data validation, service requests, access-related requests, and operational reporting.
+Analyze data issues and perform reconciliation, profiling, validation, and correction activities to ensure data accuracy, completeness, and consistency.
+Coordinate with application development, database, cloud, infrastructure, DevOps, and business teams during high-priority production incidents.
+Participate in incident, problem, change, and release management processes and ensure compliance with defined operational procedures and SLAs.
+Perform impact analysis, technical design, coding, testing, deployment, and post-production validation for minor and medium-sized application enhancements.
+Support planned releases, infrastructure changes, platform upgrades, patching, and production maintenance activities.
+Develop automation solutions using Python, SQL/PLSQL, and platform utilities to reduce manual operational effort and improve support efficiency.
+Create and maintain technical documentation, operational runbooks, troubleshooting guides, support procedures, and knowledge-base articles.
+Monitor application logs, system alerts, scheduled workflows, cloud components, and Kubernetes workloads to proactively identify potential failures.
+Participate in on-call support rotations and provide technical assistance during critical incidents, production releases, and planned maintenance activities.
+Track incidents through closure, provide timely status updates, and communicate business impact, recovery actions, root causes, and preventive measures to stakeholders.
+Drive continuous service improvement by identifying automation opportunities, performance enhancements, monitoring improvements, and process optimization initiatives.
+
+Required Skills
+Python
+R
+Alteryx
+SQL/PLSQL
+AWS S3
+AWS SNS
+AWS ECR
+Airflow
+Kubernetes
+Harness
+Production support
+RCA
+Preventive fixes
+BAU and enhancements
+
+About us
+Techaxis is a staffing and recruiting firm. Equal opportunity statement applies to all applicants.
+More jobs
+Production Support Engineer - Non-Day Shift Hours
+Application Support Engineer

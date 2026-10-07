@@ -14,10 +14,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-export function CaptureForm() {
+export function CaptureForm({ initialSourceUrl = "" }: { initialSourceUrl?: string }) {
   const router = useRouter();
   const [rawPaste, setRawPaste] = useState("");
-  const [sourceUrl, setSourceUrl] = useState("");
+  const [sourceUrl, setSourceUrl] = useState(initialSourceUrl);
   const [loading, setLoading] = useState<"save" | "tailor" | null>(null);
   const [error, setError] = useState("");
   const [previewError, setPreviewError] = useState("");
@@ -46,18 +46,21 @@ export function CaptureForm() {
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
+    const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       if (submitting.current) return;
       try {
-        const response = await fetch("/api/jobs/preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rawPaste: trimmed, overrides }) });
+        const response = await fetch("/api/jobs/preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rawPaste: trimmed, overrides }), signal: controller.signal });
         if (!response.ok) throw new Error("Preview unavailable. You can still save this posting and review it there.");
         const data: CapturePreviewData = await response.json();
         if (!cancelled) { setPreview({ raw: trimmed, source: previewKey, data }); setPreviewError(""); }
       } catch (caught) {
-        if (!cancelled) setPreviewError(caught instanceof Error ? caught.message : "Preview unavailable.");
+        if (!cancelled && !(caught instanceof DOMException && caught.name === "AbortError")) {
+          setPreviewError(caught instanceof Error ? caught.message : "Preview unavailable.");
+        }
       }
     }, 350);
-    return () => { cancelled = true; window.clearTimeout(timer); };
+    return () => { cancelled = true; controller.abort(); window.clearTimeout(timer); };
   }, [overrides, previewKey, ready, trimmed]);
 
   useEffect(() => {
@@ -220,7 +223,7 @@ export function CaptureForm() {
             {[
               "Posting noise and negative phrases are removed",
               "Requirements are matched to protected resume evidence",
-              "Unsupported tools stay out of the exported resume",
+              "Project claims stay grounded in your actual experience",
               "Every wording change is shown for your review",
               "DOCX and PDF are checked before download",
             ].map((item) => (

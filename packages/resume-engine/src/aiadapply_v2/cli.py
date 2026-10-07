@@ -10,6 +10,7 @@ import tempfile
 from datetime import date, datetime
 from pathlib import Path
 from typing import Annotated
+from uuid import uuid4
 
 import typer
 from rich import print
@@ -35,8 +36,10 @@ from aiadapply_v2.pipeline import transform_resume
 from aiadapply_v2.profiling.role_profile import build_target_role_profile
 from aiadapply_v2.reasoning.codex import CodexReasoner, _resolve_executable
 from aiadapply_v2.tracking import (
+    queue_terminal_paste,
     register_terminal_run,
     run_worker,
+    save_failure_report,
     submit_terminal_failure,
     submit_terminal_result,
     submit_worker_progress,
@@ -80,7 +83,7 @@ def inspect_base(
 ) -> None:
     """Parse the final DOCX into the semantic document model."""
     document = parse_resume_docx(base_resume)
-    print(json.dumps(document.model_dump(mode="json"), indent=2))
+    _print_json(document.model_dump(mode="json"))
 
 
 @app.command("inspect-format")
@@ -112,7 +115,7 @@ def inspect_format(
     if output is not None:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(payload + "\n", encoding="utf-8")
-    print(payload)
+    typer.echo(payload)
 
 
 @app.command()
@@ -120,14 +123,11 @@ def parse(paste_file: Annotated[Path, typer.Option("--paste-file")]) -> None:
     """Parse a noisy LinkedIn/Simplify paste and grade its keywords."""
     job = parse_linkedin_simplify(paste_file.read_text(encoding="utf-8", errors="replace"))
     keywords = grade_job_keywords(job)
-    print(
-        json.dumps(
-            {
-                "job": job.model_dump(mode="json"),
-                "keywords": [item.model_dump(mode="json") for item in keywords],
-            },
-            indent=2,
-        )
+    _print_json(
+        {
+            "job": job.model_dump(mode="json"),
+            "keywords": [item.model_dump(mode="json") for item in keywords],
+        }
     )
 
 
@@ -141,15 +141,12 @@ def profile(paste_file: Annotated[Path, typer.Option("--paste-file")]) -> None:
     target = build_target_role_profile(job, keywords)
     document = parse_resume_docx(DEFAULT_BASE)
     graph = build_evidence_graph(document, keywords)
-    add_candidate_profile_evidence(graph, loaded_profile)
-    print(
-        json.dumps(
-            {
-                "profile": target.model_dump(mode="json"),
-                "evidence_graph": graph.model_dump(mode="json"),
-            },
-            indent=2,
-        )
+    add_candidate_profile_evidence(graph, loaded_profile, keywords)
+    _print_json(
+        {
+            "profile": target.model_dump(mode="json"),
+            "evidence_graph": graph.model_dump(mode="json"),
+        }
     )
 
 
@@ -169,22 +166,20 @@ def transform(
         base_resume=base_resume,
         output_dir=output_dir,
         reasoner=CodexReasoner(),
+        aggressive_draft=False,
         candidate_profile=candidate_profile,
         progress=_print_progress,
     )
     used_pdf = archive_tailored_pdf(report.output_pdf, used_resume_root)
-    print(
-        json.dumps(
-            {
-                "docx": str(report.output_docx),
-                "pdf": str(report.output_pdf),
-                "used_pdf": str(used_pdf),
-                "pages": report.layout.page_count,
-                "keyword_coverage": report.validation.keyword_coverage,
-                "claim_risks": len(report.claim_risks),
-            },
-            indent=2,
-        )
+    _print_json(
+        {
+            "docx": str(report.output_docx),
+            "pdf": str(report.output_pdf),
+            "used_pdf": str(used_pdf),
+            "pages": report.layout.page_count,
+            "keyword_coverage": report.validation.keyword_coverage,
+            "claim_risks": len(report.claim_risks),
+        }
     )
 
 
@@ -203,7 +198,9 @@ def draft(
     """Paste a job and immediately produce a job-specific draft resume packet."""
     raw_paste = _read_job_paste(paste_file=paste_file, clipboard=clipboard)
     job = parse_linkedin_simplify(raw_paste)
-    folder = output_root / (f"{date.today().isoformat()}_{_slug(job.company)}_{_slug(job.title)}")
+    folder = output_root / (
+        f"{date.today().isoformat()}_{_slug(job.company)}_{_slug(job.title)}_{uuid4().hex[:8]}"
+    )
     folder.mkdir(parents=True, exist_ok=True)
     (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
     print(f"[bold]Drafting:[/bold] {job.company} — {job.title}\n[bold]Output:[/bold] {folder}")
@@ -232,18 +229,21 @@ def draft(
             progress_sync_available = False
             print(f"[yellow]Progress sync unavailable; continuing locally:[/yellow] {error}")
 
+    reasoner = CodexReasoner()
     try:
         report = transform_resume(
             raw_paste=raw_paste,
             base_resume=base_resume,
             output_dir=folder,
-            reasoner=CodexReasoner(),
+            reasoner=reasoner,
+            aggressive_draft=False,
             candidate_profile=candidate_profile,
             progress=report_progress,
         )
         report_progress("Organizing PDF copy in USED_RESUME")
         used_pdf = archive_tailored_pdf(report.output_pdf, used_resume_root)
     except Exception as error:
+        failure = save_failure_report(reasoner, 0, folder, error)
         if tracking is not None:
             api_url, secret, _, run_id, worker_id = tracking
             try:
@@ -254,6 +254,7 @@ def draft(
                     error=error,
                     output_folder=folder,
                     worker_id=worker_id,
+                    report=failure,
                 )
             except Exception as tracking_error:
                 print(f"[yellow]Tracking failure sync failed:[/yellow] {tracking_error}")
@@ -272,21 +273,44 @@ def draft(
             )
         except Exception as error:
             print(f"[yellow]Resume generated, but tracking sync failed:[/yellow] {error}")
-    print(
-        json.dumps(
-            {
-                "company": report.job.company,
-                "title": report.job.title,
-                "docx": str(report.output_docx),
-                "pdf": str(report.output_pdf),
-                "used_pdf": str(used_pdf),
-                "pages": report.layout.page_count,
-                "keyword_coverage": report.validation.keyword_coverage,
-                "review_flags": len(report.claim_risks),
-            },
-            indent=2,
-        )
+    _print_json(
+        {
+            "company": report.job.company,
+            "title": report.job.title,
+            "docx": str(report.output_docx),
+            "pdf": str(report.output_pdf),
+            "used_pdf": str(used_pdf),
+            "pages": report.layout.page_count,
+            "keyword_coverage": report.validation.keyword_coverage,
+            "review_flags": len(report.claim_risks),
+        }
     )
+
+
+@app.command()
+def queue(
+    paste_file: Annotated[list[Path] | None, typer.Option("--paste-file")] = None,
+    clipboard: Annotated[bool, typer.Option("--clipboard")] = False,
+    save_only: Annotated[bool, typer.Option("--save-only")] = False,
+    api_url: Annotated[str | None, typer.Option("--api-url")] = None,
+) -> None:
+    """Queue pasted jobs without a chat turn; repeat --paste-file for a batch."""
+    if clipboard and paste_file:
+        raise typer.BadParameter("Use either --paste-file or --clipboard, not both.")
+    inputs: list[Path | None] = list(paste_file) if paste_file else [None]
+    results = []
+    failed = False
+    for path in inputs:
+        try:
+            raw = _read_job_paste(paste_file=path, clipboard=clipboard)
+            result = queue_terminal_paste(raw_paste=raw, api_url=api_url, tailor=not save_only)
+            results.append({"file": str(path) if path else "paste", **result})
+        except Exception as error:
+            failed = True
+            results.append({"file": str(path) if path else "paste", "error": str(error)})
+    _print_json({"results": results})
+    if failed:
+        raise typer.Exit(code=1)
 
 
 @app.command()
@@ -314,6 +338,11 @@ def worker(
 
 def _print_progress(message: str) -> None:
     print(f"[dim]{datetime.now().strftime('%H:%M:%S')}[/dim] {message}")
+
+
+def _print_json(value: object) -> None:
+    """Write command output without Rich's terminal wrapping or markup parsing."""
+    typer.echo(json.dumps(value, indent=2))
 
 
 def _read_job_paste(*, paste_file: Path | None, clipboard: bool) -> str:

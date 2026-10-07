@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>AiadApply Assistant</title><link rel="stylesheet" href="popup.css"></head><body>
+<header><span class="brand">AA</span><div><h1>AiadApply Assistant</h1><p>Your reviewed resume. One application.</p></div></header>
+<label class="import">Import application packet<input id="packet" type="file" accept=".json,application/json"></label>
+<section id="job" hidden><h2 id="title"></h2><p id="company"></p><p id="resume" class="muted"></p><p id="host" class="muted"></p>
+<label class="check"><input id="confirm" type="checkbox">This is the job I’m applying to.</label>
+<button id="preview">Preview fields</button><div id="preview-result"></div>
+<label id="replace-label" class="check" hidden><input id="replace" type="checkbox">Replace the existing resume with this reviewed PDF.</label>
+<button id="fill" disabled>Fill contact details & attach PDF</button><button id="clear" class="quiet">Clear packet</button></section>
+<p id="status" role="status">Prepare a packet from the Apply tab in AiadApply.</p><footer>Existing answers stay intact. Review every answer and attachment, then submit yourself. This helper never submits.</footer>
+<script type="module" src="popup.mjs"></script></body></html>

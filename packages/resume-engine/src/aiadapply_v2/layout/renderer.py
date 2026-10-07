@@ -23,6 +23,10 @@ from aiadapply_v2.schemas import LayoutResult, ResumeDocument
 SECTION_ANCHORS = ("SKILLS", "EXPERIENCE", "PROJECTS", "EDUCATION", "CERTIFICATIONS")
 MAX_ANCHOR_DRIFT_POINTS = 14.0
 MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS = 0.5
+MAX_BULLET_ALIGNMENT_DRIFT_POINTS = 0.75
+MAX_EMPLOYER_SPACING_DRIFT_POINTS = 3.0
+MAX_EDGE_INTRUSION_POINTS = 1.0
+MAX_DENSITY_BAND_INCREASE = 2
 TOKEN = re.compile(r"[A-Za-z0-9]+(?:\+)?")
 
 
@@ -35,6 +39,8 @@ class ParagraphMetric(TypedDict):
     bottom_points: float
     left_points: float
     right_points: float
+    line_left_points: list[float]
+    line_right_points: list[float]
 
 
 class RenderingError(RuntimeError):
@@ -104,7 +110,10 @@ def render_docx_to_pdf(
             str(destination),
             str(render_source),
         ]
-        with _registered_macos_document_fonts(font_source_docx, Path(profile_name)):
+        with (
+            _macos_render_lock(),
+            _registered_macos_document_fonts(font_source_docx, Path(profile_name)),
+        ):
             result = subprocess.run(
                 command,
                 capture_output=True,
@@ -121,29 +130,73 @@ def render_docx_to_pdf(
     return output
 
 
+@contextmanager
+def _macos_render_lock() -> Iterator[None]:
+    """CoreText session font registration is shared by concurrent renderer processes."""
+    if sys.platform != "darwin":
+        yield
+        return
+    import fcntl
+
+    lock_path = Path(tempfile.gettempdir()) / f"aiadapply-render-{os.getuid()}.lock"
+    with lock_path.open("a") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+
 def _libreoffice_safe_source(source: Path, temporary_root: Path) -> Path:
     """Keep a searchable boundary when LibreOffice cannot honor a crowded tab stop."""
     safe_source = temporary_root / source.name
     word_namespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
     tab_tag = f"{{{word_namespace}}}tab"
     xml_space = "{http://www.w3.org/XML/1998/namespace}space"
-    with ZipFile(source) as source_archive, ZipFile(
-        safe_source, "w", compression=ZIP_DEFLATED
-    ) as safe_archive:
+    with (
+        ZipFile(source) as source_archive,
+        ZipFile(safe_source, "w", compression=ZIP_DEFLATED) as safe_archive,
+    ):
         for info in source_archive.infolist():
             content = source_archive.read(info.filename)
             if info.filename == "word/document.xml":
                 root = etree.fromstring(content)
                 for tab in root.iter(tab_tag):
-                    following_text = tab.xpath("following::w:t[1]", namespaces={"w": word_namespace})
-                    if following_text and not (following_text[0].text or "").startswith(" "):
-                        following_text[0].text = f" {following_text[0].text or ''}"
-                        following_text[0].set(xml_space, "preserve")
-                content = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+                    # w:tab also names tab-stop definitions inside paragraph
+                    # properties. Those are not text separators: adding a space
+                    # after them indents every first bullet line by a space.
+                    parent = tab.getparent()
+                    if parent is None or parent.tag != f"{{{word_namespace}}}r":
+                        continue
+                    following_results = tab.xpath(
+                        "following::w:t[1]", namespaces={"w": word_namespace}
+                    )
+                    following_text = (
+                        next(
+                            (
+                                item
+                                for item in following_results
+                                if isinstance(item, etree._Element)
+                            ),
+                            None,
+                        )
+                        if isinstance(following_results, list)
+                        else None
+                    )
+                    if following_text is not None and not (following_text.text or "").startswith(
+                        " "
+                    ):
+                        following_text.text = f" {following_text.text or ''}"
+                        following_text.set(xml_space, "preserve")
+                content = etree.tostring(
+                    root, xml_declaration=True, encoding="UTF-8", standalone=True
+                )
             elif info.filename == "word/numbering.xml":
                 root = etree.fromstring(content)
                 _add_explicit_bullet_tabs(root, word_namespace)
-                content = etree.tostring(root, xml_declaration=True, encoding="UTF-8", standalone=True)
+                content = etree.tostring(
+                    root, xml_declaration=True, encoding="UTF-8", standalone=True
+                )
             safe_archive.writestr(info, content)
     return safe_source
 
@@ -151,7 +204,10 @@ def _libreoffice_safe_source(source: Path, temporary_root: Path) -> Path:
 def _add_explicit_bullet_tabs(root: etree._Element, word_namespace: str) -> None:
     """Prevent LibreOffice from offsetting first bullet lines from continuation lines."""
     namespaces = {"w": word_namespace}
-    qualified = lambda name: f"{{{word_namespace}}}{name}"
+
+    def qualified(name: str) -> str:
+        return f"{{{word_namespace}}}{name}"
+
     for level in root.findall(".//w:lvl", namespaces):
         number_format = level.find("w:numFmt", namespaces)
         properties = level.find("w:pPr", namespaces)
@@ -295,6 +351,7 @@ def inspect_pdf(
     document: ResumeDocument | None = None,
     baseline_document: ResumeDocument | None = None,
     attempts: int = 1,
+    require_single_line_skills: bool = False,
 ) -> LayoutResult:
     path = Path(pdf_path).resolve()
     with fitz.open(path) as pdf_document:
@@ -303,6 +360,8 @@ def inspect_pdf(
         anchors = _anchors(pdf_document[0]) if page_count else {}
         fonts = _font_inventory(pdf_document)
         bounds_issues, overlap_issues = _geometry_issues(pdf_document)
+        right_clearance, bottom_clearance = _page_clearance(pdf_document)
+        density_bands = _density_bands(pdf_document)
         collapsed_tab_items = (
             _collapsed_tab_items(pdf_document, document) if document is not None else []
         )
@@ -314,11 +373,18 @@ def inspect_pdf(
     baseline_metrics = paragraph_metrics
     baseline_bounds: list[str] = []
     baseline_overlaps: list[str] = []
+    baseline_fonts = fonts
+    baseline_right_clearance = right_clearance
+    baseline_bottom_clearance = bottom_clearance
+    baseline_density_bands = density_bands
     if baseline_pdf:
         with fitz.open(baseline_pdf) as baseline:
             baseline_lines = sum(_page_lines(page) for page in baseline)
             baseline_anchors = _anchors(baseline[0]) if baseline.page_count else {}
             baseline_bounds, baseline_overlaps = _geometry_issues(baseline)
+            baseline_fonts = _font_inventory(baseline)
+            baseline_right_clearance, baseline_bottom_clearance = _page_clearance(baseline)
+            baseline_density_bands = _density_bands(baseline)
         if baseline_document is not None:
             baseline_metrics = measure_pdf_paragraphs(
                 baseline_pdf,
@@ -337,6 +403,19 @@ def inspect_pdf(
         if paragraph_id in baseline_metrics
         and int(metric["line_count"]) > int(baseline_metrics[paragraph_id]["line_count"])
     ]
+    skill_wrap_issues = (
+        [
+            paragraph.paragraph_id
+            for paragraph in document.paragraphs
+            if paragraph.kind.value == "skill_line"
+            and (
+                paragraph.paragraph_id not in paragraph_metrics
+                or paragraph_metrics[paragraph.paragraph_id]["line_count"] != 1
+            )
+        ]
+        if document is not None and require_single_line_skills
+        else []
+    )
     unmatched = [
         paragraph_id
         for paragraph_id, metric in paragraph_metrics.items()
@@ -362,17 +441,62 @@ def inspect_pdf(
         for paragraph_id, delta in protected_horizontal_deltas.items()
         if delta > MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS
     ]
+    bullet_marker_x, bullet_first_x, bullet_continuation_x = _bullet_geometry(
+        path, document, paragraph_metrics
+    )
+    baseline_bullet_marker_x: dict[str, float] = {}
+    baseline_bullet_first_x: dict[str, float] = {}
+    baseline_bullet_continuation_x: dict[str, float] = {}
+    if baseline_pdf and baseline_document is not None:
+        (
+            baseline_bullet_marker_x,
+            baseline_bullet_first_x,
+            baseline_bullet_continuation_x,
+        ) = _bullet_geometry(baseline_pdf, baseline_document, baseline_metrics)
+    bullet_alignment_issues = _bullet_alignment_issues(
+        bullet_marker_x,
+        bullet_first_x,
+        bullet_continuation_x,
+        baseline_bullet_marker_x,
+        baseline_bullet_first_x,
+        baseline_bullet_continuation_x,
+    )
+    employer_heading_issues, section_geometry_issues = _protected_geometry_issues(
+        document, baseline_document, paragraph_metrics, baseline_metrics
+    )
+    employer_spacing_issues = _employer_spacing_issues(
+        document, baseline_document, paragraph_metrics, baseline_metrics
+    )
+    font_inventory_changed = bool(baseline_pdf and fonts != baseline_fonts)
+    boundary_issues: list[str] = []
+    if right_clearance < baseline_right_clearance - MAX_EDGE_INTRUSION_POINTS:
+        boundary_issues.append("right-edge")
+    if bottom_clearance < baseline_bottom_clearance - MAX_EDGE_INTRUSION_POINTS:
+        boundary_issues.append("bottom-edge")
+    density_band_deltas = [
+        current - baseline
+        for current, baseline in zip(density_bands, baseline_density_bands, strict=True)
+    ]
+    if any(delta > MAX_DENSITY_BAND_INCREASE for delta in density_band_deltas):
+        boundary_issues.append("page-density")
     passed = (
         page_count == 1
         and rendered_lines <= baseline_lines
         and not missing_anchors
         and not drifted
         and not paragraph_overflow
+        and not skill_wrap_issues
         and not unmatched
         and not new_bounds_issues
         and not new_overlap_issues
         and not collapsed_tab_items
         and not horizontally_drifted
+        and not bullet_alignment_issues
+        and not employer_heading_issues
+        and not employer_spacing_issues
+        and not section_geometry_issues
+        and not font_inventory_changed
+        and not boundary_issues
     )
     return LayoutResult(
         passed=passed,
@@ -380,12 +504,18 @@ def inspect_pdf(
         rendered_lines=rendered_lines,
         section_anchor_deltas=deltas,
         overflow_paragraph_ids=[
+            *skill_wrap_issues,
             *missing_anchors,
             *drifted,
             *paragraph_overflow,
             *unmatched,
             *(f"horizontal:{paragraph_id}" for paragraph_id in horizontally_drifted),
             *(f"collapsed-tab:{paragraph_id}" for paragraph_id in collapsed_tab_items),
+            *bullet_alignment_issues,
+            *employer_heading_issues,
+            *employer_spacing_issues,
+            *section_geometry_issues,
+            *boundary_issues,
         ],
         paragraph_line_counts={
             paragraph_id: int(metric["line_count"])
@@ -399,8 +529,29 @@ def inspect_pdf(
             paragraph_id: float(metric["max_width_points"])
             for paragraph_id, metric in paragraph_metrics.items()
         },
+        paragraph_left_points={
+            paragraph_id: float(metric["left_points"])
+            for paragraph_id, metric in paragraph_metrics.items()
+        },
+        paragraph_right_points={
+            paragraph_id: float(metric["right_points"])
+            for paragraph_id, metric in paragraph_metrics.items()
+        },
+        bullet_marker_x_points=bullet_marker_x,
+        bullet_first_line_x_points=bullet_first_x,
+        bullet_continuation_x_points=bullet_continuation_x,
+        bullet_alignment_issues=bullet_alignment_issues,
+        skill_wrap_issues=skill_wrap_issues,
+        employer_heading_issues=employer_heading_issues,
+        employer_spacing_issues=employer_spacing_issues,
+        section_geometry_issues=section_geometry_issues,
         protected_horizontal_deltas=protected_horizontal_deltas,
         font_inventory=fonts,
+        font_inventory_changed=font_inventory_changed,
+        right_edge_clearance_points=right_clearance,
+        bottom_edge_clearance_points=bottom_clearance,
+        density_band_deltas=density_band_deltas,
+        boundary_issues=boundary_issues,
         out_of_bounds_items=new_bounds_issues,
         overlap_items=new_overlap_issues,
         collapsed_tab_items=collapsed_tab_items,
@@ -449,7 +600,7 @@ def measure_pdf_paragraphs(
         words = [
             word
             for page in pdf
-            for word in page.get_text("words")
+            for word in page.get_text("words", delimiters="●")
             if word[4].strip() not in {"", "●"}
         ]
     expanded: list[tuple[str, tuple[float, float, float, float]]] = []
@@ -477,6 +628,8 @@ def measure_pdf_paragraphs(
                 "bottom_points": 0.0,
                 "left_points": 0.0,
                 "right_points": 0.0,
+                "line_left_points": [],
+                "line_right_points": [],
             }
             continue
         start, end = token_span
@@ -487,6 +640,8 @@ def measure_pdf_paragraphs(
             visual_lines.setdefault(round(box[1], 1), []).append(box)
         ordered = [visual_lines[key] for key in sorted(visual_lines)]
         widths = [max(box[2] for box in line) - min(box[0] for box in line) for line in ordered]
+        line_lefts = [min(box[0] for box in line) for line in ordered]
+        line_rights = [max(box[2] for box in line) for line in ordered]
         result[paragraph.paragraph_id] = {
             "matched": True,
             "line_count": len(ordered),
@@ -496,8 +651,80 @@ def measure_pdf_paragraphs(
             "bottom_points": max(box[3] for _token, box in matched),
             "left_points": min(box[0] for _token, box in matched),
             "right_points": max(box[2] for _token, box in matched),
+            "line_left_points": line_lefts,
+            "line_right_points": line_rights,
         }
     return result
+
+
+def _bullet_geometry(
+    pdf_path: str | Path,
+    document: ResumeDocument | None,
+    metrics: dict[str, ParagraphMetric],
+) -> tuple[dict[str, float], dict[str, float], dict[str, float]]:
+    if document is None:
+        return {}, {}, {}
+    with fitz.open(pdf_path) as pdf:
+        markers = [
+            (float(char["bbox"][0]), float(char["bbox"][1]), float(char["bbox"][3]))
+            for page in pdf
+            for block in page.get_text("rawdict").get("blocks", [])
+            for line in block.get("lines", [])
+            for span in line.get("spans", [])
+            for char in span.get("chars", [])
+            if char["c"] == "●"
+        ]
+    marker_x: dict[str, float] = {}
+    first_x: dict[str, float] = {}
+    continuation_x: dict[str, float] = {}
+    for paragraph in document.paragraphs:
+        if paragraph.kind.value != "bullet":
+            continue
+        metric = metrics.get(paragraph.paragraph_id)
+        if not metric or not metric["matched"]:
+            continue
+        line_lefts = metric["line_left_points"]
+        if line_lefts:
+            first_x[paragraph.paragraph_id] = line_lefts[0]
+        if len(line_lefts) > 1:
+            continuation_x[paragraph.paragraph_id] = max(
+                line_lefts[1:], key=lambda left: abs(left - line_lefts[0])
+            )
+        top = float(metric["top_points"])
+        nearby = [item for item in markers if item[1] - 4.0 <= top <= item[2] + 4.0]
+        if nearby:
+            marker_x[paragraph.paragraph_id] = min(nearby, key=lambda item: abs(item[1] - top))[0]
+    return marker_x, first_x, continuation_x
+
+
+def _bullet_alignment_issues(
+    marker_x: dict[str, float],
+    first_x: dict[str, float],
+    continuation_x: dict[str, float],
+    baseline_marker_x: dict[str, float],
+    baseline_first_x: dict[str, float],
+    baseline_continuation_x: dict[str, float],
+) -> list[str]:
+    issues: list[str] = []
+    for paragraph_id, baseline in baseline_first_x.items():
+        current = first_x.get(paragraph_id)
+        if current is None or abs(current - baseline) > MAX_BULLET_ALIGNMENT_DRIFT_POINTS:
+            issues.append(f"bullet-first:{paragraph_id}")
+    for paragraph_id, baseline in baseline_marker_x.items():
+        current = marker_x.get(paragraph_id)
+        if current is None or abs(current - baseline) > MAX_BULLET_ALIGNMENT_DRIFT_POINTS:
+            issues.append(f"bullet-marker:{paragraph_id}")
+    for paragraph_id, current in continuation_x.items():
+        first = first_x.get(paragraph_id)
+        if first is not None and abs(current - first) > MAX_BULLET_ALIGNMENT_DRIFT_POINTS:
+            issues.append(f"bullet-hanging:{paragraph_id}")
+        baseline_continuation = baseline_continuation_x.get(paragraph_id)
+        if (
+            baseline_continuation is not None
+            and abs(current - baseline_continuation) > MAX_BULLET_ALIGNMENT_DRIFT_POINTS
+        ):
+            issues.append(f"bullet-continuation:{paragraph_id}")
+    return sorted(set(issues))
 
 
 def _file_uri(path: Path) -> str:
@@ -602,6 +829,124 @@ def _collapsed_tab_items(
                 issues.append(paragraph.paragraph_id)
                 break
     return issues
+
+
+def _protected_geometry_issues(
+    document: ResumeDocument | None,
+    baseline_document: ResumeDocument | None,
+    metrics: dict[str, ParagraphMetric],
+    baseline_metrics: dict[str, ParagraphMetric],
+) -> tuple[list[str], list[str]]:
+    if document is None or baseline_document is None:
+        return [], []
+    employer: list[str] = []
+    sections: list[str] = []
+    for paragraph in baseline_document.paragraphs:
+        if paragraph.kind.value not in {"entry_heading", "section_heading"}:
+            continue
+        current = metrics.get(paragraph.paragraph_id)
+        baseline = baseline_metrics.get(paragraph.paragraph_id)
+        if not current or not baseline or not current["matched"] or not baseline["matched"]:
+            issue = f"heading-unmatched:{paragraph.paragraph_id}"
+        else:
+            horizontal = max(
+                abs(float(current["left_points"]) - float(baseline["left_points"])),
+                abs(float(current["right_points"]) - float(baseline["right_points"])),
+            )
+            issue = (
+                f"heading-geometry:{paragraph.paragraph_id}"
+                if horizontal > MAX_PROTECTED_HORIZONTAL_DRIFT_POINTS
+                else ""
+            )
+        if issue and paragraph.kind.value == "entry_heading":
+            employer.append(issue)
+        elif issue:
+            sections.append(issue)
+    return employer, sections
+
+
+def _employer_spacing_issues(
+    document: ResumeDocument | None,
+    baseline_document: ResumeDocument | None,
+    metrics: dict[str, ParagraphMetric],
+    baseline_metrics: dict[str, ParagraphMetric],
+) -> list[str]:
+    if document is None or baseline_document is None:
+        return []
+    paragraphs = baseline_document.paragraphs
+    issues: list[str] = []
+    for index, paragraph in enumerate(paragraphs):
+        if paragraph.kind.value != "entry_heading" or not paragraph.section.startswith(
+            "experience."
+        ):
+            continue
+        previous = next(
+            (
+                candidate
+                for candidate in reversed(paragraphs[:index])
+                if candidate.kind.value == "bullet" and candidate.section.startswith("experience.")
+            ),
+            None,
+        )
+        if previous is None:
+            continue
+        current_heading = metrics.get(paragraph.paragraph_id)
+        current_previous = metrics.get(previous.paragraph_id)
+        baseline_heading = baseline_metrics.get(paragraph.paragraph_id)
+        baseline_previous = baseline_metrics.get(previous.paragraph_id)
+        if (
+            current_heading is None
+            or current_previous is None
+            or baseline_heading is None
+            or baseline_previous is None
+        ):
+            continue
+        current_gap = float(current_heading["top_points"]) - float(
+            current_previous["bottom_points"]
+        )
+        baseline_gap = float(baseline_heading["top_points"]) - float(
+            baseline_previous["bottom_points"]
+        )
+        if abs(current_gap - baseline_gap) > MAX_EMPLOYER_SPACING_DRIFT_POINTS:
+            issues.append(f"employer-spacing:{paragraph.paragraph_id}")
+    return issues
+
+
+def _page_clearance(document: fitz.Document) -> tuple[float, float]:
+    if not document.page_count:
+        return 0.0, 0.0
+    right_clearance = min(
+        (
+            float(page.rect.width) - float(word[2])
+            for page in document
+            for word in page.get_text("words")
+        ),
+        default=0.0,
+    )
+    last_page = document[-1]
+    bottom_clearance = min(
+        (float(last_page.rect.height) - float(word[3]) for word in last_page.get_text("words")),
+        default=0.0,
+    )
+    return right_clearance, bottom_clearance
+
+
+def _density_bands(document: fitz.Document) -> list[int]:
+    if not document.page_count:
+        return [0, 0, 0]
+    page = document[0]
+    bands = [0, 0, 0]
+    seen: set[tuple[int, float]] = set()
+    for block in page.get_text("dict").get("blocks", []):
+        for line in block.get("lines", []):
+            y_position = float(line["bbox"][1])
+            key = (0, round(y_position, 1))
+            if key in seen:
+                continue
+            seen.add(key)
+            band = min(2, int(3 * y_position / max(float(page.rect.height), 1.0)))
+            bands[band] += 1
+    return bands
 
 
 def _geometry_issues(document: fitz.Document) -> tuple[list[str], list[str]]:

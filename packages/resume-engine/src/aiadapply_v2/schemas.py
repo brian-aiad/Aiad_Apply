@@ -200,18 +200,45 @@ class ResumeEvidence(StrictModel):
     environment_signals: list[str] = Field(default_factory=list)
     outcomes: list[str] = Field(default_factory=list)
     metrics: list[str] = Field(default_factory=list)
+    claim_scope: Literal["source_specific", "skills_only", "general_exposure"] = "source_specific"
+    source_reference: str = ""
+    routine_tool_context: bool = False
+    established_technical_context: bool = False
+
+
+class DraftTechnology(StrictModel):
+    term: str
+    paragraph_ids: list[str] = Field(default_factory=list)
+    required: bool = True
+    explanation: str = "Job-derived draft assumption; verify or edit before applying."
 
 
 class ResumeEvidenceGraph(StrictModel):
     candidate_name: str
     document_sha256: str
     evidence: list[ResumeEvidence]
+    draft_technologies: list[DraftTechnology] = Field(default_factory=list)
+    automatic_technical_policy: bool = False
+
+
+class CandidateEvidenceItem(StrictModel):
+    term: str
+    category: Literal["technology", "method", "domain", "qualification", "other"]
+    scope: Literal["skills_only", "general_exposure", "source_specific"] = "skills_only"
+    confidence: Literal["confirmed"] = "confirmed"
+    source: str = "candidate_confirmation"
+    evidence_reference: str = ""
+    notes: str = ""
 
 
 class CandidateProfile(StrictModel):
     candidate_name: str
+    everyday_tools: list[str] = Field(default_factory=list)
+    established_technologies: list[str] = Field(default_factory=list)
+    automatic_technical_policy: bool = False
     confirmed_skills: list[str] = Field(default_factory=list)
     confirmed_exposure: list[str] = Field(default_factory=list)
+    confirmed_evidence: list[CandidateEvidenceItem] = Field(default_factory=list)
     drafting_notes: list[str] = Field(default_factory=list)
     rejected_terms: list[str] = Field(default_factory=list)
     review_history: list[dict[str, str]] = Field(default_factory=list)
@@ -337,11 +364,30 @@ class RewritePlan(StrictModel):
     claim_risks: list[ClaimRisk] = Field(default_factory=list)
 
 
+class TechnologySummary(StrictModel):
+    term: str
+    summary: str = Field(
+        min_length=1,
+        max_length=240,
+        description="One short plain-language sentence explaining what the technology is and its usual purpose, not candidate experience.",
+    )
+
+
+class TechnologyAssessment(StrictModel):
+    term: str
+    classification: Literal["common_development", "specialized_or_advanced", "unrelated"]
+    duty_paragraph_ids: list[str] = Field(default_factory=list)
+    reasoning: str
+    usage_boundary: str
+
+
 class ReasoningResult(StrictModel):
     role_profile: TargetRoleProfile
     transferability_map: TransferabilityMap
     rewrite_plan: RewritePlan
     stretch_lab: StretchLab = Field(default_factory=StretchLab)
+    technology_assessments: list[TechnologyAssessment] = Field(default_factory=list)
+    technology_summaries: list[TechnologySummary] = Field(default_factory=list)
 
 
 class ValidationIssue(StrictModel):
@@ -369,8 +415,23 @@ class LayoutResult(StrictModel):
     paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
     baseline_paragraph_line_counts: dict[str, int] = Field(default_factory=dict)
     paragraph_max_width_points: dict[str, float] = Field(default_factory=dict)
+    paragraph_left_points: dict[str, float] = Field(default_factory=dict)
+    paragraph_right_points: dict[str, float] = Field(default_factory=dict)
+    bullet_marker_x_points: dict[str, float] = Field(default_factory=dict)
+    bullet_first_line_x_points: dict[str, float] = Field(default_factory=dict)
+    bullet_continuation_x_points: dict[str, float] = Field(default_factory=dict)
+    bullet_alignment_issues: list[str] = Field(default_factory=list)
+    skill_wrap_issues: list[str] = Field(default_factory=list)
+    employer_heading_issues: list[str] = Field(default_factory=list)
+    employer_spacing_issues: list[str] = Field(default_factory=list)
+    section_geometry_issues: list[str] = Field(default_factory=list)
     protected_horizontal_deltas: dict[str, float] = Field(default_factory=dict)
     font_inventory: dict[str, list[float]] = Field(default_factory=dict)
+    font_inventory_changed: bool = False
+    right_edge_clearance_points: float = 0.0
+    bottom_edge_clearance_points: float = 0.0
+    density_band_deltas: list[int] = Field(default_factory=list)
+    boundary_issues: list[str] = Field(default_factory=list)
     out_of_bounds_items: list[str] = Field(default_factory=list)
     overlap_items: list[str] = Field(default_factory=list)
     collapsed_tab_items: list[str] = Field(default_factory=list)
@@ -410,6 +471,54 @@ class ResumeChangeRecord(StrictModel):
     risk_level: RiskLevel = RiskLevel.low
     compressed: bool = False
     explanation: str = ""
+    added_terms: list[str] = Field(default_factory=list)
+
+
+class TailoringSummary(StrictModel):
+    relevant_bullets: int | None = None
+    substantive_bullets_rewritten: int | None = None
+    minimum_substantive_rewrites: int | None = None
+    substantive_paragraph_ids: list[str] = Field(default_factory=list)
+    experience_bullets_changed: int = 0
+    project_bullets_changed: int = 0
+    skills_rows_changed: int = 0
+    summary_changed: bool = False
+    newly_represented_terms: list[str] = Field(default_factory=list)
+    already_present_terms: list[str] = Field(default_factory=list)
+
+
+class KeywordCoverage(StrictModel):
+    term: str
+    category: str
+    accepted: bool = True
+    automatic_technical_use: bool = False
+    evidence_ids: list[str] = Field(default_factory=list)
+    eligible_bullet_ids: list[str] = Field(default_factory=list)
+    required_bullet_groups: list[list[str]] = Field(default_factory=list)
+    placements: list[str] = Field(default_factory=list)
+    status: Literal[
+        "in_context",
+        "skills_only",
+        "credential_only",
+        "covered",
+        "missing_supported",
+        "available",
+        "needs_confirmation",
+        "excluded",
+        "draft_assumption",
+        "missing_draft",
+    ]
+    explanation: str
+
+
+class ModelCallUsage(StrictModel):
+    model: str
+    input_tokens: int | None = Field(default=None, ge=0)
+    cached_input_tokens: int | None = Field(default=None, ge=0)
+    output_tokens: int | None = Field(default=None, ge=0)
+    prompt_characters: int = Field(default=0, ge=0)
+    duration_seconds: float = Field(default=0, ge=0)
+    succeeded: bool = False
 
 
 class TransformationReport(StrictModel):
@@ -421,6 +530,12 @@ class TransformationReport(StrictModel):
     rewrite_plan: RewritePlan
     stretch_lab: StretchLab = Field(default_factory=StretchLab)
     changes: list[ResumeChangeRecord] = Field(default_factory=list)
+    tailoring_summary: TailoringSummary = Field(default_factory=TailoringSummary)
+    keyword_coverage: list[KeywordCoverage] = Field(default_factory=list)
+    technology_assessments: list[TechnologyAssessment] = Field(default_factory=list)
+    technology_summaries: list[TechnologySummary] = Field(default_factory=list)
+    tailoring_mode: Literal["aggressive_draft", "evidence_only"] = "evidence_only"
+    draft_technologies: list[DraftTechnology] = Field(default_factory=list)
     claim_risks: list[ClaimRisk]
     validation: ValidationResult
     layout: LayoutResult
@@ -428,4 +543,8 @@ class TransformationReport(StrictModel):
     output_pdf: Path
     base_sha256: str
     reasoner: str
+    model_calls: int = Field(default=1, ge=1)
+    model_usage: list[ModelCallUsage] = Field(default_factory=list)
+    document_candidates: int = Field(default=1, ge=1)
+    layout_repairs: list[str] = Field(default_factory=list)
     pipeline_version: str

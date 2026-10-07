@@ -36,6 +36,12 @@ def repair(
 ) -> TransformationReport:
     output_dir = report_path.resolve().parent
     report = TransformationReport.model_validate_json(report_path.read_text(encoding="utf-8"))
+    if report.tailoring_mode == "aggressive_draft":
+        raise RuntimeError(
+            "This legacy evidence-only repair cannot rewrite an aggressive draft. "
+            "Use Tailor again or aiadapply draft to create a new version through the "
+            "current technology-placement and layout checks."
+        )
     base = parse_resume_docx(base_resume)
     reasoning = ReasoningResult(
         role_profile=report.role_profile,

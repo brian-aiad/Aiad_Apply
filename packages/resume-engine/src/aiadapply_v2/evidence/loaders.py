@@ -14,6 +14,7 @@ from aiadapply_v2.text import contains_term, dedupe
 
 SYSTEM_TERMS = (
     "agency management system",
+    "API",
     "Astra Schedule",
     "AWS",
     "Bash",
@@ -71,6 +72,34 @@ ACTION_TERMS = (
     "validation",
 )
 TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
+    "application testing": ("tested", "validating updates", "validating fixes"),
+    "release validation": ("validating updates", "validating fixes"),
+    "access management": (
+        "managing user access",
+        "resetting user access",
+        "user provisioning",
+        "RBAC",
+    ),
+    "automation": ("Python reconciliation script", "streamline user provisioning"),
+    "background jobs": ("nightly ETL jobs",),
+    "data feeds": ("carrier/vendor feeds",),
+    "deployment": ("deployed",),
+    "digital workplace": ("Microsoft 365",),
+    "enterprise IT": ("Microsoft 365", "campus IT"),
+    "enterprise software": ("agency management SaaS", "Administered Microsoft 365"),
+    "integrations": ("carrier integration workflows", "Microsoft Graph API", "Webhooks"),
+    "platform administration": (
+        "Administered Microsoft 365",
+        "Configured RBAC",
+        "managing user access",
+    ),
+    "platform health": ("Monitored nightly ETL jobs", "platform performance"),
+    "role-based access": ("RBAC",),
+    "scripts": ("Python reconciliation script", "PowerShell"),
+    "service performance": ("average resolution", "response times"),
+    "workflow improvement": ("reduced monthly close prep", "reducing onboarding"),
+    "workflows": ("integration workflows", "user provisioning", "client intake"),
+    "continuous improvement": ("Improved platform performance",),
     "business analysis": (
         "operational need",
         "workflow support",
@@ -78,6 +107,7 @@ TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
     ),
     "business rules": ("configuration", "workflow support", "validation"),
     "case ownership": ("support tickets", "incident support", "live operations"),
+    "case management": ("support tickets", "incident documentation", "escalation notes"),
     "customer case ownership": ("support tickets", "user support", "live operations"),
     "customer needs": ("operational need", "user support", "live operations"),
     "customer service": ("first-line support", "user support", "training"),
@@ -126,6 +156,8 @@ TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
     ),
     "workflow management": ("workflow support", "production operations", "deployment"),
     "communication skills": ("documentation", "training", "coordinating"),
+    "written communication": ("documentation", "escalation notes"),
+    "technical writing": ("incident documentation", "escalation notes"),
     "written and verbal communication skills": (
         "documentation",
         "training",
@@ -138,6 +170,25 @@ TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
         "SLA management",
     ),
 }
+
+# These are descriptions of documented work, not new implementations or credentials.
+# They still require a bridge in a real experience/project paragraph; a job request,
+# generic Skills list, or high embedding score alone is insufficient.
+AUTOMATIC_CONTEXT_TERMS = frozenset({
+    "critical thinking", "problem-solving", "communication skills", "written communication",
+    "written and verbal communication skills", "verbal communication",
+    "cross-functional collaboration", "interpersonal skills", "fast-paced environment",
+    "task prioritization", "organizational skills", "case management", "automation",
+    "technical writing", "enterprise software",
+})
+
+
+def supports_automatic_context(term: str, source_text: str) -> bool:
+    normalized = term.casefold().strip()
+    return normalized in AUTOMATIC_CONTEXT_TERMS and any(
+        contains_term(source_text, bridge)
+        for bridge in TRANSFER_BRIDGES.get(normalized, ())
+    )
 
 
 def build_evidence_graph(
@@ -158,7 +209,9 @@ def build_evidence_graph(
         actions = [term for term in ACTION_TERMS if contains_term(paragraph.text, term)]
         concepts: list[EvidenceConcept] = []
         for keyword in accepted_terms:
-            direct = contains_term(paragraph.text, keyword.term)
+            direct = contains_term(paragraph.text, keyword.term) or (
+                keyword.normalized == "webhooks" and contains_term(paragraph.text, "webhook")
+            )
             bridges = [
                 term
                 for term in TRANSFER_BRIDGES.get(keyword.normalized, ())

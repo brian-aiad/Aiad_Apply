@@ -8,6 +8,7 @@ from typing import Protocol
 
 import numpy as np
 
+from aiadapply_v2.evidence.loaders import supports_automatic_context
 from aiadapply_v2.schemas import (
     EvidenceMatch,
     EvidenceStrength,
@@ -22,9 +23,15 @@ from aiadapply_v2.text import contains_term
 
 DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"
 SYSTEM_CATEGORY_EVIDENCE: dict[str, tuple[str, ...]] = {
-    "api integrations": ("REST APIs", "Webhooks", "Microsoft Graph API"),
+    "api integrations": (
+        "REST APIs",
+        "Webhooks",
+        "Microsoft Graph API",
+        "carrier integration workflows",
+    ),
     "api security": ("OAuth 2.0", "MFA", "SSO", "RBAC"),
     "command line": ("Bash", "PowerShell"),
+    "continuous integration": ("CI/CD",),
     "configuration": ("configured", "configurations"),
     "database": ("SQL", "PostgreSQL", "MySQL", "SQLite"),
     "erp": ("Dynamics 365", "D365 F&O"),
@@ -33,9 +40,15 @@ SYSTEM_CATEGORY_EVIDENCE: dict[str, tuple[str, ...]] = {
     "service level agreements": ("SLA", "SLA Management"),
     "stem degree": ("Bachelor of Science", "Computer Science"),
     "ticketing": ("support tickets", "Jira"),
-    "web services": ("REST APIs", "Webhooks"),
+    "web services": ("REST APIs", "Webhooks", "webhook"),
 }
 EXACT_EVIDENCE_TERMS = {
+    "continuous integration",
+    "ai",
+    "artificial intelligence",
+    "ai-powered support tools",
+    "crud",
+    "low-code",
     "atf access",
     "electrical engineering",
     "fintech",
@@ -50,6 +63,15 @@ EXACT_EVIDENCE_TERMS = {
 # insufficient to rename an artifact or duty as the employer's formal term.
 ALWAYS_WEAK_TRANSFER_TERMS = {
     "knowledge base",
+    "knowledge articles",
+    "runbooks",
+    "acceptance criteria",
+    "requirements elicitation",
+    "user stories",
+    "process mapping",
+    "backlog management",
+    "tier 2 support",
+    "support readiness",
 }
 
 
@@ -67,29 +89,31 @@ class SentenceTransformerEncoder:
         self._passage_vectors: np.ndarray | None = None
 
     def similarities(self, query: str, passages: Sequence[str]) -> list[float]:
-        if not passages:
+        return self.similarities_many([query], passages)[0]
+
+    def similarities_many(
+        self, queries: Sequence[str], passages: Sequence[str]
+    ) -> list[list[float]]:
+        if not queries:
             return []
-        query_text = f"Represent this sentence for searching relevant passages: {query}"
-        # Reuse only the exact evidence passages within this encoder instance.
-        # A changed resume, profile, order, or evidence annotation invalidates it.
+        if not passages:
+            return [[] for _ in queries]
+        # Cache only exact evidence within this run; changed profile text/order
+        # invalidates it. Batch job queries so each term does not launch inference.
         passage_key = tuple(passages)
         if self._passage_vectors is None or passage_key != self._passages:
             self._passage_vectors = np.asarray(
                 self._model.encode(
-                    list(passages),
-                    normalize_embeddings=True,
-                    show_progress_bar=False,
+                    list(passages), normalize_embeddings=True, show_progress_bar=False,
                 )
             )
             self._passages = passage_key
-        vectors = self._model.encode(
-            [query_text],
-            normalize_embeddings=True,
-            show_progress_bar=False,
-        )
-        query_vector = np.asarray(vectors[0])
-        values = (self._passage_vectors @ query_vector).astype(float).tolist()
-        return [float(value) for value in values]
+        query_vectors = np.asarray(self._model.encode(
+            [f"Represent this sentence for searching relevant passages: {query}" for query in queries],
+            normalize_embeddings=True, show_progress_bar=False, batch_size=32,
+        ))
+        scores = (query_vectors @ self._passage_vectors.T).astype(float).tolist()
+        return [[float(value) for value in row] for row in scores]
 
 
 class LexicalSemanticEncoder:
@@ -117,9 +141,16 @@ def build_transferability_map(
     passages = [_evidence_passage(item) for item in evidence]
     matches: list[EvidenceMatch] = []
 
-    for keyword in (item for item in keywords if item.accepted):
-        requirement = _requirement_for(keyword.term, profile)
-        scores = encoder.similarities(f"{keyword.term}: {requirement}", passages)
+    accepted = [item for item in keywords if item.accepted]
+    requirements = [_requirement_for(item.term, profile) for item in accepted]
+    queries = [f"{item.term}: {requirement}" for item, requirement in zip(accepted, requirements, strict=True)]
+    batch = getattr(encoder, "similarities_many", None)
+    scores_by_query = batch(queries, passages) if callable(batch) else [
+        encoder.similarities(query, passages) for query in queries
+    ]
+    if len(scores_by_query) != len(accepted) or any(len(scores) != len(passages) for scores in scores_by_query):
+        raise ValueError("Semantic encoder returned inconsistent evidence scores.")
+    for keyword, requirement, scores in zip(accepted, requirements, scores_by_query, strict=True):
         direct_indices = [
             index
             for index, evidence_item in enumerate(evidence)
@@ -130,8 +161,22 @@ def build_transferability_map(
             for index, evidence_item in enumerate(evidence)
             if _transferable_match(keyword.term, evidence_item)
         ]
-        if direct_indices:
+        work_direct_indices = [index for index in direct_indices if _work_evidence(evidence[index])]
+        work_transferable_indices = [
+            index for index in transferable_indices if _work_evidence(evidence[index])
+        ]
+        automatic_indices = [
+            index for index in work_transferable_indices
+            if supports_automatic_context(keyword.term, evidence[index].source_text)
+        ]
+        if work_direct_indices:
+            best_index = max(work_direct_indices, key=lambda index: scores[index])
+        elif automatic_indices:
+            best_index = max(automatic_indices, key=lambda index: scores[index])
+        elif direct_indices:
             best_index = max(direct_indices, key=lambda index: scores[index])
+        elif work_transferable_indices:
+            best_index = max(work_transferable_indices, key=lambda index: scores[index])
         elif transferable_indices:
             best_index = max(transferable_indices, key=lambda index: scores[index])
         else:
@@ -200,17 +245,25 @@ def _evidence_passage(evidence: ResumeEvidence) -> str:
     )
 
 
+def _work_evidence(evidence: ResumeEvidence) -> bool:
+    return evidence.section.startswith(("experience.", "projects.")) and ".bullet." in evidence.paragraph_id
+
+
 def _direct_match(term: str, evidence: ResumeEvidence | None) -> bool:
     if not evidence:
         return False
     direct_fields = [
-        evidence.source_text,
+        *([] if evidence.section == "candidate_profile" else [evidence.source_text]),
         *evidence.systems,
         *evidence.actions,
         *evidence.environment_signals,
         *evidence.outcomes,
     ]
-    if any(contains_term(value, term) for value in direct_fields):
+    if any(
+        contains_term(value, term)
+        or (term.casefold() == "webhooks" and contains_term(value, "webhook"))
+        for value in direct_fields
+    ):
         return True
     category_evidence = SYSTEM_CATEGORY_EVIDENCE.get(term.casefold(), ())
     return any(
@@ -272,6 +325,12 @@ def _reasoning(
     if strength == EvidenceStrength.direct:
         return f"{term} is stated directly in {evidence.paragraph_id}."
     if strength == EvidenceStrength.strongly_transferable:
+        if _work_evidence(evidence) and supports_automatic_context(term, evidence.source_text):
+            return (
+                f"Documented work in {evidence.paragraph_id} supports describing {term}. "
+                "Use it naturally with the existing actions and results; no extra confirmation "
+                "or new tool, duty, metric, or implementation claim is needed."
+            )
         return (
             f"{evidence.paragraph_id} provides a strong contextual bridge to {term} "
             f"(semantic score {score:.2f})."

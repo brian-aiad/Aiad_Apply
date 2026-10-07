@@ -1,0 +1,29 @@
+Evlo AI
+Technical Support Engineer
+Los Angeles, CA · Remote · Full-time
+
+About The Role
+
+The Technical Support Engineer resolves complex customer issues across a cloud-based technology platform, including APIs, integrations, authentication, data flows, and production configurations. The role combines hands-on troubleshooting with clear customer communication across support tickets, chat, and scheduled technical sessions.
+
+You will investigate incidents, reproduce defects, interpret logs and API responses, and partner with engineering when issues require code changes. The team depends on this role to reduce time to resolution, improve support documentation, and identify recurring product issues at scale. The position is remote and based in Los Angeles, CA.
+
+Key Responsibilities
+
+Resolve escalated technical cases involving REST APIs, webhooks, SDKs, SSO, OAuth, integrations, and account configuration
+Diagnose customer issues using logs, browser developer tools, SQL queries, API clients such as Postman, and observability platforms
+Reproduce reported defects in staging environments and provide engineering with clear steps, logs, expected behavior, and business impact
+Manage incidents and complex support queues against response and resolution SLAs using tools such as Zendesk, Intercom, Jira, or equivalent
+Write and maintain troubleshooting guides, API examples, internal runbooks, and customer-facing knowledge-base articles
+Analyze ticket trends and product feedback to identify recurring failure modes and recommend improvements to product, documentation, and support workflows
+Communicate technical findings clearly to customers, product managers, and engineers while maintaining ownership through resolution
+
+What We Are Looking For
+
+3-6 years of experience in technical support, developer support, solutions engineering, site reliability, or a related customer-facing technical role
+Strong understanding of HTTP, REST APIs, JSON, webhooks, DNS, networking fundamentals, authentication, and common SaaS integrations
+Proficiency with SQL, command-line tools, API testing, and log analysis; able to read and reason about code in at least one language such as Python, JavaScript, or Java
+Experience troubleshooting cloud applications and distributed systems using tools such as Datadog, Splunk, Sentry, CloudWatch, or comparable platforms
+Demonstrated ability to manage multiple high-priority cases, explain technical concepts to non-technical users, and communicate clearly in writing
+Bachelor’s degree in computer science, information systems, engineering, or equivalent practical experience
+Bonus: Experience with Kubernetes, AWS or GCP, identity providers such as Okta, Salesforce integrations, GraphQL, or building support automation

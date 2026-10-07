@@ -23,12 +23,26 @@ def normalized_term(value: str) -> str:
 
 def contains_term(text: str, term: str) -> bool:
     escaped = re.escape(normalized_term(term))
-    return re.search(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", text.lower()) is not None
+    suffix = r"(?![a-z0-9+#])" if normalized_term(term) == "c" else r"(?![a-z0-9])"
+    return re.search(rf"(?<![a-z0-9]){escaped}{suffix}", text.lower()) is not None
+
+
+def preserves_source_term(text: str, term: str) -> bool:
+    """Unambiguous evidence aliases; literal keyword/diff matching stays exact."""
+    aliases = {
+        "api": ("APIs",),
+        "webhooks": ("webhook",),
+        "continuous integration": ("CI/CD",),
+    }
+    return contains_term(text, term) or any(
+        contains_term(text, alias) for alias in aliases.get(normalized_term(term), ())
+    )
 
 
 def count_term(text: str, term: str) -> int:
     escaped = re.escape(normalized_term(term))
-    return len(re.findall(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])", text.lower()))
+    suffix = r"(?![a-z0-9+#])" if normalized_term(term) == "c" else r"(?![a-z0-9])"
+    return len(re.findall(rf"(?<![a-z0-9]){escaped}{suffix}", text.lower()))
 
 
 def dedupe(values: Iterable[str]) -> list[str]:

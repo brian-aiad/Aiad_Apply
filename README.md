@@ -12,6 +12,13 @@ tailors the finalized base resume, exports a validated one-page DOCX/PDF, and
 records every keyword decision and exact paragraph change in a private-purpose
 application dashboard.
 
+Every future export follows the [resume content and layout rules](docs/resume-export-rules.md),
+including substantive evidence-backed tailoring, aligned bullet continuations,
+and single-line Skills rows. Failed final checks block acceptance.
+The standing editable-draft preference is also recorded in [AGENTS.md](AGENTS.md)
+for future coding sessions and embedded in the runtime prompt and export checks.
+MATLAB is an example of the general rule, not a skill automatically added to all jobs.
+
 ## Daily Use
 
 Existing hosted dashboard: https://aiadapply-web.vercel.app (local changes are not
@@ -75,7 +82,7 @@ submissions against your adjustable goal, a Monday–Sunday ledger, your streak,
 and follow-ups due. Saving or tailoring a job does not count as applying.
 
 **Discover** checks 15 curated employer/staffing boards through public
-Greenhouse, Lever, Ashby, and SmartRecruiters feeds. It targets application
+Greenhouse, Lever, Ashby, SmartRecruiters, and RTX Workday feeds. It targets application
 support, technical support, IT operations, systems support, and software
 integrations using evidence from the protected base resume. Defaults are Seal
 Beach 90740, a maximum 30-mile radius, full-time, and $60,000/year
@@ -83,11 +90,16 @@ Beach 90740, a maximum 30-mile radius, full-time, and $60,000/year
 postings explicitly marked temporary, contract, or part-time are excluded.
 Remote roles are off by default and can be enabled in Preferences.
 
-- Opening Today or Discover initiates a check if the last search is at least
-  20 hours old. Refresh openings runs a manual check with a one-minute cooldown.
-  This is not a background scheduler: no searches run while the app is closed.
-- Today/this-week filters mean first discovered by this workspace, not a guessed
-  employer posting date. The feed also shows its last verification time.
+- The running local worker checks the discovery schedule every 15 minutes and
+  refreshes every six hours by default, including while the browser is closed.
+  The computer and local app/worker must remain running. Today and Discover also
+  check for due searches; manual refresh has a one-minute cooldown.
+- Automatic tailoring is optional and off by default. Preferences exposes a daily
+  limit (default two) and minimum score (default 80). Only recently verified,
+  dated openings with no fit cautions qualify; automatic submission is not implemented.
+- Local discovery defaults to postings within 21 days; separate first-found
+  filters and an unknown-date option preserve that distinction. Employer feeds
+  usually do not expose applicant counts, so competition remains unknown.
 - Distances are approximate city-centre radius measurements, not driving miles
   or verified street addresses. Check the worksite before approving.
 - Missing salary/full-time information, clearance, seniority, and specialist
@@ -209,14 +221,15 @@ fit gate, use `--queue-qualified --max-tailors 3`. The command never submits a
 job application. Browser collection and fit ranking do not call Codex; only
 each role actually queued for resume tailoring uses the Codex review pipeline.
 Normal capture, save, and status updates do not consume Codex usage. A tailoring
-run normally makes one structured Codex call and makes one correction call only
-when deterministic validation rejects the first plan.
+run starts with one structured Codex call. Validation and final rendered coverage
+can trigger bounded corrections (up to three quality attempts with two plan calls
+per attempt); the run report records actual calls and token usage.
 
 Local Codex calls allow up to 15 minutes by default so a correction pass can
 finish on slower machines. Set `AIADAPPLY_CODEX_TIMEOUT_SECONDS` to a value from
 60 through 1800 seconds when a different bound is needed.
 
-Tailoring is pinned to `gpt-5.6-sol` with `low` reasoning by default so Discover,
+Tailoring is pinned to `gpt-6-astra` with `high` reasoning by default so Discover,
 Capture, Mac, and Windows produce consistent results without inheriting a changing
 interactive Codex selection. Override these defaults with `AIADAPPLY_CODEX_MODEL`
 and `AIADAPPLY_CODEX_REASONING_EFFORT` when intentionally evaluating another model.
@@ -251,12 +264,13 @@ the unrelated `NEXTAUTH_URL` setting is never used for worker tracking.
   qualification gaps, and proposed gap-closing projects. Stretch items are never
   inserted into the application-ready DOCX/PDF unless they are later completed or
   confirmed in the candidate profile.
-- Important job terms may be inserted when direct or defensibly transferable
-  evidence exists.
+- Important supported job terms are placed in relevant experience prose. Posting
+  technologies without project evidence remain review gaps, not invented Loavenly
+  implementations. Plausible future extensions belong in Stretch Lab.
 - Explicitly negative phrases such as `not a traditional help desk role` are
   classified as exclusions instead of target keywords.
-- Unsupported technologies and protocols are omitted from resume prose and
-  remain visible as qualification gaps in the transformation report.
+- Unrelated physical technologies remain outside the draft. Software and data
+  technologies stay in their evidenced employer, project or Skills context.
 - Candidate-confirmed skills in `data/profile/Brian_Aiad_PROFILE.json` are durable
   evidence for future drafts.
 - Existing skills are fused with role requirements instead of being replaced by
@@ -368,6 +382,18 @@ character_audit.json
 
 ## Verification
 
+All new tailoring runs use evidence-based wording. Rewrite relevant existing bullets
+substantively while preserving real systems, project purpose and outcomes. Where
+Loavenly overlaps with the role, lightly reframe one or two existing project bullets
+instead of freezing the whole section or rewriting every bullet. Do not
+force every posting technology into Loavenly: technical plausibility alone is not
+proof of implementation. Unsupported tools remain gaps; proposed extensions stay
+in Stretch Lab. Skills-only knowledge does not become an employer/project claim.
+Historical aggressive drafts retain their warnings and files; Tailor again creates
+a new version under the current policy. The old `aggressive_draft=True` engine flag
+is reserved for explicit historical/audit compatibility, not normal product paths.
+See [resume export rules](docs/resume-export-rules.md).
+
 ```powershell
 uv run ruff format --check .
 uv run ruff check .
@@ -392,5 +418,141 @@ uv run python scripts\audit-tailoring-corpus.py <run-dir> <run-dir> ...
 ```
 
 The corpus audit rejects multi-page results, DOCX files above the 2.5 MB ATS
-parse gate, lost base skills, information retention below 90%, unsupported or
-weak keyword leakage, and known unnatural wording patterns.
+parse gate, information retention below 90%, missing required project technologies,
+unflagged or out-of-scope draft additions, and known unnatural wording patterns.
+Evidence-only historical runs additionally retain the strict base-skill audit.
+
+
+### Fast terminal capture and RTX referrals
+
+Copy the complete posting, then run from this repository:
+
+```bash
+bash scripts/queue-job.sh --clipboard
+# Or queue several saved descriptions without sending them through chat:
+bash scripts/queue-job.sh --paste-file ~/Downloads/job-one.txt --paste-file ~/Downloads/job-two.txt
+# Capture without using the model:
+bash scripts/queue-job.sh --clipboard --save-only
+```
+
+The app and worker must be running (`bash scripts/start-local.sh`). Queueing parses,
+deduplicates and saves locally; only the worker's tailoring step uses Codex. Identical
+pastes reuse the existing application. For another version, open that application
+and use **Tailor again**. Every direct `aiadapply draft` output uses a unique directory
+so previous drafts stay intact. Python commands outside the wrapper can use
+`PYTHONPATH=packages/resume-engine/src uv run aiadapply ...`.
+
+Discover supports selecting up to ten jobs and saving or tailoring the batch. Filters and
+search are retained in the Discover URL, including the selected RTX scope. Search
+matches skills and description text as well as titles, employers and cities.
+Cards expose a short employer qualification excerpt. Required experience and
+clearance are assessed separately from preferred qualifications; one shorter skill
+requirement cannot cancel a longer independent experience requirement.
+
+The direct-source registry includes HNTB and TravisMathew Workday boards. Only
+verified employer hosts are fetched, posting dates are not inferred from relative
+labels, and location-filtered refreshes do not close older saved worksites. A source
+being available does not imply it currently has suitable openings.
+
+The separate **Raytheon / RTX referrals** tab only shows known California posting
+dates within 21 calendar days. It starts with the Seal Beach radius filter; uncheck
+it for statewide options. Select roles and copy the referral list with requisition
+IDs and official links. No message is sent. Citizenship is confirmed and no active
+clearance is recorded in discovery preferences; existing-clearance requirements,
+embedded/hardware gaps, GPA requests and lower-pay alternative routes stay visible.
+RTX includes Raytheon, Collins and Pratt postings with the business unit labeled.
+
+Tailoring uses supported technologies in their actual context. Loavenly remains a
+food-bank operations project rather than a place to insert every posting tool.
+Unsupported technologies stay in review gaps or clearly proposed Stretch Lab ideas.
+Earlier hypothetical project drafts retain their original files and a review warning.
+The review distinguishes raw bullet edits from substantive sentence rewrites while
+preserving the bullet count and one-page layout. Model evidence output is sparse;
+failed runs retain measured usage in failure-report.json.
+
+The integration choices and dated verification record are in
+[the October 2 upgrade report](docs/verification-2026-10-02-upgrade.md) and the
+[entry-level and neutral-layout verification](docs/verification-2026-10-02-entry-neutral.md), followed by the
+[broad-tailoring and real-job verification](docs/verification-2026-10-02-broad-tailoring.md).
+
+The workspace uses neutral charcoal surfaces with purple accents. Discover keeps
+filters compact and supports **Save selected** / **Tailor selected**. RTX prioritizes
+support/IT and entry-level adjacent routes; experienced software-engineering roles
+are excluded. California remote roles can be included separately from commuting
+options. Requirements and clearance checks take precedence over keyword overlap.
+
+## Apply with free Simplify or AiadApply Assistant
+
+Each application now has an **Apply** tab:
+
+1. Review its selected resume version, download the PDF, and choose **Use this reviewed resume**.
+2. Open the employer application and run free Simplify Copilot. Replace its default
+   resume attachment with the reviewed AiadApply PDF, then check the filename.
+3. Review and submit yourself. Record the employer's confirmation in AiadApply;
+   this saves the reviewed version reference and schedules the normal follow-up.
+
+The **Answer kit** stores a reusable application profile in the workspace. Existing
+browser-only answers can be imported explicitly. Contact fields can be used for
+filling; screening, authorization, salary, clearance and relocation remain copy-only.
+Concurrent profile edits are detected instead of silently overwriting another tab.
+Workspace backups include this profile.
+
+For an optional local helper, load `extensions/application-assistant` as an unpacked
+extension at `chrome://extensions`. The app's `/apply-help` page has setup steps.
+Choose **Prepare autofill packet** after reviewing a resume and saving contact details.
+On the employer form, import the packet into the extension, confirm the job, preview,
+and fill. It uses temporary active-tab access and Chrome session storage; no hosted
+service, paid API, background website access, or Simplify account connection is needed.
+The packet is private and contains a hash-checked PDF, job identity, version and
+contact data. It expires after 72 hours. Clear it from the extension when finished.
+
+The helper fills recognized empty contact text inputs and one unambiguous PDF upload.
+It preserves existing answers and asks separately before replacing an existing resume.
+Repeated fields, reference contact details, custom controls, cross-origin frames,
+login/CAPTCHA screens and screening questions need manual handling or Simplify.
+It never submits. Unsupported forms fail visibly instead of guessing. Uploaded PDFs
+may trigger the employer's normal file processing; check the resulting attachment.
+A downloaded DOCX edited later is a different document: attach that edited file manually.
+
+No general Simplify candidate API was found in its public help documentation. The
+integration is an explicit browser handoff. Greenhouse and Lever submission APIs
+require employer-issued credentials, so the app does not pretend to submit through them.
+
+## Moving to another device (October 7, 2026)
+
+Pull the latest `main` from the configured origin (this checkout uses
+`https://github.com/brian-aiad/aiadapplyV2.git`). Read `AGENTS.md`, the latest entries
+in `HANDOFF.txt`, and `docs/application-automation.md` before continuing development.
+
+Transfer these privately, outside Git:
+- `apps/web/.env`: actual shared DATABASE_URL, DIRECT_URL, WORKER_SECRET and
+  optional isolated test database connections. Preserve the shared database; do
+  not reset/seed/restore into it. `.env.example` contains placeholders only.
+- `.runtime/application-onboarding.json`: private additional saved answers. Most
+  profile/settings/application records already sync through the shared database,
+  but this worker input is local and must be copied separately.
+- The current DOCX selected by AIADAPPLY_BASE_RESUME (or its existing OneDrive
+  sync). Update AIADAPPLY_BASE_RESUME, AIADAPPLY_OUTPUT_ROOT and
+  AIADAPPLY_USED_RESUME_ROOT to paths on the new machine; do not retain Mac paths
+  on Windows. Historical generated files can be downloaded from the database.
+
+Install Node.js 22, uv/Python, Google Chrome, LibreOffice for PDF export, and Codex
+CLI. Sign into Codex on the new device with the existing subscription; no paid
+model API key is required. Use the setup instructions above, `uv sync --extra dev`
+and `npm ci` in apps/web. Browser/plugin connections may need sign-in on the new
+device. Do not copy Codex auth tokens into the repository.
+
+Do not transfer node_modules, .venv, .next, PID/lock files, worker identity, pending
+claims/outboxes or the whole .runtime directory. Only one application browser
+worker should be active for this workspace: finish any live application before
+stopping the old one with `bash scripts/application-worker.sh stop`. Start the
+new worker only after configuration and authentication are ready.
+
+Native Windows: the PowerShell launcher supports dashboard and tailoring. The
+new application browser worker currently uses Unix fcntl locking and a shell
+launcher; native Windows auto-apply is not yet supported or verified. Do not
+assume WSL is fully tested. Mac auto-start/LaunchAgent setup is machine-specific.
+
+Latest outcome: IT Systems Engineer and Product Operations Specialist, Air Defense
+C2 have employer-confirmed submissions. Product Support Engineer job5238763007 is
+unavailable (404); its finished tailored v2 is saved, but it was NOT submitted.

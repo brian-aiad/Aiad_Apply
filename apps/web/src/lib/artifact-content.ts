@@ -1,5 +1,11 @@
 import { createHash } from "node:crypto";
 
+export function artifactBytesMatch(content: Buffer, artifact: { sha256: string | null; byteSize: number | null }): boolean {
+  return Boolean(artifact.sha256)
+    && (artifact.byteSize === null || artifact.byteSize === content.byteLength)
+    && createHash("sha256").update(content).digest("hex") === artifact.sha256;
+}
+
 export function validatedArtifactBytes(artifact: Record<string, unknown>): Buffer | null {
   const encoded = artifact.contentBase64;
   if (encoded === undefined || encoded === "") return null;

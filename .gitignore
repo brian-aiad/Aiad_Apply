@@ -14,12 +14,12 @@ build/
 # Node / future web app
 node_modules/
 .next/
-.next-e2e/
-/output/playwright/
+.next-*/
 out/
 .playwright-cli/
 
 # Local output
+/output/
 outputs/
 /runs/
 temp/

@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { PhraseDiff } from "@/components/phrase-diff";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import { establishedTechnology, savedEvidenceStatus } from "@/lib/stretch-review";
+import { applicationEvidence } from "@/lib/application-evidence";
+import { ApplicationApply } from "@/components/application-apply";
+import { applicationDestination, applicationPortal, handoffBlockers, reviewedArtifactMatches } from "@/lib/application-handoff";
+import { formatJobLocation } from "@/lib/format";
+import { ResumeChangeReview } from "@/components/resume-change-review";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -12,12 +19,19 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { ApplicationControls } from "@/components/application-controls";
+import { DraftTechnologyReview } from "@/components/draft-technology-review";
+import { StretchLabReview } from "@/components/stretch-lab-review";
 import { EvidenceDecision } from "@/components/evidence-decision";
 import { ApplicationStatusPill } from "@/components/application-status-pill";
+import { ApplicationWorkspaceTabs } from "@/components/application-workspace-tabs";
 import { RunAutoRefresh } from "@/components/run-auto-refresh";
+import { RunVersionSelect } from "@/components/run-version-select";
+import { ResumePreview } from "@/components/resume-preview";
 import { StatusPill } from "@/components/status-pill";
 import { formatMoneyRange, formatRelativeDate, titleCaseStatus } from "@/lib/format";
 import { getApplication } from "@/lib/queries";
+import { buildTechnologyReview, technologySummary } from "@/lib/technology-review";
+import { buildReviewGuide, hasValidatedResume, isRunActive } from "@/lib/application-review";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +57,8 @@ function displayValue(value: unknown, fallback = "") {
   return typeof value === "string" && value.length > 0 ? value : fallback;
 }
 
-function paragraphLabel(section: string, paragraphId: string) {
-  const prefix = `${section}.`;
-  return paragraphId.startsWith(prefix) ? paragraphId.slice(prefix.length) : paragraphId;
+function demonstratedInWork(keyword: { explanation: string | null }) {
+  return keyword.explanation?.startsWith("Demonstrated by documented work") === true;
 }
 
 function humanizeReference(value: string) {
@@ -61,26 +74,35 @@ export default async function ApplicationDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ run?: string }>;
+  searchParams: Promise<{ run?: string; tab?: string }>;
 }) {
   const { id } = await params;
   const application = await getApplication(id);
   if (!application) notFound();
-  const activeRun = application.tailoringRuns.find((run) =>
-    ["QUEUED", "RUNNING"].includes(run.status),
-  );
-  const { run: selectedRunId } = await searchParams;
+  let sharedProfile: Record<string, unknown> = {};
+  try {
+    sharedProfile = objectRecord(JSON.parse(await fs.readFile(path.resolve(process.cwd(), "../../data/profile/Brian_Aiad_PROFILE.json"), "utf8"))) ?? {};
+  } catch { /* Historical exports remain available when the local profile is unavailable. */ }
+  const activeRun = application.tailoringRuns.find(isRunActive);
+  const { run: selectedRunId, tab: requestedTab } = await searchParams;
   const selectedRun = selectedRunId ? application.tailoringRuns.find((run) => run.id === selectedRunId) : undefined;
   const latestRun = selectedRun ?? activeRun ?? application.tailoringRuns[0];
   const previousUsableRun = application.tailoringRuns.find(
     (run) =>
       run.id !== latestRun?.id &&
-      run.status === "SUCCEEDED" &&
-      run.validationPassed &&
-      run.artifacts.some((artifact) => ["DOCX", "PDF"].includes(artifact.kind)),
+      hasValidatedResume(run),
   );
   const historicalRun = Boolean(selectedRun && selectedRun.id !== application.tailoringRuns[0]?.id);
   const reportSnapshot = objectRecord(latestRun?.reportSnapshot);
+  const modelUsage = objectList(reportSnapshot?.model_usage);
+  const usageTotal = (key: string) => modelUsage.length && modelUsage.every((call) => typeof call[key] === "number") ? modelUsage.reduce((sum, call) => sum + Number(call[key]), 0).toLocaleString() : "Not recorded";
+  const tailoringSummary = objectRecord(reportSnapshot?.tailoring_summary);
+  const technologyCoverage = objectList(reportSnapshot?.keyword_coverage);
+  const technologyAssessments = objectList(reportSnapshot?.technology_assessments);
+  const aggressiveDraft = reportSnapshot?.tailoring_mode === "aggressive_draft";
+  const technologyReview = buildTechnologyReview(reportSnapshot, latestRun?.changes);
+  const addedTermsByParagraph = new Map(objectList(reportSnapshot?.changes).filter((change) => Array.isArray(change.added_terms)).map((change) => [displayValue(change.paragraph_id), stringList(change.added_terms)]));
+  const newlyRepresentedTerms = stringList(tailoringSummary?.newly_represented_terms);
   const stretchLab = objectRecord(reportSnapshot?.stretch_lab);
   const stretchOpportunities = objectList(stretchLab?.transferable_opportunities);
   const stretchGaps = objectList(stretchLab?.gaps);
@@ -90,7 +112,7 @@ export default async function ApplicationDetailPage({
   const capturedFitDimensions = objectList(capturedFit?.dimensions);
   const correctedCaptureFields = stringList(captureMetadata?.correctedFields);
   const visibleChanges =
-    latestRun?.changes.filter((change) => change.changeType !== "unchanged") ?? [];
+    latestRun?.changes.filter((change) => change.beforeText !== change.finalText) ?? [];
   const hasActiveRun = Boolean(activeRun);
   const progressEvent = application.events.find(
     (event) => event.eventType === "tailoring_progress" && event.toValue === latestRun?.id,
@@ -111,32 +133,30 @@ export default async function ApplicationDetailPage({
   );
   const resumeArtifacts = latestRun?.artifacts.filter((artifact) => ["DOCX", "PDF"].includes(artifact.kind)) ?? [];
   const auditArtifacts = latestRun?.artifacts.filter((artifact) => !["DOCX", "PDF"].includes(artifact.kind)) ?? [];
-  const reviewHeadline = hasActiveRun
-    ? "Tailoring is in progress"
-    : !latestRun
-      ? "Tailor this posting when you are ready"
-      : latestRun.status === "FAILED"
-        ? "This run needs attention"
-        : application.status === "READY"
-          ? "Resume reviewed and ready"
-          : application.status === "APPLIED"
-            ? "Application submitted"
-            : latestRun.riskCount > 0
-              ? `Review ${latestRun.riskCount} flagged ${latestRun.riskCount === 1 ? "item" : "items"}`
-              : "Review the tailored resume";
-  const reviewCopy = hasActiveRun
-    ? progressStage || "The audit and files will appear here automatically."
-    : !latestRun
-      ? "Every tailored version is generated from your protected base. The base is never overwritten."
-      : latestRun.status === "FAILED"
-        ? previousUsableRun
-          ? "The new run failed. Your previous validated resume and files remain available in Resume versions."
-          : latestRun.errorMessage || "Read the failure details below, then try the run again."
-        : application.status === "READY"
-          ? "Download the DOCX or PDF, then update the status after you apply."
-          : application.status === "APPLIED"
-            ? "Add a follow-up reminder or notes in Application details."
-            : "Inspect the exact changes, resolve review flags, then mark the application Ready.";
+  const keywordDecisions = [...(latestRun?.keywordDecisions ?? [])].sort((left, right) => {
+    const opportunity = (item: typeof left) => item.accepted && !item.used && item.evidenceLevel !== "UNSUPPORTED" ? 1 : 0;
+    return opportunity(right) - opportunity(left) || right.hiringImportance - left.hiringImportance;
+  });
+  const hasAcceptedResume = application.tailoringRuns.some(hasValidatedResume);
+  const stateDefaultTab = latestRun?.status === "SUCCEEDED" ? "changes" : "role";
+  const normalizedRequestedTab = requestedTab === "keywords" ? "changes" : requestedTab;
+  const requestedWorkspaceTab = ["changes", "role", "stretch-lab", "apply"].includes(normalizedRequestedTab || "")
+    ? normalizedRequestedTab as "changes" | "role" | "stretch-lab" | "apply"
+    : stateDefaultTab;
+  const defaultWorkspaceTab = requestedWorkspaceTab === "stretch-lab" && !stretchLab
+      ? stateDefaultTab
+      : requestedWorkspaceTab;
+  const destination = applicationDestination(application.job.applyUrl, application.job.sourceUrl);
+  const applyPdf = latestRun?.artifacts.find(a => a.kind === "PDF");
+  const preparedEvent = application.events.find(e => e.eventType === "application_prepared");
+  const reviewGuide = buildReviewGuide({
+    run: latestRun,
+    technology: technologyReview,
+    historical: historicalRun,
+    applicationStatus: application.status,
+    progressStage,
+    hasPreviousResume: Boolean(previousUsableRun),
+  });
 
   return (
     <div className="content">
@@ -151,7 +171,7 @@ export default async function ApplicationDetailPage({
       </Link>
 
       <div
-        className="application-layout page-heading"
+        className="application-layout page-heading application-sticky-header application-heading"
         style={{
           display: "flex",
           alignItems: "end",
@@ -169,7 +189,7 @@ export default async function ApplicationDetailPage({
           >
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
               <MapPin size={13} />
-              {application.job.location || "Location not listed"}
+              {formatJobLocation(application.job.location)}
             </span>
             <span>
               {formatMoneyRange(
@@ -187,35 +207,50 @@ export default async function ApplicationDetailPage({
       {application.tailoringRuns.length > 1 ? (
         <section className="run-history panel" aria-label="Resume versions">
           <div><strong>Resume versions</strong><span className="muted">Every run keeps its own files and review.</span></div>
-          <nav aria-label="Choose a resume version">{application.tailoringRuns.map((run) => <Link key={run.id} href={`/applications/${id}?run=${run.id}`} className={latestRun?.id === run.id ? "filter-chip filter-chip-active" : "filter-chip"} aria-current={latestRun?.id === run.id ? "page" : undefined}>Run {run.runNumber}<span>{run.status.toLowerCase()}</span></Link>)}</nav>
+          <RunVersionSelect applicationId={id} selectedRunId={latestRun?.id || ""} runs={application.tailoringRuns.map((run) => ({ id: run.id, runNumber: run.runNumber, status: run.status, sendable: hasValidatedResume(run) }))} />
           {historicalRun ? <p className="field-help">Viewing an earlier version. Application status and new tailoring actions still apply to the current application.</p> : null}
         </section>
       ) : null}
+      {activeRun && activeRun.id !== latestRun?.id ? <p className="field-help">Another version is being tailored. <Link href={`/applications/${id}?run=${activeRun.id}`}>View run {activeRun.runNumber}</Link>. This saved version remains available below.</p> : null}
       <section className="review-guide" aria-labelledby="review-guide-title">
         <div className="review-guide-copy">
-          {latestRun?.status === "FAILED" ? <CircleAlert size={20} color="var(--red)" /> : <Check size={20} color="var(--green)" />}
-          <div><div className="eyebrow">Your next decision</div><h2 id="review-guide-title">{reviewHeadline}</h2><p>{reviewCopy}</p></div>
+          {reviewGuide.tone === "success" ? <Check size={20} color="var(--green)" />
+            : reviewGuide.tone === "neutral" ? <WandSparkles size={20} color="var(--muted)" />
+            : <CircleAlert size={20} color={reviewGuide.tone === "danger" ? "var(--red)" : "var(--amber)"} />}
+          <div><div className="eyebrow">Your next decision</div><h2 id="review-guide-title">{reviewGuide.headline}</h2><p>{reviewGuide.copy}</p></div>
         </div>
-        <nav className="review-jumps" aria-label="Jump to application section">
-          <a href="#role">Posting</a>
-          <a href="#changes">Resume changes</a>
-          {latestRun?.keywordDecisions.length ? <a href="#keywords">Keywords</a> : null}
-          {stretchLab ? <a href="#stretch-lab">Stretch Lab</a> : null}
-          <a href="#files">Files</a>
-        </nav>
+        <div className="review-primary-actions">
+          {applyPdf ? <ResumePreview key={applyPdf.id} artifactId={applyPdf.id} fileName={applyPdf.fileName} /> : null}
+          {resumeArtifacts.map((artifact) => (
+            <a key={artifact.id} href={`/api/artifacts/${artifact.id}`} className={artifact.kind === "DOCX" ? "button button-primary" : "button"}>
+              <Download size={14} />{artifact.kind}
+            </a>
+          ))}
+          {application.job.sourceUrl ? <a href={application.job.sourceUrl} className="button" target="_blank" rel="noreferrer">Open posting<ExternalLink size={14} /></a> : null}
+        </div>
         {latestRun?.status === "SUCCEEDED" ? (
           <div className="review-checks">
-            <span className="review-check">{visibleChanges.filter((change) => change.beforeText !== change.finalText).length} wording changes</span>
-            <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => keyword.used && keyword.accepted).length} supported terms represented</span>
+            {typeof tailoringSummary?.substantive_bullets_rewritten === "number" && typeof tailoringSummary?.relevant_bullets === "number" ? <span className="review-check review-check-done" title="Sentence-level rewrites of relevant existing bullets, excluding punctuation and tiny synonym changes.">{tailoringSummary.substantive_bullets_rewritten} substantive bullet changes</span> : null}
+            <span className="review-check">{visibleChanges.filter((change) => change.paragraphKind === "bullet" && change.section.startsWith("experience.")).length} experience bullets edited</span>
+            <span className="review-check">{visibleChanges.filter((change) => change.paragraphKind === "bullet" && change.section.startsWith("projects.")).length} project bullets edited</span>
+            <span className="review-check">{visibleChanges.filter((change) => change.section === "skills").length} skills rows edited</span>
+            {visibleChanges.some((change) => change.paragraphId === "summary") ? <span className="review-check">Summary tailored</span> : null}
+            <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => keyword.used && keyword.accepted).length} {aggressiveDraft ? "job terms represented" : "supported terms represented"}</span>
+            {tailoringSummary ? <span className="review-check" title={newlyRepresentedTerms.join(", ")}>{newlyRepresentedTerms.length} terms newly added</span> : null}
             <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => !keyword.used && keyword.evidenceLevel === "UNSUPPORTED").length} unsupported terms excluded</span>
             <span className={latestRun.pageCount === 1 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.pageCount === 1 ? "1 page confirmed" : "Page count needs review"}</span>
-            <span className="review-check review-check-done"><Check size={13} />Tailored</span>
-            <span className={latestRun.validationPassed ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.validationPassed ? <Check size={13} /> : <CircleAlert size={13} />}Validated</span>
             <span className={latestRun.riskCount === 0 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.riskCount === 0 ? <Check size={13} /> : <CircleAlert size={13} />}{latestRun.riskCount} flags</span>
-            <span className={resumeArtifacts.length ? "review-check review-check-done" : "review-check review-check-warning"}>{resumeArtifacts.length ? <Check size={13} /> : <CircleAlert size={13} />}Files ready</span>
           </div>
         ) : null}
       </section>
+      <DraftTechnologyReview review={technologyReview} />
+      {modelUsage.length ? <details className="model-usage"><summary>Tailoring time & token use</summary><dl><dt>Model</dt><dd>{[...new Set(modelUsage.map(call => displayValue(call.model, "Not recorded")))].join(", ")}</dd><dt>Model calls</dt><dd>{modelUsage.length}</dd><dt>Input tokens</dt><dd>{usageTotal("input_tokens")}</dd><dt>Cached input (included above)</dt><dd>{usageTotal("cached_input_tokens")}</dd><dt>Output tokens</dt><dd>{usageTotal("output_tokens")}</dd><dt>Model time</dt><dd>{Math.round(modelUsage.reduce((sum, call) => sum + Number(call.duration_seconds || 0), 0))} seconds</dd></dl><p>Includes correction calls. Missing usage is shown as unrecorded.</p></details> : null}
+
+      <ApplicationWorkspaceTabs
+        defaultTab={defaultWorkspaceTab}
+        showKeywords={keywordDecisions.length > 0}
+        showStretchLab={Boolean(stretchLab)}
+      />
 
       <div
         className="application-detail-grid"
@@ -224,6 +259,10 @@ export default async function ApplicationDetailPage({
         }}
       >
         <div className="application-main-stack">
+          <ApplicationApply key={`${id}:${latestRun?.id || "none"}`} id={id} runId={latestRun?.id || ""} runNumber={latestRun?.runNumber || 0}
+            evidence={latestRun?.validationPassed && !aggressiveDraft ? applicationEvidence(latestRun.changes) : []} destination={destination} portal={applicationPortal(destination)} blockers={handoffBlockers(application.status, latestRun, hasActiveRun, destination)}
+            reviewed={reviewedArtifactMatches(preparedEvent?.detail, latestRun?.id || "", applyPdf?.sha256 || "")}
+            submitted={["APPLIED", "INTERVIEW"].includes(application.status)} pdfId={applyPdf?.id || null} resumeSha256={applyPdf?.sha256 || ""} fileName={applyPdf?.fileName || ""} hidden={defaultWorkspaceTab !== "apply"} />
           {latestRun ? (
             <section id="provenance" className="panel scroll-target provenance-panel">
               <details>
@@ -236,7 +275,7 @@ export default async function ApplicationDetailPage({
                 base resume and candidate profile, and asks the authenticated Codex CLI for
                 a structured rewrite plan. No OpenAI, Anthropic, Gemini, or Azure AI API key
                 is used. Deterministic checks reject invented metrics, employers, titles,
-                dates, tools, and unsupported role requirements before export.
+                dates, and credentials before export. {aggressiveDraft ? "Job technologies can be added automatically as draft assumptions, with each unverified placement marked for review." : "Tools and role requirements are checked against candidate evidence."}
               </p>
               <div
                 style={{
@@ -279,21 +318,11 @@ export default async function ApplicationDetailPage({
                   Extracted from the original paste
                 </div>
               </div>
-              {application.job.sourceUrl ? (
-                <a
-                  href={application.job.sourceUrl}
-                  className="button button-quiet"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open posting
-                  <ExternalLink size={14} />
-                </a>
-              ) : (
+              {!application.job.sourceUrl ? (
                 <span className="muted" style={{ fontSize: 11 }}>
                   URL can be added later
                 </span>
-              )}
+              ) : null}
             </div>
             {capturedFit ? (
               <div className="saved-fit-summary">
@@ -377,9 +406,9 @@ export default async function ApplicationDetailPage({
           <section id="changes" className="panel scroll-target">
             <div className="panel-header">
               <div>
-                <div className="panel-title">Tailoring audit</div>
+                <div className="panel-title">What changed in your resume</div>
                 <div className="muted" style={{ marginTop: 2, fontSize: 11 }}>
-                  Exact text changes from the protected base resume
+                  Full paragraphs, in resume order, with keywords added to each change
                 </div>
               </div>
               {latestRun ? <StatusPill status={latestRun.status} /> : null}
@@ -394,7 +423,7 @@ export default async function ApplicationDetailPage({
                   </p>
                 </div>
               </div>
-            ) : hasActiveRun ? (
+            ) : isRunActive(latestRun) ? (
               <div className="empty-state">
                 <div>
                   <WandSparkles size={24} color="var(--violet-bright)" />
@@ -420,117 +449,40 @@ export default async function ApplicationDetailPage({
                 </div>
               </div>
             ) : (
-              <div className="tailoring-audit-body">
-                <div
-                  className="stats-four audit-metrics"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-                    gap: 8,
-                    marginBottom: 16,
-                  }}
-                >
-                  {[
-                    ["Job coverage", `${Math.round(latestRun.keywordCoverage || 0)}%`],
-                    ["Changes", String(visibleChanges.length)],
-                    ["Review flags", String(latestRun.riskCount)],
-                    ["Pages", String(latestRun.pageCount || "—")],
-                  ].map(([label, value]) => (
-                    <div
-                      key={label}
-                      style={{
-                        padding: 12,
-                        border: "1px solid var(--line)",
-                        borderRadius: 8,
-                        background: "#0e0e11",
-                      }}
-                    >
-                      <div className="eyebrow">{label}</div>
-                      <div style={{ marginTop: 6, fontSize: 19, fontWeight: 650 }}>{value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ display: "grid", gap: 12 }}>
-                  {visibleChanges.map((change) => (
-                    <article
-                      key={change.id}
-                      className="change-card"
-                    >
-                      <div
-                        className="diff-grid"
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 10,
-                          marginBottom: 11,
-                        }}
-                      >
-                        <div>
-                          <span className="eyebrow">{change.section}</span>
-                          <span className="muted mono" style={{ marginLeft: 9, fontSize: 10 }}>
-                            · {paragraphLabel(change.section, change.paragraphId)}
-                          </span>
-                        </div>
-                        <span
-                          className={`status ${
-                            change.riskLevel === "HIGH"
-                              ? "status-red"
-                              : change.riskLevel === "MEDIUM"
-                                ? "status-amber"
-                                : "status-green"
-                          }`}
-                        >
-                          {change.riskLevel.toLocaleLowerCase()} risk
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateColumns: "1fr 1fr",
-                          gap: 9,
-                          fontSize: 12,
-                          lineHeight: 1.55,
-                        }}
-                      >
-                        <div>
-                          <div className="eyebrow" style={{ marginBottom: 6 }}>
-                            Base
-                          </div>
-                          <div className="diff-before"><PhraseDiff before={change.beforeText} after={change.finalText} side="before" /></div>
-                        </div>
-                        <div>
-                          <div className="eyebrow" style={{ marginBottom: 6 }}>
-                            Tailored
-                          </div>
-                          <div className="diff-after"><PhraseDiff before={change.beforeText} after={change.finalText} side="after" /></div>
-                        </div>
-                      </div>
-                      {Array.isArray(change.targetTerms) && change.targetTerms.length ? <div className="change-targets">Targeted: {change.targetTerms.join(", ")}</div> : null}
-                      {change.proposedText !== change.finalText ? (
-                        <details style={{ marginTop: 10 }}>
-                          <summary
-                            className="muted"
-                            style={{ cursor: "pointer", fontSize: 11 }}
-                          >
-                            View original proposal before layout fallback
-                          </summary>
-                          <div className="diff-after" style={{ marginTop: 7, fontSize: 12 }}>
-                            {change.proposedText}
-                          </div>
-                        </details>
-                      ) : null}
-                      {change.explanation || stringList(change.evidenceIds).length ? <details className="change-evidence"><summary>Why this changed</summary>{change.explanation ? <div className="secondary">{change.explanation}</div> : null}{stringList(change.evidenceIds).length ? <div className="muted mono">Evidence: {stringList(change.evidenceIds).map(humanizeReference).join(", ")}</div> : null}</details> : null}
-                    </article>
-                  ))}
-                </div>
-              </div>
+              <ResumeChangeReview
+                changes={latestRun.changes}
+                reportOrder={objectList(reportSnapshot?.changes).map(change => displayValue(change.paragraph_id))}
+                addedTerms={addedTermsByParagraph}
+              />
             )}
           </section>
 
-          {latestRun?.keywordDecisions.length ? (
-            <section id="keywords" className="panel scroll-target">
+          {technologyCoverage.length ? <section id="technology-coverage" className="panel" aria-label="Technology coverage">
+            <div className="panel-header"><div><div className="panel-title">Technology coverage</div>
+              <p className="muted">Every posting’s languages, tools, and methods, with their exact final placement. {aggressiveDraft ? "Technologies are adapted automatically. Review draft assumptions and edit your downloaded DOCX as needed." : "Established technical skills are woven into matching work or project bullets when the posting requests them. Everyday tools are used where relevant. Specialized systems and specific implementations still need evidence. Saved profile updates apply to new runs; this version’s placements remain unchanged."}</p>
+            </div></div>
+            <div className="keyword-table-scroll"><table className="data-table"><thead><tr><th>Technology / method</th><th>Coverage</th><th>Final placement</th><th>Experience</th></tr></thead>
+              <tbody>{technologyCoverage.map(row => {
+                const term = displayValue(row.term);
+                const summary = technologySummary(term, reportSnapshot?.technology_summaries);
+                const status = displayValue(row.status);
+                const savedStatus = savedEvidenceStatus(sharedProfile, term);
+                const established = savedStatus !== "rejected" && (row.automatic_technical_use === true || establishedTechnology(sharedProfile, term));
+                const assessment = technologyAssessments.find(item => displayValue(item.term).toLowerCase() === term.toLowerCase());
+                const omittedSpecialist = status === "needs_confirmation" && assessment?.classification === "specialized_or_advanced";
+                const confirmedSinceRun = status === "needs_confirmation" && savedStatus === "confirmed";
+                const labels: Record<string, string> = { in_context: "In relevant bullets", available: "Known · not included", skills_only: "Skills only", credential_only: "Credential only", covered: "Covered", missing_supported: "Missing supported term", needs_confirmation: "Confirm experience", excluded: "Excluded from this resume", draft_assumption: "Draft addition · review", missing_draft: "Not included in draft" };
+                return <tr key={term}><td><strong>{term}</strong>{summary ? <p className="muted" style={{ marginTop: 6, maxWidth: "30ch", fontWeight: 400 }}>{summary}</p> : null}</td><td>{omittedSpecialist ? "Not added · specialized" : confirmedSinceRun ? "Known · not in this version" : labels[status] || status}</td>
+                  <td>{stringList(row.placements).map(humanizeReference).join(", ") || "Not included"}<p className="muted">{omittedSpecialist ? displayValue(assessment?.reasoning) : established && status !== "in_context" ? "Already established. New tailoring places this in a matching duty automatically; this saved version’s text is unchanged." : confirmedSinceRun ? "Knowledge is saved. Tailor again to use it where relevant; this saved resume predates that confirmation." : displayValue(row.explanation)}</p>{assessment ? <details><summary>Why this technology was handled this way</summary><p className="muted">{displayValue(assessment.reasoning)} {displayValue(assessment.usage_boundary)}</p></details> : null}</td>
+                  <td>{established ? <><span className="muted">Established · automatic</span><details><summary>Correct this</summary><EvidenceDecision term={term} category={displayValue(row.category, "technology")} initialDecision={savedStatus || "confirmed"} /></details></> : !aggressiveDraft && ["skills_only", "needs_confirmation", "credential_only", "covered"].includes(status)
+                    ? <EvidenceDecision term={term} category={displayValue(row.category, "technology")} initialDecision={savedStatus} /> : null}</td>
+                </tr>;
+              })}</tbody>
+            </table></div>
+          </section> : null}
+
+          {keywordDecisions.length ? (
+          <section id="keywords" className="panel scroll-target">
               <div className="panel-header">
                 <div>
                   <div className="panel-title">Keyword decisions</div>
@@ -541,26 +493,26 @@ export default async function ApplicationDetailPage({
               </div>
               <div className="keyword-summary">
                 {[
-                  ["Used safely", latestRun.keywordDecisions.filter((item) => item.used).length, "green"],
-                  ["Transferable", latestRun.keywordDecisions.filter((item) => item.accepted && item.evidenceLevel.includes("TRANSFERABLE")).length, "cyan"],
-                  ["Needs proof", latestRun.keywordDecisions.filter((item) => item.accepted && item.evidenceLevel === "UNSUPPORTED").length, "amber"],
-                  ["Excluded", latestRun.keywordDecisions.filter((item) => !item.accepted).length, "red"],
+                  [aggressiveDraft ? "Included in draft" : "Used safely", keywordDecisions.filter((item) => item.used).length, "green"],
+                  ["Demonstrated in work", keywordDecisions.filter((item) => item.accepted && !item.used && demonstratedInWork(item)).length, "green"],
+                  ["Could be represented", keywordDecisions.filter((item) => item.accepted && !item.used && !demonstratedInWork(item) && item.evidenceLevel !== "UNSUPPORTED").length, "cyan"],
+                  ["Needs proof", keywordDecisions.filter((item) => item.accepted && item.evidenceLevel === "UNSUPPORTED").length, "amber"],
+                  ["Excluded", keywordDecisions.filter((item) => !item.accepted).length, "red"],
                 ].map(([label, count, tone]) => <div key={String(label)}><span className={`summary-dot summary-dot-${tone}`} /> <strong>{String(count)}</strong><small>{String(label)}</small></div>)}
               </div>
-              <div style={{ overflowX: "auto" }}>
-                <table className="data-table">
+              <div className="keyword-table-scroll">
+                <table className="data-table keyword-table">
                   <thead>
                     <tr>
                       <th>Keyword</th>
                       <th>Importance</th>
                       <th>Evidence</th>
                       <th>Decision</th>
-                      <th>Placement</th>
-                      <th>Why</th>
+                      <th>Result</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {latestRun.keywordDecisions.map((keyword) => {
+                    {keywordDecisions.map((keyword) => {
                       const sources = stringList(keyword.sourceSections);
                       const explicitlyExcluded = sources.includes("negative_context");
                       return (
@@ -591,18 +543,22 @@ export default async function ApplicationDetailPage({
                             </span>
                           ) : keyword.used ? (
                             <span style={{ color: "var(--green)" }}>Used</span>
+                          ) : demonstratedInWork(keyword) ? (
+                            <span style={{ color: "var(--green)" }}>Demonstrated in work</span>
+                          ) : keyword.evidenceLevel !== "UNSUPPORTED" ? (
+                            <span style={{ color: "var(--cyan)" }}>Could be represented</span>
                           ) : (
                             <span style={{ color: "var(--amber)" }}>Not placed</span>
                           )}
                         </td>
-                        <td className="secondary">
-                          {keyword.accepted && keyword.placement
-                            ? keyword.placement.split(", ").map(humanizeReference).join(", ")
-                            : "—"}
-                        </td>
-                        <td className="secondary" style={{ minWidth: 230 }}>
+                        <td className="secondary keyword-result">
+                          {keyword.accepted && keyword.placement ? (
+                            <div className="keyword-placement">
+                              {keyword.placement.split(", ").map(humanizeReference).join(", ")}
+                            </div>
+                          ) : null}
                           <div>
-                            {keyword.explanation ||
+                            {(demonstratedInWork(keyword) ? keyword.explanation?.replaceAll("experience.original_insurance", "Original Insurance").replaceAll("experience.csulb", "Cal State Long Beach").replaceAll("experience.wehelp", "WeHelp").replaceAll("projects.loavenly", "Loavenly").replace(/\.bullet\.(\d+)/g, " · bullet $1") : keyword.explanation) ||
                               keyword.rejectionReason ||
                               (keyword.used
                                 ? "Placed using candidate evidence."
@@ -629,132 +585,12 @@ export default async function ApplicationDetailPage({
                 <div>
                   <div className="panel-title">Stretch Lab</div>
                   <div className="muted" style={{ marginTop: 2, fontSize: 11 }}>
-                    Gap-closing ideas kept outside the application-ready resume
+                    {aggressiveDraft ? "Ideas for developing the technologies adapted in your draft" : "Gap-closing ideas kept outside the application-ready resume"}
                   </div>
                 </div>
                 <span className="status status-amber">Review only</span>
               </div>
-              <div style={{ padding: 16, display: "grid", gap: 18 }}>
-                <div
-                  style={{
-                    padding: 13,
-                    border: "1px solid var(--amber)",
-                    borderRadius: 9,
-                    background: "rgba(245, 158, 11, 0.07)",
-                    fontSize: 12,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {displayValue(
-                    stretchLab.disclaimer,
-                    "These ideas are unverified and are never exported into the resume.",
-                  )}
-                </div>
-
-                {stretchOpportunities.length ? (
-                  <div>
-                    <div className="eyebrow">Transferable opportunities to verify</div>
-                    <div style={{ display: "grid", gap: 8, marginTop: 9 }}>
-                      {stretchOpportunities.map((item, index) => (
-                        <article
-                          key={`${displayValue(item.target_term)}-${index}`}
-                          style={{ padding: 12, border: "1px solid var(--line)", borderRadius: 8 }}
-                        >
-                          <div style={{ fontWeight: 650 }}>{displayValue(item.target_term)}</div>
-                          <div className="secondary" style={{ marginTop: 5, fontSize: 11 }}>
-                            {displayValue(item.rationale)}
-                          </div>
-                          <div className="muted" style={{ marginTop: 5, fontSize: 11 }}>
-                            Review: {displayValue(item.review_question)}
-                          </div>
-                          <EvidenceDecision term={displayValue(item.target_term)} />
-                        </article>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {stretchGaps.length ? (
-                  <div>
-                    <div className="eyebrow">Real gaps and proof needed</div>
-                    <div className="audit-table-scroll" style={{ marginTop: 9 }}>
-                      <table className="data-table">
-                        <thead>
-                          <tr>
-                            <th>Term</th>
-                            <th>Type</th>
-                            <th>Importance</th>
-                            <th>What would make it usable</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {stretchGaps.map((gap, index) => (
-                            <tr key={`${displayValue(gap.target_term)}-${index}`}>
-                              <td style={{ fontWeight: 650 }}>{displayValue(gap.target_term)}</td>
-                              <td className="secondary">{displayValue(gap.category, "other")}</td>
-                              <td className="mono">
-                                {typeof gap.hiring_importance === "number"
-                                  ? Math.round(gap.hiring_importance)
-                                  : "—"}
-                              </td>
-                              <td className="secondary" style={{ minWidth: 280 }}>
-                                <div>{displayValue(gap.why_it_matters)}</div>
-                                {stringList(gap.proof_needed).length ? (
-                                  <ul style={{ margin: "7px 0 0", paddingLeft: 18 }}>
-                                    {stringList(gap.proof_needed).map((proof) => (
-                                      <li key={proof}>{proof}</li>
-                                    ))}
-                                  </ul>
-                                ) : null}
-                                <EvidenceDecision term={displayValue(gap.target_term)} category={displayValue(gap.category, "other")} />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ) : null}
-
-                {stretchProjects.length ? (
-                  <div>
-                    <div className="eyebrow">Proposed projects — not completed</div>
-                    <div style={{ display: "grid", gap: 10, marginTop: 9 }}>
-                      {stretchProjects.map((project, index) => (
-                        <details
-                          key={`${displayValue(project.title)}-${index}`}
-                          style={{ padding: 13, border: "1px solid var(--line)", borderRadius: 9 }}
-                        >
-                          <summary style={{ cursor: "pointer", fontWeight: 650 }}>
-                            {displayValue(project.title, "Proposed skills project")}
-                          </summary>
-                          <div className="secondary" style={{ marginTop: 10, fontSize: 12 }}>
-                            {displayValue(project.objective)}
-                          </div>
-                          {stringList(project.target_terms).length ? (
-                            <div className="muted" style={{ marginTop: 8, fontSize: 11 }}>
-                              Targets: {stringList(project.target_terms).join(", ")}
-                            </div>
-                          ) : null}
-                          <div style={{ marginTop: 10, fontSize: 12 }}>
-                            <div className="eyebrow">Build steps</div>
-                            <ol style={{ margin: "7px 0 0", paddingLeft: 19 }}>
-                              {stringList(project.build_steps).map((step) => (
-                                <li key={step} style={{ marginTop: 4 }}>
-                                  {step}
-                                </li>
-                              ))}
-                            </ol>
-                          </div>
-                          <div className="muted" style={{ marginTop: 10, fontSize: 11 }}>
-                            Resume use only after completion: {displayValue(project.resume_language_after_completion)}
-                          </div>
-                        </details>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+              <StretchLabReview opportunities={stretchOpportunities} gaps={stretchGaps} projects={stretchProjects} keywords={keywordDecisions} runNumber={latestRun?.runNumber || 0} automaticTerms={technologyCoverage.filter(row => row.automatic_technical_use === true).map(row => displayValue(row.term))} />
             </section>
           ) : null}
         </div>
@@ -768,20 +604,21 @@ export default async function ApplicationDetailPage({
             initialNotes={application.notes || ""}
             initialFollowUpAt={application.followUpAt?.toISOString() || ""}
             hasActiveRun={hasActiveRun}
-            hasResumeFiles={Boolean(application.tailoringRuns[0]?.artifacts.some((artifact) => artifact.kind === "DOCX" || artifact.kind === "PDF"))}
+            hasResumeFiles={hasAcceptedResume}
           />
 
           <div id="files" className="panel scroll-target files-panel">
             <div className="controls-heading"><div><div className="panel-title">Download files</div><div className="muted">Application-ready first; audit files below.</div></div></div>
             {resumeArtifacts.length ? (
               <div className="resume-downloads">
+                {applyPdf ? <ResumePreview key={applyPdf.id} artifactId={applyPdf.id} fileName={applyPdf.fileName} /> : null}
                 {resumeArtifacts.map((artifact) => (
                   <a
                     key={artifact.id}
                     href={`/api/artifacts/${artifact.id}`}
                     className={artifact.kind === "DOCX" ? "resume-download resume-download-primary" : "resume-download"}
                   >
-                    <span><strong>{artifact.kind === "DOCX" ? "Editable resume" : "Resume preview"}</strong><small>{artifact.fileName}</small></span>
+                    <span><strong>{artifact.kind === "DOCX" ? "Editable resume" : "Download PDF"}</strong><small>{artifact.fileName}</small></span>
                     <Download size={14} />
                   </a>
                 ))}
@@ -799,8 +636,8 @@ export default async function ApplicationDetailPage({
             ) : null}
           </div>
 
-          <div className="panel" style={{ padding: 16 }}>
-            <div className="panel-title">Timeline</div>
+          <details className="panel timeline-panel" open={hasActiveRun}>
+            <summary><span className="panel-title">Timeline</span><span className="muted">{primaryEvents.length} events</span></summary>
             <div className="timeline-events">
               {primaryEvents.map((event) => (
                 <div
@@ -823,6 +660,15 @@ export default async function ApplicationDetailPage({
                     <div className="muted" style={{ marginTop: 2, fontSize: 10 }}>
                       {formatRelativeDate(event.occurredAt)}
                     </div>
+                    {(() => {
+                      const detail = objectRecord(event.detail);
+                      if (!["application_prepared", "application_submitted"].includes(event.eventType)) return null;
+                      return <div className="field-help">
+                        {typeof detail?.runNumber === "number" ? `Resume version ${detail.runNumber}` : null}
+                        {typeof detail?.confirmation === "string" ? detail.confirmation : null}
+                        {typeof detail?.runId === "string" ? <div><Link href={`/applications/${id}?run=${detail.runId}&tab=apply`}>View recorded resume version</Link></div> : null}
+                      </div>;
+                    })()}
                     {event.detail &&
                     typeof event.detail === "object" &&
                     !Array.isArray(event.detail) &&
@@ -847,7 +693,7 @@ export default async function ApplicationDetailPage({
                 </div>
               </details>
             ) : null}
-          </div>
+          </details>
         </aside>
       </div>
     </div>

@@ -13,6 +13,48 @@ W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 XML_NS = "http://www.w3.org/XML/1998/namespace"
 NS = {"w": W_NS}
 DOCUMENT_PART = "word/document.xml"
+NUMBERING_PART = "word/numbering.xml"
+BULLET_HANGING_TWIPS = "180"
+
+
+def compact_bullet_numbering(raw_xml: bytes) -> bytes:
+    """Tighten the primary bullet marker gap without touching the protected base file."""
+    parser = etree.XMLParser(remove_blank_text=False, resolve_entities=False)
+    root = etree.fromstring(raw_xml, parser)
+    numbered_abstract_ids = {
+        abstract.get(f"{{{W_NS}}}val")
+        for number in root.findall("w:num", NS)
+        if number.get(f"{{{W_NS}}}numId") == "2"
+        for abstract in number.findall("w:abstractNumId", NS)
+    }
+    for abstract in root.findall("w:abstractNum", NS):
+        if abstract.get(f"{{{W_NS}}}abstractNumId") not in numbered_abstract_ids:
+            continue
+        level = next(
+            (item for item in abstract.findall("w:lvl", NS) if item.get(f"{{{W_NS}}}ilvl") == "0"),
+            None,
+        )
+        indent = level.find("w:pPr/w:ind", NS) if level is not None else None
+        if indent is not None:
+            indent.set(f"{{{W_NS}}}hanging", BULLET_HANGING_TWIPS)
+            # Persist the first-text tab in the exported DOCX as well as the PDF.
+            # Otherwise viewers can choose a default tab beyond the wrap indent.
+            properties = indent.getparent()
+            position = indent.get(f"{{{W_NS}}}left")
+            if properties is not None and position:
+                tabs = properties.find("w:tabs", NS)
+                if tabs is None:
+                    tabs = etree.Element(f"{{{W_NS}}}tabs")
+                    properties.insert(properties.index(indent), tabs)
+                number_tabs = [
+                    tab for tab in tabs.findall("w:tab", NS) if tab.get(f"{{{W_NS}}}val") == "num"
+                ]
+                if not number_tabs:
+                    number_tabs = [etree.SubElement(tabs, f"{{{W_NS}}}tab")]
+                for tab in number_tabs:
+                    tab.set(f"{{{W_NS}}}val", "num")
+                    tab.set(f"{{{W_NS}}}pos", position)
+    return etree.tostring(root, encoding="UTF-8", xml_declaration=True, standalone=True)
 
 
 def package_format_metadata(
@@ -127,6 +169,16 @@ def compare_format_integrity(
                 )
             )
     return issues
+
+
+def _bullet_numbering_compacted_equivalent(
+    base_path: str | Path,
+    candidate_path: str | Path,
+) -> bool:
+    with ZipFile(base_path) as base, ZipFile(candidate_path) as candidate:
+        if NUMBERING_PART not in base.namelist() or NUMBERING_PART not in candidate.namelist():
+            return False
+        return candidate.read(NUMBERING_PART) == compact_bullet_numbering(base.read(NUMBERING_PART))
 
 
 def document_xml(path: str | Path) -> bytes:

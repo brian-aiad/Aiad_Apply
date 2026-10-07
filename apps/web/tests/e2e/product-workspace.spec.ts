@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { PrismaClient } from "@prisma/client";
 import { expect, test } from "@playwright/test";
@@ -38,6 +38,7 @@ test.beforeAll(async () => {
     }, correctedFields: ["company"] },
     application: { create: { status: "REVIEW", tailoringRuns: { create: {
       status: "SUCCEEDED", validationPassed: true, pageCount: 1, completedAt: new Date(),
+      keywordDecisions: { create: { term: "SQL", normalized: "sql", kind: "technical", priority: "required", hiringImportance: 1, placementUtility: 1, accepted: true, used: true, evidenceLevel: "DIRECT" } },
       changes: { create: { paragraphId: "experience.test.bullet.1", section: "experience.test", paragraphKind: "bullet", beforeText: "Resolved customer tickets with SQL and wrote notes.", proposedText: "Resolved production tickets with SQL and wrote documentation.", finalText: "Resolved production tickets with SQL and wrote documentation.", changeType: "rewritten", explanation: "Makes the production support context explicit using the original evidence." } },
     } } } },
   }, include: { application: true } });
@@ -65,7 +66,21 @@ test("capture previews requirements and evidence before creating any application
 
 test("review highlights phrases and keyboard search focuses the application filter", async ({ page }) => {
   await page.goto(`/applications/${applicationId}`);
-  await expect(page.locator(".diff-after ins").first()).toHaveText("production");
+  await expect(page.locator(".compact-phrase-diff ins").first()).toContainText("production");
+  await expect(page.locator("#role")).toBeHidden();
+  await page.getByRole("tab", { name: "Posting" }).click();
+  await expect(page.locator("#changes")).toBeHidden();
+  await expect(page.locator("#role")).toBeVisible();
+  await expect(page).toHaveURL(/tab=role/);
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Posting" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#role")).toBeVisible();
+  await page.getByRole("tab", { name: "Posting" }).press("ArrowLeft");
+  await expect(page.getByRole("tab", { name: "Review" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("#changes")).toBeVisible();
+  await expect(page.locator("#keywords")).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Keywords" })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Posting" }).click();
   await expect(page.getByText("Capture recommendation", { exact: true })).toBeVisible();
   await expect(page.getByText("Stretch Apply", { exact: true })).toBeVisible();
   await expect(page.getByText("1 page confirmed", { exact: true })).toBeVisible();
@@ -78,6 +93,61 @@ test("review highlights phrases and keyboard search focuses the application filt
   await expect(page.getByRole("searchbox", { name: "Search applications" })).toBeFocused();
   await page.keyboard.type("Workspace QA");
   await expect(page.getByRole("link", { name: /Application Support Engineer for Customer/ }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Answer kit" }).click();
+  await expect(page.getByRole("dialog", { name: "Your reusable answers" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("button", { name: "Answer kit" })).toBeFocused();
+});
+
+test("a failed rerun keeps the latest accepted resume available", async ({ page }) => {
+  const bytes = Buffer.from("accepted resume fixture");
+  const digest = createHash("sha256").update(bytes).digest("hex");
+  const fixture = await db.job.create({
+    data: {
+      company: "Accepted Version QA",
+      title: "Support Engineer",
+      rawPaste: raw,
+      rawPasteSha256: randomUUID(),
+      application: {
+        create: {
+          status: "REVIEW",
+          tailoringRuns: {
+            create: [
+              {
+                runNumber: 1,
+                status: "SUCCEEDED",
+                validationPassed: true,
+                pageCount: 1,
+                completedAt: new Date(),
+                artifacts: {
+                  create: {
+                    kind: "PDF",
+                    fileName: "Brian_Aiad_Resume_Accepted_Version_QA_Support_Engineer.pdf",
+                    sha256: digest,
+                    byteSize: bytes.length,
+                    backup: { create: { content: bytes } },
+                  },
+                },
+              },
+              { runNumber: 2, status: "FAILED", errorMessage: "Renderer unavailable." },
+            ],
+          },
+        },
+      },
+    },
+    include: { application: true },
+  });
+  try {
+    await page.goto(`/applications/${fixture.application!.id}`);
+    await expect(page.getByRole("heading", { name: "This run needs attention" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Newest · Run 2 · failed · not sendable" })).toHaveCount(1);
+    await expect(page.getByRole("option", { name: "Latest accepted · Run 1 · succeeded" })).toHaveCount(1);
+    await expect(page.getByLabel("Status").getByRole("option", { name: "ready" })).toBeEnabled();
+    await page.getByRole("combobox", { name: /^Resume version/ }).selectOption({ label: "Latest accepted · Run 1 · succeeded" });
+    await expect(page.getByRole("link", { name: "PDF", exact: true })).toBeVisible();
+  } finally {
+    await db.job.delete({ where: { id: fixture.id } });
+  }
 });
 
 test("major pages stay within all six viewport widths", async ({ page }) => {

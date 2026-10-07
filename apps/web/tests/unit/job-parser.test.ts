@@ -10,6 +10,27 @@ function fixture(name: string) {
   return readFileSync(path.join(fixtureRoot, name), "utf8");
 }
 
+test("does not mistake About us boilerplate for the employer", () => {
+  const parsed = parseCapture(fixture("techaxis_l3_production_support_engineer_2026_09_24.txt"));
+  assert.equal(parsed.company, "Techaxis, Inc.");
+  assert.equal(parsed.title, "L3 Production Support Engineer");
+  assert.equal(parsed.location, "Irvine, CA");
+});
+
+test("parses the live Workday office code without losing the employer or role", () => {
+  const parsed = parseCapture(fixture("pacific_life_platform_engineer_ii_live_2026_09_21.txt"));
+  assert.equal(parsed.company, "Pacific Life");
+  assert.equal(parsed.title, "Platform Engineer II");
+  assert.equal(parsed.location, "Newport Beach CA-700");
+  assert.equal(parsed.employmentType, "Full-time");
+  assert.equal(parsed.salaryMin, 113490);
+  assert.equal(parsed.salaryMax, 138710);
+  assert.match(parsed.sourceUrl ?? "", /Platform-Engineer-II_R17313$/);
+  assert.equal(parsed.responsibilities.length, 6);
+  assert.equal(parsed.requiredQualifications.length, 6);
+  assert.equal(parsed.preferredQualifications.length, 4);
+});
+
 test("parses the structured LinkedIn review capture without shifting header fields", () => {
   const rawPaste = `Company logo for, GoFundMe.
 GoFundMe
@@ -199,4 +220,33 @@ test("parses Greenhouse banner navigation and custom application-support heading
   assert.equal(parsed.requiredQualifications.length, 11);
   assert.equal(parsed.preferredQualifications.length, 2);
   assert.ok(!parsed.cleanDescription.includes("Apply for this job"));
+});
+
+test("preserves an employer header link and decoded RTX office", () => {
+  const parsed = parseCapture(`Company logo for, Raytheon
+Raytheon
+Software Engineer I
+US-CA-EL SEGUNDO-R01 ~ 2000 E Imperial Hwy
+https://globalhr.wd5.myworkdayjobs.com/REC_RTX_Ext_Gateway/job/example/01878759
+About the job
+Position Role Type:
+Onsite
+Develop software using C++ and collaborate with the software engineering team.`);
+  assert.equal(parsed.location, "El Segundo, CA");
+  assert.equal(parsed.sourceUrl, "https://globalhr.wd5.myworkdayjobs.com/REC_RTX_Ext_Gateway/job/example/01878759");
+});
+
+test("plain employer header accepts full state and country names", () => {
+  const job = parseCapture("Anduril\nIT Systems Engineer\nCosta Mesa, California, United States\nFull-time\nAbout the job\nResponsibilities\nSupport SQL systems and troubleshoot production incidents using Jira and APIs.\nRequired Qualifications\nThree years of IT experience.");
+  assert.equal(job.company, "Anduril");
+  assert.equal(job.title, "IT Systems Engineer");
+});
+
+
+test("Workday competency and education headings preserve required versus preferred context", () => {
+  const job = parseCapture("TravisMathew\nBusiness Strategy Analyst\nHuntington Beach, CA\nAbout the job\nROLES AND RESPONSIBILITIES:\nBuild dashboards for commercial reporting.\nTECHNICAL COMPETENCIES (Knowledge, Skills & Abilities):\nProficiency with SQL and Tableau.\nEDUCATION AND EXPERIENCE:\nBachelor's degree and 2-4 years of analytics experience.\nPreferred Qualifications:\nExperience with SPSS.");
+  assert.ok(job.responsibilities.some((text) => text.includes("dashboards")));
+  assert.ok(job.requiredQualifications.some((text) => text.includes("SQL")));
+  assert.ok(job.requiredQualifications.some((text) => text.includes("2-4 years")));
+  assert.ok(job.preferredQualifications.some((text) => text.includes("SPSS")));
 });

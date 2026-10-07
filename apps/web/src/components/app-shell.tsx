@@ -11,8 +11,6 @@ import {
   Plus,
   Settings,
   Search,
-  PanelLeftClose,
-  PanelLeftOpen,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
 import { cn } from "@/lib/cn";
@@ -38,7 +36,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = window.localStorage.getItem("aiadapply:sidebar-collapsed");
-    queueMicrotask(() => setCollapsed(stored === null ? window.innerWidth < 1280 : stored === "true"));
+    queueMicrotask(() =>
+      setCollapsed(stored === null ? window.innerWidth < 1600 : stored === "true"),
+    );
   }, []);
 
   function toggleSidebar() {
@@ -50,8 +50,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className={cn("app-shell", collapsed && "sidebar-collapsed")}>
-      <aside className="sidebar">
-        <Link href="/" className="sidebar-brand" aria-label="AiadApply home">
+      <aside className="sidebar" id="workspace-sidebar">
+        <button
+          type="button"
+          className="sidebar-brand"
+          onClick={toggleSidebar}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-expanded={!collapsed}
+          aria-controls="workspace-sidebar"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
           <BrandMark className="brand-mark" />
           <span className="sidebar-brand-copy">
             <span style={{ display: "block", fontWeight: 700, letterSpacing: "-0.02em" }}>
@@ -61,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               Your application workspace
             </span>
           </span>
-        </Link>
+        </button>
 
         <Link
           href="/capture"
@@ -132,9 +140,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="main-frame" id="main-content">
         <header className="topbar">
           <div className="topbar-workspace">
-            <button className="sidebar-toggle" type="button" onClick={toggleSidebar} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} title={collapsed ? "Expand navigation" : "Collapse navigation"}>
-              {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
-            </button>
             <div>
               <div className="eyebrow">Brian Aiad</div>
               <div className="topbar-tagline">

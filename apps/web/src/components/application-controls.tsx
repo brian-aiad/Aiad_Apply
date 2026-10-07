@@ -49,7 +49,6 @@ export function ApplicationControls({
   const [saved, setSaved] = useState({ status: initialStatus, sourceUrl: initialUrl, notes: initialNotes, followUpAt: toLocalInput(initialFollowUpAt) });
   const [busy, setBusy] = useState<"save" | "tailor" | "delete" | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const visibleStatuses = initialStatus === "TAILORING" ? (["TAILORING", ...statuses] as const) : statuses;
@@ -114,10 +113,10 @@ export function ApplicationControls({
   }
 
   async function permanentlyDelete() {
-    if (deleteConfirmation !== "DELETE") return;
+    if (!confirmingDelete || busy !== null) return;
     setBusy("delete"); setMessage(""); setIsError(false);
     try {
-      const response = await fetch(`/api/applications/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: deleteConfirmation }) });
+      const response = await fetch(`/api/applications/${id}`, { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ confirm: "DELETE" }) });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || "Unable to permanently delete this job.");
       router.replace("/applications"); router.refresh();
@@ -150,7 +149,7 @@ export function ApplicationControls({
               {busy === "save" ? <LoaderCircle size={15} className="spin" /> : <Save size={15} />}
               Save
             </button>
-            <button className="button button-primary" type="button" onClick={tailor} disabled={busy !== null || hasActiveRun}>
+            <button className={hasResumeFiles ? "button" : "button button-primary"} type="button" onClick={tailor} disabled={busy !== null || hasActiveRun}>
               {busy === "tailor" ? <LoaderCircle size={15} className="spin" /> : <Play size={15} />}
               {hasActiveRun ? "Tailoring…" : hasResumeFiles ? "Tailor again" : "Tailor resume"}
             </button>
@@ -179,12 +178,10 @@ export function ApplicationControls({
           <div className="control-disclosure-fields">
           {!confirmingDelete ? <button className="button" type="button" onClick={() => setConfirmingDelete(true)} disabled={busy !== null} style={{ color: "#ef4444" }}><Trash2 size={15} /> Permanently delete job</button> : (
             <div role="group" aria-label="Permanent job deletion">
-              <p className="field-help">Permanently removes this job, notes, all resume versions, files, and history from the shared app on both devices. No undo or deleted-job history. Active tailoring must finish first. Local files on other computers, manual downloads, and older backups are not erased.</p>
-              <label className="field-label" htmlFor="delete-confirmation">Type DELETE to confirm</label>
-              <input id="delete-confirmation" className="input" value={deleteConfirmation} onChange={event => setDeleteConfirmation(event.target.value)} autoComplete="off" disabled={busy !== null} />
+              <p className="field-help">Delete this job and its saved resumes permanently? This cannot be undone.</p>
               <div className="control-actions" style={{ marginTop: 10 }}>
-                <button className="button" type="button" onClick={permanentlyDelete} disabled={busy !== null || deleteConfirmation !== "DELETE"} style={{ color: "#ef4444" }}>{busy === "delete" ? <LoaderCircle size={15} className="spin" /> : <Trash2 size={15} />} Delete forever</button>
-                <button className="button" type="button" disabled={busy !== null} onClick={() => { setConfirmingDelete(false); setDeleteConfirmation(""); }}>Cancel</button>
+                <button className="button" type="button" onClick={permanentlyDelete} disabled={busy !== null} style={{ color: "#ef4444" }}>{busy === "delete" ? <LoaderCircle size={15} className="spin" /> : <Trash2 size={15} />} Yes, delete</button>
+                <button className="button" type="button" disabled={busy !== null} onClick={() => setConfirmingDelete(false)}>Cancel</button>
               </div>
             </div>
           )}
