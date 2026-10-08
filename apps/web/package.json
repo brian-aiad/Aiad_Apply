@@ -13,6 +13,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "linkedin:review": "node scripts/linkedin-review.mjs",
+    "gmail:connect": "node scripts/application-browser/gmail-oauth-setup.mjs",
     "test:unit": "tsx --test tests/unit/*.test.ts tests/unit/*.test.mjs",
     "test:e2e": "playwright test",
     "db:push": "prisma db push",

@@ -9,6 +9,7 @@ export const questionSchema = z.object({
 });
 export const confirmedAnswerSchema = z.object({ question: z.string().trim().min(1).max(2000), answer: z.string().trim().min(1).max(12000) });
 export const attemptSchema = z.object({
+  verification: z.enum(["required", "rejected", "expired"]).optional(),
   prepareOnly: z.boolean().default(false),
   status: z.enum(["QUEUED", "RUNNING", "SUBMITTING", "SUBMITTED", "BLOCKED", "UNKNOWN", "CANCELED"]),
   runId: z.string().uuid(), runNumber: z.number(), artifactId: z.string().uuid(),
@@ -39,4 +40,9 @@ export function canApproveAfter(attempt: ApplicationAttempt | null) {
 
 export function attemptInterrupted(attempt: ApplicationAttempt | null, now = Date.now()) {
   return !!attempt && ["RUNNING", "SUBMITTING"].includes(attempt.status) && now - Date.parse(attempt.updatedAt) >= 120_000;
+}
+
+/** Browser-control failures are diagnostics, not questions about the candidate. */
+export function isTechnicalApplicationBlocker(message: string): boolean {
+  return /exact option wording|inspect (?:the )?(?:open )?(?:dropdown|options)|no unique exact option|technical form.control|supported number of steps|committed answer|did not (?:retain|verify)|could not identify.*(?:control|upload)/i.test(message);
 }

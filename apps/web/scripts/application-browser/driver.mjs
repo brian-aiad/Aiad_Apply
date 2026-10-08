@@ -2,12 +2,15 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { verificationState } from './verification.mjs';
 
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const normalize = text => text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 export const isReceipt = text => !/\b(not|never|no application|unable|failed)\b/i.test(text) && text.split(/[.!?\n]+/).some(sentence => !/\b(if|once|when|will be)\b/i.test(sentence) && /application (?:has been |was )?(?:successfully )?(?:submitted|received)|thank you for (?:applying|your application)|we(?:'ve| have) received your application/i.test(sentence));
 const equivalentInput = (control, left, right) => left === right || (control.type === 'tel' && left.replace(/\D/g, '').length >= 7 && left.replace(/\D/g, '') === right.replace(/\D/g, ''));
 const finalAction = text => /\b(submit|send application|complete application|finish application|confirm application)\b/i.test(text);
+const verificationControl = control => /(?:verification|security|authentication)\s*(?:code|password)|one[- ]time[- ]?(?:code|password)|\botp\b/i.test(`${control.label || ''} ${control.autocomplete || ''} ${control.name || ''} ${control.id || ''}`)
+  || /^(?:code|enter your code)$/i.test(String(control.label || '').trim());
 
 export class ApplicationBrowser {
   constructor(context, job, resumePath, outputDirectory, checkpoint, beforeSubmit) {
@@ -35,6 +38,8 @@ export class ApplicationBrowser {
       const data = await frame.evaluate(({ prefix }) => {
         const visible = el => Boolean(el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden';
         const label = el => el.getAttribute('aria-label') || (el.getAttribute('aria-labelledby') || '').split(/\s+/).map(id => document.getElementById(id)?.innerText || '').join(' ').trim() || [...(el.labels || [])].map(l => l.innerText).join(' ') || el.closest('[data-field], .field, .form-field, .input-wrapper')?.querySelector('label')?.innerText || el.getAttribute('placeholder') || el.innerText || el.getAttribute('name') || el.id || '';
+        const isVerificationControl = el => /(?:verification|security|authentication)\s*(?:code|password)|one[- ]time[- ]?(?:code|password)|\botp\b/i.test(`${label(el)} ${el.autocomplete || ''} ${el.name || ''} ${el.id || ''}`)
+          || /^(?:code|enter your code)$/i.test(label(el).trim());
         const questionContext = el => {
           if (el.getAttribute('role') === 'option') {
             const listId = el.closest('[role="listbox"]')?.id;
@@ -45,11 +50,13 @@ export class ApplicationBrowser {
         };
         const selectedValue = el => el.closest('[class*=control], [data-select]')?.querySelector('[class*=singleValue], [class*=single-value], [data-selected-value]')?.textContent?.trim() || '';
         const controls = [...document.querySelectorAll('input, textarea, select, button, a[href], [role="button"], [role="combobox"], [role="option"], [role="checkbox"], [role="radio"]')]
-          .filter(el => visible(el) || el.type === 'file').slice(0, 250).map((el, index) => {
+          .filter(el => visible(el) || el.type === 'file').sort((a,b) => Number(a.getAttribute('role') === 'option') - Number(b.getAttribute('role') === 'option')).slice(0, 400).map((el, index) => {
             const ref = `${prefix}-${index}`; el.setAttribute('data-aiad-ref', ref);
             return { ref, tag: el.tagName.toLowerCase(), type: el.type || '', role: el.getAttribute('role') || '',
               label: (el.type === 'file' && !/resume|résumé|\bcv\b|curriculum|cover.?letter/i.test(label(el)) ? [label(el), el.id, el.getAttribute('name')].filter(Boolean).join(' ') : label(el)).trim().slice(0, 1200), context: questionContext(el).slice(0, 1200),
-              value: el.type === 'password' ? '[private]' : String(el.value || (el.getAttribute('role') === 'combobox' ? selectedValue(el) : '') || '').slice(0, 12000),
+              value: el.type === 'password' || isVerificationControl(el) ? '[private]' : String(el.getAttribute('role') === 'combobox' ? (selectedValue(el) || el.getAttribute('aria-valuetext') || '') : (el.value || '')).slice(0, 12000),
+              autocomplete: el.autocomplete || '', name: el.name || '', id: el.id || '',
+              searchText: el.getAttribute('role') === 'combobox' ? String(el.value || '').slice(0, 2000) : '', expanded: el.getAttribute('aria-expanded') === 'true',
               checked: el.checked ?? (el.hasAttribute('aria-checked') ? el.getAttribute('aria-checked') === 'true' : null), selected: el.hasAttribute('aria-selected') ? el.getAttribute('aria-selected') === 'true' : null, group: el.name || el.getAttribute('aria-controls') || '', required: Boolean(el.required || el.getAttribute('aria-required') === 'true'),
               disabled: Boolean(el.disabled || el.getAttribute('aria-disabled') === 'true'), href: el.getAttribute('href') || '',
               options: el.tagName === 'SELECT' ? [...el.options].map(o => ({ label: o.text, value: o.value })) : [],
@@ -62,7 +69,7 @@ export class ApplicationBrowser {
         const target = { frame, control, locator: frame.locator(`[data-aiad-ref="${control.ref}"]`) };
         this.refs.set(control.ref, target);
         const question = [control.context, control.label].filter(Boolean).join(' — ');
-        if (['input', 'textarea', 'select'].includes(control.tag) && !['password', 'file', 'hidden', 'submit', 'checkbox', 'radio'].includes(control.type) && control.value && !this.questions.some(q => q.question === question)) {
+        if (['input', 'textarea', 'select'].includes(control.tag) && !['password', 'file', 'hidden', 'submit', 'checkbox', 'radio'].includes(control.type) && !verificationControl(control) && control.value && !this.questions.some(q => q.question === question)) {
           const answer = control.tag === 'select' ? control.options.find(o => o.value === control.value)?.label || control.value : control.value;
           if (!/^(select|choose|please select|--)/i.test(answer)) this.recordQuestion(target, answer, 'existing_answer');
         }
@@ -155,9 +162,17 @@ export class ApplicationBrowser {
       }
       const originalFrame = target.frame;
       const originalLabel = control.label;
-      await locator.click({ timeout: 10000 });
+      const isOpen = await locator.evaluate(el => [el.getAttribute('aria-controls'), el.getAttribute('aria-owns')].filter(Boolean).join(' ').split(/\s+/).some(id => { const list = document.getElementById(id); return list && list.getClientRects().length && getComputedStyle(list).visibility !== 'hidden'; }));
+      if (!isOpen) await locator.click({ timeout: 10000 });
       const listIds = await locator.evaluate(el => [el.getAttribute('aria-controls'), el.getAttribute('aria-owns')].filter(Boolean).join(' ').split(/\s+/).filter(Boolean));
       if (!listIds.length) throw new Error('Dropdown has no scoped options; inspect it before choosing.');
+      const optionExists = async () => originalFrame.evaluate(({ids,expected}) => ids.some(id => [...(document.getElementById(id)?.querySelectorAll('[role="option"]') || [])].some(el => el.getClientRects().length && el.textContent.toLowerCase().replace(/\s+/g,' ').trim() === expected)), {ids:listIds,expected:clean(expected)});
+      // Search text is a filter, never a committed answer. Only search the
+      // already identified dropdown and still require its exact option below.
+      if (!await optionExists() && await locator.isEditable()) {
+        await locator.fill(expected, { timeout: 10000 });
+        await originalFrame.waitForFunction(({ids,expected}) => ids.some(id => [...(document.getElementById(id)?.querySelectorAll('[role="option"]') || [])].some(el => el.getClientRects().length && el.textContent.toLowerCase().replace(/\s+/g,' ').trim() === expected)), {ids:listIds,expected:clean(expected)}, {timeout:3000}).catch(() => {});
+      }
       await this.snapshot();
       const candidates = [];
       for (const option of this.refs.values()) {
@@ -296,6 +311,82 @@ export class ApplicationBrowser {
       if (await locator.isChecked() !== (value === 'true')) throw new Error('The form did not retain the selected answer.');
     } else throw new Error(`Unsupported browser action: ${action.kind}`);
     this.recordQuestion(target, action.kind === 'select' ? control.options.find(o => o.value === value)?.label || value : value, action.source);
+  }
+  verificationRecipient(profileEmail) {
+    const expected = String(profileEmail || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(expected)) throw new Error('The saved application recipient email is unavailable; Gmail was not searched.');
+    const existing = this.questions
+      .filter(question => /email/i.test(question.question))
+      .map(question => String(question.answer).trim().toLowerCase())
+      .filter(answer => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(answer));
+    if (existing.some(email => email !== expected)) throw new Error('The application email differs from the saved recipient; Gmail was not searched.');
+    return expected;
+  }
+  async completeVerification(code) {
+    if (!this.submissionStarted || this.page.isClosed()) throw new Error('Email verification is allowed only in the active, already-started application tab.');
+    if (!/^[A-Za-z0-9]{4,10}$/.test(code)) throw new Error('The matching email did not contain a supported verification code.');
+    const page = this.page;
+    await this.snapshot();
+    const inputs = [...this.refs.values()].filter(target =>
+      target.control.tag === 'input'
+      && !target.control.disabled
+      && ['text', 'tel', 'number', 'password'].includes(target.control.type)
+      && verificationControl(target.control));
+    if (inputs.length !== 1) throw new Error('The employer verification field is not uniquely identifiable in the current tab.');
+    const target = inputs[0];
+    if (await target.locator.inputValue() !== '') throw new Error('The employer verification field already contains a value; it was not overwritten.');
+    let automaticallyAdvanced = false;
+    try {
+      await target.locator.fill(code, { timeout: 10000 });
+      const inputCount = await target.locator.count();
+      if (!inputCount) {
+        automaticallyAdvanced = true;
+      } else {
+        if (await target.locator.inputValue() !== code) throw new Error('The employer verification field did not retain the retrieved code.');
+        const actions = await target.locator.evaluate(input => {
+          const scope = input.form || input.closest('[role="dialog"]') || input.parentElement?.parentElement;
+          if (!scope) return [];
+          return [...scope.querySelectorAll('button, input[type="submit"], [role="button"]')]
+            .filter(button => button.getClientRects().length && getComputedStyle(button).visibility !== 'hidden' && !button.disabled && button.getAttribute('aria-disabled') !== 'true')
+            .map(button => ({
+              ref: button.getAttribute('data-aiad-ref'),
+              label: (button.getAttribute('aria-label') || button.value || button.innerText || '').trim(),
+            }));
+        });
+        const verifyActions = actions.filter(action => action.ref && /^(?:verify(?: code)?|confirm(?: code)?|continue|check code|validate code)$/i.test(action.label));
+        if (verifyActions.length === 0) {
+          await page.waitForTimeout(750);
+          await this.snapshot();
+          automaticallyAdvanced = verificationState(this.lastSnapshot) !== 'required';
+          if (!automaticallyAdvanced) throw new Error('The employer verification action is not uniquely identifiable; no other application action was clicked.');
+        } else {
+          if (verifyActions.length !== 1) throw new Error('The employer verification action is not uniquely identifiable; no other application action was clicked.');
+          const action = this.refs.get(verifyActions[0].ref);
+          if (!action) throw new Error('The verification form changed before its action could be used.');
+          await action.locator.click({ timeout: 10000 });
+        }
+      }
+      if (this.page !== page || page.isClosed()) throw new Error('The verification flow left the active application tab; no new tab was followed.');
+    } finally {
+      if (!page.isClosed()) {
+        const stillAttached = await target.locator.count();
+        if (stillAttached && await target.locator.inputValue() === code) {
+          await target.locator.fill('', { timeout: 5000 });
+          if (await target.locator.inputValue() !== '') throw new Error('The verification code could not be cleared from the application field.');
+        }
+      }
+    }
+    await this.snapshot();
+    if (!automaticallyAdvanced) {
+      for (let attempt = 0; attempt < 8 && verificationState(this.lastSnapshot) === 'required'; attempt++) {
+        await page.waitForTimeout(1000);
+        await this.snapshot();
+        if (this.page !== page || page.isClosed()) throw new Error('The verification flow left the active application tab; no new tab was followed.');
+      }
+    }
+    if (verificationState(this.lastSnapshot) === 'required') {
+      throw new Error('The employer verification challenge remains active; no second code action was attempted.');
+    }
   }
   async receipt(quote) {
     const snapshot = await this.snapshot();

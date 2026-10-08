@@ -9,7 +9,7 @@ import { readProductSettings } from "@/lib/product-settings";
 
 export const runtime = "nodejs";
 const schema = z.object({
-  action: z.enum(["claim", "heartbeat", "checkpoint", "before_submit", "finish"]),
+  action: z.enum(["claim", "heartbeat", "checkpoint", "before_submit", "before_verification", "finish", "verification"]),
   workerId: z.string().regex(WORKER_ID_PATTERN), claimToken: z.string().uuid().optional(), attemptId: z.string().uuid().optional(),
   summary: z.string().max(4000).optional(), questions: z.array(questionSchema).max(300).optional(),
   unresolved: z.array(z.string().max(2000)).max(100).optional(),
@@ -17,6 +17,7 @@ const schema = z.object({
   status: z.enum(["SUBMITTED", "BLOCKED", "UNKNOWN"]).optional(),
   confirmation: z.string().max(4000).optional(), confirmationUrl: z.string().url().optional(),
   screenshot: z.string().max(1000).optional(),
+  verification: z.enum(["required", "rejected", "expired"]).optional(),
 });
 export async function POST(request: Request) {
   if (!workerAuthorized(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
@@ -61,6 +62,27 @@ export async function POST(request: Request) {
       const event = await tx.applicationEvent.findUnique({ where: { id: command.attemptId } });
       const attempt = event?.eventType === AUTOMATION_EVENT ? readAttempt(event.detail) : null;
       if (!event || !attempt || attempt.workerId !== command.workerId) throw new AutomationError("Attempt ownership changed.");
+      // Diagnostic updates cannot authorize another click or mark an application Applied.
+      if (command.action === "verification") {
+        if (attempt.status !== "UNKNOWN" || !attempt.submissionStartedAt || !command.verification) throw new AutomationError("No pending verification to observe.");
+        attempt.verification = command.verification;
+        attempt.summary = command.verification === "rejected"
+          ? "The employer rejected the verification code. The cause is not established; submission is not confirmed."
+          : command.verification === "expired"
+            ? "The employer says the verification code expired. Submission is not confirmed."
+            : "The employer requires email verification. Email delivery and submission are not confirmed by this worker.";
+        await saveAttempt(tx, event.id, attempt);
+        return { status: attempt.status };
+      }
+      if (command.action === "before_verification") {
+        if (attempt.status !== "SUBMITTING" || !attempt.submissionStartedAt || !attempt.attachmentVerified || attempt.prepareOnly || attempt.unresolved.length) {
+          throw new AutomationError("This application is not authorized to continue email verification.");
+        }
+        await approvedMaterial(tx, event.applicationId, attempt);
+        attempt.summary = "The approved application is completing its employer email-verification step.";
+        await saveAttempt(tx, event.id, attempt);
+        return { authorized: true };
+      }
       const lateReceipt = command.action === "finish" && command.status === "SUBMITTED" && attempt.status === "UNKNOWN" && !!attempt.submissionStartedAt;
       if (command.action === "finish" && ["SUBMITTED", "BLOCKED", "UNKNOWN"].includes(attempt.status) && !lateReceipt) {
         if (attempt.status === command.status) return { status: attempt.status, alreadyRecorded: true };

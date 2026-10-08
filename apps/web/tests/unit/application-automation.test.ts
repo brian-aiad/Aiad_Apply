@@ -30,3 +30,10 @@ test("only stale browser activity is interrupted, never an unstarted queue or te
   for (const status of ["QUEUED", "SUBMITTED", "BLOCKED", "UNKNOWN"]) assert.equal(attemptInterrupted(readAttempt({ ...stale, status }), now), false);
   assert.equal(attemptInterrupted(readAttempt({ ...attempt, status: "RUNNING", updatedAt: new Date(now).toISOString() }), now), false);
 });
+
+test('technical dropdown diagnostics do not request new candidate facts', async () => {
+  const { isTechnicalApplicationBlocker } = await import('../../src/lib/application-automation');
+  assert.equal(isTechnicalApplicationBlocker('Required ITAR status selection needs exact option wording.'), true);
+  assert.equal(isTechnicalApplicationBlocker('What is your citizenship status for ITAR?'), false);
+  assert.equal(isTechnicalApplicationBlocker('Will you require sponsorship?'), false);
+});

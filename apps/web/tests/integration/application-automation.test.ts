@@ -56,11 +56,14 @@ test("explicit approval, exclusive claim, correct attachment and observed receip
   assert.equal((await worker({ action: 'finish', attemptId, status: 'SUBMITTED', confirmation: 'Made up receipt' })).status, 409);
   assert.equal((await worker({ action: 'before_submit', attemptId, resumeSha256: 'b'.repeat(64), attachmentVerified: true })).status, 409);
   assert.equal((await worker({ action: 'before_submit', attemptId, resumeSha256: f.pdf.sha256, attachmentVerified: true, unresolved: ['Missing fact'] })).status, 409);
+  assert.equal((await worker({ action: 'before_verification', attemptId })).status, 409);
   assert.equal((await worker({ action: 'before_submit', attemptId, resumeSha256: f.pdf.sha256, attachmentVerified: true, unresolved: [] })).status, 200);
+  assert.deepEqual(await (await worker({ action: 'before_verification', attemptId })).json(), { authorized: true });
   assert.equal((await worker({ action: 'before_submit', attemptId, resumeSha256: f.pdf.sha256, attachmentVerified: true })).status, 409);
   const receipt = { action: 'finish', attemptId, status: 'SUBMITTED', summary: 'Confirmed', confirmation: 'Thank you for applying', confirmationUrl: 'https://jobs.lever.co/fixture/123/thanks', screenshot: '/test/confirmation.png' };
   assert.equal((await worker(receipt)).status, 200);
   assert.equal((await worker(receipt)).status, 200);
+  assert.equal((await worker({ action: 'before_verification', attemptId })).status, 409);
   assert.equal(await db.applicationEvent.count({ where: { applicationId: f.app.id, eventType: 'application_submitted' } }), 1);
   const saved = await db.application.findUniqueOrThrow({ where: { id: f.app.id } });
   assert.equal(saved.status, 'APPLIED'); assert.ok(saved.followUpAt);

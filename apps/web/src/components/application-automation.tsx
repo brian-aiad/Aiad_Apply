@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Download } from "lucide-react";
-import { activeAutomationStates, approvalMatches, canApproveAfter, type ApplicationAttempt } from "@/lib/application-automation";
+import { activeAutomationStates, approvalMatches, canApproveAfter, isTechnicalApplicationBlocker, type ApplicationAttempt } from "@/lib/application-automation";
 import { APPLICATION_STATUS_EVENT } from "./application-status-pill";
 
 type Props = { id: string; runId: string; runNumber: number; pdfId: string | null; resumeSha256: string; fileName: string; destination: string | null; blockers: string[]; submitted: boolean };
@@ -52,6 +52,8 @@ export function ApplicationAutomation(props: Props) {
   const matches = attempt && props.pdfId && approvalMatches(attempt, props.runId, props.pdfId, props.resumeSha256, props.destination);
   const active = attempt && activeAutomationStates.includes(attempt.status);
   const allowApprove = loaded && canApproveAfter(attempt) && !props.submitted;
+  const candidateQuestions = attempt?.unresolved.filter(item => !isTechnicalApplicationBlocker(item)) ?? [];
+  const technicalBlocked = attempt?.status === "BLOCKED" && (attempt.unresolved.some(isTechnicalApplicationBlocker) || isTechnicalApplicationBlocker(attempt.summary));
   const needsVerification = attempt?.status === "UNKNOWN" && /verification|security code|one.time code/i.test([attempt.summary, ...attempt.unresolved].join(" "));
   return <div className="apply-automation">
     <header className="apply-heading"><div><div className="eyebrow">Tailor → approve → apply → report</div><h2>{interrupted ? "Browser connection interrupted" : needsVerification ? "Email verification needed · submission unconfirmed" : attempt ? labels[attempt.status] : "Approve your resume, then we apply"}</h2><p>Resume version {props.runNumber || "—"} · {online ? "Local browser worker online" : "Local browser worker offline"}</p></div></header>
@@ -75,11 +77,17 @@ export function ApplicationAutomation(props: Props) {
           {attempt.confirmation ? <p>{attempt.confirmation}</p> : null}
           {attempt.confirmationUrl ? <a href={attempt.confirmationUrl} target="_blank" rel="noreferrer">Employer confirmation page ↗</a> : null}
           {attempt.status === "UNKNOWN" ? <p>{needsVerification ? "Complete the verification in the existing employer tab. Keep that tab open and do not start a new application. We still need an employer receipt before marking this application submitted." : "Do not apply again yet. Check the employer site for a receipt; a missing confirmation does not mean submission failed."}</p> : null}
-          {attempt.unresolved.length ? <><h4>Questions or steps needing you</h4><ul>{attempt.unresolved.map((item, i) => <li key={i}>{item}</li>)}</ul></> : null}
+          {needsVerification ? <div className="apply-verification-recovery">
+            <h4>{attempt.verification === "rejected" ? "The employer rejected the code" : attempt.verification === "expired" ? "The code expired" : "Verification email missing or delayed?"}</h4>
+            <p>The employer requested a code. This worker has not confirmed email delivery. Check the recipient shown in the existing employer tab, then search that mailbox’s Inbox, Spam and All Mail for the employer or “security code”.</p>
+            <p>If it has not arrived, wait for the employer’s resend timer and use its Resend code control if available. Use the newest code. If there is no resend control, keep this tab open and request help; starting another application may create a duplicate.</p>
+            <p>Enter the code only in the employer tab and complete verification there. Keep the tab open so the worker can detect the employer’s receipt.</p>
+          </div> : null}
+          {attempt.unresolved.length ? <><h4>{technicalBlocked ? "Automation issues to resolve" : "Questions or steps needing you"}</h4><ul>{attempt.unresolved.map((item, i) => <li key={i}>{item}</li>)}</ul></> : null}
           {attempt.status === "BLOCKED" && matches && !props.blockers.length ? <div>
-            <h4>Answer and resume this application</h4><p className="muted">These answers apply only to this employer application. Resuming uses the exact resume you already approved.</p>
-            {attempt.unresolved.map((question, index) => <label key={index} style={{ display: "block", marginTop: 12 }}><span>{question}</span><textarea value={answers[question] ?? ""} maxLength={12000} onChange={event => setAnswers(previous => ({ ...previous, [question]: event.target.value }))} placeholder="Answer here if this requires a fact from you" style={{ display: "block", width: "100%" }} /></label>)}
-            <button className="button button-primary" disabled={busy} onClick={() => command({ action: "resume", attemptId: attempt.id, prepareOnly: false, answers: Object.entries(answers).filter(([, answer]) => answer.trim()).map(([question, answer]) => ({ question, answer })) })}>{busy ? "Saving…" : "Save answers & resume approved application"}</button>
+            <h4>{candidateQuestions.length ? "Answer and resume this application" : "Resume the approved application"}</h4>{technicalBlocked ? <p>The browser could not finish a form control. You do not need to supply option wording or repeat saved personal facts.</p> : null}<p className="muted">These answers apply only to this employer application. Resuming uses the exact resume you already approved.</p>
+            {candidateQuestions.map((question, index) => <label key={index} style={{ display: "block", marginTop: 12 }}><span>{question}</span><textarea value={answers[question] ?? ""} maxLength={12000} onChange={event => setAnswers(previous => ({ ...previous, [question]: event.target.value }))} placeholder="Answer here if this requires a fact from you" style={{ display: "block", width: "100%" }} /></label>)}
+            <button className="button button-primary" disabled={busy} onClick={() => command({ action: "resume", attemptId: attempt.id, prepareOnly: false, answers: Object.entries(answers).filter(([, answer]) => answer.trim()).map(([question, answer]) => ({ question, answer })) })}>{busy ? "Saving…" : candidateQuestions.length ? "Save answers & resume approved application" : "Retry automated fill"}</button>
           </div> : null}
           {attempt.questions.length ? <details className="apply-disclosure"><summary>Questions and answers ({attempt.questions.length})</summary>{attempt.questions.map((item, i) => <div key={i} style={{ marginTop: 16 }}><strong>{item.question}</strong><p style={{ whiteSpace: "pre-wrap" }}>{item.answer || "Unanswered"}</p><small className="muted">{item.source.replaceAll("_", " ")}</small></div>)}</details> : <p className="muted">Questions encountered will appear here as the worker progresses.</p>}
         </> : <p className="muted">After the attempt, see whether the employer confirmed submission, which resume was used, the questions answered and anything unresolved.</p>}

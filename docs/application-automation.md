@@ -55,6 +55,37 @@ Additional candidate setup facts: `.runtime/application-onboarding.json`.
 Do not commit these private files. A paused login leaves the dedicated Chrome
 window available for the user. Saved login state is reused by a later attempt.
 
+### Free Gmail verification-code access
+
+The worker can use Gmail's free API with the read-only `gmail.readonly` OAuth
+scope. It does not use a paid API, metered fallback, or Codex model call to read
+mail. To connect it, enable Gmail API in a Google Cloud project, create a
+Desktop-app OAuth client, and authorize it locally from `apps/web`:
+
+```sh
+GOOGLE_OAUTH_CLIENT_FILE=/absolute/path/to/desktop-oauth-client.json npm run gmail:connect
+```
+
+Open the printed Google consent URL and approve read-only Gmail access. Google
+does not require a billing account for this Gmail API use. The client and
+refresh token are stored under `.runtime/application-gmail-oauth.json` with
+owner-only permissions; revoke access from the Google Account security page
+and remove that local file to disconnect. OAuth testing-mode refresh tokens
+may expire and then require reconnecting.
+
+For an active, explicitly approved application only, the worker searches after
+the verification prompt was observed. Gmail query results are rechecked locally
+for the exact saved recipient, employer name, and message receive time. It uses
+the newest matching message only, preserves code capitalization, and makes one
+attempt in the existing application tab using a uniquely identified code field
+and verification action. A missing email, ambiguous code/field/action, rejected
+or expired code, or missing receipt is reported as unresolved; no older code,
+resend, duplicate application, or automatic retry is used. Codes are kept only
+in memory, excluded from answer capture, cleared from the field after the
+verification action, and never written to the reusable profile, attempt journal,
+or worker logs. The application is marked Applied only after a new explicit
+employer receipt.
+
 The application profile supports extra confirmed question/answer text for facts
 missing from a paused application. A confirmation or explicit consent specific to
 one employer must not be generalized to other employers.
@@ -265,3 +296,31 @@ responses fall back to browser inspection rather than falsely declaring closure.
 Actual unavailable Product Support Engineer attempt stopped with zero model calls.
 Live isolated batched form: two model decisions, 41947 input and335 output tokens.
 This is a functional measurement, not a like-for-like token savings benchmark.
+
+### Dropdown recovery and email-code status
+
+The Vast form exposed an open/close loop: `choose` clicked an already-open
+React dropdown, closing its options before selection. The driver now preserves
+an open scoped list, searches unloaded exact options in editable comboboxes,
+and verifies the committed selection separately from search text. Snapshots
+prioritize questions over long option lists. Progress monitoring requests
+recovery after three stalled decisions and stops after seven unchanged steps.
+Technical selection failures appear as automation issues instead of requests
+for the candidate to provide website option wording.
+
+Email-code monitoring distinguishes a requested code, a rejected code with an
+unknown cause, and an explicitly expired code. The worker checks these states
+before another model call. Diagnostic updates are bound to the worker and the
+existing attempt; they cannot approve a new application or mark it Applied.
+The optional read-only Gmail connection is documented above. Code retrieval
+and form handling remain separate from receipt confirmation.
+
+Browser regression coverage includes open dropdowns, searchable options,
+verification rejection, and recognition of a later receipt without repeating
+submission. Local mock results do not establish successful delivery of a real
+employer application. The Vast attempts verified the approved version 6 PDF
+and reached email-code entry; their saved outcomes remain unconfirmed unless
+a fresh employer receipt is recorded.
+
+Greenhouse documents codes as single-use and time-limited:
+https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates

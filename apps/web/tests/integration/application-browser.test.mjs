@@ -344,3 +344,46 @@ test('live model batches familiar dropdowns and completes guarded application in
   }
   assert.equal(f.submissions(),1);assert.equal(f.boundary(),1);assert.ok(choices>=2);assert.ok(modelCalls<=4,`Used ${modelCalls} calls`);
 });
+
+test('choose preserves an open toggling dropdown and searches unloaded options', async t => {
+  const f = await fixture(t);
+  await f.driver.page.setContent(`<h1>Fixture Company</h1><h2>Support Engineer</h2><div data-select><label for="degree">Degree</label><input id="degree" role="combobox" aria-controls="degrees" readonly onclick="document.getElementById('degrees').hidden=!document.getElementById('degrees').hidden"><span data-selected-value></span><div id="degrees" role="listbox" hidden><div role="option" onclick="document.querySelector('[data-selected-value]').textContent=this.textContent;this.parentElement.hidden=true">Bachelor's Degree</div></div></div><div data-select><label for="school">School</label><input id="school" role="combobox" aria-controls="schools" onclick="document.getElementById('schools').hidden=false"><span data-selected-value></span><div id="schools" role="listbox" hidden></div></div>`);
+  await f.driver.page.locator('#school').evaluate(input => {input.oninput=()=>{const list=document.getElementById('schools');list.innerHTML='';if(input.value==='Example University'){const option=document.createElement('div');option.setAttribute('role','option');option.textContent='Example University';option.onclick=()=>{input.closest('[data-select]').querySelector('[data-selected-value]').textContent=option.textContent;input.value='';list.hidden=true;};list.append(option);}};});
+  await f.driver.snapshot();await f.driver.act({kind:'click',ref:f.ref('Degree'),value:'',source:'saved_profile'});
+  await f.driver.snapshot();await f.driver.act({kind:'choose',ref:f.ref('Degree'),value:"Bachelor's Degree",source:'approved_resume'});
+  assert.equal(await f.driver.page.locator('[data-selected-value]').first().textContent(),"Bachelor's Degree");
+  await f.driver.snapshot();await f.driver.act({kind:'choose',ref:f.ref('School'),value:'Example University',source:'approved_resume'});
+  assert.equal(await f.driver.page.locator('[data-selected-value]').last().textContent(),'Example University');
+  assert.equal(f.driver.questions.find(q=>q.question==='School')?.answer,'Example University');
+});
+
+test('verification rejection is observed without another submit and a later receipt remains observable', async t => {
+  const f = await fixture(t);
+  const { verificationState } = await import('../../scripts/application-browser/verification.mjs');
+  f.driver.submissionStarted = true;
+  await f.driver.page.setContent('<h1>Fixture Company</h1><h2>Support Engineer</h2><p>Enter the security code to confirm you are a human.</p><label>Security code<input autocomplete="one-time-code"></label><p role="alert">Invalid security code</p><button>Submit application</button>');
+  assert.equal(await f.driver.observeReceipt(), null);
+  assert.equal(verificationState(f.driver.lastSnapshot), 'rejected');
+  assert.equal(f.submissions(), 0);
+  await f.driver.page.setContent('<h1>Fixture Company</h1><h2>Support Engineer</h2><p>Thank you for applying. Your application was received.</p>');
+  assert.ok(await f.driver.observeReceipt());
+  assert.equal(f.submissions(), 0);
+});
+
+test('email verification uses the newest code once in the same tab and never records it as an answer', async t => {
+  const f = await fixture(t);
+  const page = f.driver.page;
+  f.driver.submissionStarted = true;
+  f.driver.beforeText = 'Support Engineer application';
+  await page.setContent(`<h1>Fixture Company</h1><h2>Support Engineer</h2>
+    <form onsubmit="event.preventDefault();document.body.innerHTML='<h1>Fixture Company</h1><h2>Support Engineer</h2><p>Thank you for applying. Your application was received.</p>'">
+      <label>Verification code<input name="verification_code" autocomplete="one-time-code" required></label>
+      <button type="submit">Verify code</button>
+    </form>`);
+  assert.equal(f.driver.verificationRecipient('test@example.com'), 'test@example.com');
+  await f.driver.completeVerification('aB12Cd');
+  assert.equal(f.driver.page, page);
+  assert.ok(await f.driver.observeReceipt());
+  assert.equal(f.driver.questions.some(question => question.answer === 'aB12Cd'), false);
+  assert.equal(f.submissions(), 0, 'email verification must not reissue the application submit');
+});

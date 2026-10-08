@@ -6,6 +6,9 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { ApplicationBrowser, sha256 } from './driver.mjs';
+import { verificationState, verificationReport } from './verification.mjs';
+import { waitForVerificationCode } from './gmail-verification.mjs';
+import { ProgressWatch } from './progress-watch.mjs';
 import { checkPosting } from './posting-check.mjs';
 import { executeFormPlan, routineContactActions } from './form-plan.mjs';
 import { decideApplicationStep } from './reasoner.mjs';
@@ -26,6 +29,7 @@ const secret = process.env.WORKER_SECRET || process.env.CRON_SECRET;
 if (!secret) throw new Error('WORKER_SECRET is required for the local application worker.');
 let activeJob = null, pendingResult = null, driver = null, heartbeatLost = false, stopping = false;
 let observationJob = null;
+let lastVerificationState = null;
 async function send(action, detail = {}) {
   const response = await fetch(`${api}/api/worker/applications`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` }, body: JSON.stringify({ action, workerId, ...(activeJob ? { attemptId: activeJob.attemptId } : {}), ...detail }), signal: AbortSignal.timeout(45000) });
   if (response.status === 204) return null;
@@ -40,6 +44,7 @@ const guard = async (action, detail) => {
 };
 async function execute(job) {
   activeJob = job;
+  lastVerificationState = null;
   const previousDriver = driver;
   driver = null;
   const directory = path.join(root, '.runtime/application-attempts', job.attemptId);
@@ -74,14 +79,70 @@ async function execute(job) {
         throw error;
       }
     } });
-    let previousError = '', observationSteps = 0, repeatedError = '', repeats = 0, modelCalls = 0, routineFilled = 0;
+    let previousError = '', observationSteps = 0, repeatedError = '', repeats = 0, modelCalls = 0, routineFilled = 0, verificationAttempted = false;
     const saveEfficiency = () => atomicJson(path.join(directory, 'efficiency.json'), { modelCalls, routineFilled });
+    const progressWatch = new ProgressWatch();
     for (let step = 1; step <= 35; step++) {
       if (heartbeatLost || stopping) throw new Error('The worker disconnected or was stopped.');
       let snapshot = await driver.snapshot();
       if (driver.submissionStarted) {
         const receipt = await driver.observeReceipt();
         if (receipt) { finalResult = { status: 'SUBMITTED', summary: 'The employer confirmed receipt. The approved resume was verified before submission.', ...receipt }; break; }
+        const verification = verificationState(driver.lastSnapshot);
+        if (verification === 'rejected' || verification === 'expired') {
+          const report = verificationReport(verification);
+          driver.unresolved = report.unresolved;
+          finalResult = { status: 'UNKNOWN', ...report };
+          break;
+        }
+        if (verification === 'required') {
+          if (verificationAttempted) {
+            const report = verificationReport('required');
+            finalResult = { status: 'UNKNOWN', summary: 'The employer still requires email verification after one code attempt. No second code was tried and submission is not confirmed.', unresolved: report.unresolved };
+            break;
+          }
+          verificationAttempted = true;
+          try {
+            const recipient = driver.verificationRecipient(job.profile.email);
+            const requestedAt = Date.now();
+            let code = await waitForVerificationCode({
+              company: job.company,
+              recipient,
+              requestedAt,
+              credentialsPath: path.join(runtime, 'application-gmail-oauth.json'),
+            });
+            await guard('before_verification', {});
+            await driver.completeVerification(code);
+            code = '';
+            const afterVerification = verificationState(driver.lastSnapshot);
+            if (afterVerification === 'rejected' || afterVerification === 'expired') {
+              finalResult = { status: 'UNKNOWN', ...verificationReport(afterVerification) };
+              break;
+            }
+            if (afterVerification === 'required') {
+              const report = verificationReport('required');
+              finalResult = { status: 'UNKNOWN', summary: 'The employer did not accept the single newest matching email code. No other or older code was tried; submission is not confirmed.', unresolved: report.unresolved };
+              break;
+            }
+            observationSteps = 0;
+          } catch (error) {
+            const report = verificationReport('required');
+            finalResult = { status: 'UNKNOWN', summary: `Email verification could not be completed: ${String(error.message).slice(0, 1500)} Submission is not confirmed.`, unresolved: report.unresolved };
+            break;
+          }
+          continue;
+        }
+        if (verificationAttempted) {
+          if (++observationSteps >= 30) {
+            finalResult = { status: 'UNKNOWN', summary: 'The newest matching email code was entered in the existing application tab, but no explicit employer confirmation appeared. Do not retry this application.', unresolved: ['Check the employer application page for a receipt or a new verification error before taking further action.'] };
+            break;
+          }
+        } else if (++observationSteps >= 3) {
+          finalResult = { status: 'UNKNOWN', summary: 'No employer confirmation appeared after submission. Do not retry before checking the employer site.', unresolved: driver.unresolved };
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        continue;
       }
       if (!previousError) {
         const routine = routineContactActions(snapshot, job.profile);
@@ -92,6 +153,9 @@ async function execute(job) {
           snapshot = await driver.snapshot();
         }
       }
+      const stalled = progressWatch.observe(snapshot);
+      if (stalled >= 7 && !driver.submissionStarted) throw new Error('Automation could not commit a form answer after multiple recovery steps. Technical form-control issue; no new candidate fact is required.');
+      if (stalled >= 3) previousError = `RECOVERY REQUIRED: ${stalled} steps without a committed answer or page change. Do not repeat the same open/close action. Use choose on an already open combobox or click its visible exact option. Searchable comboboxes can use choose with the confirmed exact answer. If a control is optional, leave it blank and complete remaining required fields. Earlier error: ${previousError}`;
       modelCalls++;
       await saveEfficiency();
       const decision = await decideApplicationStep({ job: { company: job.company, title: job.title, destination: job.destination, posting: job.posting, prepareOnly: job.prepareOnly === true }, profile: job.profile, setup, applicationAnswers: job.confirmedAnswers || [], applicationHistory: job.applicationHistory || [], approvedResumeText: extracted.stdout, snapshot, previousError, answeredQuestions: driver.questions }, directory, step);
@@ -106,11 +170,7 @@ async function execute(job) {
         finalResult = { status: driver.submissionStarted ? 'UNKNOWN' : 'BLOCKED', summary: decision.summary };
         break;
       }
-      if (driver.submissionStarted) {
-        if (++observationSteps >= 3) throw new Error('No employer confirmation appeared after submission. Do not retry before checking the employer site.');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        continue;
-      }
+      if (driver.submissionStarted) continue;
       if (!Array.isArray(decision.actions) || !decision.actions.length || decision.actions.length > 100) throw new Error('No supported next action was available.');
       previousError = '';
       try { await executeFormPlan(driver, decision.actions); }
@@ -161,7 +221,14 @@ async function observeUnconfirmedApplication() {
   // The user can finish an email/login verification in the existing browser.
   // Observation is read-only: never repeat a submit click or recreate the form.
   const receipt = await driver.observeReceipt();
-  if (!receipt) return;
+  if (!receipt) {
+    const verification = verificationState(driver.lastSnapshot);
+    if (verification && verification !== lastVerificationState) {
+      await send('verification', { attemptId: observationJob.attemptId, verification });
+      lastVerificationState = verification;
+    }
+    return;
+  }
   const result = { status: 'SUBMITTED', summary: 'The employer confirmed receipt while observing the submitted application. The approved resume was verified before submission.', ...receipt, questions: driver.questions, unresolved: [] };
   await publishResult(observationJob, result);
 }
