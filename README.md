@@ -189,6 +189,12 @@ back up your `.env`, protected base resume, or Python dependencies; configure th
 destination installation separately. Database file copies improve portability,
 but an off-device backup is still needed to survive loss of a local database.
 
+For current LinkedIn Discover setup, queue limits, assisted import and verified
+status, read [LinkedIn workflow verification](docs/linkedin-verification-2026-10-13.md).
+Use Discover's LinkedIn tab so shared cooldown and queue protections apply.
+Live extraction is currently unverified after HTTP 429. The older review CLI
+below is a developer utility, not a way to retry around a Discover access block.
+
 For a bounded LinkedIn review session, open the isolated browser profile:
 
 ```powershell
@@ -519,6 +525,9 @@ integration is an explicit browser handoff. Greenhouse and Lever submission APIs
 require employer-issued credentials, so the app does not pretend to submit through them.
 
 ## Moving to another device (October 7, 2026)
+
+**Latest October 13 handoff:** read [Windows continuation](docs/WINDOWS_CONTINUATION.md)
+first for current results, private configuration, and platform limitations.
 
 Pull the latest `main` from `https://github.com/brian-aiad/Aiad_Apply.git`
 (the former aiadapplyV2 URL redirects there). Read `AGENTS.md`, the latest entries

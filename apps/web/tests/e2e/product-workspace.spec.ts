@@ -66,7 +66,10 @@ test("capture previews requirements and evidence before creating any application
 
 test("review highlights phrases and keyboard search focuses the application filter", async ({ page }) => {
   await page.goto(`/applications/${applicationId}`);
-  await expect(page.locator(".compact-phrase-diff ins").first()).toContainText("production");
+  const changedBullet = page.getByRole("region", { name: "Test", exact: true }).getByRole("article");
+  await expect(changedBullet.getByRole("heading", { name: "Tailored · final resume", exact: true })).toBeVisible();
+  await expect(changedBullet.locator("ins").first()).toHaveText("production");
+  await expect(changedBullet.locator("del").first()).toHaveText("customer");
   await expect(page.locator("#role")).toBeHidden();
   await page.getByRole("tab", { name: "Posting" }).click();
   await expect(page.locator("#changes")).toBeHidden();

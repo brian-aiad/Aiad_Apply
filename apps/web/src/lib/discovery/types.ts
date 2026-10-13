@@ -1,5 +1,5 @@
 export type Provider = "greenhouse" | "lever" | "ashby" | "smartrecruiters" | "adzuna" | "usajobs" | "jobicy" | "rtx" | "workday";
-export const TARGET_ROLES = ["Application support", "Technical support", "Systems & business analysis", "IT operations", "Implementation & integrations", "Data operations & testing"];
+export const TARGET_ROLES = ["Application & SaaS support", "Technical support", "Desktop & end-user support", "Help desk & service desk", "IT operations & systems administration", "Implementation & integrations"];
 export type Source = { key: string; provider: Provider; board: string; company: string; url: string };
 export type Opening = {
   externalId: string;

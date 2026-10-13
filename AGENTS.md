@@ -149,3 +149,42 @@ mailbox access. Preserve manual approval of each tailored resume followed by
 Auto apply. Verify exact approved PDF bytes and attachment before submission,
 and an employer receipt before reporting Applied. Check uncertain prior attempts
 for receipts before retrying; never infer submission from email connection.
+
+## Application corrections (October 9, 2026)
+
+- RTX and Collins applications are referral-only. Brian has a separate referral
+  contact. Do not submit these roles, including previously approved retries.
+  The saved `application-policy` setting enforces the employer hold.
+- Brian confirms no current or prior security clearance, U.S. citizenship, and
+  eligibility to obtain a clearance. Do not ask the same clearance question again.
+- No prior interviews anywhere as of October 9, 2026. Use this for interview
+  history, updating after actual interviews; preserve real prior application history.
+- Never served in the military. No criminal record; confirms he can meet criminal
+  background checks. Reference availability and civilian government employment
+  remain separate facts, not inferred from military/background answers.
+- Brian authorizes autonomous sign-in using credentials he supplies for the
+  relevant account. Keep secrets outside model prompts, application answers,
+  reports, and Git. No account password has been supplied in this conversation.
+
+## Session continuity
+
+Read `docs/WINDOWS_CONTINUATION.md` first for the October 13 cross-device checkpoint, then `docs/session-handoff.md`. They record implementation progress, verification, application outcomes and unresolved blockers. Private attempt evidence and onboarding remain under ignored `.runtime/`.
+
+## Discovery priority (October 12, 2026)
+
+Brian prioritizes landing a realistic support/IT job. Rank documented duties and experience ahead of keyword overlap; common programming knowledge is not evidence of a software-engineering career. Prioritize application, technical, desktop, help desk and IT support. Clearly flag L3 and specialist requirements; exclude unsupported primary engineering, finance and management roles from normal recommendations. Preserve existing applications/history and RTX referral-only handling. Do not describe fit scores as hiring probabilities.
+
+## Strict discovery constraints (latest correction)
+
+Recommend only full-time postings with confirmed starting base pay at or above the saved minimum ($60,000/year currently) and a confirmed worksite within the saved 30-mile radius of Seal Beach. Unknown pay, a range starting below the floor, unknown/multiple unconfirmed worksites and distant jobs are excluded, not merely cautioned. Apply these rules to normal and RTX referral discovery and revalidate before new Discover save/tailor actions. No 15-mile shortcut. Unscreened external directories are not recommendations. Keep prior application history intact.
+
+## LinkedIn discovery preferences (October 12, 2026)
+
+- Automatically tailor up to 10 new qualifying LinkedIn jobs per Pacific day.
+- User still approves the exact tailored resume and presses Auto apply.
+- Find relevant visible contacts and draft outreach only; never send automatically.
+- Daily collection covers past-day and past-week listings, deduplicates existing
+  applications and retains deferred eligible jobs. Preserve strict saved pay,
+  30-mile Seal Beach radius, full-time and role-fit requirements.
+- Premium top-applicant signals prioritize eligible jobs; they are not proof of fit.
+- Only free local tools and existing subscription; pause on access restrictions.

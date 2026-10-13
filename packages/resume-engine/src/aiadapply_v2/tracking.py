@@ -350,6 +350,10 @@ def _scheduled_discovery(url: str, secret: str, stop: threading.Event) -> None:
                 payload={},
                 timeout_seconds=120,
             )
+            _request_json(
+                f"{url}/api/worker/linkedin", secret=secret,
+                payload={}, timeout_seconds=600,
+            )
             failure_reported = False
             if result and result.get("queued"):
                 print(f"Discover queued {result['queued']} strong matches for review.")

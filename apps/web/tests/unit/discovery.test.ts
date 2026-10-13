@@ -41,7 +41,7 @@ test("does not invent salary, employment type, remote eligibility, or clearance"
   assert.equal(assessOpening({ ...opening, employmentType: "Other" }, prefs).excluded, true);
   assert.equal(assessOpening({ ...opening, workArrangement: "Remote" }, prefs).excluded, true);
   assert.equal(assessOpening({ ...opening, description: `${opening.description} Must have an active security clearance.` }, prefs).qualified, false);
-  assert.equal(assessOpening({ ...opening, title: "Senior Application Support Engineer" }, prefs).qualified, false);
+  assert.equal(assessOpening({ ...opening, title: "Senior Application Support Engineer" }, prefs).qualified, true);
 });
 test("excludes distant and ambiguous same-name locations instead of inventing proximity", () => {
   for (const location of ["San Jose, CA", "Palo Alto, CA", "Vandenberg, CA", "San Diego, CA", "Lakewood, CO", "Irvine, Scotland", "Burbank, CA"]) assert.equal(assessOpening({ ...opening, location }, prefs).excluded, true, location);
@@ -81,7 +81,7 @@ test("live-source salary blurbs and specialist titles do not create false matche
   assert.equal(annualPay(64100, 117500, "USD", "hour").salaryMin, null);
   assert.equal(payFromText("Base salary $64,100 - $117,500 annually. Sick leave is 1 hour per 30 hours worked.").salaryMin, 64100);
   for (const title of ["Mission Support Engineer, EW", "Flight Test & Integration Specialist", "Senior RF Integration Engineer", "Systems Integration Engineer, High Speed Missiles", "Staff Propulsion Integration Engineer"]) assert.equal(roleFamily(title), null, title);
-  for (const title of ["NX CAD Support Engineer", "AV Systems Administrator", "Information Systems Security Officer"]) assert.equal(assessOpening({ ...opening, title }, prefs).qualified, false, title);
+  for (const title of ["Post Production Support Specialist", "Credit Union Programmer Analyst III", "NX CAD Support Engineer", "AV Systems Administrator", "Information Systems Security Officer"]) assert.equal(assessOpening({ ...opening, title }, prefs).qualified, false, title);
   for (const description of ["Maintain an active U.S. Top Secret security clearance.", "Eligible to obtain a U.S. Security Clearance.", "4 – 6 years relevant work experience in Technical and/or Application Support."]) assert.equal(assessOpening({ ...opening, description: `${opening.description}\n${description}` }, prefs).qualified, false, description);
 });
 test("decodes double-escaped descriptions and strips executable markup", () => {
@@ -107,17 +107,66 @@ test("preferences cannot silently widen the agreed 30-mile, $60k constraints", (
   assert.deepEqual(readDiscoveryPreferences({ radiusMiles: 10, minimumSalary: 70000, includeRemote: true }), { radiusMiles: 10, minimumSalary: 70000, includeRemote: true });
 });
 
-test("multi-office listings retain a local option without claiming a confirmed local worksite", () => {
+test("multi-office listings require a confirmed worksite before recommendation", () => {
   const assessment = assessOpening({ ...opening, location: "Irvine, CA, Austin, TX, San Francisco Bay Area, CA, Denver, CO" }, prefs);
-  assert.equal(assessment.excluded, false);
+  assert.equal(assessment.excluded, true);
   assert.equal(assessment.distanceMiles, null);
   assert.equal(assessment.qualified, false);
   assert.ok(assessment.cautions.some((c) => c.includes("worksite")));
   assert.equal(assessOpening({ ...opening, location: "Austin, TX, Denver, CO" }, prefs).excluded, true);
 });
 
-test("current entry/support preferences exclude senior and experienced engineering recommendations", () => {
+test("current entry/support preferences evaluate senior duties and exclude experienced engineering recommendations", () => {
   assert.equal(assessOpening({ ...opening, title: "Senior Network Engineer" }, prefs).excluded, true);
   assert.equal(assessOpening({ ...opening, title: "Systems Engineer II" }, prefs).excluded, true);
   assert.equal(assessOpening({ ...opening, description: `${opening.description}\nActive Secret security clearance required before starting.` }, { ...prefs, clearance: "none" }).excluded, true);
+});
+
+test("realistic support matches outrank keyword-rich career changes", () => {
+  const supported = assessOpening(opening, prefs);
+  for (const title of ["Post Production Support Specialist", "Credit Union Programmer Analyst III", "NX CAD Support Engineer", "AV Systems Administrator", "Security Operations Analyst", "Product Operations Technical Specialist, Counter Intrusion", "Platform Engineer II", "Systems Engineer I—Algorithms", "Program Cost Controls Analyst", "Factory Test Technical Specialist II", "Software Engineer"]) {
+    const fit = assessOpening({ ...opening, title }, prefs);
+    assert.equal(fit.excluded, true, title);
+    assert.ok(fit.score < supported.score, title);
+    assert.ok(fit.cautions.some(c => c.startsWith("Major gap:")), title);
+  }
+  const l3 = assessOpening({ ...opening, title: "L3 Production Support Engineer" }, prefs);
+  assert.equal(l3.excluded, false);
+  assert.equal(l3.qualified, false);
+  assert.ok(l3.score <= 59);
+});
+
+test("management requirements cannot be disguised by a support title", () => {
+  const fit = assessOpening({ ...opening, description: `${opening.description}\nMust have experience managing a team of direct reports.` }, prefs);
+  assert.equal(fit.excluded, true);
+  assert.ok(fit.cautions.some(c => c.includes("people-management")));
+});
+
+test("ordinary support titles remain candidates and optional tools do not create gaps", () => {
+  for (const title of ["IT Specialist", "Information Technology Technician", "Desktop Support Technician", "Helpdesk Analyst", "IS Support Specialist II"]) {
+    assert.equal(roleFamily(title), "core", title);
+    assert.equal(assessOpening({ ...opening, title }, prefs).qualified, true, title);
+  }
+  assert.equal(assessOpening({ ...opening, description: `${opening.description}\nPreferred Qualifications\nTerraform experience.` }, prefs).qualified, true);
+  const required = assessOpening({ ...opening, description: `${opening.description}\nTerraform experience required.` }, prefs);
+  assert.equal(required.qualified, false);
+  assert.ok(required.score <= 59);
+});
+
+ test("pay and commute are hard boundaries even for otherwise ideal matches", () => {
+  for (const change of [
+    { salaryMin: null, salaryMax: null },
+    { salaryMin: 55000, salaryMax: 100000 },
+    { location: "California" },
+    { location: "San Diego, CA" },
+    { location: "Remote, United States", workArrangement: "Remote" as const },
+    { employmentType: "Not listed" as const },
+  ]) {
+    const fit = assessOpening({ ...opening, ...change }, prefs);
+    assert.equal(fit.excluded, true, JSON.stringify(change));
+    assert.equal(fit.qualified, false);
+  }
+  assert.equal(assessOpening({ ...opening, salaryMin: 60000, location: "Long Beach, CA" }, prefs).excluded, false);
+  const referral = assessOpening({ ...opening, sourceKey: "rtx:california", salaryMin: null }, prefs);
+  assert.equal(referral.excluded, true);
 });

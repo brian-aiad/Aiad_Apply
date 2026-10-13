@@ -73,18 +73,32 @@ owner-only permissions; revoke access from the Google Account security page
 and remove that local file to disconnect. OAuth testing-mode refresh tokens
 may expire and then require reconnecting.
 
+The Gmail Codex plugin is installed for interactive Codex, but it is not
+available to this non-interactive application worker: the worker deliberately
+runs `codex exec` with `--ignore-user-config`, and a read-only capability check
+found no Gmail connector in that execution. The worker therefore uses the
+separately authorized Gmail OAuth connection above instead of inheriting
+arbitrary plugin tools or mail-write permissions.
+
 For an active, explicitly approved application only, the worker searches after
 the verification prompt was observed. Gmail query results are rechecked locally
 for the exact saved recipient, employer name, and message receive time. It uses
 the newest matching message only, preserves code capitalization, and makes one
 attempt in the existing application tab using a uniquely identified code field
-and verification action. A missing email, ambiguous code/field/action, rejected
-or expired code, or missing receipt is reported as unresolved; no older code,
-resend, duplicate application, or automatic retry is used. Codes are kept only
-in memory, excluded from answer capture, cleared from the field after the
-verification action, and never written to the reusable profile, attempt journal,
-or worker logs. The application is marked Applied only after a new explicit
-employer receipt.
+and verification action. If message text has no unique code, the worker opens
+the matched message content and safe inline images in a temporary local browser
+tab, takes an in-memory screenshot, and uses macOS Vision OCR (with local
+Tesseract fallback) to look for the same contextual code. Neither the screenshot
+nor OCR text is written to disk or sent to Codex or another service. An
+unambiguous code is required; letter-only codes need an explicit separator, and
+low-information or conflicting OCR is not guessed.
+A missing email, ambiguous code/field/action, rejected or expired code, or
+missing receipt is reported as unresolved; no older code, resend, duplicate
+application, or automatic retry is used. Codes are kept only in memory,
+excluded from answer capture, cleared from the field after the verification
+action, and never written to the reusable profile, attempt journal, or worker
+logs. The application is marked Applied only after a new explicit employer
+receipt.
 
 The application profile supports extra confirmed question/answer text for facts
 missing from a paused application. A confirmation or explicit consent specific to
@@ -324,3 +338,36 @@ a fresh employer receipt is recorded.
 
 Greenhouse documents codes as single-use and time-limited:
 https://support.greenhouse.io/hc/en-us/articles/43418495049499-MyGreenhouse-FAQ-for-Candidates
+
+### Review-batch recovery checks
+
+The driver dismisses another question's expanded dropdown before opening the
+next one, without selecting or changing that question's answer. Greenhouse
+array-valued checkbox questions are validated as a group when their options
+share the question's error target. A selected option satisfies that group;
+standalone consent boxes and explicit validation errors still block submission.
+This behavior was exercised on the Relativity Factory Test application, which
+returned an employer receipt after the exact approved PDF was verified.
+
+Final result assembly preserves question history and clears stale waiting
+messages only after the driver has confirmed submission. Unconfirmed results
+retain their specific errors. A saved `greenhouse`, `lever`, or `workday`
+discovery source can establish an employer-careers-site discovery answer;
+a generic job-board profile answer cannot establish a named commercial board.
+
+Tailoring permits at most three structured-plan attempts per quality pass.
+Correction calls receive the rejected draft as editing context, explicitly
+separate from candidate evidence. Administration and provisioning count as
+technical work actions; detached skill lists still do not satisfy contextual
+coverage. All corrected drafts must pass the normal evidence and layout checks.
+Unsupported technology exclusions use the same term normalization as posting
+keywords, including names with parenthesized acronyms. This prevents skill
+post-processing from reinserting a technology the evidence check excluded.
+Coverage checks recognize a preserved “monitored” duty as monitoring without
+changing literal keyword reporting. R may satisfy ordinary ETL/data investigation
+contexts as well as explicit coding contexts; unrelated duties and skill lists
+remain insufficient.
+Page snapshots retry transient navigation/detached-frame read failures up to
+three times, discarding partial references and answers from an interrupted read.
+They do not replay the preceding click, upload, or submission action. Unrelated
+errors and repeated navigation failures still stop the attempt.

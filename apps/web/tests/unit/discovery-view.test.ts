@@ -12,8 +12,13 @@ test("invalid query options fall back and search text is bounded", () => {
   const view = readDiscoveryView(new URLSearchParams({ channel: "anything", tab: "removed", period: "9000", sort: "random", q: "x".repeat(250) }));
   assert.equal(view.channel, "local");
   assert.equal(view.tab, "all");
-  assert.equal(view.period, "21");
+  assert.equal(view.period, "recommended");
   assert.equal(view.sort, "fit");
   assert.equal(view.query.length, 200);
   assert.equal(discoveryViewSearch(readDiscoveryView(new URLSearchParams())), "");
+});
+
+test("obsolete near-home links no longer narrow the saved radius", () => {
+  const view = readDiscoveryView(new URLSearchParams("near=1"));
+  assert.equal(discoveryViewSearch(view), "");
 });

@@ -100,6 +100,7 @@ from aiadapply_v2.validation.resume import (
 
 PIPELINE_VERSION = "0.7.0"
 MAX_DOCUMENT_CANDIDATES = 24
+MAX_PLAN_GENERATIONS = 3
 SUMMARY_STRENGTH_TERMS = {
     "critical thinking",
     "cross-functional collaboration",
@@ -274,10 +275,10 @@ def _transform_resume_attempt(
         reasoning: ReasoningResult | None = None
         plan_validation: ValidationResult | None = None
         discovered_technologies: set[str] = set()
-        for generation_attempt in range(1, 3):
+        for generation_attempt in range(1, MAX_PLAN_GENERATIONS + 1):
             _emit_progress(
                 progress,
-                f"Generating the structured rewrite plan ({generation_attempt}/2)",
+                f"Generating the structured rewrite plan ({generation_attempt}/{MAX_PLAN_GENERATIONS})",
             )
             reasoning = reasoner.reason(
                 job_description=job.job_description,
@@ -440,6 +441,16 @@ def _transform_resume_attempt(
             _emit_progress(
                 progress,
                 "Rewrite plan needs correction: " + "; ".join(revision_feedback),
+            )
+            # A fresh model call has no memory of its prior draft. Supply the
+            # rejected plan as editable draft context, never as candidate evidence,
+            # so a targeted correction need not discard other valid placements.
+            revision_feedback.append(
+                "Previous rejected draft, NOT factual evidence or an approved resume. "
+                "Repair the errors above using the original candidate evidence. "
+                "Preserve unaffected supported wording and keyword placements in both "
+                "primary and shorter variants; do not repeat unsafe claims. Draft: "
+                + reasoning.rewrite_plan.model_dump_json()
             )
         if reasoning is None or plan_validation is None or not plan_validation.passed:
             assert plan_validation is not None
@@ -1259,7 +1270,7 @@ def _supported_keywords(
     additional_unsupported: list[str] | None = None,
 ) -> list[JobKeyword]:
     excluded = {
-        term.casefold()
+        normalized_term(term)
         for term in [
             *reasoning.transferability_map.unsupported_terms,
             *reasoning.transferability_map.weakly_transferable_terms,
@@ -1828,10 +1839,10 @@ def _fuse_skill_inventory(
         for paragraph in document.paragraphs
         if paragraph.kind.value == "skill_line"
     }
-    unsupported_normalized = {term.casefold() for term in (unsupported_terms or [])}
+    unsupported_normalized = {normalized_term(term) for term in (unsupported_terms or [])}
     ineligible_normalized = {
         *SOFT_TERMS,
-        *(term.casefold() for term in (skill_ineligible_terms or set())),
+        *(normalized_term(term) for term in (skill_ineligible_terms or set())),
     }
     credible_new = [
         keyword

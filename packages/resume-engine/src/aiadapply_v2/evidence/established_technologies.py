@@ -50,6 +50,8 @@ _DEV = r"\b(built|build\w*|test\w*|deploy\w*|script\w*|debug\w*|code|develop\w*)
 for _family in ("javascript", "typescript", "java", "c", "cpp", "csharp", "go", "rust", "ruby",
                 "php", "swift", "kotlin", "r", "matlab", "bash", "powershell"):
     _CONTEXTS[_family] = _CODING
+# R is routinely used for data investigation as well as explicit script work.
+_CONTEXTS["r"] = rf"(?:{_CODING}|{_DATA})"
 for _family in ("sql", "postgres", "mysql", "sqlite", "mongodb"):
     _CONTEXTS[_family] = _DATA
 for _family in ("html", "css", "react", "node", "express", "vue", "angular", "next", "django", "flask", "fastapi"):
@@ -94,7 +96,7 @@ def technical_usage_in_context(term: str, text: str) -> bool:
         if (not family or technical_duty_fits(term, clause)) and re.search(
             r"\b(?:support\w*|debug\w*|investigat\w*|test\w*|validat\w*|resolv\w*|"
             r"monitor\w*|check\w*|deploy\w*|built|build\w*|automat\w*|script\w*|"
-            r"maintain\w*|configur\w*|review\w*|operat\w*|triag\w*|run(?:ning)?|ran)\b", clause, re.I
+            r"maintain\w*|configur\w*|administer\w*|provision\w*|review\w*|operat\w*|triag\w*|run(?:ning)?|ran)\b", clause, re.I
         ):
             return True
     return False

@@ -16,7 +16,9 @@ export class ApplicationBrowser {
   constructor(context, job, resumePath, outputDirectory, checkpoint, beforeSubmit) {
     Object.assign(this, { context, job, resumePath, outputDirectory, checkpoint, beforeSubmit });
     this.refs = new Map(); this.sequence = 0; this.identityVerified = false;
+    this.identityEverVerified = false;
     this.uploadVerified = false; this.submissionStarted = false; this.questions = [];
+    this.verificationCodeMayRemain = false;
     this.uploadToken = ''; this.uploadReceiptLinks = new Set();
     this.unresolved = []; this.beforeText = ''; this.lastSnapshot = null;
   }
@@ -30,6 +32,21 @@ export class ApplicationBrowser {
     return driver;
   }
   async snapshot() {
+    const questionsBeforeRead = this.questions.map(question => ({ ...question }));
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try { return await this.snapshotOnce(); }
+      catch (error) {
+        this.refs.clear(); this.identityVerified = false; this.lastSnapshot = null;
+        this.questions = questionsBeforeRead.map(question => ({ ...question }));
+        const navigationRace = /Execution context was destroyed|Frame was detached|frame has been detached|Cannot find context with specified id/i.test(String(error));
+        if (!navigationRace || attempt === 2 || this.page.isClosed()) throw error;
+        // Retry only the read. Never repeat the click/upload/submit that preceded it.
+        await this.page.waitForLoadState('domcontentloaded', { timeout: 3000 }).catch(() => {});
+        await this.page.waitForTimeout(150);
+      }
+    }
+  }
+  async snapshotOnce() {
     this.refs.clear();
     const frames = [];
     for (const [frameIndex, frame] of this.page.frames().entries()) {
@@ -78,6 +95,7 @@ export class ApplicationBrowser {
     }
     const text = frames.map(f => f.text).join('\n');
     this.identityVerified = normalize(text).includes(normalize(this.job.company)) && normalize(text).includes(normalize(this.job.title));
+    if (this.identityVerified) this.identityEverVerified = true;
     this.snapshotUrl = this.page.url();
     this.lastSnapshot = { url: this.page.url(), identityVerified: this.identityVerified, resumeUploaded: this.uploadVerified, attachmentPresent: await this.attachmentPresent(), submissionStarted: this.submissionStarted, frames };
     return this.lastSnapshot;
@@ -143,6 +161,17 @@ export class ApplicationBrowser {
     const target = this.ref(action.ref);
     const { control, locator } = target;
     if (control.disabled) throw new Error('That control is disabled.');
+    // An unrelated open select menu may cover the next question. Dismiss only
+    // that menu through its own combobox; never force-click through an option.
+    if (control.role === 'combobox' && ['click', 'choose'].includes(action.kind)) {
+      const otherOpen = target.frame.locator('[role="combobox"][aria-expanded="true"]');
+      for (const combo of await otherOpen.all()) {
+        if (await combo.getAttribute('data-aiad-ref') !== control.ref && await combo.isVisible()) {
+          await combo.press('Escape', { timeout: 3000 });
+        }
+      }
+    }
+
     const answerControl = ['checkbox', 'radio'].includes(control.type) || ['option', 'checkbox', 'radio'].includes(control.role);
     const allowedSource = ['saved_profile', 'approved_resume', 'job_policy', 'existing_answer'].includes(action.source);
     if (action.kind !== 'click' || answerControl) {
@@ -272,7 +301,21 @@ export class ApplicationBrowser {
       if (this.unresolved.length) throw new Error('Unresolved questions remain before submission.');
       if (!await this.attachmentPresent()) throw new Error('The final page does not verify the correct approved attachment. Submission refused.');
       for (const frame of this.page.frames()) {
-        const invalid = await frame.evaluate(() => [...document.querySelectorAll('input,select,textarea')].filter(el => el.getClientRects().length && !el.disabled && !el.checkValidity()).map(el => el.getAttribute('aria-label') || el.name || el.id));
+        const invalid = await frame.evaluate(() => {
+          const controls = [...document.querySelectorAll('input,select,textarea')];
+          return controls.filter(el => {
+            if (!el.getClientRects().length || el.disabled || el.checkValidity()) return false;
+            // Greenhouse marks every option in a required array-valued checkbox
+            // question as required. Its question validator requires one selection.
+            // Keep native validation for standalone consent boxes and other hosts.
+            if (/(^|\.)greenhouse\.io$/.test(location.hostname) && el.type === 'checkbox' && el.name.endsWith('[]') && el.validity.valueMissing && !el.validity.customError && el.getAttribute('aria-invalid') !== 'true') {
+              const errorId = el.getAttribute('aria-errormessage');
+              const peers = controls.filter(other => other.type === 'checkbox' && other.form === el.form && other.name === el.name && other.getAttribute('aria-errormessage') === errorId);
+              if (errorId && peers.length > 1 && peers.some(other => other.checked) && !peers.some(other => other.getAttribute('aria-invalid') === 'true')) return false;
+            }
+            return true;
+          }).map(el => el.getAttribute('aria-label') || el.name || el.id);
+        });
         const customInvalid = await frame.evaluate(() => [...document.querySelectorAll('[aria-required="true"]')].filter(el => el.getClientRects().length && el.getAttribute('aria-disabled') !== 'true' && !el.disabled && (el.getAttribute('aria-invalid') === 'true' || (el.getAttribute('role') === 'combobox' && !(el.value || el.getAttribute('aria-valuetext') || el.getAttribute('data-value') || el.closest('[class*=control], [data-select]')?.querySelector('[class*=singleValue], [class*=single-value], [data-selected-value]')?.textContent?.trim())) || (['checkbox', 'radio'].includes(el.getAttribute('role')) && el.getAttribute('aria-checked') !== 'true'))).map(el => el.getAttribute('aria-label') || el.id || 'required custom control'));
         invalid.push(...customInvalid);
         if (invalid.length) throw new Error(`Required or invalid fields remain: ${invalid.join(', ')}`);
@@ -323,7 +366,7 @@ export class ApplicationBrowser {
     return expected;
   }
   async completeVerification(code) {
-    if (!this.submissionStarted || this.page.isClosed()) throw new Error('Email verification is allowed only in the active, already-started application tab.');
+    if ((!this.submissionStarted && !this.identityEverVerified) || this.page.isClosed()) throw new Error('Email verification is allowed only in the active, identity-verified application tab.');
     if (!/^[A-Za-z0-9]{4,10}$/.test(code)) throw new Error('The matching email did not contain a supported verification code.');
     const page = this.page;
     await this.snapshot();
@@ -333,15 +376,23 @@ export class ApplicationBrowser {
       && ['text', 'tel', 'number', 'password'].includes(target.control.type)
       && verificationControl(target.control));
     if (inputs.length !== 1) throw new Error('The employer verification field is not uniquely identifiable in the current tab.');
-    const target = inputs[0];
+    let target = inputs[0];
     if (await target.locator.inputValue() !== '') throw new Error('The employer verification field already contains a value; it was not overwritten.');
+    this.verificationCodeMayRemain = true;
     let automaticallyAdvanced = false;
     try {
       await target.locator.fill(code, { timeout: 10000 });
-      const inputCount = await target.locator.count();
-      if (!inputCount) {
+      await this.snapshot();
+      const currentInputs = [...this.refs.values()].filter(candidate =>
+        candidate.control.tag === 'input'
+        && !candidate.control.disabled
+        && ['text', 'tel', 'number', 'password'].includes(candidate.control.type)
+        && verificationControl(candidate.control));
+      if (!currentInputs.length) {
         automaticallyAdvanced = true;
       } else {
+        if (currentInputs.length !== 1) throw new Error('The employer verification field changed and is no longer uniquely identifiable.');
+        target = currentInputs[0];
         if (await target.locator.inputValue() !== code) throw new Error('The employer verification field did not retain the retrieved code.');
         const actions = await target.locator.evaluate(input => {
           const scope = input.form || input.closest('[role="dialog"]') || input.parentElement?.parentElement;
@@ -369,20 +420,23 @@ export class ApplicationBrowser {
       if (this.page !== page || page.isClosed()) throw new Error('The verification flow left the active application tab; no new tab was followed.');
     } finally {
       if (!page.isClosed()) {
-        const stillAttached = await target.locator.count();
-        if (stillAttached && await target.locator.inputValue() === code) {
-          await target.locator.fill('', { timeout: 5000 });
-          if (await target.locator.inputValue() !== '') throw new Error('The verification code could not be cleared from the application field.');
+        const candidates = new Set([target, ...[...this.refs.values()].filter(candidate =>
+          candidate.control.tag === 'input' && verificationControl(candidate.control))]);
+        for (const candidate of candidates) {
+          if (candidate.frame.isDetached()) continue;
+          if (await candidate.locator.count() && await candidate.locator.inputValue() !== '') {
+            await candidate.locator.fill('', { timeout: 5000 });
+            if (await candidate.locator.inputValue() !== '') throw new Error('The verification code could not be cleared from the application field.');
+          }
         }
+        this.verificationCodeMayRemain = false;
       }
     }
     await this.snapshot();
-    if (!automaticallyAdvanced) {
-      for (let attempt = 0; attempt < 8 && verificationState(this.lastSnapshot) === 'required'; attempt++) {
-        await page.waitForTimeout(1000);
-        await this.snapshot();
-        if (this.page !== page || page.isClosed()) throw new Error('The verification flow left the active application tab; no new tab was followed.');
-      }
+    for (let attempt = 0; attempt < 8 && verificationState(this.lastSnapshot) === 'required'; attempt++) {
+      await page.waitForTimeout(1000);
+      await this.snapshot();
+      if (this.page !== page || page.isClosed()) throw new Error('The verification flow left the active application tab; no new tab was followed.');
     }
     if (verificationState(this.lastSnapshot) === 'required') {
       throw new Error('The employer verification challenge remains active; no second code action was attempted.');
@@ -393,7 +447,10 @@ export class ApplicationBrowser {
     const text = snapshot.frames.map(f => f.text).join('\n');
     if (!this.submissionStarted || !isReceipt(quote) || !text.includes(quote) || this.beforeText.includes(quote)) return null;
     const screenshot = path.join(this.outputDirectory, 'confirmation.png');
-    await this.page.screenshot({ path: screenshot, fullPage: true });
+    const sensitiveFields = [...this.refs.values()]
+      .filter(target => target.control.tag === 'input' && verificationControl(target.control))
+      .map(target => target.locator);
+    await this.page.screenshot({ path: screenshot, fullPage: true, mask: sensitiveFields });
     return { confirmation: quote, confirmationUrl: this.page.url(), screenshot };
   }
   async observeReceipt() {

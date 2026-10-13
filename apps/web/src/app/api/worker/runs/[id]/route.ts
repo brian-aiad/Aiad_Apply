@@ -362,5 +362,10 @@ export async function POST(
     throw error;
   }
 
+  // Drain saved eligible jobs after capacity opens, without any browser collection.
+  try {
+    const { queueLinkedIn } = await import("@/lib/discovery/linkedin");
+    await queueLinkedIn();
+  } catch { /* Completion is durable; the scheduled pump can retry. */ }
   return NextResponse.json({ ok: true });
 }

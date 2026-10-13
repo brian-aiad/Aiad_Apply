@@ -38,6 +38,7 @@ def demonstrates_ordinary_capability(term: str, source: str, final: str) -> bool
     """Narrow ordinary-work equivalence, grounded in the same source paragraph."""
     equivalent_actions = {
         "deployment": r"\bdeploy(?:ed|ing|ment|ments)?\b",
+        "monitoring": r"\bmonitor(?:ed|ing)\b",
         "product operations": r"\b(?:live production operations|product operations)\b",
         "product support": r"\b(?:production|application|software|product) support\b",
         "configuration": r"\b(?:configurations?|configured|configuring)\b",

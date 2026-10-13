@@ -2041,7 +2041,7 @@ def test_restoration_explains_lost_context_to_correction_model():
 
 
 def test_rest_api_project_rewrite_keeps_generic_api_evidence():
-    from aiadapply_v2.text import preserves_source_term, contains_term
+    from aiadapply_v2.text import contains_term, preserves_source_term
     assert preserves_source_term("Configured REST APIs", "API")
     assert not contains_term("Configured REST APIs", "API")
     assert not preserves_source_term("Configured an API", "Microsoft Graph API")
@@ -2239,3 +2239,21 @@ def test_ai_skill_allowance_does_not_allow_unsupported_ai_or_named_tool_bundles(
     tools.skills.append("AI")
     _fuse_skill_inventory(plan, document, [ai])
     assert "AI" not in tools.skills
+
+
+def test_parenthesized_unsupported_technology_is_not_reintroduced_into_skills():
+    from aiadapply_v2.text import normalized_term
+    document = parse_resume_docx(BASE)
+    plan = identity_plan(document)
+    term = "AWS Elastic Container Registry (ECR)"
+    keyword = JobKeyword(term=term, normalized=normalized_term(term), kind="system", hiring_importance=90, placement_utility=90)
+    reasoning = ReasoningResult(
+        role_profile=TargetRoleProfile(title="Support Engineer", normalized_role_family="application_support", professional_identity="Application Support Specialist"),
+        transferability_map=TransferabilityMap(unsupported_terms=[term]), rewrite_plan=plan,
+    )
+    assert _supported_keywords(reasoning, [keyword]) == []
+    tools = next(line for line in plan.skills.lines if line.paragraph_id == "skills.tools")
+    tools.skills.append(term)
+    _fuse_skill_inventory(plan, document, [keyword], unsupported_terms=[term])
+    _ensure_important_keyword_placement(reasoning, _supported_keywords(reasoning, [keyword]), document)
+    assert all(term not in line.skills and term not in line.shorter_skills for line in plan.skills.lines)

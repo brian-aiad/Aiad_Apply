@@ -245,6 +245,7 @@ def test_request_retries_transient_server_errors_but_not_client_errors(
 
 def test_failed_run_retains_only_its_model_usage_and_bounds_error(tmp_path):
     from types import SimpleNamespace
+
     from aiadapply_v2.schemas import ModelCallUsage
 
     reasoner = SimpleNamespace(usage=[

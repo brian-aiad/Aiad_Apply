@@ -22,7 +22,7 @@ export function integrationStatus(env: Readonly<Record<string, string | undefine
 export function externalSources(prefs: DiscoveryPreferences, env: Readonly<Record<string, string | undefined>> = process.env): Source[] {
   const result: Source[] = [];
   if (env.ADZUNA_APP_ID && env.ADZUNA_APP_KEY) {
-    for (const query of ["application support", "systems analyst", "technical support", "implementation", "IT operations", "integration analyst"]) {
+    for (const query of ["application support", "technical support", "IT support", "desktop support", "help desk", "service desk", "software support", "systems administrator", "implementation specialist", "IT operations", "integration analyst"]) {
       result.push({ key: `adzuna:${query.replaceAll(" ", "-")}`, board: query, provider: "adzuna", company: `Adzuna · ${query}`, url: "https://www.adzuna.com" });
     }
   }

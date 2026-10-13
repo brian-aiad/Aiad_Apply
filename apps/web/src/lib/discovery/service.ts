@@ -1,3 +1,6 @@
+import { sameKnownJob } from "./linkedin";
+import { requiredQualifications } from "./requirements";
+import { LINKEDIN_STATE, LINKEDIN_META, LINKEDIN_CONFIG, LINKEDIN_QUEUE, LINKEDIN_SESSION, TAILORING_CAPACITY, linkedInConfig, linkedInEligibility, object } from "./linkedin-policy";
 import { postedWithin } from "./freshness";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { externalSources, integrationStatus } from "./external-providers";
@@ -21,11 +24,29 @@ export const postingId = (sourceKey: string, externalId: string) => createHash("
 export async function discoverySnapshot() {
   const [postings, settings] = await Promise.all([
     db.discoveryPosting.findMany({ orderBy: [{ score: "desc" }, { firstSeenAt: "desc" }], take: 2000 }),
-    db.setting.findMany({ where: { key: { in: [SCAN_KEY, PREFS_KEY, AUTOMATION_KEY, AUTOMATION_STATE_KEY] } } }),
+    db.setting.findMany({ where: { OR: [{ key: { in: ["discovery:linkedin:assisted-capture", SCAN_KEY, PREFS_KEY, AUTOMATION_KEY, AUTOMATION_STATE_KEY, LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_QUEUE, LINKEDIN_SESSION] } }, { key: { startsWith: LINKEDIN_META } }] } }),
   ]);
   const preferences = readDiscoveryPreferences(settings.find((s) => s.key === PREFS_KEY)?.value);
+  const applications = await db.application.findMany({ where: { id: { in: postings.flatMap(p => p.approvedApplicationId ? [p.approvedApplicationId] : []) } }, select: { id: true, status: true, tailoringRuns: { orderBy: { runNumber: "desc" }, take: 1, select: { status: true } } } });
+  const queue = object(settings.find(s => s.key === LINKEDIN_QUEUE)?.value);
+  const queueItems = Array.isArray(queue.items) ? queue.items.map(object) : [];
   return {
-    postings: postings.map((posting) => ({ ...posting, ...assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time" | "Other" | "Not listed", workArrangement: posting.workArrangement as "Hybrid" | "On-site" | "Remote" | "Not listed" }, preferences) })),
+    postings: postings.map(posting => {
+      const linkedin = settings.find(s => s.key === LINKEDIN_META + posting.id)?.value ?? null;
+      const fit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, preferences);
+      const app = applications.find(a => a.id === posting.approvedApplicationId);
+      const eligibility = linkedInEligibility({ ...posting, ...fit }, linkedin);
+      const queuedState = queueItems.find(i => i.postingId === posting.id);
+      return { ...posting, ...fit, description: posting.description.slice(0, 1600), requiredExcerpt: requiredQualifications(posting.description).slice(0, 4), linkedin,
+        ...(app ? { application: { id: app.id, status: app.status, tailoringStatus: app.tailoringRuns[0]?.status } } : {}),
+        ...(posting.sourceKey.startsWith("linkedin:") ? { pipeline: eligibility.status === "eligible" && queuedState ? { status: String(queuedState.status), reason: String(queuedState.reason) } : eligibility } : {}),
+      };
+    }),
+    linkedinCapture: settings.find(s => s.key === "discovery:linkedin:assisted-capture")?.value ?? null,
+    linkedinConfig: linkedInConfig(settings.find(s => s.key === LINKEDIN_CONFIG)?.value),
+    linkedinQueue: queue,
+    linkedinSession: settings.find(s => s.key === LINKEDIN_SESSION)?.value ?? null,
+    linkedinState: settings.find(s => s.key === LINKEDIN_STATE)?.value ?? null,
     preferences,
     automation: readAutomationPreferences(settings.find((s) => s.key === AUTOMATION_KEY)?.value),
     automationState: settings.find((s) => s.key === AUTOMATION_STATE_KEY)?.value ?? null,
@@ -101,14 +122,15 @@ export async function refreshDiscovery(force = false) {
   return { claimed: true, scan: { ...claim.scan, completedAt: new Date().toISOString(), status: sources.some((s) => s.status !== "failed") ? "completed" : "failed", sources, found }, reason: "completed" };
 }
 
-export async function approvePosting(id: string, tailor: boolean, automatic = false) {
+export async function approvePosting(id: string, tailor: boolean, automatic: boolean | "linkedin" = false) {
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(9074031)`;
     const posting = await tx.discoveryPosting.findUnique({ where: { id } });
     if (!posting) throw new Error("Posting not found.");
     if (posting.sourceKey.startsWith("adzuna:")) throw new Error("Open the Adzuna listing and paste the full employer posting into Capture job before saving or tailoring.");
     if (posting.sourceKey === "rtx:california" && !postedWithin(posting.postedAt, 21)) throw new Error("This RTX posting is outside your 21-day window. Refresh the search.");
-    if (automatic) {
+    if (automatic === true) {
+      if (posting.sourceKey.startsWith("linkedin:")) throw new Error("LinkedIn jobs use their separate daily queue.");
       const settings = await tx.setting.findMany({ where: { key: { in: [AUTOMATION_KEY, PREFS_KEY] } } });
       const automation = readAutomationPreferences(settings.find((s) => s.key === AUTOMATION_KEY)?.value);
       const preferences = readDiscoveryPreferences(settings.find((s) => s.key === PREFS_KEY)?.value);
@@ -123,6 +145,9 @@ export async function approvePosting(id: string, tailor: boolean, automatic = fa
       const existing = await tx.application.findUnique({ where: { id: posting.approvedApplicationId } });
       if (existing) return { id: existing.id, duplicate: true };
     }
+    const currentPreferences = readDiscoveryPreferences((await tx.setting.findUnique({ where: { key: PREFS_KEY } }))?.value);
+    const currentFit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, currentPreferences);
+    if (currentFit.excluded) throw new Error("This opening does not meet your current role, confirmed pay or commute requirements. Refresh Discover.");
     if (!posting.active) throw new Error("This posting is no longer listed. Refresh the search before approving it.");
     if (Date.now() - posting.lastSeenAt.getTime() > 48 * 60 * 60 * 1000) throw new Error("This listing has not been checked in two days. Refresh the search before approving it.");
     const candidates = await tx.job.findMany({
@@ -131,15 +156,42 @@ export async function approvePosting(id: string, tailor: boolean, automatic = fa
       take: 20,
       orderBy: { capturedAt: "desc" },
     });
+    {
+      const linkedMeta = (await tx.setting.findUnique({ where: { key: LINKEDIN_META + posting.id } }))?.value as { applyUrl?: string } | null;
+      const priorJobs = await tx.job.findMany({ include: { application: true }, });
+      // A direct feed discovered after LinkedIn must link the same requisition too.
+      const destination = linkedMeta?.applyUrl || (posting.sourceKey.startsWith("linkedin:") ? null : posting.sourceUrl);
+      const prior = priorJobs.find(job => job.application && sameKnownJob(job, posting, destination));
+      if (prior?.application) {
+        await tx.discoveryPosting.update({ where: { id }, data: { approvedApplicationId: prior.application.id } });
+        return { id: prior.application.id, duplicate: true };
+      }
+    }
     const fingerprint = postingFingerprint({ ...posting, cleanDescription: posting.description });
     const duplicate = candidates.find((candidate) => candidate.sourceUrl === posting.sourceUrl || postingFingerprint(candidate) === fingerprint);
     if (duplicate?.application) {
       await tx.discoveryPosting.update({ where: { id }, data: { approvedApplicationId: duplicate.application.id, dismissedAt: null } });
       return { id: duplicate.application.id, duplicate: true };
     }
+    if (tailor && posting.sourceKey === "linkedin:premium") {
+      const start = fromZonedTime(`${formatInTimeZone(new Date(), "America/Los_Angeles", "yyyy-MM-dd")}T00:00:00`, "America/Los_Angeles");
+      const used = await tx.applicationEvent.count({ where: { eventType: "discovery_approved", occurredAt: { gte: start }, detail: { path: ["source"], equals: "linkedin:premium" }, toValue: "TAILORING" } });
+      const config = linkedInConfig((await tx.setting.findUnique({ where: { key: LINKEDIN_CONFIG } }))?.value);
+      if (automatic === "linkedin") {
+        const meta = (await tx.setting.findUnique({ where: { key: LINKEDIN_META + id } }))?.value;
+        const eligibility = linkedInEligibility({ ...posting, ...currentFit }, meta);
+        if (!config.enabled || !config.autoTailor) throw new Error("LinkedIn automatic tailoring is paused.");
+        if (eligibility.status !== "eligible") throw new Error(eligibility.reason);
+      }
+      if (used >= config.dailyLimit) throw new Error("LinkedIn daily limit reached; deferred until tomorrow.");
+      const pending = await tx.tailoringRun.count({ where: { status: { in: ["QUEUED", "RUNNING"] } } });
+      if (pending >= TAILORING_CAPACITY) throw new Error("Tailoring queue full; deferred until capacity is available.");
+    }
     // Preserve the existing parser's known header format for the Python engine.
     const rawPaste = [`Company logo for, ${posting.company}`, posting.company, posting.title, `${posting.location} · ${posting.workArrangement}`, posting.employmentType, posting.salaryText || "", `Official posting: ${posting.sourceUrl}`, "About the job", posting.description].filter(Boolean).join("\n");
+    const metadata = (await tx.setting.findUnique({ where: { key: LINKEDIN_META + posting.id } }))?.value as { applyUrl?: string } | null;
     const job = await tx.job.create({ data: {
+      ...(metadata?.applyUrl ? { applyUrl: metadata.applyUrl } : {}),
       source: posting.sourceKey.split(":")[0], company: posting.company, title: posting.title, location: posting.location,
       workArrangement: posting.workArrangement, employmentType: posting.employmentType,
       salaryMin: posting.salaryMin === null ? null : Math.round(posting.salaryMin), salaryMax: posting.salaryMax === null ? null : Math.round(posting.salaryMax), salaryText: posting.salaryText,
@@ -147,7 +199,7 @@ export async function approvePosting(id: string, tailor: boolean, automatic = fa
     } });
     const application = await tx.application.create({ data: {
       jobId: job.id, status: tailor ? "TAILORING" : "CAPTURED",
-      events: { create: { eventType: automatic ? "automatic_tailoring_queued" : "discovery_approved", toValue: tailor ? "TAILORING" : "CAPTURED", detail: { source: posting.sourceKey, postingId: id } } },
+      events: { create: { eventType: automatic === true ? "automatic_tailoring_queued" : "discovery_approved", toValue: tailor ? "TAILORING" : "CAPTURED", detail: { source: posting.sourceKey, postingId: id } } },
       ...(tailor ? { tailoringRuns: { create: { runNumber: 1, status: "QUEUED" } } } : {}),
     } });
     await tx.discoveryPosting.update({ where: { id }, data: { approvedApplicationId: application.id, dismissedAt: null } });
@@ -160,11 +212,13 @@ export async function runDiscoveryAutomation() {
   if (!settings.scheduledSearch) return { enabled: false, queued: 0 };
   const scan = await refreshDiscovery(false);
   if (scan.reason === "running" || scan.scan?.status === "failed") return { enabled: true, queued: 0, reason: scan.reason };
-  const snapshot = await discoverySnapshot();
+  const prefs = readDiscoveryPreferences((await db.setting.findUnique({ where: { key: PREFS_KEY } }))?.value);
+  const rows = await db.discoveryPosting.findMany({ where: { active: true, sourceKey: { not: { startsWith: "linkedin:" } } } });
+  const snapshot = { postings: rows.map(p => ({ ...p, ...assessOpening({ ...p, employmentType: p.employmentType as "Full-time", workArrangement: p.workArrangement as "On-site" }, prefs) })) };
   let queued = 0;
   const messages: string[] = [];
   if (settings.autoTailor) {
-    const candidates = snapshot.postings.filter((p) => eligibleForAutoTailoring(p, settings)).sort((a, b) => b.score - a.score || b.firstSeenAt.getTime() - a.firstSeenAt.getTime());
+    const candidates = snapshot.postings.filter((p) => !p.sourceKey.startsWith("linkedin:") && eligibleForAutoTailoring(p, settings)).sort((a, b) => b.score - a.score || b.firstSeenAt.getTime() - a.firstSeenAt.getTime());
     for (const posting of candidates.slice(0, settings.dailyLimit)) {
       try { const result = await approvePosting(posting.id, true, true); if (!result.duplicate) queued++; }
       catch (error) { messages.push(error instanceof Error ? error.message : "Could not queue this opening."); }

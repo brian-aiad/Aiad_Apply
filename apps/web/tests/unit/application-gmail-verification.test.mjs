@@ -20,6 +20,8 @@ const message = ({ id, to = 'Brian <brian@example.com>', from = 'no-reply@exampl
 test('verification code extraction preserves capitalization and rejects ambiguous or uncontextualized values', () => {
   assert.equal(extractVerificationCode('Your verification code is aB12Cd.'), 'aB12Cd');
   assert.equal(extractVerificationCode('Use code: 123456 to continue.'), '123456');
+  assert.equal(extractVerificationCode('Your verification code will arrive shortly.'), null);
+  assert.equal(extractVerificationCode('Verification code: AbCdEf.'), 'AbCdEf');
   assert.equal(extractVerificationCode('Your password is 123456.'), null);
   assert.equal(extractVerificationCode('Your code is 123456. Verification code: AbCd12.'), null);
 });
@@ -27,7 +29,7 @@ test('verification code extraction preserves capitalization and rejects ambiguou
 test('only the newest email for the exact employer, recipient, and request time can supply a code', () => {
   const requestedAt = Date.parse('2026-10-07T18:00:00.000Z');
   const emails = [
-    message({ id: 'newest', body: 'We received your application to Example Company.', receivedAt: requestedAt + 5000 }),
+    message({ id: 'newest', body: 'We received your application to Example Company.\nOn Tue, 7 Oct 2026 at 9:00, user@example.com wrote:\n> Your verification code is OldQuoted1.', receivedAt: requestedAt + 5000 }),
     message({ id: 'older', body: 'Your verification code is Old123.', receivedAt: requestedAt + 3000 }),
     message({ id: 'wrong-recipient', to: 'other@example.com', body: 'Example Company verification code: Wrong1.', receivedAt: requestedAt + 6000 }),
     message({ id: 'wrong-employer', body: 'Other Company verification code: Wrong2.', receivedAt: requestedAt + 7000 }),
@@ -52,11 +54,13 @@ test('Gmail lookup reads a new matching message and returns the code only to the
   t.after(() => rm(directory, { recursive: true, force: true }));
   const requestedAt = Date.now();
   let searched = '';
+  let includesSpamTrash = false;
   const fetchImpl = async (input, options = {}) => {
     const url = new URL(input);
     if (url.hostname === 'oauth2.googleapis.com') return new Response(JSON.stringify({ access_token: 'test-access' }), { status: 200 });
     if (url.pathname.endsWith('/messages')) {
       searched = url.searchParams.get('q');
+      includesSpamTrash = url.searchParams.get('includeSpamTrash') === 'true';
       return new Response(JSON.stringify({ messages: [{ id: 'message-1' }] }), { status: 200 });
     }
     if (url.pathname.endsWith('/messages/message-1')) {
@@ -79,4 +83,5 @@ test('Gmail lookup reads a new matching message and returns the code only to the
   assert.match(searched, /to:brian@example\.com/);
   assert.match(searched, /Example Company/);
   assert.match(searched, /after:/);
+  assert.equal(includesSpamTrash, true);
 });

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
           if (command.claimToken && attempt.claimToken === command.claimToken && attempt.workerId === command.workerId && attempt.status === "RUNNING" && !attempt.submissionStartedAt && !attempt.browserStartedAt) {
             const { app, bytes, profile, applicationHistory } = await approvedMaterial(tx, event.applicationId, attempt);
             await saveAttempt(tx, event.id, attempt);
-            return { attemptId: event.id, applicationId: app.id, ...attempt, company: app.job.company, title: app.job.title, posting: app.job.rawPaste, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
+            return { attemptId: event.id, applicationId: app.id, ...attempt, company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
           }
           if (Date.now() - Date.parse(attempt.updatedAt) < 120_000) return null;
           await saveAttempt(tx, event.id, { ...attempt, status: attempt.status === "SUBMITTING" ? "UNKNOWN" : "BLOCKED", summary: attempt.status === "SUBMITTING" ? "The worker disconnected during submission. Check the employer site before any retry; this has not been marked Applied." : "The browser worker disconnected before submission. Review the interruption before approving another attempt." });
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
         try {
           const { app, bytes, profile, applicationHistory } = await approvedMaterial(tx, event.applicationId, attempt);
           await saveAttempt(tx, event.id, { ...attempt, status: "RUNNING", workerId: command.workerId, ...(command.claimToken ? { claimToken: command.claimToken } : {}), summary: "Opening the approved job and preparing its application." });
-          return { attemptId: event.id, applicationId: app.id, ...attempt, status: "RUNNING", ...(command.claimToken ? { claimToken: command.claimToken } : {}), company: app.job.company, title: app.job.title, posting: app.job.rawPaste, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
+          return { attemptId: event.id, applicationId: app.id, ...attempt, status: "RUNNING", ...(command.claimToken ? { claimToken: command.claimToken } : {}), company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
         } catch (error) {
           await saveAttempt(tx, event.id, { ...attempt, status: "BLOCKED", summary: error instanceof AutomationError ? error.message : "Could not load the approved resume." });
           return null;

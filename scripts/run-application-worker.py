@@ -1,8 +1,8 @@
 """Hold an OS-level exclusive lock for the lifetime of the browser worker."""
 import fcntl
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 root = Path(__file__).resolve().parent.parent
 lock_path = root / ".runtime/application-worker.lock"
@@ -12,7 +12,7 @@ try:
     fcntl.flock(descriptor, fcntl.LOCK_EX | fcntl.LOCK_NB)
 except BlockingIOError:
     os.close(descriptor)
-    raise SystemExit("Another application browser worker already owns this installation.")
+    raise SystemExit("Another application browser worker already owns this installation.") from None
 os.set_inheritable(descriptor, True)
 os.ftruncate(descriptor, 0)
 os.write(descriptor, f"{os.getpid()}\n".encode())

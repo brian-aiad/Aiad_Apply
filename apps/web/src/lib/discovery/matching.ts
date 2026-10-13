@@ -10,7 +10,7 @@ const skillDefinitions: [string, RegExp, string][] = [
   ["SQL & databases", /\b(?:SQL|PostgreSQL|MySQL|database queries)\b/i, "sql"],
   ["API troubleshooting", /\b(?:REST|APIs?|Postman|webhooks?)\b/i, "postman"],
   ["Microsoft 365", /\b(?:Microsoft|Office|M)\s*365\b/i, "microsoft 365"],
-  ["Identity & access", /\b(?:Entra|Azure AD|RBAC|SSO|SAML|OAuth|MFA)\b/i, "entra"],
+  ["Identity & access", /\b(?:Entra|Azure AD|RBAC|SSO|SAML|OAuth|MFA|(?:user )?access management|user administration)\b/i, "entra"],
   ["Incident resolution", /\b(?:incident|troubleshoot\w*|root cause|production support)\b/i, "incident"],
   ["Python & automation", /\b(?:Python|PowerShell|Bash)\b/i, "python"],
   ["Ticketing & SLAs", /\b(?:Jira|ticket\w*|SLAs?|escalation\w*)\b/i, "jira"],
@@ -25,6 +25,7 @@ export function excludedTitle(title: string) {
 
 export function roleFamily(title: string): "core" | "adjacent" | null {
   if (excludedTitle(title)) return null;
+  if (/\b(?:computer|end[ -]user|helpdesk|service desk|desktop)\b.*\b(?:support|technician|analyst|specialist)\b|\b(?:IT|information technology|information systems|IS)\s+(?:technician|specialist)\b/i.test(title)) return "core";
   if (/\b(?:application|technical|technology|production|software|product|IT|IS|desktop|systems?)\s+support\b|\bsupport\s+(?:engineer|analyst|specialist|technician|representative|rep)\b|\b(?:service|help)[ -]?desk\b/i.test(title)) return "core";
   if (/\b(?:implementation|integration|integrations)\s+(?:analyst|specialist|engineer|consultant)\b|\b(?:business|IT|information)\s+systems\b|\bsystems?\s+administrator\b|\bIT\s+(?:operations|analyst|specialist|technician)\b/i.test(title)) return "adjacent";
   if (/\b(?:applications?|business|systems?|business systems|information systems|technical|integration|data operations|data quality|implementation|reporting|identity|access|IAM|IT)\s+(?:analyst|administrator|specialist|consultant)\b|\b(?:QA|quality assurance|software test|API test)\s+(?:analyst|engineer|tester)\b/i.test(title)) return "adjacent";
@@ -35,7 +36,32 @@ export function roleFamily(title: string): "core" | "adjacent" | null {
 }
 
 export function couldBeRelevant(title: string) {
-  return !excludedTitle(title) && (roleFamily(title) !== null || /\b(?:analyst|specialist|administrator|support|technician|consultant)\b/i.test(title));
+  return !excludedTitle(title) && (roleFamily(title) !== null || /\b(?:analyst|specialist|administrator|support|technician|consultant|platform engineer|solutions engineer)\b/i.test(title));
+}
+
+// Solutions titles can describe support escalations and integrations, or a very
+// different sales/architecture role. Require direct support duties and experience
+// evidence; the normal seniority, specialist and architecture checks still apply.
+function supportSolutionsRole(title: string, description: string, requiredLines: string[]) {
+  if (excludedTitle(title) || !/\bsolutions engineer\b/i.test(title)) return false;
+  return requiredLines.some(line => /\bexperience\b/i.test(line) && /\btechnical (?:support|operations)\b/i.test(line))
+    && /\b(?:troubleshoot|resolve)\w*[^.\n]{0,90}\b(?:production|technical|software) (?:issues|incidents)\b/i.test(description)
+    && /\bsupport tickets\b/i.test(description)
+    && /\b(?:APIs?|integrations?)\b/i.test(description);
+}
+
+// Platform titles also cover junior digital-workplace operations. Fetch their
+// descriptions, but only admit this narrow, evidence-backed support scope.
+function digitalWorkplacePlatformRole(title: string, description: string, requiredLines: string[]) {
+  if (!/\bplatform engineer\b/i.test(title)) return false;
+  const experience = experienceRequirement(requiredLines);
+  if (!experience || experience.years > 3) return false;
+  const advanced = /\b(?:Kubernetes|Terraform|distributed systems|site reliability|SRE|infrastructure as code|microservices|production infrastructure)\b/i;
+  if (requiredLines.some(line => advanced.test(line))) return false;
+  return /\b(?:end[ -]user services|digital workplace)\b/i.test(description)
+    && /\b(?:platform administration|access management|role-based permissions)\b/i.test(description)
+    && /\b(?:scripts?|scripting|API[ -]based|API integrations|workflows?)\b/i.test(description)
+    && /\b(?:under guidance|foundational experience|internships|co-ops)\b/i.test(description);
 }
 
 // Approximate city centres; the UI explicitly distinguishes radius from road miles.
@@ -96,15 +122,31 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   const distanceMiles = localDistance(opening.location);
   const remote = opening.workArrangement === "Remote";
   const text = opening.description;
+  const requiredLines = requiredQualifications(text
+    .replace(/^The Experience You Bring\s*$/gmi, "Required Qualifications")
+    .replace(/^What Makes You Stand Out\s*$/gmi, "Preferred Qualifications"));
+  const workplacePlatform = digitalWorkplacePlatformRole(opening.title, text, requiredLines);
+  if (workplacePlatform) family = "core";
+  const supportSolutions = supportSolutionsRole(opening.title, text, requiredLines);
+  if (supportSolutions) family = "core";
   const positiveText = text.split(/\n|(?<=[.!?])\s+/).filter((line) => !/\b(?:not required|no (?:prior )?experience (?:with|in)|does not require)\b/i.test(line)).join("\n");
   const matchReasons = skillDefinitions.filter(([, pattern, evidence]) => baseEvidence.includes(evidence) && pattern.test(positiveText)).map(([label]) => label);
-  if (opening.sourceKey === "rtx:california") return rtxFit(opening, distanceMiles, matchReasons, new Date(), preferences);
-  const cautions: string[] = [];
+  const constraintGaps = [
+    ...(opening.salaryMin === null || opening.salaryMin < preferences.minimumSalary ? [`Outside your pay criteria: confirmed starting base pay must be at least $${preferences.minimumSalary.toLocaleString("en-US")}/year.`] : []),
+    ...(distanceMiles === null || distanceMiles > preferences.radiusMiles ? [`Outside your location criteria: a confirmed worksite within ${preferences.radiusMiles} miles of Seal Beach is required.`] : []),
+    ...(opening.employmentType !== "Full-time" ? ["Outside your employment criteria: confirmed full-time employment is required."] : []),
+  ];
+  if (opening.sourceKey === "rtx:california") {
+    const result = rtxFit(opening, distanceMiles, matchReasons, new Date(), preferences);
+    return { ...result, excluded: result.excluded || constraintGaps.length > 0, qualified: result.qualified && constraintGaps.length === 0, cautions: [...constraintGaps, ...result.cautions] };
+  }
+  const cautions: string[] = [...constraintGaps];
   if (!family && couldBeRelevant(opening.title) && matchReasons.length >= 4) {
     family = "adjacent";
     cautions.push("Related duties found under an unfamiliar title; review the role scope.");
   }
-  let excluded = !family || /\b(?:software|systems?|electrical|mechanical|manufacturing|test)\s+engineer\s*(?:II|2|III|3)\b/i.test(opening.title) && !/\b(?:IT|support)\b/i.test(opening.title);
+  let excluded = constraintGaps.length > 0 || !family || /\b(?:software|systems?|electrical|mechanical|manufacturing|test)\s+engineer\s*(?:II|2|III|3)\b/i.test(opening.title) && !/\b(?:IT|support)\b/i.test(opening.title);
+  if (!family) cautions.push("Role scope is not established as application support, IT operations or a supported adjacent role.");
   if (remote && !preferences.includeRemote) excluded = true;
   if (remote && !/\b(?:United States|USA|US|California|CA)\b/i.test(opening.location)) {
     cautions.push("Confirm this remote role hires in California.");
@@ -119,10 +161,12 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   if (opening.salaryMax !== null && opening.salaryMax < preferences.minimumSalary) excluded = true;
   if (opening.salaryMin === null) cautions.push("Salary is not confirmed; ask for the base-pay range.");
   else if (opening.salaryMin < preferences.minimumSalary) cautions.push("The posted range starts below your salary target.");
-  const senior = /\b(?:senior|sr\.?|lead|manager|supervisor|staff)\b/i.test(opening.title);
-  if (senior) { excluded = true; cautions.push("Senior or leadership role is outside your current entry/support target."); }
-  const requiredLines = requiredQualifications(text);
+  const leadershipTitle = /\b(?:lead|manager|supervisor|staff)\b/i.test(opening.title);
+  if (leadershipTitle) { excluded = true; cautions.push("Leadership role is outside your documented support scope."); }
   const experience = experienceRequirement(requiredLines);
+  if (/\b(?:senior|sr\.?)\b/i.test(opening.title) && !experience) {
+    cautions.push("Senior title: experience depth is not specified; review ownership and scope before tailoring.");
+  }
   if (experience && experience.years > 3) {
     cautions.push(`Required experience: ${experience.years}+ years; your documented background is 3+ years. ${experience.years >= 5 ? "Outside your current target." : "Review this stretch before tailoring."}`);
     if (experience.years >= 5) excluded = true;
@@ -142,7 +186,7 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   }
   if (!requiredLines.length) cautions.push("Required qualifications were not clearly identified; review the full posting.");
   cautions.push(...roleConditions(`${opening.title}\n${text}`).map(condition => `Work schedule: ${condition}.`));
-  const specialistRequirements = ["ServiceNow", "Salesforce", "SAP", "Workday", "Epic", "Cerner", "CISSP", "CCNP", "Kubernetes", "Terraform", "Oracle ERP", "Odoo"];
+  const specialistRequirements = ["ServiceNow", "Salesforce", "SAP", "Workday", "Epic", "Cerner", "CISSP", "CCNP", "Kubernetes", "Terraform", "Oracle ERP", "Odoo", "ITIL Foundation", "OpCon", "Symitar", "UiPath Orchestrator", "Axway", "CUDA"];
   for (const term of specialistRequirements) {
     if (!baseEvidence.includes(term.toLowerCase()) && requiredLines.some((line) => new RegExp(`\\b${term}\\b`, "i").test(line) && !(/e\.g\.|such as|\bor\b/i.test(line) && /\b(?:Jira|Python|SQL|Microsoft 365)\b/i.test(line)))) {
       cautions.push(`Required ${term} experience or credential is not established in your base resume.`);
@@ -151,11 +195,41 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   if (opening.sourceKey.startsWith("adzuna:")) cautions.push("Adzuna supplies a description excerpt. Open the source and capture the full posting before tailoring.");
   if (opening.sourceKey.startsWith("usajobs:")) cautions.push("Federal opening: verify hiring eligibility, specialized experience and the announcement's resume requirements.");
   if (matchReasons.length < 3) cautions.push("Limited overlap with the duties documented in your base resume.");
-  const score = Math.max(0, Math.min(100, (family === "core" ? 32 : family ? 28 : 0)
-    + Math.min(49, matchReasons.length * 7)
+  // Evaluate job scope separately from technology familiarity. Shared keywords
+  // cannot compensate for an unsupported primary profession or responsibility.
+  const scopeGaps: string[] = [];
+  if (/\b(?:network engineer|post[ -]production|programmer|CAD|NX|AV systems|security operations analyst|counter intrusion|field technical|site reliability|SRE|DevOps engineer|software developer|software engineer|data scientist|machine learning engineer|algorithms?|cost controls?|financial analyst|consumer insights|factory test)\b/i.test(opening.title)) {
+    excluded = true;
+    scopeGaps.push("Major gap: the primary role is outside your documented application support and IT operations experience.");
+  }
+  if (/\bplatform engineer\b/i.test(opening.title) && !workplacePlatform) {
+    excluded = true;
+    scopeGaps.push("Major gap: platform engineering scope is not established as entry-level digital-workplace support.");
+  }
+  if (specialtyDomains.length) scopeGaps.push("Experience gap: required specialist-domain work is not established; shared tools do not replace that experience.");
+  const management = requiredLines.some(line => /(?:manag|supervis|lead)\w*[^.\n]{0,35}(?:direct reports|staff|employees|people|a team)|(?:people management|personnel management)/i.test(line));
+  const architecture = requiredLines.some(line => /\b(?:own|lead|design|architect)\w*[^.\n]{0,65}\b(?:enterprise architecture|distributed systems|production infrastructure|infrastructure architecture|cloud architecture)\b/i.test(line));
+  if (architecture) {
+    excluded = true;
+    scopeGaps.push("Major gap: required architecture ownership is outside documented support duties.");
+  }
+  if (management) {
+    excluded = true;
+    scopeGaps.push("Major gap: required people-management experience is not established.");
+  }
+  if (/\b(?:L3|tier[ -]?3|level[ -]?3)\b/i.test(opening.title)) scopeGaps.push("Stretch: verify the depth of L3 escalation ownership; general support experience alone does not establish it.");
+  if (family === "adjacent" && matchReasons.length < 3) {
+    excluded = true;
+    scopeGaps.push("Insufficient evidence: this adjacent role does not establish enough overlap with your documented duties.");
+  }
+  const requiredToolGaps = cautions.filter(c => /^Required .*experience or credential/.test(c)).length;
+  const fitGap = scopeGaps.length > 0 || requiredToolGaps > 0 || Boolean(experience && experience.years > 3);
+  cautions.unshift(...scopeGaps);
+  const score = Math.max(0, Math.min(excluded ? 39 : fitGap ? 59 : matchReasons.length < 3 ? 64 : 100, (family === "core" ? 40 : family ? 22 : 0)
+    + Math.min(40, matchReasons.length * 6)
     + (distanceMiles !== null && distanceMiles <= 15 ? 6 : 0)
     + (opening.salaryMin !== null && opening.salaryMin >= preferences.minimumSalary ? 5 : 0)
     + (opening.employmentType === "Full-time" ? 4 : 0)
-    - (senior ? 16 : 0) - (cautions.some((c) => c.startsWith("Required ")) ? 18 : 0)));
-  return { excluded, distanceMiles, score, matchReasons: [...(family === "core" ? ["Support duties align with your IT / application support background"] : family === "adjacent" ? ["Adjacent systems, analyst or operations route"] : []), ...matchReasons], cautions, qualified: !excluded && cautions.length === 0 && matchReasons.length >= 3 && score >= 65 };
+    - (leadershipTitle ? 16 : 0) - (cautions.some((c) => c.startsWith("Required ")) ? 18 : 0)));
+  return { excluded, distanceMiles, score, matchReasons: [...(workplacePlatform ? ["Digital-workplace platform duties align: end-user services, access administration and guided automation"] : []), ...(family === "core" ? ["Support duties align with your IT / application support background"] : family === "adjacent" ? ["Adjacent systems, analyst or operations route"] : []), ...matchReasons], cautions, qualified: !excluded && cautions.length === 0 && matchReasons.length >= 3 && score >= 65 };
 }

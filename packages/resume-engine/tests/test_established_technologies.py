@@ -142,3 +142,19 @@ def test_specialized_or_advanced_products_do_not_become_basic_from_profile_name_
 def test_aws_support_wording_preserves_the_work_without_exact_duty_phrase():
     assert technical_usage_in_context("AWS", "Resolved production tickets across AWS and Microsoft 365.")
     assert not technical_usage_in_context("AWS", "Tools: AWS, Microsoft 365.")
+
+
+def test_administration_is_actual_technical_use_not_a_skills_list():
+    assert technical_usage_in_context(
+        "O365", "Administered Microsoft 365 (O365), Entra ID, MFA, RBAC, and license management."
+    )
+    assert not technical_usage_in_context("O365", "Skills: Microsoft 365 (O365), Entra ID.")
+    assert not technical_usage_in_context("O365", "Familiar with administering Microsoft 365 (O365).")
+
+
+def test_r_data_troubleshooting_is_valid_without_borrowing_the_next_clause_action():
+    assert technical_usage_in_context(
+        "R", "Performed nightly ETL monitoring of vendor feeds, triaging failures with R; built a Python reconciliation script."
+    )
+    assert not technical_usage_in_context("R", "Handled customer correspondence with R.")
+    assert not technical_usage_in_context("R", "Skills: R, ETL, SQL.")

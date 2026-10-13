@@ -5,6 +5,7 @@ import { readVerifiedArtifact } from "./verified-artifact";
 import { readApplicationProfile, missingContactFields } from "./application-profile";
 import { AUTOMATION_EVENT, AUTOMATION_HEARTBEAT, readAttempt, type ApplicationAttempt } from "./application-automation";
 import { applicationIdentity, sameEmployer } from "./application-history";
+import { referralOnlyEmployer } from "./application-restrictions";
 
 export class AutomationError extends Error { constructor(message: string, readonly status = 409) { super(message); } }
 export async function lockAutomation(tx: Prisma.TransactionClient) {
@@ -22,6 +23,10 @@ export async function saveAttempt(tx: Prisma.TransactionClient, id: string, atte
 export async function approvedMaterial(tx: Prisma.TransactionClient, applicationId: string, identity: { runId: string; artifactId: string; resumeSha256: string; destination: string; approvedAt?: string }) {
   const app = await tx.application.findUnique({ where: { id: applicationId }, include: { job: true, tailoringRuns: { include: { artifacts: true } } } });
   if (!app) throw new AutomationError("Application not found.", 404);
+  const policy = await tx.setting.findUnique({ where: { key: "application-policy" } });
+  if (referralOnlyEmployer(app.job.company, [app.job.applyUrl, app.job.sourceUrl, identity.destination], policy?.value)) {
+    throw new AutomationError("This employer is reserved for your referral contact. Automated applications are disabled.");
+  }
   const run = app.tailoringRuns.find(r => r.id === identity.runId);
   if (identity.approvedAt && app.tailoringRuns.some(r => r.queuedAt.getTime() > Date.parse(identity.approvedAt!))) throw new AutomationError("A new tailoring run was started after approval. Review the intended version and approve again.");
   const destination = applicationDestination(app.job.applyUrl, app.job.sourceUrl);

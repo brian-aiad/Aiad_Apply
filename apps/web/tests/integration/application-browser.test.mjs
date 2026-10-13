@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import http from 'node:http';
 import path from 'node:path';
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, mkdir, readdir, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import { ApplicationBrowser, sha256 } from '../../scripts/application-browser/driver.mjs';
+import { captureEmailScreenshot, extractVerificationCode, recognizeScreenshotText } from '../../scripts/application-browser/gmail-verification.mjs';
 import { decideApplicationStep, subscriptionEnvironment } from '../../scripts/application-browser/reasoner.mjs';
 
 async function fixture(t) {
@@ -385,5 +386,91 @@ test('email verification uses the newest code once in the same tab and never rec
   assert.equal(f.driver.page, page);
   assert.ok(await f.driver.observeReceipt());
   assert.equal(f.driver.questions.some(question => question.answer === 'aB12Cd'), false);
+  assert.equal(f.driver.verificationCodeMayRemain, false);
   assert.equal(f.submissions(), 0, 'email verification must not reissue the application submit');
+});
+
+test('screenshot fallback reads an image-only code locally without persisting the screenshot', async t => {
+  const f = await fixture(t);
+  const filesBefore = await readdir(f.output);
+  const codePage = await f.driver.context.newPage();
+  await codePage.setContent('<main style="font: bold 72px Arial; padding: 40px">aB12Cd</main>');
+  const image = await codePage.screenshot({ type: 'png' });
+  await codePage.close();
+  const screenshot = await captureEmailScreenshot({
+    message: { payload: { headers: [
+      { name: 'From', value: 'no-reply@example.com' },
+      { name: 'To', value: 'test@example.com' },
+      { name: 'Subject', value: 'Your verification code' },
+    ] } },
+    body: 'Your Fixture Company verification code is:',
+    images: [{ mimeType: 'image/png', data: image }],
+  }, f.driver.context);
+  const text = await recognizeScreenshotText(screenshot);
+  assert.equal(extractVerificationCode(text), 'aB12Cd', `OCR output: ${JSON.stringify(text)}`);
+  assert.deepEqual(await readdir(f.output), filesBefore);
+  assert.equal(f.driver.context.pages().some(page => page !== f.driver.page && !page.isClosed()), false);
+});
+
+test('opening another question dismisses an overlapping dropdown without choosing its answer', async t => {
+ const f=await fixture(t);
+ await f.driver.page.setContent(`<h1>Fixture Company</h1><h2>Support Engineer</h2>
+ <label>Clearance<input role="combobox" aria-expanded="true" aria-controls="clearance-list" onkeydown="if(event.key==='Escape'){this.setAttribute('aria-expanded','false');document.getElementById('clearance-list').hidden=true}"></label>
+ <div id="clearance-list" role="listbox" style="position:fixed;inset:0;z-index:5;background:white"><div role="option">Top Secret</div></div>
+ <label>Source<input role="combobox" aria-expanded="false" onclick="this.setAttribute('aria-expanded','true')"></label>`);
+ await f.driver.snapshot();
+ const ref=[...f.driver.refs.values()].find(t=>t.control.label==='Source').control.ref;
+ await f.driver.act({kind:'click',ref,source:'unanswered',value:'',explanation:'Inspect the next question'});
+ assert.equal(await f.driver.page.getByLabel('Clearance').inputValue(),'');
+ assert.equal(await f.driver.page.getByLabel('Source').getAttribute('aria-expanded'),'true');
+ assert.equal(await f.driver.page.locator('#clearance-list').isVisible(),false);
+});
+
+test('Greenhouse required checkbox choices accept one answer but still require standalone consent', async t => {
+  const f = await fixture(t);
+  const url = 'https://job-boards.greenhouse.io/fixture/jobs/123';
+  await f.driver.page.route(url, route => route.fulfill({ contentType: 'text/html', body: `<h1>Fixture Company</h1><h2>Support Engineer</h2><form novalidate onsubmit="event.preventDefault()">
+    <label>Resume<input name="resume" type="file" required></label>
+    <label>Company Website<input type="checkbox" name="source[]" required aria-invalid="false" aria-errormessage="source-error"></label>
+    <label>Conference<input type="checkbox" name="source[]" required aria-invalid="false" aria-errormessage="source-error"></label>
+    <label>Consent<input type="checkbox" name="consent" required></label>
+    <button type="submit">Submit application</button></form>` }));
+  f.driver.job.destination = url;
+  await f.driver.page.goto(url); await f.driver.snapshot();
+  const action = (kind, label, value = '') => ({ kind, ref: f.ref(label), value, source: 'saved_profile' });
+  await f.driver.act(action('upload', 'Resume')); await f.driver.snapshot();
+  await assert.rejects(f.driver.act(action('submit', 'Submit application')), /source/);
+  await f.driver.act(action('check', 'Company Website', 'true')); await f.driver.snapshot();
+  await assert.rejects(f.driver.act(action('submit', 'Submit application')), /consent/);
+  await f.driver.act(action('check', 'Consent', 'true')); await f.driver.snapshot();
+  await f.driver.act(action('submit', 'Submit application'));
+  assert.equal(f.boundary(), 1);
+  assert.equal(await f.driver.page.getByLabel('Conference').isChecked(), false);
+});
+
+
+test('snapshot retries navigation races without replaying form actions and bounds repeated failures', async t => {
+  const f = await fixture(t);
+  const read = f.driver.snapshotOnce.bind(f.driver);
+  let reads = 0;
+  f.driver.snapshotOnce = async () => {
+    if (++reads === 1) {
+      f.driver.questions.push({ question: 'Stale page', answer: 'Discard me', source: 'existing_answer' });
+      throw new Error('frame.evaluate: Execution context was destroyed, most likely because of a navigation');
+    }
+    return read();
+  };
+  assert.equal((await f.driver.snapshot()).identityVerified, true);
+  assert.equal(reads, 2);
+  assert.equal(f.driver.questions.some(q => q.question === 'Stale page'), false);
+  assert.equal(f.boundary(), 0); assert.equal(f.submissions(), 0);
+  reads = 0;
+  f.driver.snapshotOnce = async () => { reads++; throw new Error('Frame was detached'); };
+  await assert.rejects(f.driver.snapshot(), /Frame was detached/);
+  assert.equal(reads, 3); assert.equal(f.driver.refs.size, 0);
+  assert.equal(f.driver.identityVerified, false);
+  reads = 0;
+  f.driver.snapshotOnce = async () => { reads++; throw new Error('Unrelated failure'); };
+  await assert.rejects(f.driver.snapshot(), /Unrelated failure/);
+  assert.equal(reads, 1); assert.equal(f.boundary(), 0);
 });

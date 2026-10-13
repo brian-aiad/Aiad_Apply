@@ -365,3 +365,10 @@ def test_full_delivery_ownership_accepts_verb_inflection_without_rewrite_pressur
     assert demonstrates_ordinary_capability(
         "end-to-end", "Independently built, tested, and deployed the application.",
         "Centralized tracking by independently building, testing and deploying the application.")
+
+
+def test_preserved_monitoring_duty_does_not_require_a_cosmetic_inflection_change():
+    source = "Monitored nightly ETL jobs, triaging failures and validating data feeds."
+    assert demonstrates_ordinary_capability("monitoring", source, source)
+    assert not demonstrates_ordinary_capability("monitoring", source, "Installed desktop monitors.")
+    assert not demonstrates_ordinary_capability("monitoring", "Wrote documentation.", source)

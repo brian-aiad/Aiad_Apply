@@ -58,3 +58,14 @@ test("work conditions are surfaced without inventing requirements", () => {
   assert.deepEqual(roleConditions("Willingness to travel up to 25%. Second shift. Participate in the on-call rotation."), ["Travel up to 25%", "Evening / second shift", "On-call rotation"]);
   assert.deepEqual(roleConditions("Our overnight success took years. Travel up to 0%."), []);
 });
+
+ test("ordinary background-check clearance does not imply a security clearance", () => {
+  assert.equal(clearanceRequirement("All employment is contingent upon successful clearance of a background check and drug test."), null);
+  assert.equal(clearanceRequirement("Active Secret security clearance required.\nMust pass a background check."), "existing");
+});
+
+test("mixed required and preferred clauses keep real minimums only", () => {
+  const lines = requiredQualifications("Requirements\n2 years of support experience required; 5 years preferred.\nPreferred qualifications: Kubernetes experience.\nMinimum Qualifications\n3 years of incident management experience required, Salesforce preferred.");
+  assert.equal(experienceRequirement(lines)?.years, 3);
+  assert.equal(lines.some(line => /Kubernetes|Salesforce/.test(line)), false);
+});

@@ -8,6 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { ApplicationBrowser, sha256 } from './driver.mjs';
 import { verificationState, verificationReport } from './verification.mjs';
 import { waitForVerificationCode } from './gmail-verification.mjs';
+import { finishBrowserResult } from './final-result.mjs';
 import { ProgressWatch } from './progress-watch.mjs';
 import { checkPosting } from './posting-check.mjs';
 import { executeFormPlan, routineContactActions } from './form-plan.mjs';
@@ -81,14 +82,66 @@ async function execute(job) {
     } });
     let previousError = '', observationSteps = 0, repeatedError = '', repeats = 0, modelCalls = 0, routineFilled = 0, verificationAttempted = false;
     const saveEfficiency = () => atomicJson(path.join(directory, 'efficiency.json'), { modelCalls, routineFilled });
+    const completeEmailVerification = async () => {
+      const recipient = driver.verificationRecipient(job.profile.email);
+      const requestedAt = Date.now();
+      let code = await waitForVerificationCode({
+        company: job.company,
+        recipient,
+        requestedAt,
+        credentialsPath: path.join(runtime, 'application-gmail-oauth.json'),
+        browserContext: driver.context,
+      });
+      try {
+        if (driver.submissionStarted) await guard('before_verification', {});
+        else await guard('checkpoint', { summary: 'Completing employer email verification', questions: driver.questions, unresolved: driver.unresolved });
+        await driver.completeVerification(code);
+      } finally {
+        code = '';
+      }
+      return verificationState(driver.lastSnapshot);
+    };
     const progressWatch = new ProgressWatch();
     for (let step = 1; step <= 35; step++) {
       if (heartbeatLost || stopping) throw new Error('The worker disconnected or was stopped.');
       let snapshot = await driver.snapshot();
+      if (!driver.submissionStarted) {
+        const preSubmitVerification = verificationState(snapshot);
+        if (preSubmitVerification === 'rejected' || preSubmitVerification === 'expired') {
+          finalResult = { status: 'BLOCKED', ...verificationReport(preSubmitVerification) };
+          break;
+        }
+        if (preSubmitVerification === 'required') {
+          if (verificationAttempted) {
+            const report = verificationReport('required');
+            finalResult = { status: 'BLOCKED', summary: 'The employer still requires email verification after one code attempt. No second code was tried.', unresolved: report.unresolved };
+            break;
+          }
+          verificationAttempted = true;
+          try {
+            const afterVerification = await completeEmailVerification();
+            if (afterVerification === 'rejected' || afterVerification === 'expired') {
+              finalResult = { status: 'BLOCKED', ...verificationReport(afterVerification) };
+              break;
+            }
+            if (afterVerification === 'required') {
+              const report = verificationReport('required');
+              finalResult = { status: 'BLOCKED', summary: 'The employer did not accept the single newest matching email code. No other or older code was tried.', unresolved: report.unresolved };
+              break;
+            }
+          } catch (error) {
+            const report = verificationReport('required');
+            finalResult = { status: driver.submissionStarted ? 'UNKNOWN' : 'BLOCKED', summary: `Email verification could not be completed: ${String(error.message).slice(0, 1500)}`, unresolved: report.unresolved };
+            break;
+          }
+          continue;
+        }
+      }
       if (driver.submissionStarted) {
         const receipt = await driver.observeReceipt();
         if (receipt) { finalResult = { status: 'SUBMITTED', summary: 'The employer confirmed receipt. The approved resume was verified before submission.', ...receipt }; break; }
         const verification = verificationState(driver.lastSnapshot);
+        if (verification) lastVerificationState = verification;
         if (verification === 'rejected' || verification === 'expired') {
           const report = verificationReport(verification);
           driver.unresolved = report.unresolved;
@@ -103,18 +156,8 @@ async function execute(job) {
           }
           verificationAttempted = true;
           try {
-            const recipient = driver.verificationRecipient(job.profile.email);
-            const requestedAt = Date.now();
-            let code = await waitForVerificationCode({
-              company: job.company,
-              recipient,
-              requestedAt,
-              credentialsPath: path.join(runtime, 'application-gmail-oauth.json'),
-            });
-            await guard('before_verification', {});
-            await driver.completeVerification(code);
-            code = '';
-            const afterVerification = verificationState(driver.lastSnapshot);
+            const afterVerification = await completeEmailVerification();
+            lastVerificationState = afterVerification;
             if (afterVerification === 'rejected' || afterVerification === 'expired') {
               finalResult = { status: 'UNKNOWN', ...verificationReport(afterVerification) };
               break;
@@ -158,7 +201,7 @@ async function execute(job) {
       if (stalled >= 3) previousError = `RECOVERY REQUIRED: ${stalled} steps without a committed answer or page change. Do not repeat the same open/close action. Use choose on an already open combobox or click its visible exact option. Searchable comboboxes can use choose with the confirmed exact answer. If a control is optional, leave it blank and complete remaining required fields. Earlier error: ${previousError}`;
       modelCalls++;
       await saveEfficiency();
-      const decision = await decideApplicationStep({ job: { company: job.company, title: job.title, destination: job.destination, posting: job.posting, prepareOnly: job.prepareOnly === true }, profile: job.profile, setup, applicationAnswers: job.confirmedAnswers || [], applicationHistory: job.applicationHistory || [], approvedResumeText: extracted.stdout, snapshot, previousError, answeredQuestions: driver.questions }, directory, step);
+      const decision = await decideApplicationStep({ job: { company: job.company, title: job.title, destination: job.destination, posting: job.posting, discoverySource: job.discoverySource, prepareOnly: job.prepareOnly === true }, profile: job.profile, setup, applicationAnswers: job.confirmedAnswers || [], applicationHistory: job.applicationHistory || [], approvedResumeText: extracted.stdout, snapshot, previousError, answeredQuestions: driver.questions }, directory, step);
       driver.unresolved = decision.unresolved;
       if (decision.outcome === 'confirmation') {
         const receipt = await driver.receipt(decision.confirmationText);
@@ -187,12 +230,11 @@ async function execute(job) {
   } catch (error) {
     finalResult = { status: submissionBoundary || driver?.submissionStarted ? 'UNKNOWN' : 'BLOCKED', summary: String(error.message).slice(0, 4000) };
   }
-  finalResult.questions = driver?.questions || [];
-  finalResult.unresolved = driver?.unresolved || [];
+  finalResult = finishBrowserResult(finalResult, driver);
   pendingResult = finalResult;
   try { await journal.save(job, 'RESULT', finalResult); }
   catch { console.error('Terminal journal write failed; retaining the result in memory and attempting the bound result copy.'); }
-  if (driver && !finalResult.screenshot) {
+  if (driver && !finalResult.screenshot && !driver.verificationCodeMayRemain) {
     const screenshot = path.join(directory, 'last-page.png');
     await driver.page.screenshot({ path: screenshot, fullPage: true, timeout: 10000 }).then(() => { finalResult.screenshot = screenshot; }).catch(() => {});
   }

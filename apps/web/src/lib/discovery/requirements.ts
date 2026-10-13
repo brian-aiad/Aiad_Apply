@@ -1,7 +1,7 @@
 /** Read qualifications in their section context, without treating company copy as requirements. */
 export function requiredQualifications(description: string): string[] {
-  const required = /^(?:education and experience|technical competencies(?: \(knowledge, skills & abilities\))?|required qualifications|minimum qualifications|basic qualifications|qualifications you must have|qualifications we require|what you(?:’|')?ll bring|what you bring|what you need|what we're looking for|what we’re looking for|requirements|qualifications|your qualifications|who you are|here(?:’|')s what you(?:’|')ll need)\s*:?$/i;
-  const optional = /^(?:preferred qualifications|qualifications we prefer|qualifications you prefer|nice to haves?(?:\/other)?|bonus points(?: if you have)?|preferred skills|desirable qualifications)\s*:?$/i;
+  const required = /^(?:the essential requirements of the job include|the experience you bring|education and experience|technical competencies(?: \(knowledge, skills & abilities\))?|required qualifications|minimum qualifications|basic qualifications|qualifications you must have|qualifications we require|what you(?:’|')?ll bring|what you bring|what you need|what we're looking for|what we’re looking for|what we are looking for|requirements|qualifications|your qualifications|who you are|here(?:’|')s what you(?:’|')ll need)\s*:?$/i;
+  const optional = /^(?:what makes you stand out|it would be a plus if you also possess previous experience in|preferred qualifications|qualifications we prefer|qualifications you prefer|nice to haves?(?:\/other)?|bonus points(?: if you have)?|preferred skills|desirable qualifications)\s*:?$/i;
   const other = /^(?:what you(?:’|')?ll do|responsibilities|benefits|compensation|us salary range|salary range|about (?:us|the company)|equal opportunity|what we offer)\s*:?$/i;
   let section: "required" | "optional" | "other" = "other";
   const result: string[] = [];
@@ -15,12 +15,14 @@ export function requiredQualifications(description: string): string[] {
     const colon = line.indexOf(":");
     if (colon > 0 && required.test(line.slice(0, colon))) {
       section = "required";
-      if (line.slice(colon + 1).trim()) result.push(line.slice(colon + 1).trim());
+      if (line.slice(colon + 1).trim()) result.push(...requiredQualifications(`Requirements\n${line.slice(colon + 1).trim()}`));
       continue;
     }
+    if (colon > 0 && optional.test(line.slice(0, colon))) { section = "optional"; continue; }
     if (section === "optional") continue;
     if (section === "required" || /\b(?:must have|minimum of|required|at least|essential)\b/i.test(line) || /\b(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten)\+?\s*years?\b[^.]{0,80}experience/i.test(line)) {
-      result.push(...line.split(/(?<=[.!?])\s+(?=[A-Z])/).filter(part => !/\b(?:not required|preferred|nice to have|no (?:prior )?experience)\b/i.test(part)));
+      result.push(...line.split(/(?<=[.!?;])\s+|,\s*(?=[^,;.]{0,65}\b(?:preferred|nice to have|a plus)\b)/)
+        .filter(part => !/\b(?:not required|preferred|nice to have|a plus|no (?:prior )?experience)\b/i.test(part)));
     }
   }
   return result;
@@ -34,7 +36,7 @@ export function experienceRequirement(lines: string[]): { years: number; text: s
     const bachelorPath = line.split(/\bor\b/i).filter(part => !/\b(?:master|Ph\.?D|doctorate)/i.test(part));
     const eligible = bachelorPath.length ? bachelorPath.join(" or ") : line;
     if (!/experience|background|working|supporting/i.test(eligible)) continue;
-    const values = [...eligible.matchAll(/\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)(?:\s*[-–—]\s*(?:\d{1,2}|\w+))?\+?\s*(?:years?|yrs?)\b/gi)]
+    const values = [...eligible.matchAll(/\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)(?:\s*(?:[-–—]|to)\s*(?:\d{1,2}|\w+))?\+?\s*(?:years?|yrs?)\b/gi)]
       .map(match => yearWords[match[1].toLowerCase()] ?? Number(match[1]));
     if (values.length) thresholds.push({ years: Math.min(...values), text: line });
   }
@@ -43,7 +45,7 @@ export function experienceRequirement(lines: string[]): { years: number; text: s
 }
 
 export function clearanceRequirement(description: string): "existing" | "obtainable" | "mentioned" | null {
-  const lines = description.split(/\n/).filter(line => /\bclearance\b|TS\/SCI/i.test(line) && !/not required|no (?:security )?clearance required|clearance (?:type|level):\s*(?:none|not required)/i.test(line));
+  const lines = description.split(/\n/).filter(line => !/clearance of (?:a )?(?:background|drug)|background (?:check )?clearance/i.test(line) && /\bclearance\b|TS\/SCI/i.test(line) && !/not required|no (?:security )?clearance required|clearance (?:type|level):\s*(?:none|not required)/i.test(line));
   if (lines.some(line => /active|current|existing|prior to (?:start|employment)|before (?:start|employment)/i.test(line) && !/ability to obtain|able to obtain|after day (?:1|one)|or (?:be able to )?obtain/i.test(line))) return "existing";
   if (lines.some(line => /(?:ability|able|eligible) to (?:obtain|secure)|obtain and maintain|after day (?:1|one)/i.test(line))) return "obtainable";
   return lines.length ? "mentioned" : null;

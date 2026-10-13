@@ -10,6 +10,8 @@ const str = (v: unknown) => typeof v === "string" ? v : "";
 
 // Fixed public employer boards verified from their careers pages; no arbitrary host fetches.
 export const WORKDAY_BOARDS: Record<string, { tenant: string; host: string; site: string }> = {
+  "workday:usc": { tenant: "usc", host: "usc.wd5.myworkdayjobs.com", site: "ExternalUSCCareers" },
+  "workday:motorolasolutions": { tenant: "motorolasolutions", host: "motorolasolutions.wd5.myworkdayjobs.com", site: "Careers" },
   "workday:hntb": { tenant: "hntb", host: "hntb.wd5.myworkdayjobs.com", site: "HNTB_Careers" },
   "workday:travismathew": { tenant: "tcbrands", host: "tcbrands.wd1.myworkdayjobs.com", site: "TravisMathew-Careers" },
 };

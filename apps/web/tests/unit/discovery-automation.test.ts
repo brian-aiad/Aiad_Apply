@@ -36,7 +36,9 @@ test("external sources require credentials or remote preference, never expose se
   assert.equal(externalSources(DEFAULT_DISCOVERY_PREFERENCES, {}).length, 0);
   const env = { ADZUNA_APP_ID: "private-id", ADZUNA_APP_KEY: "private-key", USAJOBS_API_KEY: "private-key", USAJOBS_EMAIL: "private-email" };
   const sources = externalSources({ ...DEFAULT_DISCOVERY_PREFERENCES, includeRemote: true }, env);
-  assert.equal(sources.length, 8);
+  assert.ok(sources.some(s => s.board === "desktop support"));
+  assert.ok(sources.some(s => s.board === "help desk"));
+  assert.ok(sources.some(s => s.board === "application support"));
   assert.equal(JSON.stringify([sources, integrationStatus(env)]).includes("private-"), false);
 });
 
