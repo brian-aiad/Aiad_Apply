@@ -47,6 +47,13 @@ The launcher opens `http://127.0.0.1:3000`. Use **Capture job** to paste a
 posting, optionally add or edit its URL, and either save it for later or queue
 the tailored draft immediately.
 
+### Overnight autonomous builds
+
+For a large project prompt that should keep working unattended, use the repository's
+[overnight Codex workflow](docs/overnight/README.md). Start the prompt with `OVERNIGHT GOAL`;
+Codex stores the full request in a private ignored run file, creates a durable Goal-mode objective,
+keeps resumable checkpoints, and verifies the result before reporting completion.
+
 Capture now previews the extracted role, requirements, documented skill overlap,
 evidence gaps, and a factor-by-factor Apply recommendation before saving. Company,
 role, location, workplace, and employment extraction can be corrected in place;

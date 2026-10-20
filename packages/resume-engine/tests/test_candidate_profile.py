@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from aiadapply_v2.evidence.candidate_profile import (
     add_candidate_profile_evidence,
     apply_candidate_profile_to_keywords,
@@ -7,7 +8,13 @@ from aiadapply_v2.evidence.candidate_profile import (
 )
 from aiadapply_v2.grading.keywords import grade_job_keywords
 from aiadapply_v2.parsers.linkedin_simplify import parse_linkedin_simplify
-from aiadapply_v2.schemas import CandidateProfile, ResumeEvidenceGraph
+from aiadapply_v2.schemas import (
+    CandidateProfile,
+    JobKeyword,
+    KeywordKind,
+    KeywordPriority,
+    ResumeEvidenceGraph,
+)
 
 
 def test_confirmed_candidate_skills_become_durable_evidence() -> None:
@@ -75,3 +82,44 @@ def test_missing_experience_still_allows_separate_software_draft_assumptions() -
     assert "candidate_confirmed" not in zendesk.scoring_factors
     assert profile.rejected_terms == ["Zendesk"]
     assert "Zendesk" not in profile.confirmed_skills
+
+
+def test_candidate_rejection_also_blocks_a_longer_variant() -> None:
+    keywords = [
+        JobKeyword(
+            term="ERP systems",
+            normalized="erp systems",
+            kind=KeywordKind.system,
+            priority=KeywordPriority.high,
+            hiring_importance=80,
+            placement_utility=80,
+            accepted=True,
+        )
+    ]
+    profile = CandidateProfile(candidate_name="Brian", rejected_terms=["ERP"])
+
+    apply_candidate_profile_to_keywords(keywords, profile)
+
+    assert not keywords[0].accepted
+    assert keywords[0].scoring_factors["candidate_rejected"] == -100.0
+
+
+@pytest.mark.parametrize(
+    ("rejected", "term"), [("ERP", "enterprise support"), ("Java", "JavaScript"), ("C", "C++")]
+)
+def test_rejected_term_does_not_match_inside_unrelated_technology(rejected: str, term: str) -> None:
+    keyword = JobKeyword(
+        term=term,
+        normalized=term.lower(),
+        kind=KeywordKind.system,
+        priority=KeywordPriority.high,
+        hiring_importance=80,
+        placement_utility=80,
+        accepted=True,
+    )
+    profile = CandidateProfile(candidate_name="Test candidate", rejected_terms=[rejected])
+
+    apply_candidate_profile_to_keywords([keyword], profile)
+
+    assert keyword.accepted
+    assert "candidate_rejected" not in keyword.scoring_factors

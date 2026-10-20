@@ -24,6 +24,8 @@ outputs/
 /runs/
 temp/
 .runtime/
+/docs/overnight/runs/*
+!/docs/overnight/runs/.gitkeep
 .env
 .env.*
 !.env.example

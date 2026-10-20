@@ -188,3 +188,44 @@ Recommend only full-time postings with confirmed starting base pay at or above t
   30-mile Seal Beach radius, full-time and role-fit requirements.
 - Premium top-applicant signals prioritize eligible jobs; they are not proof of fit.
 - Only free local tools and existing subscription; pause on access restrictions.
+
+# Aiad_Apply agent guidance
+
+Read `README.md` before changing this repository. Preserve existing user changes and keep
+credentials, pasted job descriptions, candidate data, and generated artifacts out of Git.
+
+## Overnight goal protocol
+
+Activate this protocol only when the user explicitly starts their message with `OVERNIGHT GOAL`
+or directly asks to create/start/resume an overnight goal. An ordinary large request is not, by
+itself, authorization to create a goal.
+
+1. Save the complete request verbatim to `docs/overnight/runs/ACTIVE_TASK.md`. This folder is
+   intentionally ignored by Git because prompts may contain private data.
+2. Read the saved request, this file, `README.md`, relevant configuration, and the current Git
+   status before editing source files.
+3. Start Goal mode with a concise objective (maximum 4,000 characters) that points to
+   `docs/overnight/runs/ACTIVE_TASK.md`. The objective must name the outcome, constraints,
+   verification, and stopping condition. Do not set a token budget unless the user explicitly
+   supplies one.
+4. Maintain `docs/overnight/runs/PROGRESS.md` with the current checkpoint, completed work and
+   evidence, failed approaches worth remembering, remaining work, and the next verification
+   command. Refresh it after every meaningful checkpoint and before any expected interruption.
+5. Work autonomously through implementation, review, and verification. Do not stop after merely
+   drafting a plan. Prefer focused tests during development, then run the relevant full checks
+   listed under `Verification` in `README.md` before declaring completion.
+6. Treat a temporary account usage/rate limit as a pause, not successful completion and not a
+   project blocker. Leave the goal active and use the progress file to resume without repeating
+   completed work when execution becomes available again.
+7. Mark the goal complete only when the saved request's acceptance criteria are satisfied and the
+   required checks pass. Write the final result, verification evidence, and any explicitly scoped
+   residual risk to `docs/overnight/runs/LAST_RESULT.md`.
+
+Goal mode does not broaden authority. Unless the saved request explicitly authorizes them, do not
+deploy, purchase anything, submit job applications, contact people, change external accounts,
+delete material data, rotate credentials, or alter production/shared databases. Never weaken or
+skip tests just to reach the stopping condition. Ask only when a missing decision would materially
+change the requested outcome or an external/destructive action requires authorization.
+
+Avoid parallel writers in the same checkout. Use a separate Git worktree for any explicitly
+requested parallel coding run.

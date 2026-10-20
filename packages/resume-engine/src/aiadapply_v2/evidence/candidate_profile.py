@@ -148,6 +148,7 @@ def apply_candidate_profile_to_keywords(
         if not keyword.accepted:
             continue
         if any(contains_term(value, keyword.term)
+               or contains_term(keyword.term, value)
                or (technical_family(keyword.term) is not None
                    and technical_family(value) == technical_family(keyword.term))
                for value in profile.rejected_terms):
