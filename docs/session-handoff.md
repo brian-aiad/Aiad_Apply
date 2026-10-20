@@ -1,5 +1,9 @@
 # Project memory and handoff
 
+**Start with [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md) and the startup procedure in AGENTS.md.**
+The dated entries below are historical evidence; their push authorizations and
+runtime states must not be treated as current instructions or live checks.
+
 **Current cross-device checkpoint:** [Windows continuation, October 13](WINDOWS_CONTINUATION.md).
 Brian now explicitly requested commit/push to main. The no-commit note below is
 historical. Assisted capture saved 25 cards; three tailored resumes are in Review.

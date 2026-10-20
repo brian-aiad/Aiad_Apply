@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   outputFileTracingRoot: process.cwd(),
   experimental: {
+    cpus: 2,
     serverActions: {
       bodySizeLimit: "4mb",
     },

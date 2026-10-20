@@ -531,7 +531,25 @@ No general Simplify candidate API was found in its public help documentation. Th
 integration is an explicit browser handoff. Greenhouse and Lever submission APIs
 require employer-issued credentials, so the app does not pretend to submit through them.
 
-## Moving to another device (October 7, 2026)
+## Continuing between desktop and MacBook
+
+Attach each computer's own checkout as the local project's primary folder. Before
+new work, Codex follows `AGENTS.md`: fetch GitHub with
+`python scripts/session-check.py --sync` (`python3` on macOS), read
+[the current handoff](docs/CURRENT_HANDOFF.md), and reconcile branch state before
+editing. The check only fast-forwards a clean branch from the matching remote
+branch; it never overwrites local work, switches branches, or publishes files.
+Without `--sync`, it fetches and reports only. A failed fetch is reported as an
+incomplete check, not proof that the checkout is current.
+
+At checkpoints the agent updates the shared handoff with the objective, decisions,
+verification and next action. Only committed and pushed notes/code reach the other
+computer. Commit/push require current authorization; chat history, local secrets,
+browser sessions and uncommitted files do not travel with Git. Read the current
+handoff for this setup's published branch and one-time desktop bootstrap.
+This is an agent workflow, not a background automatic sync service.
+
+## Moving to another device (historical October 7 setup)
 
 **Latest October 13 handoff:** read [Windows continuation](docs/WINDOWS_CONTINUATION.md)
 first for current results, private configuration, and platform limitations.

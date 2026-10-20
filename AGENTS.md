@@ -1,3 +1,40 @@
+# Cross-device session startup and handoff (October 19, 2026)
+
+At the beginning of every new task/session, before editing or starting services:
+1. Run `python scripts/session-check.py --sync` from this repository (use
+   `python3` on macOS if needed). It fetches GitHub and only fast-forwards a clean
+   branch from its matching origin branch. Never reset, clean, auto-stash, force
+   push, change branches over local work, or merge divergent history automatically.
+2. Read `docs/CURRENT_HANDOFF.md`, then the historical continuity documents below.
+   Inspect recent remote branches printed by the check for a newer handoff. A
+   clean branch or an up-to-date main does not prove another device pushed its work.
+   If newer work is on another branch, inspect its handoff and diff before choosing
+   the correct continuation; preserve all local changes. Re-read instructions and
+   handoff files after any branch update. If fetch fails, disclose that GitHub
+   could not be verified; continue independent local work only when appropriate.
+3. Recover the objective, decisions, verification and next action from the handoff
+   and Git history. Do not ask Brian to repeat facts already recorded. Say briefly
+   which branch/checkpoint is being continued. Verify live runtime state separately.
+
+At meaningful checkpoints, before ending a task, and when Brian switches devices:
+- Refresh `docs/CURRENT_HANDOFF.md` with the UTC timestamp, objective, branch,
+  completed changes, exact verification results, unfinished work and next command.
+  Record uncommitted/unpushed work explicitly; never claim it is on another device.
+- Keep this shared note technical: no credentials, resume content, candidate data,
+  application answers, private employer records or full private prompts. Reference
+  ignored local evidence by path only and identify when it needs private transfer.
+- Commit/push only within current authorization, stage specific reviewed paths,
+  preserve other work and never force-push. If publication is not authorized, leave
+  the note locally and clearly report the remaining handoff step. This standing
+  workflow alone does not authorize future commits, pushes or deployments.
+- Keep `.env`, `.runtime`, dependencies and browser profiles device-local. Check
+  existing workers before starting another; do not start dev/build/tests merely
+  to load context. On this Mac use Webpack dev and bounded workers (see handoff).
+
+These are agent startup instructions, not a background filesystem/chat sync service.
+Each computer must attach its own checkout and receive this branch once. GitHub
+transfers published code and notes, not a running chat or unpushed work.
+
 # Persistent tailoring preference
 
 Read `docs/resume-export-rules.md` before changing tailoring, prompts, validation,
@@ -168,7 +205,7 @@ for receipts before retrying; never infer submission from email connection.
 
 ## Session continuity
 
-Read `docs/WINDOWS_CONTINUATION.md` first for the October 13 cross-device checkpoint, then `docs/session-handoff.md`. They record implementation progress, verification, application outcomes and unresolved blockers. Private attempt evidence and onboarding remain under ignored `.runtime/`.
+Read `docs/CURRENT_HANDOFF.md` first, then `docs/WINDOWS_CONTINUATION.md` and `docs/session-handoff.md` for historical context. Dated historical commit/push requests are not fresh authorization. Private attempt evidence and onboarding remain under ignored `.runtime/`.
 
 ## Discovery priority (October 12, 2026)
 
