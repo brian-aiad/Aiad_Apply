@@ -1,3 +1,4 @@
+import { candidateProfile } from "@/lib/workspace-material";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { parseCapture } from "@/lib/job-parser";
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
   return NextResponse.json(
     {
       parsed,
-      intelligence: captureIntelligence(parsed, readDiscoveryPreferences(preference?.value)),
+      intelligence: captureIntelligence(parsed, readDiscoveryPreferences(preference?.value), await candidateProfile()),
     },
     { headers: { "Cache-Control": "no-store" } },
   );

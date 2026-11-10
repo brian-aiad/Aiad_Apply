@@ -45,7 +45,7 @@ elif action == 'start':
     if process.poll() is not None:
         raise SystemExit('Application worker failed to start; see .runtime/application-worker.log')
     record.write_text(json.dumps({'repository': str(root), 'pid': process.pid})+'\n')
-    print('Application browser worker running; waiting for resume approvals.')
+    print('Application browser worker running; checking authorized applications.')
 else:
     raise SystemExit('Usage: bash scripts/application-worker.sh [start|stop]')
 PY

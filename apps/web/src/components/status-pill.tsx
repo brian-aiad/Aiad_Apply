@@ -16,5 +16,5 @@ const color: Record<string, string> = {
 };
 
 export function StatusPill({ status }: { status: string }) {
-  return <span className={cn("status", color[status])}>{titleCaseStatus(status)}</span>;
+  return <span className={cn("status", color[status])}>{status === "REVIEW" ? "Prepared" : titleCaseStatus(status)}</span>;
 }

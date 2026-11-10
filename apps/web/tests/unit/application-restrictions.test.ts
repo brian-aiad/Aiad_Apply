@@ -8,5 +8,6 @@ test("referral-only restrictions cover RTX companies and their ATS without block
   assert.equal(referralOnlyEmployer("Anduril", [], policy), false);
   assert.equal(referralOnlyEmployer("RTXify", [], policy), false);
   assert.equal(referralOnlyEmployer("Other", ["https://careers.rtx.com.evil.test/job"], policy), false);
-  assert.equal(referralOnlyEmployer("RTX", [], undefined), false);
+  assert.equal(referralOnlyEmployer("RTX", [], undefined), true);
+  assert.equal(referralOnlyEmployer("Collins Aerospace", [], {}), true);
 });

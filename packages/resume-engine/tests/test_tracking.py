@@ -196,6 +196,8 @@ def test_worker_keeps_polling_after_tracking_api_recovers(
     monkeypatch.setattr(tracking, "tracking_configuration", lambda _: ("http://web", "secret"))
     monkeypatch.setattr(tracking, "_request_json", recovering_request)
     monkeypatch.setattr(tracking.time, "sleep", sleeps.append)
+    # Exercise claim recovery independently of the Windows browser wakeup thread.
+    monkeypatch.setattr(tracking, "_application_browser_wakeup", lambda *args: None)
 
     with pytest.raises(KeyboardInterrupt):
         run_worker(
@@ -248,10 +250,14 @@ def test_failed_run_retains_only_its_model_usage_and_bounds_error(tmp_path):
 
     from aiadapply_v2.schemas import ModelCallUsage
 
-    reasoner = SimpleNamespace(usage=[
-        ModelCallUsage(model="earlier-run", input_tokens=999),
-        ModelCallUsage(model="this-run", input_tokens=123, output_tokens=45, duration_seconds=2.5),
-    ])
+    reasoner = SimpleNamespace(
+        usage=[
+            ModelCallUsage(model="earlier-run", input_tokens=999),
+            ModelCallUsage(
+                model="this-run", input_tokens=123, output_tokens=45, duration_seconds=2.5
+            ),
+        ]
+    )
     report = tracking.save_failure_report(reasoner, 1, tmp_path, RuntimeError("x" * 6000))
     assert report["model_calls"] == 1
     assert report["model_usage"][0]["input_tokens"] == 123
@@ -259,3 +265,100 @@ def test_failed_run_retains_only_its_model_usage_and_bounds_error(tmp_path):
     assert report["validation"]["passed"] is False
     assert len(report["error"]) == 5000
     assert json.loads((tmp_path / "failure-report.json").read_text()) == report
+
+
+def test_manual_discovery_poll_is_lightweight_and_retains_regular_cadence(monkeypatch):
+    class Stop:
+        now = 0.0
+
+        def is_set(self):
+            return self.now > 900
+
+        def wait(self, seconds):
+            self.now += seconds
+
+    stop = Stop()
+    calls = []
+    monkeypatch.setattr(tracking.time, "monotonic", lambda: stop.now)
+    monkeypatch.setattr(tracking, "_request_json", lambda url, **kw: calls.append(kw) or {})
+    tracking._scheduled_source("http://localhost", "fixture", stop, "discovery")
+    assert len(calls) == 16
+    assert calls[0]["payload"] == calls[-1]["payload"] == {}
+    assert all(c["payload"] == {"pendingOnly": True} for c in calls[1:-1])
+
+
+def test_slow_linkedin_does_not_block_public_discovery(monkeypatch):
+    import threading
+
+    stop = threading.Event()
+    linkedin_started = threading.Event()
+    public_ran = threading.Event()
+
+    def request(url, **kwargs):
+        if url.endswith("/linkedin"):
+            linkedin_started.set()
+            assert public_ran.wait(2)
+        else:
+            assert linkedin_started.wait(2)
+            public_ran.set()
+            stop.set()
+        return {}
+
+    monkeypatch.setattr(tracking, "_request_json", request)
+    tracking._scheduled_discovery("http://localhost", "fixture", stop)
+    assert public_ran.is_set()
+
+
+def test_discovery_poll_backs_off_failed_endpoint(monkeypatch):
+    class Stop:
+        waits = []
+
+        def is_set(self):
+            return len(self.waits) >= 5
+
+        def wait(self, seconds):
+            self.waits.append(seconds)
+
+    stop = Stop()
+
+    def request(*args, **kwargs):
+        raise RuntimeError("offline")
+
+    monkeypatch.setattr(tracking, "_request_json", request)
+    tracking._scheduled_source("http://localhost", "fixture", stop, "discovery")
+    assert stop.waits == [120, 240, 480, 900, 900]
+
+
+def test_browser_wakeup_starts_only_after_server_reports_approved_queued_work(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Stop:
+        stopped = False
+
+        def is_set(self) -> bool:
+            return self.stopped
+
+        def wait(self, timeout: float) -> bool:
+            return self.stopped
+
+    stop = Stop()
+    calls: list[dict[str, Any]] = []
+    starts: list[Any] = []
+
+    def request(url: str, **kwargs: Any) -> dict[str, bool]:
+        assert url.endswith("/api/worker/browser-start")
+        calls.append(kwargs)
+        if len(calls) == 2:
+            stop.stopped = True
+        return {"start": len(calls) == 2}
+
+    monkeypatch.setattr(tracking, "_request_json", request)
+    monkeypatch.setattr(
+        tracking.subprocess, "run", lambda command, **kwargs: starts.append(command)
+    )
+    tracking._application_browser_wakeup("http://localhost", "fixture", stop)  # type: ignore[arg-type]
+    assert len(calls) == 2
+    assert all(call["payload"] == {"platform": "win32"} for call in calls)
+    assert len(starts) == 1
+    assert starts[0][-1] == "start"
+    assert starts[0][-2].endswith("application-worker.ps1")

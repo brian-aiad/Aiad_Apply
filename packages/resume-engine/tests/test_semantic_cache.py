@@ -36,9 +36,15 @@ def test_batched_queries_preserve_order_and_reuse_exact_evidence():
             calls.append(list(texts))
             return np.array([[1.0, 0.0] if "SQL" in text else [0.0, 1.0] for text in texts])
 
-    with patch.dict("sys.modules", {"sentence_transformers": SimpleNamespace(SentenceTransformer=lambda _: Model())}):
+    with patch.dict(
+        "sys.modules",
+        {"sentence_transformers": SimpleNamespace(SentenceTransformer=lambda _: Model())},
+    ):
         encoder = SentenceTransformerEncoder()
-    assert encoder.similarities_many(["SQL", "Python"], ["SQL source", "Python source"]) == [[1.0, 0.0], [0.0, 1.0]]
+    assert encoder.similarities_many(["SQL", "Python"], ["SQL source", "Python source"]) == [
+        [1.0, 0.0],
+        [0.0, 1.0],
+    ]
     assert len(calls) == 2
     assert encoder.similarities_many([], ["SQL source"]) == []
     assert encoder.similarities_many(["SQL", "Python"], []) == [[], []]

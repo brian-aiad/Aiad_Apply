@@ -1,3 +1,4 @@
+import { payFromText } from "./discovery/normalization";
 import { createHash } from "node:crypto";
 
 export type ParsedCapture = {
@@ -198,7 +199,7 @@ function extractJobSections(lines: string[]) {
   const responsibilityHeading =
     /^(?:Responsibilities|Roles and Responsibilities|Job Responsibilities|What You(?:'|’|â€™)ll (?:Do|Be Doing|Accomplish)|Essential Job Duties and Responsibilities|Essential Functions(?: & Responsibilities)?|Key Responsibilities|Required Duties|Accountabilities|Your Impact|Functions and duties of this role include, but not limited to):?$/i;
   const requiredHeading =
-    /^(?:Required Qualifications(?:, Capabilities And Skills)?|Required Skills|Required Technical Experience \(MUST\)|Required Education\/Credentials\/Qualifications|Requirements|Qualifications|Minimum Requirements|Job Qualifications\/Requirements|Who You Are|What We Require|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities|Education and Experience|Technical Competencies \(Knowledge, Skills & Abilities\)):?$/i;
+    /^(?:Required Qualifications(?:, Capabilities And Skills)?|Required Skills|Required Technical Experience \(MUST\)|Required Education\/Credentials\/Qualifications|Requirements|Qualifications|Minimum Requirements|Job Qualifications\/Requirements|Who You Are|What We Require|What We(?:'|’|â€™)re Looking For|What We Are Looking For|What You(?:'|’|â€™)ll Bring(?:\s*\(Required\))?|What You Bring(?:\s*\(Required\))?|Required Skills, Knowledge and Abilities|Education and Experience|Experience and Education|Technical Competencies \(Knowledge, Skills & Abilities\)):?$/i;
   const preferredHeading =
     /^(?:Preferred|Preferred Qualifications(?:, Capabilities And Skills)?|Nice To Have|Bonus Points If You Have|Experience That Would Be Helpful):?$/i;
   const expandedResponsibilityHeading =
@@ -213,7 +214,7 @@ function extractJobSections(lines: string[]) {
   const greenhouseRequiredHeading = /^(?:What You Have|Your Education and Experience):?$/i;
   const officialPreferredHeading = /^(?:Qualifications We Prefer|What Makes You Stand Out):?$/i;
   const qualificationSubheading =
-    /^(?:Education(?:\/| and )Credentials|Prior Experience|Technical Skills|Experience):?$/i;
+    /^(?:Education(?:\/| and )Credentials|Prior Experience|Technical Skills|Experience|Knowledge of|Ability to|Skills|License\/Certification Required):?$/i;
   const responsibilitySubheading =
     /^(?:Operational Support|Documentation & Process Management|Documentation, Compliance & Collaboration|Continuous Improvement|Collaboration|Application & End User Support|System Operations & Maintenance|Application & Platform Support|Systems & Data Operations|Customer Communication & Experience|Integration & SaaS Tool Support|Tooling & Operational Excellence):?$/i;
   const expandedResponsibilitySubheading =
@@ -288,7 +289,7 @@ function extractJobSections(lines: string[]) {
       result.responsibilities.push(line);
       continue;
     }
-    if (!current || (line.length < 15 && !shortRequiredSkills) || line.length > 500) continue;
+    if (!current || (line.length < 15 && !shortRequiredSkills)) continue;
     if (
       (line.endsWith(":") || line === line.toLocaleUpperCase()) &&
       /^[A-Z][A-Za-z &/,\-]{2,45}:?$/.test(line) &&
@@ -370,8 +371,17 @@ export function parseCapture(
   const selectedSalaryMatch = salaryMatch ?? officialSalaryMatch;
   const salaryParts =
     selectedSalaryMatch?.[0].split(/\s*(?:-|–|—|â€“|â€”)\s*/) ?? [];
-  const salaryMin = salaryParts[0] ? parseMoney(salaryParts[0]) : null;
-  const salaryMax = salaryParts[1] ? parseMoney(salaryParts[1]) : null;
+  let salaryMin = salaryParts[0] ? parseMoney(salaryParts[0]) : null;
+  let salaryMax = salaryParts[1] ? parseMoney(salaryParts[1]) : null;
+  if (selectedSalaryMatch) {
+    const line = salaryNormalized.slice(Math.max(0, selectedSalaryMatch.index || 0)).split("\n")[0];
+    const before = salaryNormalized.slice(Math.max(0,(selectedSalaryMatch.index || 0)-60),selectedSalaryMatch.index || 0).split("\n").pop() || "";
+    const normalizedPay = payFromText(before + line);
+    if (/\bmonth(?:ly)?\b|\/(?:mo|month)\b/i.test(line) && normalizedPay.salaryMin !== null) {
+      const months = Number(normalized.match(/\b(\d{1,2})\s*months?\s*(?:\/|per)\s*year\b/i)?.[1] || 12);
+      if (months >= 1 && months <= 12) { salaryMin = Math.round(normalizedPay.salaryMin * months / 12); salaryMax = normalizedPay.salaryMax === null ? null : Math.round(normalizedPay.salaryMax * months / 12); }
+    } else if (/\b(?:hour|hourly|hr)\b|\/(?:hr|hour)\b/i.test(line) && normalizedPay.salaryMin !== null) { salaryMin = normalizedPay.salaryMin; salaryMax = normalizedPay.salaryMax; }
+  }
   const singleSalaryMatch = selectedSalaryMatch
     ? null
     : normalized.match(/\$\s?\d[\d,]*(?:\.\d+)?[Kk]?\/(?:yr|year|hr|hour)/i);

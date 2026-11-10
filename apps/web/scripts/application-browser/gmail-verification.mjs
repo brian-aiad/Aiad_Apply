@@ -181,12 +181,17 @@ export async function recognizeScreenshotText(screenshot) {
       visionError = error;
     }
   }
+  if (process.platform === 'win32') {
+    try {
+      return await runLocalOcr('powershell.exe', ['-NoProfile', '-File', fileURLToPath(new URL('./gmail-screenshot-ocr.ps1', import.meta.url))], Buffer.from(screenshot.toString('base64')));
+    } catch (error) { visionError = error; }
+  }
   try {
     return await runLocalOcr('tesseract', ['stdin', 'stdout', '--psm', '6'], screenshot);
   } catch (error) {
     const visionStatus = visionError?.code || (visionError ? 'failed' : 'not available');
     const tesseractStatus = error.code || 'failed';
-    throw new Error(`Local email screenshot OCR failed (macOS Vision: ${visionStatus}; Tesseract: ${tesseractStatus}). No code was guessed.`);
+    throw new Error(`Local email screenshot OCR failed (native OCR: ${visionStatus}; Tesseract: ${tesseractStatus}). No code was guessed.`);
   }
 }
 

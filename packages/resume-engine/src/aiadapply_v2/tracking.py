@@ -5,6 +5,8 @@ import hashlib
 import json
 import os
 import socket
+import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -14,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from aiadapply_v2.config import default_output_root, default_used_resume_root
+from aiadapply_v2.naming import run_directory_basename
 from aiadapply_v2.pipeline import Reasoner, transform_resume
 from aiadapply_v2.schemas import TransformationReport
 from aiadapply_v2.used_resumes import archive_tailored_pdf
@@ -142,7 +145,9 @@ def save_failure_report(
     reasoner: Reasoner, usage_start: int, output_folder: Path, error: BaseException
 ) -> dict[str, Any]:
     """Retain this attempt's measured usage even when no resume is accepted."""
-    usage = [entry.model_dump(mode="json") for entry in getattr(reasoner, "usage", [])[usage_start:]]
+    usage = [
+        entry.model_dump(mode="json") for entry in getattr(reasoner, "usage", [])[usage_start:]
+    ]
     report = {
         "validation": {"passed": False},
         "model_calls": len(usage),
@@ -150,7 +155,9 @@ def save_failure_report(
         "error": f"{type(error).__name__}: {error}"[:5000],
     }
     output_folder.mkdir(parents=True, exist_ok=True)
-    (output_folder / "failure-report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    (output_folder / "failure-report.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8"
+    )
     return report
 
 
@@ -197,13 +204,29 @@ def run_worker(
     scheduler_stop = threading.Event()
     scheduler: threading.Thread | None = None
     claim_failure_reported = False
+    browser_wakeup = None
+    if os.name == "nt" and not once:
+        browser_wakeup = threading.Thread(
+            target=_application_browser_wakeup,
+            args=(url, secret, scheduler_stop),
+            name="aiadapply-browser-wakeup",
+            daemon=True,
+        )
+        browser_wakeup.start()
     try:
         while True:
             try:
                 claimed = _request_json(
                     f"{url}/api/worker/claim",
                     secret=secret,
-                    payload={"workerId": worker_id},
+                    payload={
+                        "workerId": worker_id,
+                        "platform": "win32"
+                        if os.name == "nt"
+                        else "darwin"
+                        if sys.platform == "darwin"
+                        else "linux",
+                    },
                     allow_empty=True,
                     retry_attempts=2,
                 )
@@ -234,8 +257,8 @@ def run_worker(
             raw_paste = str(claimed["rawPaste"])
             company = str(claimed["company"])
             title = str(claimed["title"])
-            folder = output_root / (
-                f"{date.today().isoformat()}_{_slug(company)}_{_slug(title)}_run_{run_id[:8]}"
+            folder = output_root / run_directory_basename(
+                company, title, run_id, date.today().isoformat()
             )
             folder.mkdir(parents=True, exist_ok=True)
             (folder / "job-description.txt").write_text(raw_paste.rstrip() + "\n", encoding="utf-8")
@@ -286,16 +309,21 @@ def run_worker(
                     progress_sync_available = False
                     print(f"Progress sync unavailable; continuing locally: {error}")
 
+            run_profile = candidate_profile
+            run_base = base_resume
             usage_start = len(getattr(reasoner, "usage", []))
             try:
                 try:
+                    run_base, run_profile = material_sources(
+                        claimed.get("material"), folder, base_resume, candidate_profile
+                    )
                     report = transform_resume(
                         raw_paste=raw_paste,
-                        base_resume=base_resume,
+                        base_resume=run_base,
                         output_dir=folder,
                         reasoner=reasoner,
                         aggressive_draft=False,
-                        candidate_profile=candidate_profile,
+                        candidate_profile=run_profile,
                         progress=report_progress,
                     )
                     report_progress("Organizing PDF copy in USED_RESUME")
@@ -337,31 +365,57 @@ def run_worker(
         scheduler_stop.set()
         if scheduler is not None:
             scheduler.join(timeout=1)
+        if browser_wakeup is not None:
+            browser_wakeup.join(timeout=1)
+
+
+def _scheduled_source(url: str, secret: str, stop: threading.Event, endpoint: str) -> None:
+    """Poll manual requests cheaply; server retains shared scan cadence and caps."""
+    next_regular = 0.0
+    failures = 0
+    while not stop.is_set():
+        pending_only = endpoint == "discovery" and time.monotonic() < next_regular
+        try:
+            if not pending_only:
+                next_regular = time.monotonic() + 900
+            result = _request_json(
+                f"{url}/api/worker/{endpoint}",
+                secret=secret,
+                payload={"pendingOnly": True} if pending_only else {},
+                timeout_seconds=120 if endpoint == "discovery" else 600,
+            )
+            failures = 0
+            if result and result.get("queued"):
+                print(
+                    f"Discover queued {result['queued']} qualifying matches for tailoring.",
+                    flush=True,
+                )
+        except Exception:
+            failures += 1
+            if failures == 1:
+                print(
+                    f"Scheduled {endpoint} discovery unavailable; retrying with backoff.",
+                    flush=True,
+                )
+        interval = 60 if endpoint == "discovery" else 900
+        stop.wait(min(900, interval * (2 ** min(failures, 4))))
 
 
 def _scheduled_discovery(url: str, secret: str, stop: threading.Event) -> None:
-    """The server owns the shared schedule and caps across Mac/Windows workers."""
-    failure_reported = False
-    while not stop.is_set():
-        try:
-            result = _request_json(
-                f"{url}/api/worker/discovery",
-                secret=secret,
-                payload={},
-                timeout_seconds=120,
-            )
-            _request_json(
-                f"{url}/api/worker/linkedin", secret=secret,
-                payload={}, timeout_seconds=600,
-            )
-            failure_reported = False
-            if result and result.get("queued"):
-                print(f"Discover queued {result['queued']} strong matches for review.")
-        except Exception:
-            if not failure_reported:
-                print("Scheduled discovery unavailable; retrying in 15 minutes.")
-            failure_reported = True
-        stop.wait(900)
+    # LinkedIn can take minutes; it must not delay public employer collection or
+    # a desktop search request. Both threads share shutdown and server leases.
+    linkedin = threading.Thread(
+        target=_scheduled_source,
+        args=(url, secret, stop, "linkedin"),
+        name="aiadapply-linkedin-discovery",
+        daemon=True,
+    )
+    linkedin.start()
+    try:
+        _scheduled_source(url, secret, stop, "discovery")
+    finally:
+        stop.set()
+        linkedin.join(timeout=1)
 
 
 def build_worker_payload(
@@ -463,3 +517,67 @@ def _slug(value: str) -> str:
 
     slug = re.sub(r"[^A-Za-z0-9]+", "_", value).strip("_")
     return slug[:80] or "unknown"
+
+
+def material_sources(
+    material: Any, folder: Path, base_resume: Path, candidate_profile: Path
+) -> tuple[Path, Path]:
+    """Keep a private, hash-verified snapshot; never mutate the user's source file."""
+    if not isinstance(material, dict):
+        return base_resume, candidate_profile
+    private = folder / ".source"
+    private.mkdir(mode=0o700, parents=True, exist_ok=True)
+    if isinstance(material.get("candidateProfile"), dict):
+        candidate_profile = private / "candidate-profile.json"
+        candidate_profile.write_text(json.dumps(material["candidateProfile"]), encoding="utf-8")
+        candidate_profile.chmod(0o600)
+    source = material.get("baseResume", {})
+    if source:
+        content = base64.b64decode(source["contentBase64"], validate=True)
+        if (
+            len(content) != source["byteSize"]
+            or hashlib.sha256(content).hexdigest() != source["sha256"]
+        ):
+            raise ValueError("Shared base resume fingerprint mismatch")
+        base_resume = private / "base.docx"
+        base_resume.write_bytes(content)
+        base_resume.chmod(0o600)
+    return base_resume, candidate_profile
+
+
+def shared_sources(
+    folder: Path, base_resume: Path, candidate_profile: Path, api_url: str | None = None
+) -> tuple[Path, Path]:
+    url, secret = tracking_configuration(api_url)
+    material = _request_json(
+        f"{url}/api/worker/material", secret=secret, payload={}, timeout_seconds=30
+    )
+    return material_sources(material, folder, base_resume, candidate_profile)
+
+
+def _application_browser_wakeup(url: str, secret: str, stop: threading.Event) -> None:
+    """Wake only approved browser work, independently of long tailoring/search calls."""
+    while not stop.is_set():
+        try:
+            result = _request_json(
+                f"{url}/api/worker/browser-start",
+                secret=secret,
+                payload={"platform": "win32"},
+                timeout_seconds=10,
+            )
+            if result and result.get("start"):
+                subprocess.run(
+                    [
+                        "powershell.exe",
+                        "-NoProfile",
+                        "-File",
+                        str(REPOSITORY_ROOT / "scripts/application-worker.ps1"),
+                        "start",
+                    ],
+                    check=False,
+                    timeout=30,
+                )
+        except Exception:
+            # No browser work is claimed here. Connectivity recovery cannot replay a submit.
+            pass
+        stop.wait(10)

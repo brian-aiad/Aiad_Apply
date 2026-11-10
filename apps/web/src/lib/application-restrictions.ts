@@ -1,6 +1,7 @@
 export function referralOnlyEmployer(company: string, urls: (string | null | undefined)[], policy: unknown): boolean {
-  if (!policy || typeof policy !== "object" || !("referralOnlyEmployers" in policy) || !Array.isArray(policy.referralOnlyEmployers)) return false;
-  const requested = policy.referralOnlyEmployers.map(value => String(value).toLowerCase());
+  // The standing referral hold must survive missing settings and old backups.
+  const extra = policy && typeof policy === "object" && "referralOnlyEmployers" in policy && Array.isArray(policy.referralOnlyEmployers) ? policy.referralOnlyEmployers : [];
+  const requested = [...new Set(["rtx", "collins", ...extra.map(value => String(value).toLowerCase())])];
   const name = company.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
   if (requested.some(value => name === value || name.startsWith(`${value} `))) return true;
   if (!requested.includes("rtx")) return false;

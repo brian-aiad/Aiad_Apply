@@ -1,7 +1,22 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { approvalMatches, attemptInterrupted, browserWorkerOnline, canApproveAfter, readAttempt } from "../../src/lib/application-automation";
+import { approvalMatches, attemptInterrupted, browserWorkerOnline, canApproveAfter, readAttempt, attemptWithReceipt } from "../../src/lib/application-automation";
 const attempt = { status: "QUEUED", runId: "a1111111-1111-4111-8111-111111111111", runNumber: 1, artifactId: "b1111111-1111-4111-8111-111111111111", resumeSha256: "a".repeat(64), fileName: "resume.pdf", destination: "https://example.com/job/1", approvedAt: new Date().toISOString(), updatedAt: new Date().toISOString(), summary: "Waiting", questions: [], unresolved: [], attachmentVerified: false };
+test("recorded receipts resolve only the exact parked attempt without inventing browser evidence", () => {
+  const receipt = { runId: attempt.runId, resumeSha256: attempt.resumeSha256, destination: attempt.destination, confirmation: "Employer receipt" };
+  for (const status of ["BLOCKED", "UNKNOWN"]) {
+    const parked = readAttempt({ ...attempt, status, unresolved: ["Old blocker"] })!;
+    const resolved = attemptWithReceipt(parked, receipt)!;
+    assert.equal(resolved.status, "SUBMITTED");
+    assert.deepEqual(resolved.unresolved, []);
+    assert.equal(resolved.attachmentVerified, false);
+    assert.equal(resolved.submissionStartedAt, undefined);
+    for (const changed of [{ runId: "other" }, { resumeSha256: "b".repeat(64) }, { destination: "https://example.com/job/2" }, { confirmation: " " }]) {
+      assert.equal(attemptWithReceipt(parked, { ...receipt, ...changed }), null);
+    }
+  }
+  for (const status of ["QUEUED", "RUNNING", "SUBMITTING", "CANCELED", "SUBMITTED"]) assert.equal(attemptWithReceipt(readAttempt({ ...attempt, status }), receipt), null);
+});
 test("approval binds the run, artifact, content and exact application destination", () => {
   const parsed = readAttempt(attempt)!;
   assert.ok(approvalMatches(parsed, attempt.runId, attempt.artifactId, attempt.resumeSha256, attempt.destination));

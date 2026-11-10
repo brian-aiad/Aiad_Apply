@@ -315,7 +315,9 @@ def _build_prompt(
         "protected_metrics_by_section": document.protected_metrics_by_section,
         "evidence": compact_evidence,
         "automatic_technical_policy": evidence_graph.automatic_technical_policy,
-        "technologies_to_assess": pending_technology_assessments(document, keywords, evidence_graph),
+        "technologies_to_assess": pending_technology_assessments(
+            document, keywords, evidence_graph
+        ),
         "skill_categories": skill_categories,
         "untrusted_job_description": job_description,
         "preliminary_role_profile": preliminary_profile.model_dump(
@@ -341,8 +343,13 @@ def _build_prompt(
             {"paragraph_id": paragraph.paragraph_id, "supported_terms": terms}
             for paragraph in document.paragraphs
             if ".bullet." in paragraph.paragraph_id
-            and (terms := [keyword.term for keyword in keywords if keyword.accepted
-                           and supports_automatic_context(keyword.term, paragraph.text)])
+            and (
+                terms := [
+                    keyword.term
+                    for keyword in keywords
+                    if keyword.accepted and supports_automatic_context(keyword.term, paragraph.text)
+                ]
+            )
         ],
         "rejected_keywords": [
             {"term": item.term, "reason": item.rejection_reason}
@@ -376,8 +383,11 @@ def _build_prompt(
         ],
         "preliminary_transferability_map": compact_matches,
         "substantive_bullet_rewrite_plan": tailoring_breadth(
-            document, {p.paragraph_id: p.text for p in document.paragraphs},
-            keywords, evidence_graph, preliminary_map,
+            document,
+            {p.paragraph_id: p.text for p in document.paragraphs},
+            keywords,
+            evidence_graph,
+            preliminary_map,
         ),
         "revision_feedback": revision_feedback,
     }

@@ -3,6 +3,7 @@
 macOS assisted action only. Raw page data stays in a private temporary directory
 and is removed before exit. Output is consumed locally by the offline parser.
 """
+
 import email.policy
 import json
 import pathlib
@@ -13,7 +14,9 @@ import time
 from email.parser import BytesParser
 
 if sys.platform != "darwin":
-    raise SystemExit("Open-page capture currently requires macOS. Use pasted job details on this device.")
+    raise SystemExit(
+        "Open-page capture currently requires macOS. Use pasted job details on this device."
+    )
 with tempfile.TemporaryDirectory(prefix="aiadapply-linkedin-capture-") as directory:
     target = pathlib.Path(directory) / "search.mhtml"
     script = """const c=Application('Google Chrome'); let result=null;
@@ -25,12 +28,22 @@ for(const w of c.windows()) { for(const t of w.tabs()) {
  }
 } if(result) break; }
 JSON.stringify(result);""".replace("TARGET", json.dumps(str(target)))
-    result = subprocess.run(["osascript", "-l", "JavaScript", "-e", script], capture_output=True, text=True, timeout=15, check=False)
+    result = subprocess.run(
+        ["osascript", "-l", "JavaScript", "-e", script],
+        capture_output=True,
+        text=True,
+        timeout=15,
+        check=False,
+    )
     if result.returncode:
-        raise SystemExit("Chrome did not permit saving the open search. Check macOS Automation access.")
+        raise SystemExit(
+            "Chrome did not permit saving the open search. Check macOS Automation access."
+        )
     info = json.loads(result.stdout or "null")
     if not info:
-        raise SystemExit("No open LinkedIn search was found in Chrome. Open your saved search first.")
+        raise SystemExit(
+            "No open LinkedIn search was found in Chrome. Open your saved search first."
+        )
     previous = -1
     for _ in range(40):
         size = target.stat().st_size if target.exists() else 0

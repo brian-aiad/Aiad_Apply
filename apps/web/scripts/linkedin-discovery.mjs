@@ -11,8 +11,8 @@ export const SUPPORT_QUERIES = [
   '"Technical Support" OR "Product Support"',
   '"IT Support" OR "Desktop Support"',
   '"Service Desk" OR "Help Desk"',
-  '"Implementation Specialist" OR "Integration Support"',
-  '"Business Applications" OR "Platform Support"',
+  '"Implementation Specialist" OR "Implementation Support" OR "Integration Support"',
+  '"Business Applications" OR "Platform Support" OR "Sales System Analyst"',
 ];
 export function buildSearchUrl(query, window = 'day') {
   const url = new URL('https://www.linkedin.com/jobs/search/');
@@ -122,8 +122,10 @@ export function extractLinkedInDocument() {
     let body = about.parentElement;
     for (let depth = 0; body && body !== componentRoot && depth < 4 && safeText(body).length < 300; depth++) body = body.parentElement;
     const paragraphs = [...componentRoot.querySelectorAll('p')].filter(p => !p.closest(noise));
-    const title = clean(selectedLink.textContent);
-    const titleIndex = paragraphs.findIndex(p => p.contains(selectedLink));
+    const linkedTitleIndex = paragraphs.findIndex(p => p.contains(selectedLink));
+    const observedMetadataIndex = paragraphs.findIndex(p => /[·•]/.test(p.textContent || '') && /\b(?:ago|applicants?|clicked apply)\b/i.test(p.textContent || ''));
+    const titleIndex = linkedTitleIndex >= 1 ? linkedTitleIndex : observedMetadataIndex >= 2 ? observedMetadataIndex - 1 : -1;
+    const title = titleIndex >= 0 ? clean(paragraphs[titleIndex].textContent) : '';
     const company = titleIndex > 0 ? clean(paragraphs[titleIndex - 1].textContent) : '';
     const metadataText = clean(paragraphs[titleIndex + 1]?.textContent);
     const location = metadataText.split(/\s+[·•]\s+/)[0];
@@ -284,7 +286,8 @@ async function runLinkedInCollection({ window = 'day', queries = SUPPORT_QUERIES
     result.seenJobIds = [...observedIds];
     result.duplicatesAvoided = seeds.filter(id => skipped.has(id)).length;
     const candidates = new Map(seeds.filter(id => /^\d{7,}$/.test(id) && !skipped.has(id)).map(id => [id, { id, topApplicant: false, premiumMatch: null, searchQueries: [], searchWindows: [] }]));
-    const searchPlan = preferredSearch ? [{ query: new URL(preferredSearch).searchParams.get('keywords'), url: preferredSearch }] : queries.slice(0, 6).map(query => ({ query, url: buildSearchUrl(query, window) }));
+    const preferred = preferredSearch ? [{ query: new URL(preferredSearch).searchParams.get('keywords'), url: preferredSearch }] : [];
+    const searchPlan = [...preferred, ...queries.slice(0, 6).map(query => ({ query, url: buildSearchUrl(query, window) }))].filter((item, index, all) => all.findIndex(other => other.url === item.url) === index);
     for (const { query, url } of (oneJob ? [] : searchPlan)) {
       if (Date.now() > deadline - 25_000) { result.status = 'partial'; result.reason = 'Scan time budget reached.'; break; }
       diagnostic({ stage: 'search', query, window });

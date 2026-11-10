@@ -6,7 +6,7 @@ from aiadapply_v2.schemas import ParsedJob
 from aiadapply_v2.text import dedupe, normalize_text, sha256_text
 
 JOB_START = re.compile(
-    r"^(?:About the job|Job Description|About (?:This|The) Role|What You['\u2019]ll Do:?)\s*$",
+    r"^(?:About the job|Job Description|Description|About (?:This|The) Role|What You['\u2019]ll Do:?)\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 OFFICIAL_JOB_SIGNAL = re.compile(
@@ -103,6 +103,7 @@ HEADINGS = {
         "education",
         "your education and experience",
         "education and experience",
+        "experience and education",
         "technical competencies (knowledge, skills & abilities)",
         "technical knowledge",
         "additionally, it support analyst is expected to demonstrate",
@@ -128,6 +129,10 @@ HEADINGS = {
     ),
 }
 QUALIFICATION_SUBHEADINGS = {
+    "knowledge of",
+    "ability to",
+    "skills",
+    "license/certification required",
     "education/credentials",
     "education and credentials",
     "prior experience",
@@ -222,6 +227,15 @@ def parse_linkedin_simplify(raw: str) -> ParsedJob:
 def _extract_title_company(raw: str) -> tuple[str, str]:
     lines = [line.strip() for line in raw.splitlines() if line.strip()]
     location_title = ""
+    # Government job captures place labelled pay/location metadata after the
+    # employer and role; those labels must not become the exported identity.
+    if (
+        len(lines) > 6
+        and lines[2].casefold() == "salary"
+        and "Job Number" in lines
+        and "Closing Date" in lines
+    ):
+        return lines[1], lines[0]
     for index, line in enumerate(lines):
         match = re.match(r"^Company\s*(?:logo for,|,)\s*(.+?)\.?$", line, re.IGNORECASE)
         if not match:
@@ -310,8 +324,10 @@ def _extract_title_company(raw: str) -> tuple[str, str]:
     prefix_lines = [line.strip() for line in prefix.splitlines() if line.strip()]
     for index, line in enumerate(prefix_lines):
         if not (
-            LOCATION.match(line) or OFFICIAL_LOCATION.match(line)
-            or WORKDAY_LOCATION.match(line) or REMOTE_LOCATION.match(line)
+            LOCATION.match(line)
+            or OFFICIAL_LOCATION.match(line)
+            or WORKDAY_LOCATION.match(line)
+            or REMOTE_LOCATION.match(line)
         ):
             continue
         candidates = [
@@ -526,7 +542,7 @@ def _split_job_sections(job_description: str) -> dict[str, list[str]]:
         if not current and not qualifications_started and _looks_like_unheaded_responsibility(line):
             result["responsibilities"].append(line)
             continue
-        if current and (15 <= len(line) <= 500 or short_required_skills and len(line) <= 500):
+        if current and (len(line) >= 15 or short_required_skills):
             destination = (
                 "preferred"
                 if current == "required"

@@ -7,6 +7,11 @@ export function applicationIdentity(value: string | null): string | null {
       const match = url.pathname.match(/^\/([^/]+)\/jobs\/(\d+)/);
       if (match) return `greenhouse:${match[1].toLowerCase()}:${match[2]}`;
     }
+    // iCIMS embeds the same employer job with viewport/redirect display options.
+    // Keep the tenant host and job path; do not discard unknown query parameters.
+    if (url.hostname.endsWith(".icims.com") && /^\/jobs\/\d+\/[^/]+\/job\/?$/.test(url.pathname)) {
+      for (const key of ["mobile", "width", "height", "bga", "needsRedirect", "jan1offset", "jun1offset"]) url.searchParams.delete(key);
+    }
     url.hash = "";
     for (const key of [...url.searchParams.keys()]) if (/^(utm_.+|gh_src|gh_jid|source|ref|referrer|trackingId)$/i.test(key)) url.searchParams.delete(key);
     url.searchParams.sort();

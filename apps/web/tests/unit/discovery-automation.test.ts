@@ -22,7 +22,7 @@ test("Adzuna caps minute and monthly requests and resets expired buckets", () =>
 test("automatic drafts require explicit enablement, full recent listings and clear fit", () => {
   assert.equal(eligibleForAutoTailoring(candidate, settings, now), true);
   assert.equal(eligibleForAutoTailoring(candidate, DEFAULT_AUTOMATION, now), false);
-  for (const change of [{ active: false }, { excluded: true }, { qualified: false }, { score: 79 }, { cautions: ["Review required"] }, { description: "Excerpt" }, { approvedApplicationId: "saved" }, { dismissedAt: now }, { postedAt: null }, { postedAt: "invalid" }, { postedAt: "2026-09-01" }, { postedAt: "2026-10-03" }, { lastSeenAt: "2026-10-01" }, { sourceKey: "adzuna:test" }, { sourceKey: "usajobs:test" }]) {
+  for (const change of [{ active: false }, { excluded: true }, { qualified: false }, { score: 79 }, { cautions: ["Review required"] }, { description: "Excerpt" }, { approvedApplicationId: "saved" }, { dismissedAt: now }, { postedAt: null }, { postedAt: "invalid" }, { postedAt: "2026-10-03" }, { lastSeenAt: "2026-10-01" }, { sourceKey: "adzuna:test" }, { sourceKey: "usajobs:test" }]) {
     assert.equal(eligibleForAutoTailoring({ ...candidate, ...change }, settings, now), false, JSON.stringify(change));
   }
 });
@@ -59,3 +59,34 @@ test("Jobicy preserves full duties and USAJOBS preserves eligibility requirement
   assert.ok(federal?.description.includes("Current federal employees only"));
   assert.ok(federal?.description.includes("Citizenship required"));
 });
+
+
+test("realistic adjacent fit and disclosed schedules can prepare drafts without waiving requirements", () => {
+  const realistic = { ...settings, minimumScore: 65 };
+  assert.equal(eligibleForAutoTailoring({ ...candidate, score: 71, cautions: ["Work schedule: On-call rotation."] }, realistic, now), true);
+  assert.equal(eligibleForAutoTailoring({ ...candidate, score: 64 }, realistic, now), false);
+  for (const caution of ["Required Salesforce experience or credential is not established", "Required experience: 4+ years", "Existing clearance required", "Salary is not confirmed"]) assert.equal(eligibleForAutoTailoring({ ...candidate, cautions: [caution] }, realistic, now), false);
+  assert.equal(readAutomationPreferences(realistic).minimumScore,65);
+});
+
+ test("automatic preparation skips over-30-day listings despite fresh observations", () => {
+  assert.equal(eligibleForAutoTailoring({ ...candidate, postedAt: "2026-07-01" }, settings, now), false);
+  assert.equal(eligibleForAutoTailoring({ ...candidate, postedAt: "2026-07-01", lastSeenAt: "2026-09-30" }, settings, now), false);
+ });
+
+
+test("undated live staffing boards use fresh open observations without waiving any other fit gate", () => {
+  for (const sourceKey of ["trinet:balboa", "luxus:careers"]) {
+    const live = { ...candidate, sourceKey, postedAt: null };
+    assert.equal(eligibleForAutoTailoring(live, settings, now), true);
+    for (const change of [{ lastSeenAt: "2026-09-30" }, { active: false }, { excluded: true }, { qualified: false }, { score: 50 }, { cautions: ["Required experience missing"] }, { postedAt: "invalid" }, { postedAt: "2026-10-03" }]) assert.equal(eligibleForAutoTailoring({ ...live, ...change }, settings, now), false, JSON.stringify(change));
+  }
+  assert.equal(eligibleForAutoTailoring({ ...candidate, sourceKey: "luxus:untrusted", postedAt: null }, settings, now), false);
+});
+
+ test("collector-confirmed official future deadlines permit undated openings without waiving freshness",()=>{
+ const p={...candidate,sourceKey:'calcareers:it',postedAt:null,description:'Application closing date: 2026-10-05T23:59:00Z\n'+candidate.description};
+ assert.equal(eligibleForAutoTailoring(p,settings,now),true);
+ assert.equal(eligibleForAutoTailoring({...p,sourceKey:'edjoin:district'},settings,now),true);
+ for(const change of [{sourceKey:'greenhouse:test'},{description:'Application closing date: 2026-10-01T23:59:00Z\n'+candidate.description},{lastSeenAt:'2026-09-30'},{postedAt:'invalid'},{postedAt:'2026-10-03'},{qualified:false},{excluded:true}])assert.equal(eligibleForAutoTailoring({...p,...change},settings,now),false);
+ });

@@ -9,6 +9,20 @@ const source = (provider: Provider, board: string, company: string): Source => (
 });
 
 export const DISCOVERY_SOURCES: Source[] = [
+  source("greenhouse", "laclippers", "LA Clippers"),
+  source("greenhouse", "vianttechnology", "Viant Technology · Platform operations"),
+  { key: "oracle:hoag", provider: "oracle", board: "hoag", company: "Hoag · Information technology", url: "https://jobs.hoag.org/en/sites/CX_1/jobs" },
+  { key: "oracle:lbtransit", provider: "oracle", board: "lbtransit", company: "Long Beach Transit", url: "https://myportal.lbtransit.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs" },
+  { key: "edjoin:orange-schools", provider: "edjoin", board: "517,531,529,521,509", company: "Orange County public schools · IT support", url: "https://www.edjoin.org/iusd" },
+  { key: "calcareers:orange", provider: "calcareers", board: "358", company: "California state · Orange County IT", url: "https://calcareers.ca.gov/CalHRPublic/Search/JobSearchResults.aspx#kw=Information%20Technology&locid=358" },
+  { key: "calcareers:losangeles", provider: "calcareers", board: "681", company: "California state · Los Angeles County IT", url: "https://calcareers.ca.gov/CalHRPublic/Search/JobSearchResults.aspx#kw=Information%20Technology&locid=681" },
+  { key: "trinet:balboa", provider: "trinet", board: "50346", company: "Balboa Technologies", url: "https://app.trinethire.com/companies/50346-balboa-technologies/jobs" },
+  { key: "luxus:careers", provider: "luxus", board: "careers", company: "Luxus Group", url: "https://luxusjobs.com/careers" },
+  { key: "workday:pacificlife", provider: "workday", board: "PacificLifeCareers", company: "Pacific Life · Local business technology", url: "https://pacificlife.wd1.myworkdayjobs.com/PacificLifeCareers" },
+  { key: "pageup:csulb", provider: "pageup", board: "873/lb", company: "CSULB · Staff technology roles", url: "https://careers.pageuppeople.com/873/lb/en-us/listing/" },
+  { key: "jobvite:laserfiche", provider: "jobvite", board: "laserfiche", company: "Laserfiche", url: "https://jobs.jobvite.com/laserfiche/jobs" },
+  { key: "workday:primoris", provider: "workday", board: "Primoris", company: "Primoris · Business application support", url: "https://prim.wd108.myworkdayjobs.com/Primoris" },
+  { key: "workday:scan", provider: "workday", board: "scancareers", company: "SCAN · Local health-plan systems", url: "https://scanhealthplan.wd108.myworkdayjobs.com/scancareers" },
   source("lever", "waremalcomb", "Ware Malcomb"),
   source("greenhouse", "trace3", "Trace3 · IT services"),
   source("greenhouse", "sonyinteractiveentertainmentglobal", "Sony Interactive Entertainment"),
@@ -50,10 +64,7 @@ export const DISCOVERY_SOURCES: Source[] = [
 export const LOCAL_SEARCHES = [
   { name: "CSULB CareerLINK · alumni", category: "Your university network", url: "https://www.csulb.edu/career-development-center/article/careerlink-job-board", note: "Jobs for CSULB students and alumni. Use your existing campus experience; search application support, IT support and service desk. Sign-in may be required." },
   { name: "MemorialCare", category: "Long Beach · Fountain Valley", url: "https://careers.memorialcare.org/search-jobs", note: "Filter to IT and full-time. Target desktop, service desk and business application support; clinical certifications still need evidence." },
-  { name: "Hoag IT", category: "Newport Beach · Irvine", url: "https://careers.hoag.org/it/", note: "Look for end-user support and IT operations. Review the actual worksite and avoid roles requiring unheld clinical-system certifications." },
-  { name: "Laserfiche", category: "Local software employer", url: "https://jobs.jobvite.com/laserfiche/", note: "Long Beach software support and implementation. Check posting dates and shift requirements on the employer page." },
   { name: "City of Long Beach", category: "Local government", url: "https://www.longbeach.gov/jobs/", note: "Business systems, technology services, and city operations." },
-  { name: "Cal State Long Beach", category: "Higher education", url: "https://careers.pageuppeople.com/873/lb/en-us/listing/", note: "Campus IT and application support, building on your CSULB experience." },
   { name: "UC Irvine", category: "University & health", url: "https://jobs.uci.edu/", note: "Enterprise applications, service desk, and clinical systems." },
   { name: "Orange County", category: "Public sector", url: "https://www.governmentjobs.com/careers/oc", note: "IT analyst and systems support positions across county departments." },
   { name: "Robert Half", category: "Staffing", url: "https://www.roberthalf.com/us/en/jobs?searchTerm=application%20support&location=Seal%20Beach%2C%20CA", note: "Check full-time and direct-hire terms on each posting." },

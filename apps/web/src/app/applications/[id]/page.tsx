@@ -1,6 +1,9 @@
+import {TailoringProgress} from '@/components/tailoring-progress';
+import {db} from '@/lib/db';
+import {AUTONOMY_KEY,readAutonomy,unresolvedExportRisks} from '@/lib/application-autonomy-policy';
+import {AUTOMATION_EVENT,readAttempt,activeAutomationStates} from '@/lib/application-automation';
+import { candidateProfile } from "@/lib/workspace-material";
 import Link from "next/link";
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { establishedTechnology, savedEvidenceStatus } from "@/lib/stretch-review";
 import { applicationEvidence } from "@/lib/application-evidence";
 import { ApplicationApply } from "@/components/application-apply";
@@ -31,7 +34,7 @@ import { StatusPill } from "@/components/status-pill";
 import { formatMoneyRange, formatRelativeDate, titleCaseStatus } from "@/lib/format";
 import { getApplication } from "@/lib/queries";
 import { buildTechnologyReview, technologySummary } from "@/lib/technology-review";
-import { buildReviewGuide, hasValidatedResume, isRunActive } from "@/lib/application-review";
+import { buildReviewGuide, hasValidatedApplicationPdf, hasValidatedResume, isRunActive } from "@/lib/application-review";
 
 export const dynamic = "force-dynamic";
 
@@ -81,8 +84,11 @@ export default async function ApplicationDetailPage({
   if (!application) notFound();
   let sharedProfile: Record<string, unknown> = {};
   try {
-    sharedProfile = objectRecord(JSON.parse(await fs.readFile(path.resolve(process.cwd(), "../../data/profile/Brian_Aiad_PROFILE.json"), "utf8"))) ?? {};
+    sharedProfile = await candidateProfile();
   } catch { /* Historical exports remain available when the local profile is unavailable. */ }
+  const automatic=readAutonomy((await db.setting.findUnique({where:{key:AUTONOMY_KEY}}))?.value).enabled;
+  const attemptEvent=application.events.find(e=>e.eventType===AUTOMATION_EVENT);
+  const attempt=readAttempt(attemptEvent?.detail);
   const activeRun = application.tailoringRuns.find(isRunActive);
   const { run: selectedRunId, tab: requestedTab } = await searchParams;
   const selectedRun = selectedRunId ? application.tailoringRuns.find((run) => run.id === selectedRunId) : undefined;
@@ -138,7 +144,7 @@ export default async function ApplicationDetailPage({
     return opportunity(right) - opportunity(left) || right.hiringImportance - left.hiringImportance;
   });
   const hasAcceptedResume = application.tailoringRuns.some(hasValidatedResume);
-  const stateDefaultTab = latestRun?.status === "SUCCEEDED" ? "changes" : "role";
+  const stateDefaultTab = attempt && !historicalRun ? "apply" : latestRun?.status === "SUCCEEDED" ? "changes" : "role";
   const normalizedRequestedTab = requestedTab === "keywords" ? "changes" : requestedTab;
   const requestedWorkspaceTab = ["changes", "role", "stretch-lab", "apply"].includes(normalizedRequestedTab || "")
     ? normalizedRequestedTab as "changes" | "role" | "stretch-lab" | "apply"
@@ -156,11 +162,13 @@ export default async function ApplicationDetailPage({
     applicationStatus: application.status,
     progressStage,
     hasPreviousResume: Boolean(previousUsableRun),
+    automatic:automatic&&unresolvedExportRisks(latestRun?.reportSnapshot,latestRun?.riskCount||0)===0,
+    attempt:attempt?.runId===latestRun?.id?attempt:null,
   });
 
   return (
     <div className="content">
-      <RunAutoRefresh active={hasActiveRun} />
+      <RunAutoRefresh active={hasActiveRun || !!attempt&&activeAutomationStates.includes(attempt.status)} />
       <Link
         href="/applications"
         className="muted"
@@ -204,32 +212,30 @@ export default async function ApplicationDetailPage({
         <ApplicationStatusPill applicationId={application.id} initialStatus={application.status} />
       </div>
 
-      {application.tailoringRuns.length > 1 ? (
-        <section className="run-history panel" aria-label="Resume versions">
-          <div><strong>Resume versions</strong><span className="muted">Every run keeps its own files and review.</span></div>
-          <RunVersionSelect applicationId={id} selectedRunId={latestRun?.id || ""} runs={application.tailoringRuns.map((run) => ({ id: run.id, runNumber: run.runNumber, status: run.status, sendable: hasValidatedResume(run) }))} />
-          {historicalRun ? <p className="field-help">Viewing an earlier version. Application status and new tailoring actions still apply to the current application.</p> : null}
-        </section>
-      ) : null}
-      {activeRun && activeRun.id !== latestRun?.id ? <p className="field-help">Another version is being tailored. <Link href={`/applications/${id}?run=${activeRun.id}`}>View run {activeRun.runNumber}</Link>. This saved version remains available below.</p> : null}
+      <ol className="workflow-strip" aria-label="Application progress">
+        <li data-state="done"><span>Job</span><strong>Posting saved</strong></li>
+        <li data-state={hasValidatedApplicationPdf(latestRun||{status:'',validationPassed:false,artifacts:[]})?'done':hasActiveRun?'active':'waiting'}><span>Resume</span><strong>{hasActiveRun?'Tailoring':hasValidatedApplicationPdf(latestRun||{status:'',validationPassed:false,artifacts:[]})?'Validated PDF':latestRun && hasValidatedResume(latestRun)?'Validated DOCX · PDF needed':latestRun?.status==='FAILED'?'Needs repair':'Not prepared'}</strong></li>
+        <li data-state={application.status==='APPLIED'?'done':attempt?.status==='BLOCKED'||attempt?.status==='UNKNOWN'?'attention':attempt&&activeAutomationStates.includes(attempt.status)?'active':'waiting'}><span>Application</span><strong>{application.status==='APPLIED'?'Receipt confirmed':attempt?.status==='BLOCKED'?'Parked':attempt?.status==='UNKNOWN'?'Check receipt':attempt&&activeAutomationStates.includes(attempt.status)?'In progress':'Not submitted'}</strong></li>
+      </ol>
       <section className="review-guide" aria-labelledby="review-guide-title">
         <div className="review-guide-copy">
           {reviewGuide.tone === "success" ? <Check size={20} color="var(--green)" />
             : reviewGuide.tone === "neutral" ? <WandSparkles size={20} color="var(--muted)" />
             : <CircleAlert size={20} color={reviewGuide.tone === "danger" ? "var(--red)" : "var(--amber)"} />}
-          <div><div className="eyebrow">Your next decision</div><h2 id="review-guide-title">{reviewGuide.headline}</h2><p>{reviewGuide.copy}</p></div>
+          <div><div className="eyebrow">Current status</div><h2 id="review-guide-title">{reviewGuide.headline}</h2><p>{reviewGuide.copy}</p></div>
         </div>
+        {hasActiveRun&&latestRun&&isRunActive(latestRun)?<TailoringProgress queuedAt={latestRun.queuedAt.toISOString()} startedAt={latestRun.startedAt?.toISOString()||null} updatedAt={progressEvent?.occurredAt.toISOString()||latestRun.updatedAt.toISOString()} observedAt={new Date().getTime()}/>:null}
         <div className="review-primary-actions">
           {applyPdf ? <ResumePreview key={applyPdf.id} artifactId={applyPdf.id} fileName={applyPdf.fileName} /> : null}
           {resumeArtifacts.map((artifact) => (
-            <a key={artifact.id} href={`/api/artifacts/${artifact.id}`} className={artifact.kind === "DOCX" ? "button button-primary" : "button"}>
+            <a key={artifact.id} href={`/api/artifacts/${artifact.id}`} className={artifact.kind === "PDF" ? "button button-primary" : "button button-quiet"}>
               <Download size={14} />{artifact.kind}
             </a>
           ))}
           {application.job.sourceUrl ? <a href={application.job.sourceUrl} className="button" target="_blank" rel="noreferrer">Open posting<ExternalLink size={14} /></a> : null}
         </div>
         {latestRun?.status === "SUCCEEDED" ? (
-          <div className="review-checks">
+          <details className="review-evidence"><summary>Changes and validation <span>{latestRun.pageCount===1?'1 page':'Check layout'} · {visibleChanges.length} edits{latestRun.riskCount?` · ${latestRun.riskCount} ${latestRun.riskCount===1?'note':'notes'}`:''}</span></summary><div className="review-checks">
             {typeof tailoringSummary?.substantive_bullets_rewritten === "number" && typeof tailoringSummary?.relevant_bullets === "number" ? <span className="review-check review-check-done" title="Sentence-level rewrites of relevant existing bullets, excluding punctuation and tiny synonym changes.">{tailoringSummary.substantive_bullets_rewritten} substantive bullet changes</span> : null}
             <span className="review-check">{visibleChanges.filter((change) => change.paragraphKind === "bullet" && change.section.startsWith("experience.")).length} experience bullets edited</span>
             <span className="review-check">{visibleChanges.filter((change) => change.paragraphKind === "bullet" && change.section.startsWith("projects.")).length} project bullets edited</span>
@@ -240,9 +246,17 @@ export default async function ApplicationDetailPage({
             <span className="review-check">{latestRun.keywordDecisions.filter((keyword) => !keyword.used && keyword.evidenceLevel === "UNSUPPORTED").length} unsupported terms excluded</span>
             <span className={latestRun.pageCount === 1 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.pageCount === 1 ? "1 page confirmed" : "Page count needs review"}</span>
             <span className={latestRun.riskCount === 0 ? "review-check review-check-done" : "review-check review-check-warning"}>{latestRun.riskCount === 0 ? <Check size={13} /> : <CircleAlert size={13} />}{latestRun.riskCount} flags</span>
-          </div>
+          </div></details>
         ) : null}
       </section>
+      {application.tailoringRuns.length > 1 ? (
+        <section className="run-history panel" aria-label="Resume versions">
+          <div className="run-history-title"><strong>Saved versions</strong></div>
+          <RunVersionSelect applicationId={id} selectedRunId={latestRun?.id || ""} runs={application.tailoringRuns.map((run) => ({ id: run.id, runNumber: run.runNumber, status: run.status, sendable: hasValidatedApplicationPdf(run) }))} />
+          {historicalRun ? <p className="field-help">Viewing an earlier version. Application status and new tailoring actions still apply to the current application.</p> : null}
+        </section>
+      ) : null}
+      {activeRun && activeRun.id !== latestRun?.id ? <p className="field-help">Another version is being tailored. <Link href={`/applications/${id}?run=${activeRun.id}`}>View run {activeRun.runNumber}</Link>. This saved version remains available below.</p> : null}
       <DraftTechnologyReview review={technologyReview} />
       {modelUsage.length ? <details className="model-usage"><summary>Tailoring time & token use</summary><dl><dt>Model</dt><dd>{[...new Set(modelUsage.map(call => displayValue(call.model, "Not recorded")))].join(", ")}</dd><dt>Model calls</dt><dd>{modelUsage.length}</dd><dt>Input tokens</dt><dd>{usageTotal("input_tokens")}</dd><dt>Cached input (included above)</dt><dd>{usageTotal("cached_input_tokens")}</dd><dt>Output tokens</dt><dd>{usageTotal("output_tokens")}</dd><dt>Model time</dt><dd>{Math.round(modelUsage.reduce((sum, call) => sum + Number(call.duration_seconds || 0), 0))} seconds</dd></dl><p>Includes correction calls. Missing usage is shown as unrecorded.</p></details> : null}
 
@@ -259,7 +273,7 @@ export default async function ApplicationDetailPage({
         }}
       >
         <div className="application-main-stack">
-          <ApplicationApply key={`${id}:${latestRun?.id || "none"}`} id={id} runId={latestRun?.id || ""} runNumber={latestRun?.runNumber || 0}
+          <ApplicationApply automatic={automatic} initialAttempt={attempt&&attemptEvent?{...attempt,id:attemptEvent.id}:null} key={`${id}:${latestRun?.id || "none"}`} id={id} runId={latestRun?.id || ""} runNumber={latestRun?.runNumber || 0}
             evidence={latestRun?.validationPassed && !aggressiveDraft ? applicationEvidence(latestRun.changes) : []} destination={destination} portal={applicationPortal(destination)} blockers={handoffBlockers(application.status, latestRun, hasActiveRun, destination)}
             reviewed={reviewedArtifactMatches(preparedEvent?.detail, latestRun?.id || "", applyPdf?.sha256 || "")}
             submitted={["APPLIED", "INTERVIEW"].includes(application.status)} pdfId={applyPdf?.id || null} resumeSha256={applyPdf?.sha256 || ""} fileName={applyPdf?.fileName || ""} hidden={defaultWorkspaceTab !== "apply"} />
@@ -600,9 +614,11 @@ export default async function ApplicationDetailPage({
             key={`${application.status}:${application.job.sourceUrl || ""}`}
             id={application.id}
             initialStatus={application.status}
+            initialUpdatedAt={application.updatedAt.toISOString()}
             initialUrl={application.job.sourceUrl || ""}
             initialNotes={application.notes || ""}
             initialFollowUpAt={application.followUpAt?.toISOString() || ""}
+            initialCommitmentAt={application.events.find(event => event.eventType === "commitment_scheduled")?.toValue || ""}
             hasActiveRun={hasActiveRun}
             hasResumeFiles={hasAcceptedResume}
           />

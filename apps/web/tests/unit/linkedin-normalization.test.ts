@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeLinkedInOpening, canonicalApplyUrl, sameRoleIdentity, employerRequisitionIdentity } from "../../src/lib/discovery/linkedin-normalization";
+import { linkedInBasePay, normalizeLinkedInOpening, canonicalApplyUrl, sameRoleIdentity, employerRequisitionIdentity } from "../../src/lib/discovery/linkedin-normalization";
 import { assessOpening } from "../../src/lib/discovery/matching";
 import { DEFAULT_DISCOVERY_PREFERENCES as prefs } from "../../src/lib/discovery/types";
 const raw = {
@@ -74,4 +74,12 @@ test("ATS identity ignores title slugs but preserves distinct boards and requisi
   assert.equal(employerRequisitionIdentity("https://boards.greenhouse.io/vast/jobs/4707513006?gh_src=li"), employerRequisitionIdentity("https://job-boards.greenhouse.io/vast/jobs/4707513006"));
   assert.equal(employerRequisitionIdentity("https://example.com/job/123"), null);
   assert.equal(employerRequisitionIdentity("https://jobs.lever.co/company/12345678-1234-1234-1234-123456789abc/apply"), "lever:company:12345678-1234-1234-1234-123456789abc");
+});
+
+ test("spaced slash hourly pay retains its explicit period", () => {
+  assert.equal(linkedInBasePay("The range for this position is $30.00-$35.00/ hour.").salaryMin, 62400);
+  assert.equal(linkedInBasePay("The range for this position is $30.00-$35.00/ hour.").salaryMax, 72800);
+  assert.equal(linkedInBasePay("$35 / hr").salaryMin, 72800);
+  assert.equal(linkedInBasePay("CAD $30.00-$35.00/ hour.").salaryMin, null);
+  assert.equal(linkedInBasePay("$30.00-$35.00/ hour or per year").salaryMin, null);
 });

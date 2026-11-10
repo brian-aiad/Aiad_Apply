@@ -1,3 +1,4 @@
+import {listingAgeBlocker} from './listing-age';
 import type { DiscoveryPreferences } from "./types";
 
 // Queries cover different employer naming conventions; none require a paid API.
@@ -17,9 +18,10 @@ export function supportSearchLinks(preferences: DiscoveryPreferences) {
   }));
 }
 
-export function recommendedPosting(postedAt: string | Date | null, lastSeenAt: string | Date, now: Date) {
+export function recommendedPosting(postedAt: string | Date | null, lastSeenAt: string | Date, now: Date, details: {sourceKey?:string;description?:string} = {}) {
   const seen = new Date(lastSeenAt).getTime();
   if (!Number.isFinite(seen) || seen > now.getTime() || now.getTime() - seen > 48 * 3600000) return false;
+  if(listingAgeBlocker({postedAt,...details},now))return false;
   if (!postedAt) return true; // Recently verified active, never labelled newly posted.
   const posted = new Date(postedAt).getTime();
   return Number.isFinite(posted) && posted <= now.getTime();

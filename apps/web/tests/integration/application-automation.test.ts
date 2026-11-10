@@ -233,3 +233,34 @@ test("uncertain attempts require a fresh explicit retry authorization and retain
   assert.equal((await user(f.app.id, retry)).status, 409);
   await user(f.app.id, { action: 'cancel', attemptId: next.attemptId });
 });
+
+test("explicit blocked recovery binds latest validated PDF and current automatic authority", async () => {
+  const {AUTONOMY_KEY}=await import('../../src/lib/application-autonomy-policy');
+  const saved=await db.setting.findUnique({where:{key:AUTONOMY_KEY}});
+  const f=await fixture();
+  await user(f.app.id,f.approve);
+  const claim=await (await worker({action:'claim',platform:'darwin'})).json();
+  await worker({action:'finish',attemptId:claim.attemptId,status:'BLOCKED',summary:'Workday sign-in required'});
+  const bytes=Buffer.from('%PDF-1.4\nfixture-second-version');
+  const newest=await db.tailoringRun.create({data:{applicationId:f.app.id,runNumber:2,status:'SUCCEEDED',validationPassed:true,pageCount:1,reportSnapshot:{tailoring_mode:'evidence_only'},artifacts:{create:{kind:'PDF',fileName:'fixture.pdf',sha256:createHash('sha256').update(bytes).digest('hex'),byteSize:bytes.length,backup:{create:{content:bytes}}}}},include:{artifacts:true}});
+  const authorizationId=randomUUID();
+  const command={action:'resume_latest',attemptId:claim.attemptId,runId:newest.id,artifactId:newest.artifacts[0].id,resumeSha256:newest.artifacts[0].sha256,destination:f.approve.destination,answers:[]};
+  try{
+    assert.equal((await user(f.app.id,{action:'resume',attemptId:claim.attemptId,answers:[]})).status,409);
+    assert.equal((await user(f.app.id,command)).status,409);
+    const parked=await db.applicationEvent.findUniqueOrThrow({where:{id:claim.attemptId}});assert.equal((parked.detail as Record<string,unknown>).executionPlatform,'darwin');
+    await db.setting.upsert({where:{key:AUTONOMY_KEY},create:{key:AUTONOMY_KEY,value:{enabled:true,authorizationId,authorizedAt:new Date().toISOString(),dailyLimit:5}},update:{value:{enabled:true,authorizationId,authorizedAt:new Date().toISOString(),dailyLimit:5}}});
+    assert.equal((await user(f.app.id,{...command,resumeSha256:'f'.repeat(64)})).status,409);
+    const response=await user(f.app.id,command);assert.equal(response.status,200,JSON.stringify(await response.clone().json()));
+    const queued=await response.json();const event=await db.applicationEvent.findUniqueOrThrow({where:{id:queued.attemptId}});
+    const attempt=event.detail as Record<string,unknown>;
+    assert.equal(attempt.runId,newest.id);assert.equal(attempt.resumeSha256,createHash('sha256').update(bytes).digest('hex'));assert.equal(attempt.authorizationId,authorizationId);assert.equal(attempt.uploadedResumeVerified,false);assert.equal(attempt.attachmentVerified,false);assert.equal(attempt.liveEligibility,undefined);assert.equal(attempt.executionPlatform,undefined);
+    await db.applicationEvent.update({where:{id:event.id},data:{toValue:'UNKNOWN',detail:{...attempt,status:'UNKNOWN',submissionStartedAt:new Date().toISOString()} as Prisma.InputJsonValue}});
+    assert.equal((await user(f.app.id,{...command,attemptId:event.id})).status,409);
+    await db.applicationEvent.update({where:{id:event.id},data:{toValue:'BLOCKED',detail:{...attempt,status:'BLOCKED',submissionStartedAt:new Date().toISOString()} as Prisma.InputJsonValue}});
+    assert.equal((await user(f.app.id,{...command,attemptId:event.id})).status,409);
+  }finally{
+    await db.setting.deleteMany({where:{key:AUTONOMY_KEY}});
+    if(saved)await db.setting.create({data:{key:saved.key,value:saved.value as Prisma.InputJsonValue}});
+  }
+});

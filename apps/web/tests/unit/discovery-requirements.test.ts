@@ -69,3 +69,13 @@ test("mixed required and preferred clauses keep real minimums only", () => {
   assert.equal(experienceRequirement(lines)?.years, 3);
   assert.equal(lines.some(line => /Kubernetes|Salesforce/.test(line)), false);
 });
+
+test("required event coverage surfaces schedule cautions without confusing benefits", () => {
+ assert.deepEqual(roleConditions("The candidate must be available to work a flexible schedule including weeknights, weekends, and holidays to cover concerts."), ["Weeknight availability", "Weekend availability", "Holiday availability"]);
+ assert.deepEqual(roleConditions("Benefits include paid holidays. Weekends are not required."), []);
+});
+
+test("schedule negation does not hide a separate affirmative clause", () => {
+ assert.deepEqual(roleConditions("Weekend availability is required; no holidays."), ["Weekend availability"]);
+ assert.deepEqual(roleConditions("Weeknights are required; weekend work is not required."), ["Weeknight availability"]);
+});

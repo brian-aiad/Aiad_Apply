@@ -1,3 +1,4 @@
+import { rankLinkedIn } from "./linkedin-policy";
 export type DiscoveryView = {
   channel: "local" | "rtx" | "linkedin";
   tab: "all" | "matches" | "review" | "approved" | "dismissed" | "excluded";
@@ -35,8 +36,7 @@ export function discoveryViewSearch(view: DiscoveryView): string {
 }
 
 export function compareLinkedInFit(a: { qualified: boolean; score: number; linkedin?: { premiumSignal?: string; topApplicant?: boolean } }, b: { qualified: boolean; score: number; linkedin?: { premiumSignal?: string; topApplicant?: boolean } }) {
-  const rank = (posting: typeof a) => ({ TOP_APPLICANT: 4, HIGH: 3, MEDIUM: 2, LOW: 1, NONE: 0, UNKNOWN: 0 }[posting.linkedin?.premiumSignal ?? (posting.linkedin?.topApplicant ? "TOP_APPLICANT" : "UNKNOWN")] ?? 0);
-  return Number(b.qualified) - Number(a.qualified) || b.score - a.score || rank(b) - rank(a);
+  return Number(b.qualified) - Number(a.qualified) || rankLinkedIn({ ...a, postedAt: null }, { ...b, postedAt: null });
 }
 export function visibleLinkedInContact(contact: { name?: string; profileUrl?: string }) {
   if (!contact.name?.trim() || !contact.profileUrl) return false;

@@ -145,6 +145,19 @@ test('external redirect unwrapping accepts only known LinkedIn redirect paths an
 });
 
 
+test('component detail with plain title and linked Remote pill retains employer identity', async () => {
+  const browser = await chromium.launch({ channel: 'chrome', headless: true });
+  try {
+    const page = await browser.newPage();
+    const html = (await fixture('detail-component-column')).replace('<a href="https://www.linkedin.com/jobs/view/1234567890/">Application Support Specialist</a>', 'Application Support Specialist').replace('<button>Hybrid</button>', '<a href="https://www.linkedin.com/jobs/view/1234567890/">Remote</a>');
+    await page.setContent(html);
+    const raw = await page.evaluate(extractLinkedInDocument);
+    assert.equal(raw.title, 'Application Support Specialist');
+    assert.equal(raw.company, 'Example Employer');
+    assert.equal(raw.location, 'Irvine, CA');
+  } finally { await browser.close(); }
+});
+
 test('six grouped searches cover adjacent support families and prioritize Top then High cards', () => {
   assert.equal(SUPPORT_QUERIES.length, 6);
   assert.match(SUPPORT_QUERIES.join(' '), /Production Support/);
@@ -155,7 +168,7 @@ test('six grouped searches cover adjacent support families and prioritize Top th
   assert.deepEqual(cards.sort(comparePremiumCandidates).map(card => card.id), ['top', 'high', 'unknown']);
 });
 
-test('preferred search drives collection instead of generic queries, using only offline fixtures', async () => {
+test('preferred search leads supplemental support queries within the same offline budget', async () => {
   const browser = await chromium.launch({ channel: 'chrome', headless: true });
   const context = await browser.newContext();
   const dir = await mkdtemp(path.join(os.tmpdir(), 'linkedin-preferred-'));
@@ -172,10 +185,11 @@ test('preferred search drives collection instead of generic queries, using only 
     const result = await collectLinkedInSearch({ window: 'day', limit: 1, searchUrl: 'https://www.linkedin.com/jobs/search-results/?keywords=Application+Support+Engineer&geoId=104234982&distance=35&f_TPR=r604800&f_SAL=chosen-band', lockPath: path.join(dir, 'lease'),
       browserConnector: async () => ({ contexts: () => [{ pages: () => [signedIn], newPage: async () => fixturePage }] }),
     });
-    assert.equal(result.status, 'completed'); assert.equal(result.searches.length, 1); assert.equal(result.jobs.length, 1);
+    assert.equal(result.status, 'completed'); assert.equal(result.searches.length, 7); assert.equal(result.jobs.length, 1);
     const search = new URL(visited[0]);
     assert.equal(search.pathname, '/jobs/search-results/'); assert.equal(search.searchParams.get('keywords'), 'Application Support Engineer');
     assert.equal(search.searchParams.get('f_SAL'), 'chosen-band'); assert.equal(search.searchParams.get('geoId'), '104234982');
-    assert.equal(search.searchParams.get('f_TPR'), 'r86400'); assert.equal(visited.length, 2);
+    assert.equal(search.searchParams.get('f_TPR'), 'r86400'); assert.equal(visited.length, 8);
+    assert.equal(visited.filter(url => url.includes('/jobs/view/')).length, 1);
   } finally { await browser.close(); await rm(dir, { recursive: true, force: true }); }
 });

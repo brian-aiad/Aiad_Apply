@@ -1,3 +1,5 @@
+import { candidateProfile } from "@/lib/workspace-material";
+import { captureSource } from "@/lib/job-source";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
@@ -40,7 +42,7 @@ export async function POST(request: Request) {
     where: { key: "discovery:preferences" },
     select: { value: true },
   });
-  const intelligence = captureIntelligence(parsed, readDiscoveryPreferences(preference?.value));
+  const intelligence = captureIntelligence(parsed, readDiscoveryPreferences(preference?.value), await candidateProfile());
   let existing = await db.job.findUnique({
     where: { rawPasteSha256: parsed.rawPasteSha256 },
     include: { application: true },
@@ -75,7 +77,7 @@ export async function POST(request: Request) {
     const record = await db.$transaction(async (transaction) => {
       const job = await transaction.job.create({
         data: {
-          source: "linkedin",
+          source: captureSource(parsed.sourceUrl),
           company: parsed.company,
           title: parsed.title,
           location: parsed.location,

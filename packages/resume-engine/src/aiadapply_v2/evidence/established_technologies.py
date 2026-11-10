@@ -8,6 +8,8 @@ import re
 
 from aiadapply_v2.text import contains_term
 
+from .work_actions import affirmed_work_action
+
 _FAMILIES = {
     "python": ("Python",),
     "api": ("API", "APIs"),
@@ -15,25 +17,53 @@ _FAMILIES = {
     "webhooks": ("Webhook", "Webhooks"),
     "aws": ("AWS", "Amazon Web Services"),
     "ci": ("CI/CD", "Continuous Integration", "Continuous Delivery", "Continuous Deployment"),
-    "javascript": ("JavaScript",), "typescript": ("TypeScript",),
-    "java": ("Java",), "c": ("C",), "cpp": ("C++",), "csharp": ("C#",),
-    "go": ("Go", "Golang"), "rust": ("Rust",), "ruby": ("Ruby",),
-    "php": ("PHP",), "swift": ("Swift",), "kotlin": ("Kotlin",),
-    "r": ("R",), "matlab": ("MATLAB",), "bash": ("Bash", "Shell scripting"),
+    "javascript": ("JavaScript",),
+    "typescript": ("TypeScript",),
+    "java": ("Java",),
+    "c": ("C",),
+    "cpp": ("C++",),
+    "csharp": ("C#",),
+    "go": ("Go", "Golang"),
+    "rust": ("Rust",),
+    "ruby": ("Ruby",),
+    "php": ("PHP",),
+    "swift": ("Swift",),
+    "kotlin": ("Kotlin",),
+    "r": ("R",),
+    "matlab": ("MATLAB",),
+    "bash": ("Bash", "Shell scripting"),
     "powershell": ("PowerShell",),
-    "sql": ("SQL",), "postgres": ("PostgreSQL", "Postgres"),
-    "mysql": ("MySQL",), "sqlite": ("SQLite",), "mongodb": ("MongoDB",),
-    "html": ("HTML", "HTML5"), "css": ("CSS", "CSS3"),
-    "react": ("React", "React.js"), "node": ("Node.js", "NodeJS"),
-    "express": ("Express", "Express.js"), "vue": ("Vue", "Vue.js"),
-    "angular": ("Angular",), "next": ("Next.js",),
-    "django": ("Django",), "flask": ("Flask",), "fastapi": ("FastAPI",),
-    "git": ("Git",), "github": ("GitHub",), "gitlab": ("GitLab",),
-    "github_actions": ("GitHub Actions",), "docker": ("Docker",),
-    "linux": ("Linux",), "unix": ("Unix",),
-    "json": ("JSON",), "http": ("HTTP", "HTTPS"), "xml": ("XML",),
-    "postman": ("Postman",), "vscode": ("VS Code", "Visual Studio Code"),
-    "pytest": ("pytest",), "jest": ("Jest",), "junit": ("JUnit",),
+    "sql": ("SQL",),
+    "postgres": ("PostgreSQL", "Postgres"),
+    "mysql": ("MySQL",),
+    "sqlite": ("SQLite",),
+    "mongodb": ("MongoDB",),
+    "html": ("HTML", "HTML5"),
+    "css": ("CSS", "CSS3"),
+    "react": ("React", "React.js"),
+    "node": ("Node.js", "NodeJS"),
+    "express": ("Express", "Express.js"),
+    "vue": ("Vue", "Vue.js"),
+    "angular": ("Angular",),
+    "next": ("Next.js",),
+    "django": ("Django",),
+    "flask": ("Flask",),
+    "fastapi": ("FastAPI",),
+    "git": ("Git",),
+    "github": ("GitHub",),
+    "gitlab": ("GitLab",),
+    "github_actions": ("GitHub Actions",),
+    "docker": ("Docker",),
+    "linux": ("Linux",),
+    "unix": ("Unix",),
+    "json": ("JSON",),
+    "http": ("HTTP", "HTTPS"),
+    "xml": ("XML",),
+    "postman": ("Postman",),
+    "vscode": ("VS Code", "Visual Studio Code"),
+    "pytest": ("pytest",),
+    "jest": ("Jest",),
+    "junit": ("JUnit",),
 }
 _CONTEXTS = {
     "python": r"\b(script\w*|automat\w*|reconcil\w*|ETL|debug\w*)\b",
@@ -45,18 +75,56 @@ _CONTEXTS = {
 }
 _CODING = r"\b(script\w*|coding|develop\w*|built|build\w*|test\w*|debug\w*|APIs?)\b"
 _DATA = r"\b(databases?|SQL|queries|ETL|reconcil\w*|data.sync|indexing|aggregation)\b"
-_WEB = r"\b(SaaS|platform|APIs?|application|authentication|permissions?|user access)\b"
+_WEB = r"\b(SaaS|platform|APIs?|applications?|authentication|permissions?|user access)\b"
 _DEV = r"\b(built|build\w*|test\w*|deploy\w*|script\w*|debug\w*|code|develop\w*)\b"
-for _family in ("javascript", "typescript", "java", "c", "cpp", "csharp", "go", "rust", "ruby",
-                "php", "swift", "kotlin", "r", "matlab", "bash", "powershell"):
+for _family in (
+    "javascript",
+    "typescript",
+    "java",
+    "c",
+    "cpp",
+    "csharp",
+    "go",
+    "rust",
+    "ruby",
+    "php",
+    "swift",
+    "kotlin",
+    "r",
+    "matlab",
+    "bash",
+    "powershell",
+):
     _CONTEXTS[_family] = _CODING
 # R is routinely used for data investigation as well as explicit script work.
 _CONTEXTS["r"] = rf"(?:{_CODING}|{_DATA})"
 for _family in ("sql", "postgres", "mysql", "sqlite", "mongodb"):
     _CONTEXTS[_family] = _DATA
-for _family in ("html", "css", "react", "node", "express", "vue", "angular", "next", "django", "flask", "fastapi"):
+for _family in (
+    "html",
+    "css",
+    "react",
+    "node",
+    "express",
+    "vue",
+    "angular",
+    "next",
+    "django",
+    "flask",
+    "fastapi",
+):
     _CONTEXTS[_family] = _WEB
-for _family in ("git", "github", "gitlab", "github_actions", "docker", "vscode", "pytest", "jest", "junit"):
+for _family in (
+    "git",
+    "github",
+    "gitlab",
+    "github_actions",
+    "docker",
+    "vscode",
+    "pytest",
+    "jest",
+    "junit",
+):
     _CONTEXTS[_family] = _DEV
 for _family in ("json", "http", "xml", "postman"):
     _CONTEXTS[_family] = _CONTEXTS["api"]
@@ -68,14 +136,23 @@ COMMON_DEVELOPMENT_TECHNOLOGIES = [aliases[0] for aliases in _FAMILIES.values()]
 
 
 def technical_family(term: str) -> str | None:
-    return next((key for key, aliases in _FAMILIES.items()
-                 if term.casefold() in {a.casefold() for a in aliases}), None)
+    return next(
+        (
+            key
+            for key, aliases in _FAMILIES.items()
+            if term.casefold() in {a.casefold() for a in aliases}
+        ),
+        None,
+    )
 
 
 def established_technology(profile_terms: list[str], term: str, rejected: list[str]) -> bool:
     family = technical_family(term)
-    return bool(family and any(technical_family(t) == family for t in profile_terms)
-                and not any(technical_family(t) == family for t in rejected))
+    return bool(
+        family
+        and any(technical_family(t) == family for t in profile_terms)
+        and not any(technical_family(t) == family for t in rejected)
+    )
 
 
 def technical_duty_fits(term: str, duty: str) -> bool:
@@ -90,13 +167,17 @@ def technical_usage_in_context(term: str, text: str) -> bool:
     for clause in re.split(r"[.!?;](?:\s+|$)", text):
         if not any(contains_term(clause, a) for a in aliases):
             continue
-        if re.search(r"\b(?:familiar(?:ity)? with|knowledge of|exposure to|coursework|classroom|(?:tools|skills|technologies)\s*:)", clause, re.I):
+        # A classroom can be the workplace (campus AV/desktop support).
+        # Reject learning qualifiers, not the physical location of real work.
+        if re.search(
+            r"\b(?:familiar(?:ity)? with|knowledge of|exposure to|coursework|classroom(?:\s+[\w/+.-]+){0,3}\s+(?:knowledge|experience|learning|training|use)\b|(?:tools|skills|technologies)\s*:)",
+            clause,
+            re.I,
+        ):
             continue
         # Matching the technology's name alone is not a documented work action.
-        if (not family or technical_duty_fits(term, clause)) and re.search(
-            r"\b(?:support\w*|debug\w*|investigat\w*|test\w*|validat\w*|resolv\w*|"
-            r"monitor\w*|check\w*|deploy\w*|built|build\w*|automat\w*|script\w*|"
-            r"maintain\w*|configur\w*|administer\w*|provision\w*|review\w*|operat\w*|triag\w*|run(?:ning)?|ran)\b", clause, re.I
+        if (not family or technical_duty_fits(term, clause)) and affirmed_work_action(
+            clause, aliases
         ):
             return True
     return False

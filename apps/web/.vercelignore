@@ -3,3 +3,10 @@
 test-results
 playwright-report
 *.log
+.next*
+node_modules
+coverage
+.runtime
+output
+tests
+*.tsbuildinfo

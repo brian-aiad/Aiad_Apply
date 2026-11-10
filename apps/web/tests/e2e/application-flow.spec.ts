@@ -72,12 +72,13 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
   await expect(page.locator("span.status", { hasText: "Captured" })).toBeVisible();
   await expect(page.getByText("URL can be added later")).toBeVisible();
 
-  await page.getByLabel("Status").selectOption("APPLIED");
+  await expect(page.getByLabel("Status").locator('option[value="APPLIED"]')).toBeDisabled();
   await page.getByText("Notes, URL & follow-up", { exact: true }).click();
   await page.getByLabel("Private notes").fill("Follow up with the recruiting team.");
   await page.getByLabel("Follow-up reminder").fill("2026-08-25T09:30");
   await page.getByRole("button", { name: "Save", exact: true }).click();
-  await expect(page.locator("span.status", { hasText: "Applied" })).toBeVisible();
+  await expect(page.getByText("Application changes saved.", { exact: true })).toBeVisible();
+  await expect(page.locator("span.status", { hasText: "Captured" })).toBeVisible();
   await page.reload();
   await page.getByText("Notes, URL & follow-up", { exact: true }).click();
   await expect(page.getByLabel("Private notes")).toHaveValue(
@@ -85,7 +86,7 @@ test("captures a noisy JPMorgan posting and tracks application progress", async 
   );
 
   await page.goto("/");
-  await expect(page.getByText("1 / 8")).toBeVisible();
+  await expect(page.getByRole("progressbar", { name: "Daily application goal" })).toHaveAttribute("aria-valuenow", "0");
   await expect(page.getByText("Technology Support II").first()).toBeVisible();
 });
 
@@ -116,7 +117,7 @@ test("remains usable at a mobile viewport", async ({ page, request }) => {
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/capture");
-  await expect(page.getByRole("heading", { name: "Capture a job" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Paste & tailor a job" })).toBeVisible();
   await expect(page.getByLabel("Complete job posting paste")).toBeVisible();
   const mobileNavigation = page.getByRole("navigation", { name: "Mobile navigation" });
   await expect(mobileNavigation).toBeVisible();
@@ -333,8 +334,8 @@ test("ingests and deduplicates the dated live LinkedIn stress corpus", async ({
 }) => {
   const records = (await fixtures()).slice(8, 15);
   const expected = [
-    ["CoreWeave", "Technical Support Engineer (Bare Metal)", 13, 13, 0],
-    ["Infinite Giving", "Client Operations Specialist", 3, 7, 3],
+    ["CoreWeave", "Technical Support Engineer (Bare Metal)", 14, 13, 0],
+    ["Infinite Giving", "Client Operations Specialist", 4, 7, 3],
     ["LiveRamp", "Technical Support Engineer", 5, 15, 3],
     [
       "Crossover",
@@ -523,10 +524,11 @@ test("records authenticated worker progress and displays the current stage", asy
   });
 
   await page.reload();
-  await expect(page.locator("span.status", { hasText: "Review" }).first()).toBeVisible();
+  await expect(page.locator("span.status", { hasText: "Prepared" }).first()).toBeVisible();
   await expect(page.getByLabel("Status")).toHaveValue("REVIEW");
   await expect(page.getByText("Direct", { exact: true })).toBeVisible();
   await expect(page.getByText("Not assessed")).toBeVisible();
   await expect(page.getByText("Rejected", { exact: true })).toBeVisible();
+  await page.locator(".review-evidence > summary").click();
   await expect(page.getByText("2 flags", { exact: true })).toBeVisible();
 });

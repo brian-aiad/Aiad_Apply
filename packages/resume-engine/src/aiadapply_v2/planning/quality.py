@@ -47,10 +47,18 @@ def demonstrates_ordinary_capability(term: str, source: str, final: str) -> bool
         "service desk": r"\b(?:(?:support|production) tickets|service desk|first-line application support)\b",
     }
     if term.casefold() == "end-to-end":
-        return all(all(re.search(pattern, text, re.I) for pattern in (
-            r"\bindependently\b", r"\b(?:built|build(?:ing)?|develop(?:ed|ing)?)\b",
-            r"\btest(?:ed|ing)?\b", r"\bdeploy(?:ed|ing)?\b",
-        )) for text in (source, final))
+        return all(
+            all(
+                re.search(pattern, text, re.I)
+                for pattern in (
+                    r"\bindependently\b",
+                    r"\b(?:built|build(?:ing)?|develop(?:ed|ing)?)\b",
+                    r"\btest(?:ed|ing)?\b",
+                    r"\bdeploy(?:ed|ing)?\b",
+                )
+            )
+            for text in (source, final)
+        )
     if pattern := equivalent_actions.get(term.casefold()):
         return all(re.search(pattern, text, re.I) for text in (source, final))
     if not supports_automatic_context(term, source):
@@ -59,12 +67,21 @@ def demonstrates_ordinary_capability(term: str, source: str, final: str) -> bool
         return bool(
             re.search(r"\b(?:Python|PowerShell|scripts?|workflows?)\b", final, re.I)
             and re.search(r"reconcil|provision|ETL|repeated|nightly", final, re.I)
-            and re.search(r"built|developed|created|automat|streamlin|reduced|cut|monitor", final, re.I)
+            and re.search(
+                r"built|developed|created|automat|streamlin|reduced|cut|monitor", final, re.I
+            )
         )
     if term.casefold() == "case management":
         return bool(
-            (supports_automatic_context(term, final) or re.search(r"(?:support|Jira|incident).{0,40}(?:tickets|cases)", final, re.I))
-            and re.search(r"\b(?:resolv(?:e|ed|ing)|manag(?:e|ed|ing)|handl(?:e|ed|ing)|track(?:ed|ing)?|maintain(?:ed|ing)?|coordinat(?:e|ed|ing)|document(?:ed|ing)?|escalat(?:e|ed|ing))\b", final, re.I)
+            (
+                supports_automatic_context(term, final)
+                or re.search(r"(?:support|Jira|incident).{0,40}(?:tickets|cases)", final, re.I)
+            )
+            and re.search(
+                r"\b(?:resolv(?:e|ed|ing)|manag(?:e|ed|ing)|handl(?:e|ed|ing)|track(?:ed|ing)?|maintain(?:ed|ing)?|coordinat(?:e|ed|ing)|document(?:ed|ing)?|escalat(?:e|ed|ing))\b",
+                final,
+                re.I,
+            )
         )
     return supports_automatic_context(term, final)
 
@@ -85,12 +102,14 @@ def tailoring_opportunities(
         and keyword.normalized not in SOFT_TERMS | NON_PROSE_QUALIFICATIONS
     }
     project_terms = {
-        keyword.term for keyword in keywords
+        keyword.term
+        for keyword in keywords
         if keyword.accepted
         and keyword.normalized not in SOFT_TERMS | NON_PROSE_QUALIFICATIONS
-        and (keyword.hiring_importance >= 10 or bool(
-            {"required", "preferred", "responsibilities"} & set(keyword.source_sections)
-        ))
+        and (
+            keyword.hiring_importance >= 10
+            or bool({"required", "preferred", "responsibilities"} & set(keyword.source_sections))
+        )
     }
     source = {p.paragraph_id: p.text for p in base.paragraphs if p.editable}
     opportunities = {}
@@ -101,7 +120,9 @@ def tailoring_opportunities(
         terms = [term for term in row["missing_supported_terms"] if term in important]
         terms.extend(sorted(term for term in important if contains_term(source.get(pid, ""), term)))
         if pid.startswith("projects."):
-            terms.extend(sorted(term for term in project_terms if contains_term(source.get(pid, ""), term)))
+            terms.extend(
+                sorted(term for term in project_terms if contains_term(source.get(pid, ""), term))
+            )
         if terms:
             opportunities[pid] = list(dict.fromkeys(terms))
     # Job-derived project adaptations remain separate from factual experience.
@@ -115,6 +136,7 @@ def tailoring_opportunities(
 
 def substantive_reframe(before: str, after: str) -> bool:
     """Do not count punctuation, case, moved words or one synonym as a rewrite."""
+
     def tokens(text: str) -> list[str]:
         return re.findall(r"[a-z0-9+#]+", text.casefold())
 
@@ -144,7 +166,8 @@ def tailoring_breadth(
     opportunities = tailoring_opportunities(base, keywords, graph, matches)
     source = {p.paragraph_id: p.text for p in base.paragraphs}
     adapted = [
-        pid for pid, terms in opportunities.items()
+        pid
+        for pid, terms in opportunities.items()
         if (
             substantive_reframe(source.get(pid, ""), final_text.get(pid, ""))
             or any(
@@ -206,14 +229,19 @@ def tailoring_feedback(
         for term in {term for terms in candidates.values() for term in terms}
         if not any(
             preserves_source_term(final_text.get(pid, ""), term)
-            or demonstrates_ordinary_capability(term, source_by_id.get(pid, ""), final_text.get(pid, ""))
-            for pid in final_text if ".bullet." in pid
+            or demonstrates_ordinary_capability(
+                term, source_by_id.get(pid, ""), final_text.get(pid, "")
+            )
+            for pid in final_text
+            if ".bullet." in pid
         )
     }
     if missing_placements:
         feedback.append(
             "Supported role requirements still need natural evidenced bullet placement: "
-            + "; ".join(f"{term} ({', '.join(pids)})" for term, pids in sorted(missing_placements.items()))
+            + "; ".join(
+                f"{term} ({', '.join(pids)})" for term, pids in sorted(missing_placements.items())
+            )
             + ". Choose the strongest factual placement for each requirement; do not "
             "repeat it across every candidate bullet or append a keyword list. "
             "Keep already effective bullets unchanged."
@@ -232,7 +260,11 @@ def tailoring_feedback(
         and keyword.normalized not in SOFT_TERMS
         and keyword.term.casefold() not in optional_tools
         and not preserves_source_term(exported, keyword.term)
-        and not any(demonstrates_ordinary_capability(keyword.term, source_by_id.get(pid, ""), text) for pid, text in final_text.items() if ".bullet." in pid)
+        and not any(
+            demonstrates_ordinary_capability(keyword.term, source_by_id.get(pid, ""), text)
+            for pid, text in final_text.items()
+            if ".bullet." in pid
+        )
         and keyword.normalized not in NON_PROSE_QUALIFICATIONS
     ]
     if missing:
@@ -246,15 +278,21 @@ def tailoring_feedback(
         if ".bullet." in paragraph_id:
             section = paragraph_id.rsplit(".bullet.", 1)[0]
             for term in ALWAYS_WEAK_TRANSFER_TERMS:
-                if not contains_term(text, term) or contains_term(source_by_id.get(paragraph_id, ""), term):
+                if not contains_term(text, term) or contains_term(
+                    source_by_id.get(paragraph_id, ""), term
+                ):
                     continue
                 if not any(
                     item.claim_scope == "source_specific"
-                    and (item.section == section or item.source_reference in {section, paragraph_id})
+                    and (
+                        item.section == section or item.source_reference in {section, paragraph_id}
+                    )
                     and contains_term(item.source_text, term)
                     for item in graph.evidence
                 ):
-                    feedback.append(f"{paragraph_id}: {term} needs evidence for this employer/project; general exposure or ordinary documentation does not establish this formal duty.")
+                    feedback.append(
+                        f"{paragraph_id}: {term} needs evidence for this employer/project; general exposure or ordinary documentation does not establish this formal duty."
+                    )
         reproduction = re.compile(r"\breproduc(?:e|ed|ing|tion)\b", re.I)
         if ".bullet." in paragraph_id and reproduction.search(text):
             section = paragraph_id.rsplit(".bullet.", 1)[0]

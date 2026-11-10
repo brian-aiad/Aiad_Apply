@@ -40,6 +40,7 @@ from aiadapply_v2.tracking import (
     register_terminal_run,
     run_worker,
     save_failure_report,
+    shared_sources,
     submit_terminal_failure,
     submit_terminal_result,
     submit_worker_progress,
@@ -161,6 +162,15 @@ def transform(
     ] = DEFAULT_USED_RESUME_ROOT,
 ) -> None:
     """Run Codex review, validate, render, and export the one-page resume."""
+    if base_resume == DEFAULT_BASE and candidate_profile == DEFAULT_PROFILE:
+        try:
+            base_resume, candidate_profile = shared_sources(
+                output_dir, base_resume, candidate_profile
+            )
+        except Exception as error:
+            print(
+                f"[yellow]Shared source unavailable; using this installation's source:[/yellow] {error}"
+            )
     report = transform_resume(
         raw_paste=paste_file.read_text(encoding="utf-8", errors="replace"),
         base_resume=base_resume,
@@ -231,6 +241,10 @@ def draft(
 
     reasoner = CodexReasoner()
     try:
+        if tracking and base_resume == DEFAULT_BASE and candidate_profile == DEFAULT_PROFILE:
+            base_resume, candidate_profile = shared_sources(
+                folder, base_resume, candidate_profile, api_url
+            )
         report = transform_resume(
             raw_paste=raw_paste,
             base_resume=base_resume,

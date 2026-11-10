@@ -52,12 +52,17 @@ export function annualPay(min: unknown, max: unknown, currency: unknown, interva
 
 export function payFromText(text: string, title?: string): Pay {
   const empty = { salaryMin: null, salaryMax: null, salaryText: null };
+  // iCIMS renders an annual band as separate, explicitly labelled endpoints.
+  // Normalize only a complete USD pair; ordinary ambiguity guards still apply.
+  text = text.replace(/\bMin\s+USD\s*\$\s*(\d[\d,]*(?:\.\d+)?)\s*\/\s*Yr\.\s*Max\s+USD\s*\$\s*(\d[\d,]*(?:\.\d+)?)\s*\/\s*Yr\./gi,
+    (_, min, max) => `USD annual base pay $${min} - $${max}/year`);
   if (title) {
     const matchingLine = text.split("\n").find((line) => line.trim().toLowerCase().startsWith(`${title.trim().toLowerCase()}:`) && line.includes("$"));
     if (matchingLine) { const pay = payFromText(matchingLine); if (pay.salaryMin !== null) return pay; }
   }
-  const ranges = [...text.matchAll(/\$\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?(?:\s*\/\s*(?:hr|hour|year))?\s*(?:[-–—]|to)\s*\$?\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?/g)];
+  const ranges = [...text.matchAll(/\$\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?(?:\s*\/\s*(?:hr|hour|year))?\s*(?:[-–—]|to|and)\s*\$?\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?/g)];
   const parsed = ranges.flatMap((m) => {
+    if (/\band\b/i.test(m[0]) && !/\bbetween\s*$/i.test(text.slice(0, m.index))) return [];
     const context = text.slice(Math.max(0, (m.index ?? 0) - 90), (m.index ?? 0) + m[0].length + 70);
     if (/\b(?:CAD|AUD|NZD|SGD)\b/i.test(context)) return [];
     if (/\b(?:bonus|equity|sign-on|stock)\b/i.test(context) && !/\b(?:base (?:salary|pay)|hourly|annual salary)\b/i.test(context)) return [];

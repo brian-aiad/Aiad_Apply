@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {workerPosting}from'../../src/lib/worker-posting';
+const job={company:'Employer',title:'IT Support',location:'Commerce, CA',employmentType:'Full-time',workArrangement:'Hybrid',rawPaste:'Support people. Solve problems.\nAnnual Salary: $65,000–$75,000\nWhat you bring\nHelpdesk experience.'};
+test('employer prose receives a boundary without changing its captured source',()=>{const result=workerPosting(job);assert.ok(result.startsWith('Employer\nIT Support\nCommerce, CA\nFull-time\nHybrid\nAbout the job\n'));assert.ok(result.endsWith(job.rawPaste));});
+test('an existing description boundary is preserved byte for byte',()=>{for(const heading of ['About the job','Job Description:','Position Description']){const rawPaste=`Employer\nIT Support\n${heading}\n${job.rawPaste}`;assert.equal(workerPosting({...job,rawPaste}),rawPaste);}});

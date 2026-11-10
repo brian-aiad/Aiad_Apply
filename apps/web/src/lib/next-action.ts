@@ -1,6 +1,8 @@
 type ActionCandidate = {
   id: string;
   status: string;
+  automationStatus?: string | null;
+  referralOnly?: boolean;
   job: { company: string; title: string };
   tailoringRuns: { status: string; errorMessage: string | null }[];
 };
@@ -11,7 +13,7 @@ type FollowUpCandidate = {
 };
 
 export type NextAction = {
-  kind: "follow_up" | "apply" | "review" | "retry" | "tailor" | "wait" | "discover";
+  kind: "recovery" | "referral" | "commitment" | "follow_up" | "apply" | "review" | "retry" | "tailor" | "wait" | "discover";
   href: string;
   label: string;
   note: string;
@@ -23,25 +25,22 @@ export function chooseNextAction({
   applications,
   strongDiscoveries,
   workerAvailable = true,
+  commitments = [],
+  now = new Date(),
 }: {
   followUps: FollowUpCandidate[];
   applications: ActionCandidate[];
   strongDiscoveries: number;
   workerAvailable?: boolean;
+  commitments?: (FollowUpCandidate & { dueAt: Date })[];
+  now?: Date;
 }): NextAction {
-  const followUp = followUps[0];
-  if (followUp) {
-    return {
-      kind: "follow_up",
-      href: `/applications/${followUp.id}`,
-      label: `Follow up with ${followUp.job.company}`,
-      note: `${followUp.job.title}. The reminder is due; review your notes and record the follow-up.`,
-      actionLabel: "Open follow-up",
-    };
-  }
+  const urgent = commitments.filter(item => item.dueAt.getTime() >= now.getTime() - 86400000 && item.dueAt.getTime() <= now.getTime() + 48 * 3600000)
+    .sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime())[0];
+  if (urgent) return { kind: "commitment", href: `/applications/${urgent.id}`, label: `Prepare for ${urgent.job.company}`, note: `${urgent.job.title}. A dated interview or application commitment needs attention.`, actionLabel: "Open commitment" };
 
   const inStatus = (status: string) => applications.find((item) => item.status === status);
-  const ready = inStatus("READY");
+  const ready = applications.find(item => item.status === "READY" && !item.referralOnly && (!item.automationStatus || item.automationStatus === "CANCELED"));
   if (ready) {
     return {
       kind: "apply",
@@ -60,6 +59,22 @@ export function chooseNextAction({
       label: `Review the resume for ${review.job.company}`,
       note: review.job.title,
       actionLabel: "Review resume",
+    };
+  }
+
+  const uncertain = applications.find(item => item.automationStatus === "UNKNOWN");
+  if (uncertain) return { kind: "recovery", href: `/applications/${uncertain.id}?tab=apply`, label: `Check submission for ${uncertain.job.company}`, note: "The employer receipt is unresolved. Inspect the existing attempt before any retry.", actionLabel: "Check existing attempt" };
+  const referral = applications.find(item => item.referralOnly && item.status === "READY");
+  if (referral) return { kind: "referral", href: `/applications/${referral.id}?tab=role`, label: `Prepare referral for ${referral.job.company}`, note: "This employer is reserved for your referral contact. Review the posting and resume for that handoff.", actionLabel: "Open referral material" };
+
+  const followUp = followUps[0];
+  if (followUp) {
+    return {
+      kind: "follow_up",
+      href: `/applications/${followUp.id}`,
+      label: `Follow up with ${followUp.job.company}`,
+      note: `${followUp.job.title}. The reminder is due; review your notes and record the follow-up.`,
+      actionLabel: "Open follow-up",
     };
   }
 

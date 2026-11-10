@@ -1,5 +1,9 @@
 # Current development handoff
 
+## Pre-integration checkpoint — 2026-11-10T04:19:44.646185+00:00
+
+Publishing the current AIADApply checkout from codex/cross-device-handoff to main before the planned AIAD HQ integration. Changes cover shared workspace material, job discovery, application automation, cross-device workers and resume validation. Detailed historical operational notes with private application records are retained in the ignored local file .runtime/pre-hq-handoff-20261110T041944Z.md. Runtime data and device configuration require private transfer. Verification for this checkpoint is Git synchronization only. Next: fetch origin/main and await integration directions.
+
 Updated: 2026-10-20 UTC (October 19 Pacific). Device: MacBook.
 Branch to continue: `codex/cross-device-handoff`.
 

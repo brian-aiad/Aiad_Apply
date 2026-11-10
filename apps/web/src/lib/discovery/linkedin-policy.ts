@@ -7,6 +7,7 @@ export const LINKEDIN_META = "discovery:linkedin:job:";
 export const LINKEDIN_QUEUE = "discovery:linkedin:queue";
 export const LINKEDIN_SESSION = "discovery:linkedin:session";
 export const TAILORING_CAPACITY = 4;
+export const LINKEDIN_SCAN_INTERVAL_MS = 12 * 60 * 60 * 1000;
 export type PremiumSignal = "TOP_APPLICANT" | "HIGH" | "MEDIUM" | "LOW" | "NONE" | "UNKNOWN";
 export const object = (v: unknown): Record<string, unknown> => v && typeof v === "object" && !Array.isArray(v) ? v as Record<string, unknown> : {};
 export function linkedInConfig(value: unknown) {
@@ -46,11 +47,10 @@ export function linkedInEligibility(p: Candidate, meta: unknown, now = new Date(
   return { status: "eligible", reason: "Strong supported fit; ready for automatic tailoring" };
 }
 export function rankLinkedIn(a: { score: number; postedAt: Date | string | null; linkedin?: unknown }, b: { score: number; postedAt: Date | string | null; linkedin?: unknown }) {
-  // Premium breaks ties within a comparable fit band; it cannot rescue a weak fit.
+  // Exact documented fit leads; Premium breaks ties among equally fitting jobs.
   const weight = { TOP_APPLICANT: 4, HIGH: 3, MEDIUM: 2, LOW: 0, NONE: 1, UNKNOWN: 1 };
-  return Math.floor(b.score / 10) - Math.floor(a.score / 10)
-    || weight[premiumSignal(b.linkedin)] - weight[premiumSignal(a.linkedin)]
-    || b.score - a.score || new Date(b.postedAt || 0).getTime() - new Date(a.postedAt || 0).getTime();
+  return b.score - a.score || weight[premiumSignal(b.linkedin)] - weight[premiumSignal(a.linkedin)]
+    || new Date(b.postedAt || 0).getTime() - new Date(a.postedAt || 0).getTime();
 }
 export function scanGate(state: unknown, force: boolean, now = new Date()) {
   const s = object(state), at = now.getTime();
@@ -58,6 +58,6 @@ export function scanGate(state: unknown, force: boolean, now = new Date()) {
   if (Number.isFinite(retry) && at < retry) return { status: "cooldown", message: "LinkedIn is cooling down. You can paste a job or use employer feeds.", nextAllowedAt: new Date(retry).toISOString() };
   const start = Date.parse(String(s.startedAt));
   if (s.status === "running" && at - start < 15 * 60000) return { status: "running", message: "A LinkedIn scan is already running." };
-  if (Number.isFinite(start) && at - start < (force ? 60000 : 86400000)) return { status: "not_due", message: "The next LinkedIn scan is not due yet.", nextAllowedAt: new Date(start + (force ? 60000 : 86400000)).toISOString() };
+  if (Number.isFinite(start) && at - start < (force ? 60000 : LINKEDIN_SCAN_INTERVAL_MS)) return { status: "not_due", message: "The next LinkedIn scan is not due yet.", nextAllowedAt: new Date(start + (force ? 60000 : LINKEDIN_SCAN_INTERVAL_MS)).toISOString() };
   return null;
 }

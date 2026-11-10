@@ -1,3 +1,4 @@
+import { captureSource } from "@/lib/job-source";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -35,7 +36,7 @@ export async function POST(request: Request) {
       if (!job) {
         job = await transaction.job.create({
           data: {
-            source: "linkedin",
+            source: captureSource(parsed.sourceUrl),
             company: parsed.company,
             title: parsed.title,
             location: parsed.location,

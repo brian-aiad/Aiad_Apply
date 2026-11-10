@@ -1,11 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
+import type { ReusableAnswer } from "@/lib/reusable-answers";
 import { Clipboard, Save } from "lucide-react";
 import { emptyApplicationProfile, profileFields, type ApplicationProfile } from "@/lib/application-profile";
 
 export function ApplicationProfileForm() {
   const [profile, setProfile] = useState<ApplicationProfile>({ ...emptyApplicationProfile });
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [reusableAnswers, setReusableAnswers] = useState<ReusableAnswer[]>([]);
+  const [reusableUpdatedAt, setReusableUpdatedAt] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -15,16 +18,16 @@ export function ApplicationProfileForm() {
     fetch("/api/application-profile").then(async response => {
       if (!response.ok) throw new Error("Profile could not be loaded. Reopen the answer kit to retry.");
       const data = await response.json();
-      if (!ignore) { setProfile(data.profile); setUpdatedAt(data.updatedAt); setLoaded(true); }
+      if (!ignore) { setProfile(data.profile); setUpdatedAt(data.updatedAt); setReusableAnswers(data.reusableAnswers ?? []); setReusableUpdatedAt(data.reusableUpdatedAt ?? null); setLoaded(true); }
     }).catch(error => { if (!ignore) setMessage(error.message); });
     return () => { ignore = true; };
   }, []);
   async function save(event: React.FormEvent) {
     event.preventDefault(); setBusy(true); setMessage("");
     try {
-      const response = await fetch("/api/application-profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ profile, updatedAt }) });
+      const response = await fetch("/api/application-profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ profile, updatedAt, reusableAnswers, reusableUpdatedAt }) });
       const data = await response.json(); if (!response.ok) throw new Error(data.error);
-      setProfile(data.profile); setUpdatedAt(data.updatedAt); setDirty(false); setMessage("Application profile saved across this workspace.");
+      setProfile(data.profile); setUpdatedAt(data.updatedAt); setReusableAnswers(data.reusableAnswers ?? []); setReusableUpdatedAt(data.reusableUpdatedAt ?? null); setDirty(false); setMessage("Application profile saved across this workspace.");
       window.dispatchEvent(new Event("application-profile-saved"));
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not save profile."); }
     finally { setBusy(false); }
@@ -45,6 +48,7 @@ export function ApplicationProfileForm() {
         try { await navigator.clipboard.writeText(profile[field.key]); setMessage(`${field.label} copied.`); } catch { setMessage("Select the answer and copy it manually."); }
       }}><Clipboard size={14} /></button>
     </div></label>)}</div>
+    {reusableAnswers.length ? <fieldset><legend>Facts saved from applications</legend><p className="field-help">Change or remove outdated answers here. Employer consents remain with their application.</p>{reusableAnswers.map((row, index) => <label key={row.question}>{row.question}<textarea value={row.answer} disabled={!loaded || busy} maxLength={12000} onChange={event => { setReusableAnswers(previous => previous.map((item, i) => i === index ? { ...item, answer: event.target.value } : item)); setDirty(true); }} /><button type="button" className="button" onClick={() => { setReusableAnswers(previous => previous.filter((_, i) => i !== index)); setDirty(true); }}>Remove saved answer</button></label>)}</fieldset> : null}
     <div className="apply-actions"><button type="submit" className="button button-primary" disabled={!loaded || busy || !dirty}><Save size={14} />{busy ? "Saving…" : "Save profile"}</button><button type="button" className="button" disabled={!loaded || busy} onClick={importAnswers}>Import old browser answers</button></div>
     <p role="status" className="field-help">{message || (dirty ? "Unsaved changes" : "")}</p>
   </form>;

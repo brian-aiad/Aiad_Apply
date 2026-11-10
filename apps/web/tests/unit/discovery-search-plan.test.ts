@@ -22,7 +22,7 @@ test("recommended view includes freshly checked undated jobs without inventing p
   assert.equal(recommendedPosting(null, "2026-10-12T10:00:00Z", now), true);
   assert.equal(recommendedPosting(null, "2026-10-08T10:00:00Z", now), false);
   assert.equal(recommendedPosting("2026-10-11", now, now), true);
-  assert.equal(recommendedPosting("2026-08-01", now, now), true);
+  assert.equal(recommendedPosting("2026-08-01", now, now), false);
   assert.equal(recommendedPosting("2026-10-13", now, now), false);
   assert.equal(recommendedPosting(null, "invalid", now), false);
 });

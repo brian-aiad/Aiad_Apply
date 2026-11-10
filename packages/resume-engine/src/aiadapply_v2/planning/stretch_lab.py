@@ -60,7 +60,9 @@ def build_stretch_lab(
         match = matches.get(keyword.normalized)
         if not match or match.strength != EvidenceStrength.strongly_transferable:
             continue
-        if (match.evidence_id or "").startswith(("evidence.experience.", "evidence.projects.")) and supports_automatic_context(keyword.term, match.source_text):
+        if (match.evidence_id or "").startswith(
+            ("evidence.experience.", "evidence.projects.")
+        ) and supports_automatic_context(keyword.term, match.source_text):
             continue
         opportunity_model = proposed_opportunities.get(keyword.normalized)
         opportunities.append(

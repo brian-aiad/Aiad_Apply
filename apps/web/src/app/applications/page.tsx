@@ -1,3 +1,4 @@
+import { WorkspaceLiveRefresh } from "@/components/workspace-live-refresh";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { ApplicationTable } from "@/components/application-table";
@@ -5,11 +6,12 @@ import { getApplications } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
-export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
-  const { status } = await searchParams;
+export default async function ApplicationsPage({ searchParams }: { searchParams: Promise<{ status?: string; automation?: string }> }) {
+  const { status, automation } = await searchParams;
   const applications = await getApplications();
   return (
     <div className="content">
+      <WorkspaceLiveRefresh />
       <div className="page-heading" style={{ display: "flex", alignItems: "end", justifyContent: "space-between", gap: 16 }}>
         <div>
           <div className="eyebrow">Pipeline</div>
@@ -25,7 +27,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
         </Link>
       </div>
       <section className="panel" style={{ marginTop: 24 }}>
-        <ApplicationTable key={status || "ALL"} applications={applications} showTools initialStatus={status} />
+        <ApplicationTable key={`${status || "ALL"}:${automation || "ALL"}`} applications={applications} showTools initialStatus={status} initialAutomation={automation} />
       </section>
     </div>
   );

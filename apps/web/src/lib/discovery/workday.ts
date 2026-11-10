@@ -1,3 +1,4 @@
+import { settledConcurrentMap } from "./concurrent-map";
 import { fetchPublicJson } from "./public-fetch";
 import { annualPay, employmentType, payFromText, safeExternalUrl, textFromHtml, workArrangement } from "./normalization";
 import { couldBeRelevant, hasLocalLocationOption, localDistance } from "./matching";
@@ -10,6 +11,9 @@ const str = (v: unknown) => typeof v === "string" ? v : "";
 
 // Fixed public employer boards verified from their careers pages; no arbitrary host fetches.
 export const WORKDAY_BOARDS: Record<string, { tenant: string; host: string; site: string }> = {
+  "workday:pacificlife": { tenant: "pacificlife", host: "pacificlife.wd1.myworkdayjobs.com", site: "PacificLifeCareers" },
+  "workday:primoris": { tenant: "prim", host: "prim.wd108.myworkdayjobs.com", site: "Primoris" },
+  "workday:scan": { tenant: "scanhealthplan", host: "scanhealthplan.wd108.myworkdayjobs.com", site: "scancareers" },
   "workday:usc": { tenant: "usc", host: "usc.wd5.myworkdayjobs.com", site: "ExternalUSCCareers" },
   "workday:motorolasolutions": { tenant: "motorolasolutions", host: "motorolasolutions.wd5.myworkdayjobs.com", site: "Careers" },
   "workday:hntb": { tenant: "hntb", host: "hntb.wd5.myworkdayjobs.com", site: "HNTB_Careers" },
@@ -77,18 +81,33 @@ export async function collectWorkday(source: Source, prefs: DiscoveryPreferences
   const candidates = listing.filter(item => couldBeRelevant(str(item.title)));
   const openings: Opening[] = [];
   let failures = 0;
-  for (let offset = 0; offset < candidates.length; offset += 4) {
-    if (signal?.aborted) { complete = false; break; }
-    const batch = await Promise.allSettled(candidates.slice(offset, offset + 4).map(async item => {
+  let accessHold = false;
+  const reasons = new Set<string>();
+  const details = await settledConcurrentMap(candidates, 4, async item => {
+    if (accessHold || signal?.aborted) {
+      complete = false;
+      if (signal?.aborted) reasons.add("Collection deadline reached");
+      return null;
+    }
+    try {
       const path = str(item.externalPath);
       if (!/^\/job\/[\w/-]+$/.test(path)) throw new Error("Unexpected employer detail path.");
       return normalizeWorkday(source, await fetchPublicJson(`${api}${path}`, signal));
-    }));
-    for (const result of batch) {
-      if (result.status === "rejected") failures++;
-      else if (result.value) openings.push(result.value);
+    } catch (error) {
+      failures++;
+      const message = error instanceof Error ? error.message : "";
+      const status = message.match(/HTTP (\d{3})/)?.[1];
+      // Keep diagnostics bounded and free of provider response bodies or URLs.
+      reasons.add(status ? `HTTP ${status}` : /timeout|aborted/i.test(message) ? "Request timed out or was aborted" : /detail path/.test(message) ? "Unexpected employer detail path" : "Detail request failed");
+      if (status && ["401", "403", "429"].includes(status)) accessHold = true;
+      return null;
     }
+  });
+  for (const result of details) {
+    if (result.status === "fulfilled" && result.value) openings.push(result.value);
   }
+  const finished = complete && failures === 0;
+  const message = !finished ? `Collection incomplete: ${[...reasons].join("; ") || "listing pagination limit reached"}. Previous listings preserved.` : undefined;
   // A location-filtered response is not authoritative for older saved worksites.
-  return { openings, liveIds: listing.flatMap(item => Array.isArray(item.bulletFields) ? item.bulletFields.map(String) : []), complete: complete && failures === 0, authoritative: !filtered, checked: listing.length, failures };
+  return { openings, liveIds: listing.flatMap(item => Array.isArray(item.bulletFields) ? item.bulletFields.map(String) : []), complete: finished, message, authoritative: !filtered, checked: listing.length, failures };
 }

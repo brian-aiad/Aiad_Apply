@@ -12,17 +12,19 @@ export async function baseResumePath({
   home = os.homedir(),
   platform = process.platform,
   repository = path.resolve(process.cwd(), "..", ".."),
+  outputRootOnly = false,
 }: {
   environment?: Record<string, string | undefined>;
   home?: string;
   platform?: string;
   repository?: string;
+  outputRootOnly?: boolean;
 } = {}) {
   const expandHome = (value: string) => value.startsWith("~/")
     ? path.join(home, value.slice(2)) : value;
   const configured = environment.AIADAPPLY_BASE_RESUME?.trim();
   // An explicit missing path is an error, not permission to serve an older base.
-  if (configured) return expandHome(configured);
+  if (configured && !outputRootOnly) return expandHome(configured);
 
   let outputRoot = environment.AIADAPPLY_OUTPUT_ROOT?.trim();
   if (outputRoot) {
@@ -38,7 +40,10 @@ export async function baseResumePath({
     }
     outputRoot = path.join(downloads, "Resume_Builder", "OUTPUT_RESUMES");
   }
+  if (outputRootOnly) return outputRoot;
   const synced = path.join(path.dirname(outputRoot), "Brian_Aiad_BASE.docx");
   if (await stat(synced).then((entry) => entry.isFile()).catch(() => false)) return synced;
   return path.join(repository, "data", "resumes", "Brian_Aiad_BASE.docx");
 }
+
+export async function localOutputRoot() { return baseResumePath({ outputRootOnly: true }); }

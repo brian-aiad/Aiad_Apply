@@ -13,6 +13,7 @@ $webErrorLog = Join-Path $runtimeRoot "web-error.log"
 $workerLog = Join-Path $runtimeRoot "worker.log"
 $workerErrorLog = Join-Path $runtimeRoot "worker-error.log"
 $localUrl = "http://127.0.0.1:3000"
+$pythonPath = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 
 function Stop-ProcessTree {
     param([int]$RootProcessId)
@@ -35,7 +36,7 @@ function Stop-ProcessTree {
     Stop-Process -Id $RootProcessId -Force -ErrorAction SilentlyContinue
 }
 
-foreach ($commandName in @("node", "npm", "uv")) {
+foreach ($commandName in @("node", "npm")) {
     if (-not (Get-Command $commandName -ErrorAction SilentlyContinue)) {
         throw "Missing required command: $commandName"
     }
@@ -51,10 +52,23 @@ if (-not (Test-Path -LiteralPath (Join-Path $webRoot ".env")) -and
 
 Push-Location $repositoryRoot
 try {
-    & uv run python -c "import aiadapply_v2" 2>$null
-    if ($LASTEXITCODE -ne 0) {
+    # Windows PowerShell 5 reports native stderr as ErrorRecords even for a
+    # successful uv editable rebuild. Decide readiness from the native exit code.
+    $savedPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        $importExit = 1
+        if (Test-Path -LiteralPath $pythonPath) {
+            & $pythonPath -c "import aiadapply_v2" 2>$null
+            $importExit = $LASTEXITCODE
+        }
+    } finally { $ErrorActionPreference = $savedPreference }
+    if ($importExit -ne 0) {
+        if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+            throw "The local Python environment needs repair. Install uv, then run this launcher again."
+        }
         Write-Host "Repairing the local Python environment..."
-        & uv sync --extra dev
+        & uv sync --quiet --extra dev
         if ($LASTEXITCODE -ne 0) {
             $venvPath = [IO.Path]::GetFullPath((Join-Path $repositoryRoot ".venv"))
             $users = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object {
@@ -66,7 +80,7 @@ try {
             }
             throw "uv sync failed while repairing .venv. Run 'uv sync --extra dev' from $repositoryRoot to see the complete dependency error."
         }
-        & uv run python -c "import aiadapply_v2"
+        & $pythonPath -c "import aiadapply_v2"
         if ($LASTEXITCODE -ne 0) {
             throw "The resume engine is not importable after uv sync."
         }
@@ -137,7 +151,7 @@ if (-not $ready) {
     throw "The dashboard did not become ready at $localUrl."
 }
 
-$workerCommand = "Set-Location -LiteralPath '$($repositoryRoot.Replace("'", "''"))'; uv run aiadapply worker --api-url $localUrl"
+$workerCommand = "Set-Location -LiteralPath '$($repositoryRoot.Replace("'", "''"))'; & '$($pythonPath.Replace("'", "''"))' -m aiadapply_v2.cli worker --api-url $localUrl"
 $workerProcess = Start-Process powershell.exe `
     -ArgumentList @("-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", $workerCommand) `
     -WindowStyle Hidden `

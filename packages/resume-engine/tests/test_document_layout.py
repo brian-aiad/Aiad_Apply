@@ -352,10 +352,23 @@ def test_layout_rejects_excessive_upward_section_drift(tmp_path: Path) -> None:
 
 def test_final_docx_validation_recognizes_demonstrated_ordinary_work():
     from aiadapply_v2.schemas import JobKeyword, KeywordKind
+
     document = parse_resume_docx(BASE)
-    keywords = [JobKeyword(term=term, normalized=term, kind=KeywordKind.action,
-                           hiring_importance=50, placement_utility=50)
-                for term in ("critical thinking", "cross-functional collaboration", "automation", "case management")]
+    keywords = [
+        JobKeyword(
+            term=term,
+            normalized=term,
+            kind=KeywordKind.action,
+            hiring_importance=50,
+            placement_utility=50,
+        )
+        for term in (
+            "critical thinking",
+            "cross-functional collaboration",
+            "automation",
+            "case management",
+        )
+    ]
     result = validate_candidate_docx(document, str(BASE), keywords)
     assert result.passed
     assert not result.issues
@@ -363,10 +376,72 @@ def test_final_docx_validation_recognizes_demonstrated_ordinary_work():
 
 def test_missing_named_technology_warning_does_not_invent_compression_history():
     from aiadapply_v2.schemas import JobKeyword, KeywordKind
+
     document = parse_resume_docx(BASE)
-    keyword = JobKeyword(term="Kubernetes", normalized="kubernetes", kind=KeywordKind.system,
-                         hiring_importance=50, placement_utility=50)
+    keyword = JobKeyword(
+        term="Kubernetes",
+        normalized="kubernetes",
+        kind=KeywordKind.system,
+        hiring_importance=50,
+        placement_utility=50,
+    )
     result = validate_candidate_docx(document, str(BASE), [keyword])
-    warning = next(issue for issue in result.issues if issue.code == "important_keyword_not_represented")
+    warning = next(
+        issue for issue in result.issues if issue.code == "important_keyword_not_represented"
+    )
     assert "Kubernetes" in warning.message
     assert "Compression" not in warning.message
+
+
+def test_exported_heading_tab_has_visible_separator_without_changing_facts(tmp_path: Path) -> None:
+    from aiadapply_v2.documents.writer import _rewrite_document_xml
+    from lxml import etree
+
+    document = parse_resume_docx(BASE)
+    output = write_resume_candidate(document, identity_plan(document), tmp_path / "heading.docx")
+    with ZipFile(output) as archive:
+        xml = archive.read(DOCUMENT_PART)
+    headings = {p.index for p in document.paragraphs if p.kind.value == "entry_heading"}
+    rewritten = _rewrite_document_xml(xml, {}, heading_indices=headings)
+    assert etree.tostring(etree.fromstring(rewritten), method="c14n") == etree.tostring(
+        etree.fromstring(xml), method="c14n"
+    )
+    parsed = parse_resume_docx(output)
+    for before, after in zip(document.paragraphs, parsed.paragraphs, strict=True):
+        if before.kind.value == "entry_heading":
+            assert after.text.replace("\t ", "\t") == before.text.replace("\t ", "\t")
+    with ZipFile(BASE) as source, ZipFile(output) as candidate:
+        assert source.read(NUMBERING_PART) == candidate.read(NUMBERING_PART)
+    assert validate_candidate_docx(document, str(output), []).passed
+
+    # A real date alteration must still fail the protected-fact check.
+    root = etree.fromstring(xml)
+    ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+    date = next(node for node in root.findall(".//w:t", ns) if "2024" in (node.text or ""))
+    date.text = date.text.replace("2024", "2023")
+    tampered = tmp_path / "tampered.docx"
+    with ZipFile(output) as source, ZipFile(tampered, "w") as dest:
+        for member in source.infolist():
+            dest.writestr(
+                member,
+                etree.tostring(root) if member.filename == DOCUMENT_PART else source.read(member),
+            )
+    assert any(
+        issue.code == "protected_text_changed"
+        for issue in validate_candidate_docx(document, str(tampered), []).issues
+    )
+
+
+def test_heading_separator_handles_empty_runs_and_never_crosses_paragraphs() -> None:
+    from aiadapply_v2.documents.writer import _rewrite_document_xml
+    from lxml import etree
+
+    ns = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+    xml = b"""<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Title</w:t><w:tab/><w:t/><w:t>Apr 2021</w:t></w:r></w:p><w:p><w:r><w:t>Terminal</w:t><w:tab/></w:r></w:p><w:p><w:r><w:t>Untouched</w:t></w:r></w:p></w:body></w:document>"""
+    output = _rewrite_document_xml(xml, {}, heading_indices={0, 1})
+    root = etree.fromstring(output)
+    dates = root.findall(".//w:t", ns)
+    assert dates[2].text == " Apr 2021"
+    assert dates[2].get("{http://www.w3.org/XML/1998/namespace}space") == "preserve"
+    assert dates[-1].text == "Untouched"
+    assert _rewrite_document_xml(output, {}, heading_indices={0, 1}) == output

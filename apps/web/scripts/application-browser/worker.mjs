@@ -1,4 +1,10 @@
+import { loadCoverLetter } from './supplemental-document.mjs';
+import { AccessPages } from './access-pages.mjs';
+import { QueuePolling } from './worker-polling.mjs';
+import { applicableMethodHints, withoutFailedMethods } from './portal-methods.mjs';
 import { config } from 'dotenv';
+import { ReceiptObservers } from './receipt-observers.mjs';
+import {stepDisposition} from './step-disposition.mjs';
 import { fstatSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
@@ -22,17 +28,25 @@ config({ path: path.join(webRoot, '.env'), quiet: true });
 const api = process.env.AIADAPPLY_APPLICATION_API_URL || 'http://127.0.0.1:3000';
 const runtime = path.join(root, '.runtime');
 const lockDescriptor = Number(process.env.AIADAPPLY_APPLICATION_LOCK_FD);
-if (!Number.isInteger(lockDescriptor) || lockDescriptor < 3 || fstatSync(lockDescriptor).ino !== statSync(path.join(runtime, 'application-worker.lock')).ino) throw new Error('Start the exclusive application worker with bash scripts/application-worker.sh start.');
+if (process.platform === 'win32') {
+  const proof = JSON.parse(await readFile(path.join(runtime, 'application-launch.json'), 'utf8'));
+  if (proof.pid !== process.ppid || proof.pid !== Number(process.env.AIADAPPLY_APPLICATION_PARENT_PID) || !proof.token || proof.token !== process.env.AIADAPPLY_APPLICATION_LOCK_TOKEN) throw new Error('Start the locked worker with scripts/application-worker.ps1 start.');
+} else if (!Number.isInteger(lockDescriptor) || lockDescriptor < 3 || fstatSync(lockDescriptor).ino !== statSync(path.join(runtime, 'application-worker.lock')).ino) throw new Error('Start the exclusive application worker with bash scripts/application-worker.sh start.');
 const workerId = await durableWorkerId(runtime);
 const journal = new ApplicationJournal(runtime, workerId);
 const claimFile = path.join(runtime, 'application-pending-claim.json');
 const secret = process.env.WORKER_SECRET || process.env.CRON_SECRET;
 if (!secret) throw new Error('WORKER_SECRET is required for the local application worker.');
 let activeJob = null, pendingResult = null, driver = null, heartbeatLost = false, stopping = false;
-let observationJob = null;
-let lastVerificationState = null;
+const receiptObservers = new ReceiptObservers();
+const accessPages = new AccessPages();
+let browserContext = null;
+if (process.platform === 'win32') {
+  process.stdin.resume();
+  process.stdin.on('end', () => { stopping = true; void browserContext?.close().finally(() => process.exit(1)); if (!browserContext) process.exit(1); });
+}
 async function send(action, detail = {}) {
-  const response = await fetch(`${api}/api/worker/applications`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` }, body: JSON.stringify({ action, workerId, ...(activeJob ? { attemptId: activeJob.attemptId } : {}), ...detail }), signal: AbortSignal.timeout(45000) });
+  const response = await fetch(`${api}/api/worker/applications`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${secret}` }, body: JSON.stringify({ action, workerId, platform: process.platform, ...(activeJob ? { attemptId: activeJob.attemptId } : {}), ...detail }), signal: AbortSignal.timeout(45000) });
   if (response.status === 204) return null;
   const result = await response.json();
   if (!response.ok) { const error = new Error(result.error || 'Application worker update failed.'); error.status = response.status; throw error; }
@@ -45,7 +59,6 @@ const guard = async (action, detail) => {
 };
 async function execute(job) {
   activeJob = job;
-  lastVerificationState = null;
   const previousDriver = driver;
   driver = null;
   const directory = path.join(root, '.runtime/application-attempts', job.attemptId);
@@ -56,19 +69,44 @@ async function execute(job) {
   try {
     await atomicJson(path.join(directory, 'efficiency.json'), { modelCalls: 0, routineFilled: 0 });
     await checkPosting(job);
-    if (previousDriver) await previousDriver.context.close().catch(() => {});
+    if (previousDriver && !receiptObservers.entries.has(previousDriver.job.attemptId) && !accessPages.has(previousDriver)) { previousDriver.detach?.(); await previousDriver.page.close().catch(() => {}); }
     await journal.save(job, 'CLAIMED');
     await unlink(claimFile).catch(error => { if (error.code !== 'ENOENT') throw error; });
     await mkdir(directory, { recursive: true, mode: 0o700 });
     const bytes = Buffer.from(job.resumeBase64, 'base64');
     if (sha256(bytes) !== job.resumeSha256) throw new Error('Approved resume fingerprint mismatch.');
     await writeFile(resumePath, bytes, { mode: 0o600 });
-    const extracted = spawnSync('uv', ['run', 'python', '-c', 'import fitz,sys; d=fitz.open(sys.argv[1]); print("\\n".join(p.get_text() for p in d))', resumePath], { cwd: root, encoding: 'utf8', timeout: 30000 });
+    job.coverLetter = await loadCoverLetter(root, job);
+    const python = path.join(root, '.venv', process.platform === 'win32' ? 'Scripts/python.exe' : 'bin/python');
+    const extracted = spawnSync(python, ['-X', 'utf8', '-c', 'import fitz,sys; d=fitz.open(sys.argv[1]); print("\\n".join(p.get_text() for p in d))', resumePath], { cwd: root, encoding: 'utf8', timeout: 30000, env: { ...process.env, PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' } });
     if (extracted.status !== 0 || !extracted.stdout.trim()) throw new Error('Could not read the approved resume for application answers.');
-    const setup = JSON.parse(await readFile(path.join(root, '.runtime/application-onboarding.json'), 'utf8').catch(() => '{}'));
+    const setup = job.onboarding || JSON.parse(await readFile(path.join(root, '.runtime/application-onboarding.json'), 'utf8').catch(() => '{}'));
+    const reusableAnswers = job.reusableAnswers || [];
+    let portalMethods = [];
+    const syncMethods = async observations => {
+      try {
+        const response = await fetch(`${api}/api/worker/application-methods`, {method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${secret}`},body:JSON.stringify({workerId,attemptId:job.attemptId,claimToken:job.claimToken,...(observations ? {observations} : {})}),signal:AbortSignal.timeout(5000)});
+        if (response.ok) { portalMethods = (await response.json()).records || []; return true; }
+      } catch { /* Optional method learning never blocks an application. */ }
+      return false;
+    };
+    await syncMethods();
+    const pendingMethods = [];
+    const learnMethod = observation => {
+      portalMethods = withoutFailedMethods(portalMethods,observation);
+      pendingMethods.push(observation);
+    };
+    const flushMethods = async () => {
+      if (!pendingMethods.length) return;
+      const batch = pendingMethods.splice(0,20);
+      if (!await syncMethods(batch)) pendingMethods.unshift(...batch.filter(item=>item.failed).slice(-20));
+      // A concurrent refresh must not restore an invalidation awaiting delivery.
+      for (const item of pendingMethods) portalMethods = withoutFailedMethods(portalMethods,item);
+    };
     await journal.save(job, 'BROWSER_STARTED');
-    driver = await ApplicationBrowser.launch({ job, resumePath, outputDirectory: directory, profileDirectory: path.join(root, '.runtime/application-browser-profile'), checkpoint: detail => guard('checkpoint', detail), beforeSubmit: async detail => {
+    driver = await ApplicationBrowser.launch({ existingContext: browserContext, existingPage: accessPages.take(job, browserContext), job, resumePath, outputDirectory: directory, profileDirectory: path.join(root, '.runtime/application-browser-profile'), checkpoint: detail => guard('checkpoint', detail), beforeSubmit: async detail => {
       if (job.prepareOnly) throw new Error('Preparation-only recheck: final submission is disabled until the missing questions are answered.');
+      await flushMethods();
       await journal.save(job, 'SUBMITTING');
       submissionBoundary = true;
       try { return await guard('before_submit', detail); }
@@ -80,11 +118,12 @@ async function execute(job) {
         throw error;
       }
     } });
+    browserContext = driver.context;
     let previousError = '', observationSteps = 0, repeatedError = '', repeats = 0, modelCalls = 0, routineFilled = 0, verificationAttempted = false;
     const saveEfficiency = () => atomicJson(path.join(directory, 'efficiency.json'), { modelCalls, routineFilled });
     const completeEmailVerification = async () => {
       const recipient = driver.verificationRecipient(job.profile.email);
-      const requestedAt = Date.now();
+      const requestedAt = driver.lastRequestAt || Date.parse(job.browserStartedAt || job.approvedAt);
       let code = await waitForVerificationCode({
         company: job.company,
         recipient,
@@ -101,6 +140,7 @@ async function execute(job) {
       }
       return verificationState(driver.lastSnapshot);
     };
+    let liveEligibilityVerified = job.authorizationMode !== "automatic";
     const progressWatch = new ProgressWatch();
     for (let step = 1; step <= 35; step++) {
       if (heartbeatLost || stopping) throw new Error('The worker disconnected or was stopped.');
@@ -141,7 +181,6 @@ async function execute(job) {
         const receipt = await driver.observeReceipt();
         if (receipt) { finalResult = { status: 'SUBMITTED', summary: 'The employer confirmed receipt. The approved resume was verified before submission.', ...receipt }; break; }
         const verification = verificationState(driver.lastSnapshot);
-        if (verification) lastVerificationState = verification;
         if (verification === 'rejected' || verification === 'expired') {
           const report = verificationReport(verification);
           driver.unresolved = report.unresolved;
@@ -157,7 +196,6 @@ async function execute(job) {
           verificationAttempted = true;
           try {
             const afterVerification = await completeEmailVerification();
-            lastVerificationState = afterVerification;
             if (afterVerification === 'rejected' || afterVerification === 'expired') {
               finalResult = { status: 'UNKNOWN', ...verificationReport(afterVerification) };
               break;
@@ -187,11 +225,12 @@ async function execute(job) {
         await new Promise(resolve => setTimeout(resolve, 2000));
         continue;
       }
-      if (!previousError) {
+      if (!previousError && liveEligibilityVerified) {
         const routine = routineContactActions(snapshot, job.profile);
         if (routine.length) {
-          try { await executeFormPlan(driver, routine); routineFilled += routine.length; }
+          try { await executeFormPlan(driver, routine, learnMethod); routineFilled += routine.length; }
           catch (error) { previousError = error.message; }
+          await flushMethods();
           await saveEfficiency();
           snapshot = await driver.snapshot();
         }
@@ -201,7 +240,22 @@ async function execute(job) {
       if (stalled >= 3) previousError = `RECOVERY REQUIRED: ${stalled} steps without a committed answer or page change. Do not repeat the same open/close action. Use choose on an already open combobox or click its visible exact option. Searchable comboboxes can use choose with the confirmed exact answer. If a control is optional, leave it blank and complete remaining required fields. Earlier error: ${previousError}`;
       modelCalls++;
       await saveEfficiency();
-      const decision = await decideApplicationStep({ job: { company: job.company, title: job.title, destination: job.destination, posting: job.posting, discoverySource: job.discoverySource, prepareOnly: job.prepareOnly === true }, profile: job.profile, setup, applicationAnswers: job.confirmedAnswers || [], applicationHistory: job.applicationHistory || [], approvedResumeText: extracted.stdout, snapshot, previousError, answeredQuestions: driver.questions }, directory, step);
+      const decision = await decideApplicationStep({ job: { coverLetterAvailable: Boolean(job.coverLetter), company: job.company, title: job.title, destination: job.destination, posting: job.posting, discoverySource: job.discoverySource, authorizationMode: job.authorizationMode, liveEligibilityVerified, automaticRequirements: job.automaticRequirements, prepareOnly: job.prepareOnly === true }, profile: job.profile, setup, applicationAnswers: job.confirmedAnswers || [], reusableAnswers, applicationHistory: job.applicationHistory || [], approvedResumeText: extracted.stdout, portalMethodHints: applicableMethodHints(job, snapshot, portalMethods), snapshot, previousError, answeredQuestions: driver.questions }, directory, step);
+      let verifiedThisStep=false;
+      if (job.authorizationMode === 'automatic') {
+        const normalize = text => String(text || '').replace(/\s+/g, ' ').trim();
+        const visibleText = normalize((snapshot.frames || []).map(frame => frame.text || '').join('\n'));
+        for (const action of decision.actions.filter(action => action.kind === 'verify_job')) {
+          const proof = JSON.parse(action.value);
+          if (!proof.evidenceText || !visibleText.includes(normalize(proof.evidenceText)) || proof.sourceUrl !== snapshot.url) throw new Error('Live job evidence did not match the observed page. Automatic application parked.');
+          await guard('verify_eligibility', { liveEligibility: proof });
+          liveEligibilityVerified = true;
+          verifiedThisStep=true;
+        }
+        decision.actions = decision.actions.filter(action => action.kind !== 'verify_job');
+        if (!liveEligibilityVerified && decision.actions.some(action => ['fill', 'select', 'choose', 'check', 'upload', 'submit'].includes(action.kind))) throw new Error('Live job eligibility must be verified before entering personal application data.');
+      }
+
       driver.unresolved = decision.unresolved;
       if (decision.outcome === 'confirmation') {
         const receipt = await driver.receipt(decision.confirmationText);
@@ -214,10 +268,14 @@ async function execute(job) {
         break;
       }
       if (driver.submissionStarted) continue;
-      if (!Array.isArray(decision.actions) || !decision.actions.length || decision.actions.length > 100) throw new Error('No supported next action was available.');
+      if(stepDisposition(decision,verifiedThisStep)==='observe'){
+        await guard('checkpoint',{summary:decision.summary,questions:driver.questions,unresolved:driver.unresolved});
+        continue;
+      }
       previousError = '';
-      try { await executeFormPlan(driver, decision.actions); }
+      try { await executeFormPlan(driver, decision.actions, learnMethod); }
       catch (error) { previousError = error.message; }
+      await flushMethods();
       if (previousError) {
         repeats = previousError === repeatedError ? repeats + 1 : 1;
         repeatedError = previousError;
@@ -231,6 +289,8 @@ async function execute(job) {
     finalResult = { status: submissionBoundary || driver?.submissionStarted ? 'UNKNOWN' : 'BLOCKED', summary: String(error.message).slice(0, 4000) };
   }
   finalResult = finishBrowserResult(finalResult, driver);
+  const retainedAccess = accessPages.retain(job, driver, finalResult);
+  if (retainedAccess === "capacity") finalResult.summary += " Six access tabs are already parked in the dedicated browser. This additional tab may close when the next job starts; reopen this employer there before resuming.";
   pendingResult = finalResult;
   try { await journal.save(job, 'RESULT', finalResult); }
   catch { console.error('Terminal journal write failed; retaining the result in memory and attempting the bound result copy.'); }
@@ -253,26 +313,30 @@ async function publishResult(job, result) {
   }
   await journal.save(job, 'PUBLISHED', result);
   console.log(`Application ${job.applicationId}: ${result.status}`);
-  if (result.status === 'UNKNOWN' && driver?.submissionStarted && driver.job.attemptId === job.attemptId) observationJob = job;
-  else if (observationJob?.attemptId === job.attemptId) observationJob = null;
+  if (result.status === 'UNKNOWN' && driver?.submissionStarted && driver.job.attemptId === job.attemptId) receiptObservers.add(job, driver);
+  else receiptObservers.remove(job.attemptId);
   activeJob = null; pendingResult = null; heartbeatLost = false;
 }
-async function observeUnconfirmedApplication() {
-  if (!observationJob) return;
-  if (!driver || driver.page.isClosed()) { observationJob = null; return; }
-  // The user can finish an email/login verification in the existing browser.
-  // Observation is read-only: never repeat a submit click or recreate the form.
-  const receipt = await driver.observeReceipt();
-  if (!receipt) {
-    const verification = verificationState(driver.lastSnapshot);
-    if (verification && verification !== lastVerificationState) {
-      await send('verification', { attemptId: observationJob.attemptId, verification });
-      lastVerificationState = verification;
+async function observeUnconfirmedApplications() {
+  await receiptObservers.poll(async entry => {
+    const observedDriver = entry.driver;
+    // Read-only, bound to the original attempt. Never repeat a final click.
+    const receipt = await observedDriver.observeReceipt();
+    if (!receipt) {
+      const verification = verificationState(observedDriver.lastSnapshot);
+      if (verification && verification !== entry.verification) {
+        await send('verification', { attemptId: entry.job.attemptId, verification });
+        entry.verification = verification;
+      }
+      return false;
     }
-    return;
-  }
-  const result = { status: 'SUBMITTED', summary: 'The employer confirmed receipt while observing the submitted application. The approved resume was verified before submission.', ...receipt, questions: driver.questions, unresolved: [] };
-  await publishResult(observationJob, result);
+    const result = { status: 'SUBMITTED', summary: 'The employer confirmed receipt while observing the submitted application. The approved resume was verified before submission.', ...receipt, questions: observedDriver.questions, unresolved: [] };
+    await publishResult(entry.job, result);
+    return true;
+  }, error => {
+    if (pendingResult) throw error; // Preserve a failed receipt report for idempotent retry.
+    console.error(`Parked receipt observation failed: ${error.message}`);
+  });
 }
 async function recoverPending() {
   for (const entry of await journal.pending()) {
@@ -294,16 +358,21 @@ async function claimNext() {
 }
 process.on('SIGTERM', () => { stopping = true; });
 process.on('SIGINT', () => { stopping = true; });
-console.log('Application browser worker started; waiting for explicit resume approvals.');
+console.log('Application browser worker started; checking authorized manual and automatic applications.');
 try {
   let recovered = false;
+  const polling = new QueuePolling();
   while (!stopping) {
     try {
       if (pendingResult && activeJob) await publishResult(activeJob, pendingResult);
       if (!recovered) { await recoverPending(); recovered = true; }
-      if (observationJob) await observeUnconfirmedApplication();
-      else {
-        const job = await claimNext();
+      await observeUnconfirmedApplications();
+      // Pending result reporting must complete before claiming another job.
+      if (!pendingResult && polling.due()) {
+        let job;
+        try { job = await claimNext(); }
+        catch (error) { polling.failed(); throw error; }
+        polling.observed(Boolean(job));
         if (job) await execute(job);
       }
     } catch (error) {
@@ -315,5 +384,5 @@ try {
   }
 } finally {
   clearInterval(heartbeat);
-  if (driver) await driver.context.close().catch(() => {});
+  if (browserContext) await browserContext.close().catch(() => {});
 }

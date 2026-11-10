@@ -32,8 +32,13 @@ export const profileFields: { key: keyof ApplicationProfile; label: string; type
   { key: "confirmedAnswers", label: "Additional confirmed answers (question and answer)", type: "textarea", copyOnly: true },
 ];
 export function readApplicationProfile(value: unknown): ApplicationProfile {
-  const result = applicationProfileSchema.safeParse(value);
-  return result.success ? result.data : { ...emptyApplicationProfile };
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  const profile = { ...emptyApplicationProfile };
+  for (const key of Object.keys(applicationProfileSchema.shape) as (keyof ApplicationProfile)[]) {
+    const parsed = applicationProfileSchema.shape[key].safeParse(source[key]);
+    if (parsed.success) profile[key] = parsed.data;
+  }
+  return profile;
 }
 export function missingContactFields(profile: ApplicationProfile) {
   return profileFields.filter(({ key }) => ["firstName", "lastName", "email", "phone"].includes(key) && !profile[key]).map(({ label }) => label);

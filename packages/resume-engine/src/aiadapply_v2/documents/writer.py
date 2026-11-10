@@ -95,7 +95,11 @@ def write_resume_candidate(
         )
 
     with ZipFile(base.source_path) as source:
-        document_xml = _rewrite_document_xml(source.read(DOCUMENT_PART), replacements)
+        document_xml = _rewrite_document_xml(
+            source.read(DOCUMENT_PART),
+            replacements,
+            heading_indices={p.index for p in base.paragraphs if p.kind.value == "entry_heading"},
+        )
         with ZipFile(output, "w", compression=ZIP_DEFLATED) as destination:
             destination.comment = source.comment
             for member in source.infolist():
@@ -124,10 +128,26 @@ def _select_text(
 def _rewrite_document_xml(
     raw_xml: bytes,
     replacements: dict[int, tuple[str, str | None]],
+    *,
+    heading_indices: set[int] | None = None,
 ) -> bytes:
     parser = etree.XMLParser(remove_blank_text=False, resolve_entities=False)
     root = etree.fromstring(raw_xml, parser)
     paragraphs = body_paragraphs(root)
+    for index in heading_indices or set():
+        # A crowded right tab may collapse in Word/LibreOffice. Retain the tab
+        # and every style, but make its date boundary readable in the DOCX too.
+        nodes = list(paragraphs[index].iter())
+        for offset, node in enumerate(nodes):
+            parent = node.getparent()
+            if node.tag != f"{{{W_NS}}}tab" or parent is None or parent.tag != f"{{{W_NS}}}r":
+                continue
+            following = next(
+                (n for n in nodes[offset + 1 :] if n.tag == f"{{{W_NS}}}t" and n.text), None
+            )
+            if following is not None and following.text and not following.text.startswith(" "):
+                following.text = " " + following.text
+                following.set(f"{{{XML_NS}}}space", "preserve")
     for index, (primary, secondary) in replacements.items():
         paragraph = paragraphs[index]
         if secondary is None:

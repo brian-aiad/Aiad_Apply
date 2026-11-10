@@ -16,7 +16,7 @@ export function QuickAnswers() {
     const keydown = (event: KeyboardEvent) => {
       if (event.key === "Escape") { event.preventDefault(); close(); }
       if (event.key !== "Tab") return;
-      const controls = panel.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), a[href]');
+      const controls = panel.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href], [tabindex="0"]');
       const first = controls?.[0], last = controls?.[controls.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }

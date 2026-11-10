@@ -77,3 +77,15 @@ test("profile saving rejects stale forms and cross-origin changes", async () => 
   assert.equal((await write(current.updatedAt)).status, 200);
   assert.equal((await write(current.updatedAt)).status, 409);
 });
+
+test("candidate receipt records an exact uploaded automatic PDF without obsolete manual review",async()=>{
+ const {app,run}=await fixture();const pdf=run.artifacts[0];const command={action:'submitted',runId:run.id,confirmed:true,confirmation:'Employer receipt for the isolated job'};
+ const attempt={authorizationMode:'automatic',authorizationId:randomUUID(),status:'BLOCKED',runId:run.id,runNumber:run.runNumber,artifactId:pdf.id,resumeSha256:pdf.sha256,fileName:pdf.fileName,destination:'https://jobs.lever.co/fixture/123',approvedAt:new Date().toISOString(),updatedAt:new Date().toISOString(),summary:'Parked before submission',questions:[],unresolved:[],confirmedAnswers:[],attachmentVerified:false,uploadedResumeVerified:false};
+ const e=await db.applicationEvent.create({data:{applicationId:app.id,eventType:'application_automation',toValue:'BLOCKED',detail:attempt}});
+ assert.equal((await call(app.id,command)).status,409);
+ await db.applicationEvent.update({where:{id:e.id},data:{detail:{...attempt,uploadedResumeVerified:true,resumeSha256:'0'.repeat(64)}}});assert.equal((await call(app.id,command)).status,409);
+ await db.applicationEvent.update({where:{id:e.id},data:{detail:{...attempt,uploadedResumeVerified:true,destination:'https://jobs.lever.co/fixture/different'}}});assert.equal((await call(app.id,command)).status,409);
+ await db.applicationEvent.update({where:{id:e.id},data:{detail:{...attempt,uploadedResumeVerified:true}}});assert.equal((await call(app.id,command)).status,200);assert.equal((await db.application.findUniqueOrThrow({where:{id:app.id}})).status,'APPLIED');assert.equal((await call(app.id,command)).status,200);
+ const reconciled=await db.applicationEvent.findUniqueOrThrow({where:{id:e.id}});assert.equal(reconciled.toValue,'SUBMITTED');assert.equal((reconciled.detail as {status:string}).status,'SUBMITTED');
+ await db.applicationEvent.update({where:{id:e.id},data:{toValue:'BLOCKED',detail:{...attempt,uploadedResumeVerified:true}}});assert.equal((await call(app.id,command)).status,200);assert.equal((await db.applicationEvent.findUniqueOrThrow({where:{id:e.id}})).toValue,'SUBMITTED');
+});

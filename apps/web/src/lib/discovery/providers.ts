@@ -1,3 +1,8 @@
+import { collectOracle } from "./oracle";
+import { collectSchools } from "./edjoin";
+import { collectCalCareers } from "./calcareers";
+import { collectStaffingBoard } from "./staffing-boards";
+import { collectLocalBoard } from "./local-boards";
 import { collectWorkday } from "./workday";
 import { collectRtx } from "./rtx";
 import { fetchPublicJson } from "./public-fetch";
@@ -70,7 +75,12 @@ export function normalizeOpening(source: Source, raw: unknown): Opening | null {
   };
 }
 
-export async function collectSource(source: Source, prefs: DiscoveryPreferences, signal?: AbortSignal) {
+export async function collectSource(source: Source, prefs: DiscoveryPreferences, signal?: AbortSignal, state?: unknown) {
+  if (source.provider === "oracle") return collectOracle(source, signal);
+  if (source.provider === "edjoin") return collectSchools(source, signal, state);
+  if (source.provider === "calcareers") return collectCalCareers(source, signal, state);
+  if (source.provider === "trinet" || source.provider === "luxus") return collectStaffingBoard(source, signal);
+  if (source.provider === "pageup" || source.provider === "jobvite") return collectLocalBoard(source, signal);
   if (source.provider === "rtx") return collectRtx(signal);
   if (source.provider === "workday") return collectWorkday(source, prefs, signal);
   if (["adzuna", "usajobs", "jobicy"].includes(source.provider)) return collectExternalSource(source, prefs, signal);

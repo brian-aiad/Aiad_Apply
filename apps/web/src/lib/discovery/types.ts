@@ -1,4 +1,4 @@
-export type Provider = "greenhouse" | "lever" | "ashby" | "smartrecruiters" | "adzuna" | "usajobs" | "jobicy" | "rtx" | "workday";
+export type Provider = "oracle" | "edjoin" | "calcareers" | "trinet" | "luxus" | "pageup" | "jobvite" | "greenhouse" | "lever" | "ashby" | "smartrecruiters" | "adzuna" | "usajobs" | "jobicy" | "rtx" | "workday";
 export const TARGET_ROLES = ["Application & SaaS support", "Technical support", "Desktop & end-user support", "Help desk & service desk", "IT operations & systems administration", "Implementation & integrations"];
 export type Source = { key: string; provider: Provider; board: string; company: string; url: string };
 export type Opening = {
@@ -38,7 +38,7 @@ export function readDiscoveryPreferences(value: unknown): DiscoveryPreferences {
     ...(["none", "secret", "top-secret"].includes(String(v.clearance)) ? { clearance: v.clearance as "none" | "secret" | "top-secret" } : {}),
   };
 }
-export type SourceResult = { sourceKey: string; company: string; status: "ok" | "partial" | "failed"; checked: number; found: number; message?: string };
+export type SourceResult = { sourceKey: string; company: string; status: "ok" | "partial" | "failed"; checked: number; found: number; message?: string; checkedAt?: string; continuationPending?: boolean };
 export type ScanSummary = { id: string; startedAt: string; completedAt?: string; status: "running" | "completed" | "failed"; sources: SourceResult[]; found: number };
 
 export type AutomationPreferences = { scheduledSearch: boolean; intervalHours: number; autoTailor: boolean; dailyLimit: number; minimumScore: number };
@@ -46,5 +46,5 @@ export const DEFAULT_AUTOMATION: AutomationPreferences = { scheduledSearch: true
 export function readAutomationPreferences(value: unknown): AutomationPreferences {
   const v = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const number = (key: string, fallback: number, min: number, max: number) => typeof v[key] === "number" && Number.isInteger(v[key]) && v[key] >= min && v[key] <= max ? v[key] as number : fallback;
-  return { scheduledSearch: v.scheduledSearch !== false, autoTailor: v.autoTailor === true, intervalHours: number("intervalHours", 6, 4, 24), dailyLimit: number("dailyLimit", 2, 1, 5), minimumScore: number("minimumScore", 80, 75, 100) };
+  return { scheduledSearch: v.scheduledSearch !== false, autoTailor: v.autoTailor === true, intervalHours: number("intervalHours", 6, 4, 24), dailyLimit: number("dailyLimit", 2, 1, 5), minimumScore: number("minimumScore", 80, 65, 100) };
 }

@@ -89,7 +89,7 @@ PY
   if [[ $web_running -eq 1 && $worker_running -eq 1 ]] && \
     curl --silent --fail --max-time 10 "$local_url/api/health" | grep -q '"status":"ready"'; then
       echo "AIAD Apply is already running at $local_url"
-      bash "$repository_root/scripts/application-worker.sh" start
+      echo "Browser automation starts when needed on the primary Windows computer."
       if [[ $open_browser -eq 1 ]] && command -v open >/dev/null 2>&1; then open "$local_url"; fi
       exit 0
   fi
@@ -193,7 +193,7 @@ with open(path, "w", encoding="utf-8") as handle:
 PY
 
 trap - ERR INT TERM
-bash "$repository_root/scripts/application-worker.sh" start
+echo "Browser automation starts when needed on the primary Windows computer."
 echo "AIAD Apply is running at $local_url"
 echo "Logs: $web_log and $worker_log"
 echo "Stop it with: bash scripts/stop-local.sh"

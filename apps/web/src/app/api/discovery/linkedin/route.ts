@@ -3,7 +3,7 @@ import { z } from "zod";
 import { captureLinkedInOpenSearch, scanLinkedIn, openLinkedInBrowser, linkedInSession, configureLinkedIn, configureLinkedInSearch, importLinkedInPaste } from "@/lib/discovery/linkedin";
 import { crossOriginMutation } from "@/lib/web-url";
 export const runtime = "nodejs";
-export const maxDuration = 600;
+export const maxDuration = 300;
 const schema = z.object({ action: z.enum(["open", "scan", "status", "pause", "resume", "import", "save-search", "capture-open-search"]), window: z.enum(["day", "week", "both"]).default("both"), searchUrl: z.string().max(4000).optional(), oneJob: z.string().regex(/^\d+$/).optional(), text: z.string().min(300).max(60000).optional(), sourceUrl: z.string().url().max(2000).optional(), applyUrl: z.string().url().max(2000).optional() });
 export async function POST(request: Request) {
   if (crossOriginMutation(request)) return NextResponse.json({ error: "Cross-origin changes are not allowed." }, { status: 403 });

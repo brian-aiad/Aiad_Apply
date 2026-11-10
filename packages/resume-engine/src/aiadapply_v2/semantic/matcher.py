@@ -19,7 +19,7 @@ from aiadapply_v2.schemas import (
     TargetRoleProfile,
     TransferabilityMap,
 )
-from aiadapply_v2.text import contains_term
+from aiadapply_v2.text import contains_term, preserves_source_term
 
 DEFAULT_MODEL = "BAAI/bge-small-en-v1.5"
 SYSTEM_CATEGORY_EVIDENCE: dict[str, tuple[str, ...]] = {
@@ -104,14 +104,23 @@ class SentenceTransformerEncoder:
         if self._passage_vectors is None or passage_key != self._passages:
             self._passage_vectors = np.asarray(
                 self._model.encode(
-                    list(passages), normalize_embeddings=True, show_progress_bar=False,
+                    list(passages),
+                    normalize_embeddings=True,
+                    show_progress_bar=False,
                 )
             )
             self._passages = passage_key
-        query_vectors = np.asarray(self._model.encode(
-            [f"Represent this sentence for searching relevant passages: {query}" for query in queries],
-            normalize_embeddings=True, show_progress_bar=False, batch_size=32,
-        ))
+        query_vectors = np.asarray(
+            self._model.encode(
+                [
+                    f"Represent this sentence for searching relevant passages: {query}"
+                    for query in queries
+                ],
+                normalize_embeddings=True,
+                show_progress_bar=False,
+                batch_size=32,
+            )
+        )
         scores = (query_vectors @ self._passage_vectors.T).astype(float).tolist()
         return [[float(value) for value in row] for row in scores]
 
@@ -143,12 +152,19 @@ def build_transferability_map(
 
     accepted = [item for item in keywords if item.accepted]
     requirements = [_requirement_for(item.term, profile) for item in accepted]
-    queries = [f"{item.term}: {requirement}" for item, requirement in zip(accepted, requirements, strict=True)]
-    batch = getattr(encoder, "similarities_many", None)
-    scores_by_query = batch(queries, passages) if callable(batch) else [
-        encoder.similarities(query, passages) for query in queries
+    queries = [
+        f"{item.term}: {requirement}"
+        for item, requirement in zip(accepted, requirements, strict=True)
     ]
-    if len(scores_by_query) != len(accepted) or any(len(scores) != len(passages) for scores in scores_by_query):
+    batch = getattr(encoder, "similarities_many", None)
+    scores_by_query = (
+        batch(queries, passages)
+        if callable(batch)
+        else [encoder.similarities(query, passages) for query in queries]
+    )
+    if len(scores_by_query) != len(accepted) or any(
+        len(scores) != len(passages) for scores in scores_by_query
+    ):
         raise ValueError("Semantic encoder returned inconsistent evidence scores.")
     for keyword, requirement, scores in zip(accepted, requirements, scores_by_query, strict=True):
         direct_indices = [
@@ -166,7 +182,8 @@ def build_transferability_map(
             index for index in transferable_indices if _work_evidence(evidence[index])
         ]
         automatic_indices = [
-            index for index in work_transferable_indices
+            index
+            for index in work_transferable_indices
             if supports_automatic_context(keyword.term, evidence[index].source_text)
         ]
         if work_direct_indices:
@@ -246,7 +263,10 @@ def _evidence_passage(evidence: ResumeEvidence) -> str:
 
 
 def _work_evidence(evidence: ResumeEvidence) -> bool:
-    return evidence.section.startswith(("experience.", "projects.")) and ".bullet." in evidence.paragraph_id
+    return (
+        evidence.section.startswith(("experience.", "projects."))
+        and ".bullet." in evidence.paragraph_id
+    )
 
 
 def _direct_match(term: str, evidence: ResumeEvidence | None) -> bool:
@@ -259,11 +279,7 @@ def _direct_match(term: str, evidence: ResumeEvidence | None) -> bool:
         *evidence.environment_signals,
         *evidence.outcomes,
     ]
-    if any(
-        contains_term(value, term)
-        or (term.casefold() == "webhooks" and contains_term(value, "webhook"))
-        for value in direct_fields
-    ):
+    if any(preserves_source_term(value, term) for value in direct_fields):
         return True
     category_evidence = SYSTEM_CATEGORY_EVIDENCE.get(term.casefold(), ())
     return any(

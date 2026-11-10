@@ -463,9 +463,11 @@ def validate_rewrite_plan(
             )
             for bullet in plan.bullets
         )
-        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not preserves_source_term(
-            resume_text, keyword.term
-        ) and not demonstrated:
+        if (
+            keyword.normalized not in NON_PROSE_QUALIFICATIONS
+            and not preserves_source_term(resume_text, keyword.term)
+            and not demonstrated
+        ):
             issues.append(
                 ValidationIssue(
                     code="important_keyword_missing",
@@ -561,8 +563,16 @@ def validate_candidate_docx(
         )
     )
 
+    heading_texts = {p.text for p in base.paragraphs if p.kind.value == "entry_heading"}
+    candidate_headings = [p.text for p in candidate.paragraphs if p.kind.value == "entry_heading"]
     for protected in base.protected_strings:
-        if protected not in candidate_text:
+        # The writer may add a display separator immediately after an existing
+        # tab in a protected heading. No words, dates or other spaces change.
+        heading_separator_only = protected in heading_texts and any(
+            re.fullmatch(r"\t ?".join(re.escape(part) for part in protected.split("\t")), heading)
+            for heading in candidate_headings
+        )
+        if protected not in candidate_text and not heading_separator_only:
             issues.append(
                 ValidationIssue(
                     code="protected_text_changed",
@@ -622,9 +632,11 @@ def validate_candidate_docx(
             )
             for paragraph in candidate.paragraphs
         )
-        if keyword.normalized not in NON_PROSE_QUALIFICATIONS and not preserves_source_term(
-            candidate_text, keyword.term
-        ) and not demonstrated:
+        if (
+            keyword.normalized not in NON_PROSE_QUALIFICATIONS
+            and not preserves_source_term(candidate_text, keyword.term)
+            and not demonstrated
+        ):
             issues.append(
                 ValidationIssue(
                     code="important_keyword_not_represented",

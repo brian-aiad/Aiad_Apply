@@ -1,5 +1,6 @@
 "use client";
 
+import { automationGroups, attentionLabel, matchesAutomationGroup, type AutomationGroup } from '@/lib/application-attention';
 import { formatJobLocation } from "@/lib/format";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -12,13 +13,15 @@ import { StatusPill } from "@/components/status-pill";
 type Row = Application & {
   job: Job;
   tailoringRuns: TailoringRun[];
+  automationStatus?: string | null;
+  automationGroup?: AutomationGroup | null;
 };
 
 const filters = [
   ["ALL", "All"],
-  ["CAPTURED", "Captured"],
+  ["CAPTURED", "Saved"],
   ["TAILORING", "Tailoring"],
-  ["REVIEW", "Review"],
+  ["REVIEW", "Prepared"],
   ["READY", "Ready"],
   ["APPLIED", "Applied"],
   ["INTERVIEW", "Interview"],
@@ -29,10 +32,12 @@ export function ApplicationTable({
   applications,
   showTools = false,
   initialStatus,
+  initialAutomation,
 }: {
   applications: Row[];
   showTools?: boolean;
   initialStatus?: string;
+  initialAutomation?: string;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -48,6 +53,7 @@ export function ApplicationTable({
     return () => document.removeEventListener("keydown", focusSearch);
   }, [showTools]);
   const [status, setStatus] = useState<(typeof filters)[number][0]>(() => filters.find(([key]) => key === initialStatus)?.[0] ?? "ALL");
+  const [automation, setAutomation] = useState<AutomationGroup>(()=>automationGroups.find(([key])=>key===initialAutomation)?.[0] || 'ALL');
   const [sort, setSort] = useState<"UPDATED" | "COVERAGE_HIGH" | "COVERAGE_LOW">("UPDATED");
   const [renderedAt] = useState(() => Date.now());
   const normalizedQuery = query.trim().toLocaleLowerCase();
@@ -55,6 +61,7 @@ export function ApplicationTable({
     () =>
       applications
         .filter((application) => {
+          if (!matchesAutomationGroup(application.automationGroup,automation)) return false;
           if (status !== "ALL" && application.status !== status) return false;
           if (!normalizedQuery) return true;
           return [application.job.title, application.job.company, application.job.location, application.job.workArrangement]
@@ -66,7 +73,7 @@ export function ApplicationTable({
           const rightCoverage = right.tailoringRuns[0]?.keywordCoverage ?? -1;
           return sort === "COVERAGE_HIGH" ? rightCoverage - leftCoverage : leftCoverage - rightCoverage;
         }),
-    [applications, normalizedQuery, sort, status],
+    [applications, normalizedQuery, sort, status, automation],
   );
 
   if (!applications.length) {
@@ -127,6 +134,11 @@ export function ApplicationTable({
             })}
           </div>
           <div className="tools-meta">
+            <label className="sort-field"><span>Automation</span>
+              <select aria-label="Filter applications by automation" value={automation} onChange={event => setAutomation(event.target.value as AutomationGroup)}>
+                {automationGroups.map(([key,label]) => <option key={key} value={key}>{label} ({applications.filter(row => matchesAutomationGroup(row.automationGroup,key)).length})</option>)}
+              </select>
+            </label>
             <label className="sort-field">
               <span>Sort</span>
               <select aria-label="Sort applications" value={sort} onChange={(event) => setSort(event.target.value as typeof sort)}>
@@ -180,7 +192,7 @@ export function ApplicationTable({
                       </Link>
                       <span className="muted application-company">{application.job.company}</span>
                     </td>
-                    <td data-label="Status"><StatusPill status={application.status} /></td>
+                    <td data-label="Status"><StatusPill status={application.status} />{!["APPLIED","INTERVIEW","CLOSED"].includes(application.status) && application.automationStatus && application.automationStatus !== "SUBMITTED" ? <span className="field-help" style={{ display: "block" }}>{(application.automationGroup !== 'ACTIVE' && attentionLabel(application.automationGroup)) || ({UNKNOWN:"Submission unconfirmed",BLOCKED:"Application paused",QUEUED:"Approved · queued",RUNNING:"Application in progress",SUBMITTING:"Checking submission",CANCELED:"Automation canceled"} as Record<string,string>)[application.automationStatus] || application.automationStatus}</span> : null}</td>
                     <td data-label="Location" className="secondary application-location">
                       {formatJobLocation(application.job.location)}
                     </td>
@@ -212,7 +224,7 @@ export function ApplicationTable({
           <div>
             <div style={{ fontWeight: 650 }}>No applications match</div>
             <p className="muted" style={{ margin: "6px 0 16px" }}>Clear the search or choose another status.</p>
-            <button className="button" type="button" onClick={() => { setQuery(""); setStatus("ALL"); }}>Clear filters</button>
+            <button className="button" type="button" onClick={() => { setQuery(""); setStatus("ALL"); setAutomation("ALL"); }}>Clear filters</button>
           </div>
         </div>
       )}

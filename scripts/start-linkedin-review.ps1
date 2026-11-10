@@ -1,3 +1,4 @@
+param([switch]$ForDiscovery)
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $profileRoot = Join-Path $repositoryRoot ".runtime\chrome-linkedin-profile"
@@ -33,10 +34,11 @@ try {
     if ($running.Count -or (Test-Path -LiteralPath (Join-Path $profileRoot 'SingletonLock'))) { throw "The dedicated profile is already running or locked but its endpoint is unavailable. Close that profile's Chrome and retry; its data was left intact." }
     if (@(Get-NetTCPConnection -LocalPort 9222 -State Listen -ErrorAction SilentlyContinue).Count) { throw "Port 9222 is occupied. No browser was launched." }
     New-Item -ItemType Directory -Force -Path $profileRoot | Out-Null
-    $arguments = @("--user-data-dir=`"$profileRoot`"", '--remote-debugging-port=9222', '--no-first-run', '--no-default-browser-check', 'about:blank')
+    $initialUrl = if ($ForDiscovery) { 'https://www.linkedin.com/jobs/' } else { 'about:blank' }
+    $arguments = @("--user-data-dir=`"$profileRoot`"", '--remote-debugging-port=9222', '--no-first-run', '--no-default-browser-check', $initialUrl)
     Start-Process -FilePath $chrome -ArgumentList $arguments -WindowStyle Normal
     for ($attempt = 0; $attempt -lt 20; $attempt++) {
-        if (Test-Endpoint) { Assert-DedicatedOwner; Write-Host "Opened the dedicated LinkedIn window without navigation. Open LinkedIn manually when access is available."; exit 0 }
+        if (Test-Endpoint) { Assert-DedicatedOwner; Write-Host "Opened the dedicated LinkedIn window. Discovery navigation is used only when explicitly requested after schedule and cooldown checks."; exit 0 }
         Start-Sleep -Milliseconds 500
     }
     throw "Chrome opened, but its endpoint is unavailable. No second browser was launched."

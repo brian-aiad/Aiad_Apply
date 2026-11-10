@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import path from 'node:path';import {resolveCodexExecutable} from '../../scripts/application-browser/codex-executable.mjs';
+test('Windows user shim cannot hide the structured native Codex executable later on PATH',()=>{
+ const root=mkdtempSync(path.join(tmpdir(),'codex-launch-'));
+ try{const shim=path.join(root,'user-bin'),npm=path.join(root,'npm');mkdirSync(shim);writeFileSync(path.join(shim,'codex.cmd'),'@echo user wrapper');const exe=path.join(npm,'node_modules/@openai/codex/node_modules/@openai/codex-win32-x64/vendor/x86_64-pc-windows-msvc/codex/codex.exe');mkdirSync(path.dirname(exe),{recursive:true});writeFileSync(exe,'fixture');assert.equal(resolveCodexExecutable({platform:'win32',pathValue:[shim,npm].join(';')}),exe);assert.equal(resolveCodexExecutable({platform:'darwin',pathValue:npm}),'codex');assert.equal(resolveCodexExecutable({platform:'win32',configured:exe,pathValue:''}),exe);}finally{rmSync(root,{recursive:true,force:true});}
+});

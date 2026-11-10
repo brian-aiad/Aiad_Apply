@@ -170,3 +170,74 @@ test("ordinary support titles remain candidates and optional tools do not create
   const referral = assessOpening({ ...opening, sourceKey: "rtx:california", salaryMin: null }, prefs);
   assert.equal(referral.excluded, true);
 });
+
+test("campus computer services titles are support, while preferred tools and application portal are not requirements", () => {
+  const fit = assessOpening({ ...opening, title: "Computer Services Consultant II", description: "Required Knowledge/Skills:\nTroubleshoot Windows computers and Microsoft 365. Support incident tickets and SLAs.\nBonus Skills:\nWorkday experience.\nMinimum Qualifications:\n3 years related professional experience.\nCompensation\n$37 per hour.\nMinimum Experience: 2 years\nUSC is an equal opportunity employer.\nIf you are a current USC employee, apply in Workday." }, prefs);
+  assert.equal(roleFamily("Computer Services Consultant II"), "core");
+  assert.equal(fit.qualified, true);
+  assert.ok(!fit.cautions.some(c => c.includes("Workday")));
+});
+
+
+test("county-only worksites cannot pass the strict city commute check", () => {
+  for (const location of ["Los Angeles County", "Orange County", "Los Angeles County, CA"]) {
+    assert.equal(localDistance(location),null);
+    assert.equal(assessOpening({...opening,location},prefs).excluded,true);
+  }
+});
+
+
+test("adjacent systems roles earn explicit transferable duties without weakening gates", () => {
+  const adjacent = { ...opening, title: "Implementation Specialist", description: "Responsibilities\nTroubleshoot SQL and REST API integrations. Validate data and reconcile records. Train end users and develop support documentation. Resolve application issues and support end users.\nRequired Qualifications\nOne year of technical support experience." };
+  const profile = { confirmed_evidence: [{ scope: "source_specific", confidence: "confirmed", evidence_reference: "experience.csulb", term: "User training", notes: "Delivered user training and maintained support documentation." }] };
+  const fit = assessOpening(adjacent, prefs, profile);
+  assert.equal(fit.qualified, true);
+  for (const reason of ["Data integrity & reporting duties", "User training & support documentation", "End-user troubleshooting duties"]) assert.ok(fit.matchReasons.includes(reason), reason);
+  assert.ok(assessOpening({ ...adjacent, title: "Application Support Specialist" }, prefs, profile).score > fit.score);
+  assert.ok(!assessOpening(adjacent, prefs).matchReasons.includes("User training & support documentation"));
+  for (const patch of [{ salaryMin: 59000 }, { location: "San Diego, CA" }, { location: "Irvine, CA or Long Beach, CA" }, { employmentType: "Other" as const }]) assert.equal(assessOpening({ ...adjacent, ...patch }, prefs, profile).qualified, false);
+  assert.equal(assessOpening({ ...adjacent, description: adjacent.description + "\nRequired: 5 years of Workday administration experience." }, prefs, profile).qualified, false);
+});
+
+test("adjacent duty credit excludes incidental words and negated support", () => {
+  for (const description of ["SQL and REST API knowledge. Quarterly reports are available. Employee training benefits and computer literacy.", "SQL and REST API knowledge. This role does not require training end users or validating data. This role does not require resolving application issues."]) {
+    const fit = assessOpening({ ...opening, title: "Business Systems Analyst", description }, prefs);
+    assert.equal(fit.qualified, false);
+    assert.ok(!fit.matchReasons.some(reason => /reporting duties|support documentation|troubleshooting duties/.test(reason)));
+  }
+});
+
+
+test("mandatory HR domain experience cannot be replaced by generic support", () => {
+  for (const requirement of ["Two years of HRIS administration experience.", "Experience with HRIS systems and technical support or systems administration.", "Payroll processing experience using SQL or Excel and technical support.", "Hands-on HRIS administration expertise.", "Technical support experience with HRIS or Workday.", "Experience processing payroll.", "HRIS and application support experience.", "Experience in human resources administration.", "Technical support or systems administration experience and payroll processing experience."]) {
+    const fit = assessOpening({ ...opening, description: `${opening.description}\nExperience and Education\n${requirement}` }, prefs);
+    assert.equal(fit.qualified, false, requirement);
+    assert.ok(fit.cautions.some(c => /Required .*HRIS|Required .*payroll|Required .*human resources/i.test(c)), requirement);
+  }
+  for (const requirement of ["Experience in technical support or HRIS administration.", "Experience in HRIS or application support.", "Experience in systems administration, technical support, HRIS, or a related field.", "Preferred Qualifications\nHRIS administration experience."]) {
+    const fit = assessOpening({ ...opening, description: `${opening.description}\nExperience and Education\n${requirement}` }, prefs);
+    assert.equal(fit.qualified, true, requirement);
+  }
+});
+
+
+test("HR domain evidence must describe actual work, not a skills-only or proposed claim", () => {
+  const job = { ...opening, description: opening.description + "\nRequirements\nTwo years of HRIS administration experience." };
+  for (const notes of ["HRIS familiarity.", "Proposed implementing HRIS.", "Have not supported HRIS.", "Supported HRIS configuration."]) {
+    assert.equal(assessOpening(job, prefs, { confirmed_evidence: [{scope: "source_specific", confidence: "confirmed", evidence_reference: "experience.csulb", term: "HRIS", notes}] }).qualified, false);
+  }
+  assert.equal(assessOpening(job, prefs, { confirmed_evidence: [{scope: "source_specific", confidence: "confirmed", evidence_reference: "experience.csulb", term: "HRIS", notes: "Two years of experience supporting HRIS user access; administered HRIS configuration."}] }).qualified, true);
+});
+
+test("platform operations support is an adjacent role, without admitting leadership titles", () => {
+  assert.equal(roleFamily("Technical Platform Operations Specialist"), "adjacent");
+  assert.equal(roleFamily("Platform Operations Analyst"), "adjacent");
+  assert.equal(roleFamily("Director of Platform Operations"), null);
+});
+
+test("accepts explicit between-and pay bands without merging separate amounts", () => {
+ assert.equal(payFromText("The annual salary range generally falls between $78,000 and $96,000 annually.").salaryMin,78000);
+ assert.equal(payFromText("Annual salary $78,000 and $96,000 bonus.").salaryMin,null);
+ assert.equal(payFromText("Bonus between $10,000 and $20,000 annually.").salaryMin,null);
+ assert.equal(payFromText("Annual salary CAD between $78,000 and $96,000.").salaryMin,null);
+});

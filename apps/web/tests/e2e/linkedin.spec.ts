@@ -56,7 +56,9 @@ for (const count of [0, 5, 25, 100]) {
     }
     for (const width of [1100, 1000, 900, 800, 390]) {
       await page.setViewportSize({ width, height: 900 });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), `No horizontal document overflow at ${width}px`).toBe(true);
+      const overflow = await page.evaluate(() => ({ width: document.documentElement.scrollWidth, viewport: window.innerWidth,
+        elements: [...document.querySelectorAll("body *")].filter(element => element.getBoundingClientRect().right > window.innerWidth + 1).map(element => ({ tag: element.tagName, className: element.className, right: element.getBoundingClientRect().right })).slice(0, 12) }));
+      expect(overflow.width <= overflow.viewport + 1, `No horizontal document overflow at ${width}px: ${JSON.stringify(overflow)}`).toBe(true);
       await expect(page.getByRole("button", { name: "Check session", exact: true })).toBeVisible();
     }
     await page.getByText("Paste a LinkedIn job manually", { exact: true }).click();

@@ -1,4 +1,5 @@
 "use client";
+import type {ApplicationAttempt} from "@/lib/application-automation";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Clipboard, Download, ExternalLink } from "lucide-react";
@@ -6,13 +7,14 @@ import { ApplicationProfileForm } from "./application-profile-form";
 import { APPLICATION_STATUS_EVENT } from "./application-status-pill";
 import { ApplicationAutomation } from "./application-automation";
 
-type Props = { id: string; runId: string; runNumber: number; destination: string | null; portal: string; blockers: string[];
+type Props = { automatic?:boolean; initialAttempt?:(ApplicationAttempt & {id:string})|null; id: string; runId: string; runNumber: number; destination: string | null; portal: string; blockers: string[];
   evidence: { id: string; source: string; text: string; terms: string[] }[];
   reviewed: boolean; submitted: boolean; pdfId: string | null; resumeSha256: string; fileName: string; hidden: boolean; };
 export function ApplicationApply(props: Props) {
   const router = useRouter();
   const [url, setUrl] = useState(props.destination || ""), [reviewed, setReviewed] = useState(props.reviewed);
-  const [prepared, setPrepared] = useState(props.reviewed), [submitted, setSubmitted] = useState(props.submitted);
+  const [prepared, setPrepared] = useState(props.reviewed), [locallySubmitted, setSubmitted] = useState(props.submitted);
+  const submitted=props.submitted || locallySubmitted;
   const [busy, setBusy] = useState(false), [message, setMessage] = useState(""), [confirmation, setConfirmation] = useState("");
   async function command(body: Record<string, unknown>) {
     const response = await fetch(`/api/applications/${props.id}/apply`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });

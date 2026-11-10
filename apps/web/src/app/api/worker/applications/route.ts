@@ -1,3 +1,11 @@
+import { liveEligibilityBlockers } from "@/lib/application-autonomy-eligibility";
+import { readDiscoveryPreferences } from "@/lib/discovery/types";
+import { applicationIdentity } from "@/lib/application-history";
+import { queueAutonomousApplication } from "@/lib/application-autonomy";
+import { ONBOARDING_KEY } from "@/lib/workspace-material";
+import { automationPlatformAllowed } from "@/lib/automation-device-policy";
+import { AUTOMATION_POLICY_KEY } from "@/lib/workspace-material";
+import { automationDeviceAllowed } from "@/lib/automation-device";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -9,8 +17,10 @@ import { readProductSettings } from "@/lib/product-settings";
 
 export const runtime = "nodejs";
 const schema = z.object({
-  action: z.enum(["claim", "heartbeat", "checkpoint", "before_submit", "before_verification", "finish", "verification"]),
+  action: z.enum(["claim", "heartbeat", "checkpoint", "before_submit", "before_verification", "verify_eligibility", "finish", "verification"]),
+  platform: z.enum(["win32", "darwin", "linux"]).optional(),
   workerId: z.string().regex(WORKER_ID_PATTERN), claimToken: z.string().uuid().optional(), attemptId: z.string().uuid().optional(),
+  liveEligibility: z.object({ sourceUrl: z.string().url(), evidenceText: z.string().min(20).max(10000), worksite: z.string().min(2).max(300) }).optional(),
   summary: z.string().max(4000).optional(), questions: z.array(questionSchema).max(300).optional(),
   unresolved: z.array(z.string().max(2000)).max(100).optional(),
   resumeSha256: z.string().regex(/^[a-f0-9]{64}$/).optional(), attachmentVerified: z.boolean().optional(), uploadedResumeVerified: z.boolean().optional(),
@@ -24,11 +34,31 @@ export async function POST(request: Request) {
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return NextResponse.json({ error: "Invalid application-worker message." }, { status: 400 });
   const command = parsed.data;
+  const selected = await automationDeviceAllowed(command.platform, "applications");
+  if (!selected && (command.action === "claim" || command.action === "heartbeat" && !command.attemptId)) return new NextResponse(null, { status: 204 });
+  let producerFailed = false;
+  if (selected && command.action === "claim") {
+    try {
+      // Existing exact-artifact work and interrupted-attempt recovery must not
+      // depend on discovery evidence extraction or automatic candidate scoring.
+      const pending = await db.applicationEvent.findFirst({ where: { eventType: AUTOMATION_EVENT, toValue: { in: ["QUEUED", "RUNNING", "SUBMITTING"] } }, select: { id: true } });
+      if (!pending) await queueAutonomousApplication();
+    }
+    catch {
+      // A concurrently queued application can still be claimed. Report the
+      // producer failure only when no independent work can proceed.
+      producerFailed = true;
+    }
+  }
+  const [onboarding, reusable] = await Promise.all([db.setting.findUnique({ where: { key: ONBOARDING_KEY } }), db.setting.findUnique({ where: { key: "application:reusable-answers" } })]);
+  const automaticRequirements = readDiscoveryPreferences((await db.setting.findUnique({ where: { key: "discovery:preferences" } }))?.value);
+  const sharedFacts = { automaticRequirements, onboarding: onboarding?.value ?? null, reusableAnswers: reusable?.value ?? [] };
   try {
     const response = await db.$transaction(async tx => {
       await lockAutomation(tx);
+      if ((command.action === "claim" || command.action === "heartbeat" && !command.attemptId) && !automationPlatformAllowed((await tx.setting.findUnique({where:{key:AUTOMATION_POLICY_KEY}}))?.value, command.platform, "applications")) return null;
       const now = new Date().toISOString();
-      await tx.setting.upsert({ where: { key: AUTOMATION_HEARTBEAT }, create: { key: AUTOMATION_HEARTBEAT, value: { at: now, workerId: command.workerId } }, update: { value: { at: now, workerId: command.workerId } } });
+      await tx.setting.upsert({ where: { key: AUTOMATION_HEARTBEAT }, create: { key: AUTOMATION_HEARTBEAT, value: { at: now, workerId: command.workerId, platform: command.platform || "unknown" } }, update: { value: { at: now, workerId: command.workerId, platform: command.platform || "unknown" } } });
       if (command.action === "claim") {
         const active = await tx.applicationEvent.findMany({ where: { eventType: AUTOMATION_EVENT, toValue: { in: ["RUNNING", "SUBMITTING"] } } });
         for (const event of active) {
@@ -37,7 +67,7 @@ export async function POST(request: Request) {
           if (command.claimToken && attempt.claimToken === command.claimToken && attempt.workerId === command.workerId && attempt.status === "RUNNING" && !attempt.submissionStartedAt && !attempt.browserStartedAt) {
             const { app, bytes, profile, applicationHistory } = await approvedMaterial(tx, event.applicationId, attempt);
             await saveAttempt(tx, event.id, attempt);
-            return { attemptId: event.id, applicationId: app.id, ...attempt, company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
+            return { attemptId: event.id, applicationId: app.id, ...attempt, company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, ...sharedFacts, resumeBase64: bytes.toString("base64") };
           }
           if (Date.now() - Date.parse(attempt.updatedAt) < 120_000) return null;
           await saveAttempt(tx, event.id, { ...attempt, status: attempt.status === "SUBMITTING" ? "UNKNOWN" : "BLOCKED", summary: attempt.status === "SUBMITTING" ? "The worker disconnected during submission. Check the employer site before any retry; this has not been marked Applied." : "The browser worker disconnected before submission. Review the interruption before approving another attempt." });
@@ -48,8 +78,8 @@ export async function POST(request: Request) {
         if (!attempt) throw new AutomationError("Unreadable approval.");
         try {
           const { app, bytes, profile, applicationHistory } = await approvedMaterial(tx, event.applicationId, attempt);
-          await saveAttempt(tx, event.id, { ...attempt, status: "RUNNING", workerId: command.workerId, ...(command.claimToken ? { claimToken: command.claimToken } : {}), summary: "Opening the approved job and preparing its application." });
-          return { attemptId: event.id, applicationId: app.id, ...attempt, status: "RUNNING", ...(command.claimToken ? { claimToken: command.claimToken } : {}), company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, resumeBase64: bytes.toString("base64") };
+          await saveAttempt(tx, event.id, { ...attempt, status: "RUNNING", workerId: command.workerId, executionPlatform: command.platform, ...(command.claimToken ? { claimToken: command.claimToken } : {}), summary: "Opening the approved job and preparing its application." });
+          return { attemptId: event.id, applicationId: app.id, ...attempt, status: "RUNNING", ...(command.claimToken ? { claimToken: command.claimToken } : {}), company: app.job.company, title: app.job.title, posting: app.job.rawPaste, discoverySource: app.job.source, profile, applicationHistory, ...sharedFacts, resumeBase64: bytes.toString("base64") };
         } catch (error) {
           await saveAttempt(tx, event.id, { ...attempt, status: "BLOCKED", summary: error instanceof AutomationError ? error.message : "Could not load the approved resume." });
           return null;
@@ -62,6 +92,18 @@ export async function POST(request: Request) {
       const event = await tx.applicationEvent.findUnique({ where: { id: command.attemptId } });
       const attempt = event?.eventType === AUTOMATION_EVENT ? readAttempt(event.detail) : null;
       if (!event || !attempt || attempt.workerId !== command.workerId) throw new AutomationError("Attempt ownership changed.");
+      if (command.action === "verify_eligibility") {
+        if (attempt.authorizationMode !== "automatic" || attempt.status !== "RUNNING" || attempt.submissionStartedAt || !command.liveEligibility) throw new AutomationError("No automatic job verification is pending.");
+        const proof = { ...command.liveEligibility, observedAt: now };
+        const expectedIdentity = applicationIdentity(attempt.destination);
+        if (proof.sourceUrl !== attempt.destination && !(expectedIdentity && applicationIdentity(proof.sourceUrl) === expectedIdentity)) throw new AutomationError("Live job proof belongs to a different destination.");
+        const prefs = readDiscoveryPreferences((await tx.setting.findUnique({ where: { key: "discovery:preferences" } }))?.value);
+        const blockers = liveEligibilityBlockers(proof, prefs);
+        if (blockers.length) throw new AutomationError(blockers.join(" "));
+        await approvedMaterial(tx, event.applicationId, attempt);
+        await saveAttempt(tx, event.id, { ...attempt, liveEligibility: proof });
+        return { verified: true };
+      }
       // Diagnostic updates cannot authorize another click or mark an application Applied.
       if (command.action === "verification") {
         if (attempt.status !== "UNKNOWN" || !attempt.submissionStartedAt || !command.verification) throw new AutomationError("No pending verification to observe.");
@@ -102,6 +144,7 @@ export async function POST(request: Request) {
         if (attempt.status !== "RUNNING") throw new AutomationError("Submission has already started; do not repeat it.");
         await approvedMaterial(tx, event.applicationId, attempt);
       } else if (command.action === "before_submit") {
+        if (attempt.authorizationMode === "automatic" && !attempt.liveEligibility) throw new AutomationError("Live job eligibility must be verified before automatic submission.");
         if (attempt.prepareOnly) throw new AutomationError("This is a preparation-only attempt. Submission is not authorized for this attempt.");
         if (attempt.status !== "RUNNING") throw new AutomationError("Submission has already started; do not repeat it.");
         await approvedMaterial(tx, event.applicationId, attempt);
@@ -129,8 +172,9 @@ export async function POST(request: Request) {
       await saveAttempt(tx, event.id, attempt);
       return { status: attempt.status };
     }, { timeout: 30_000 });
+    if (!response && producerFailed) return NextResponse.json({ error: "Automatic application queue check failed. No browser work was started." }, { status: 503 });
     return response ? NextResponse.json(response, { headers: { "Cache-Control": "private, no-store" } }) : new NextResponse(null, { status: 204 });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof AutomationError ? error.message : "Application worker update failed." }, { status: error instanceof AutomationError ? error.status : 503 });
+    return NextResponse.json({ error: error instanceof AutomationError ? error.message : producerFailed ? "Automatic application queue check failed. No browser work was started." : "Application worker update failed." }, { status: error instanceof AutomationError ? error.status : 503 });
   }
 }

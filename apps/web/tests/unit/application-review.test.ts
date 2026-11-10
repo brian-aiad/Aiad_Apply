@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildReviewGuide, hasValidatedResume, isRunActive } from "../../src/lib/application-review";
+import { buildReviewGuide, hasValidatedApplicationPdf, hasValidatedResume, isRunActive } from "../../src/lib/application-review";
 import { buildTechnologyReview } from "../../src/lib/technology-review";
 
 const run = { status: "SUCCEEDED", validationPassed: true, riskCount: 0, artifacts: [{ kind: "DOCX" }] };
@@ -59,4 +59,29 @@ test("empty and failed runs provide actionable guidance without a success icon",
   const failed = { ...run, status: "FAILED", errorMessage: "Layout failed" };
   assert.equal(buildReviewGuide({ ...options, run: failed }).copy, "Layout failed");
   assert.match(buildReviewGuide({ ...options, run: failed, hasPreviousResume: true }).copy, /validated version remains available/);
+});
+
+test('automatic workflow describes real application status without requiring optional review',()=>{
+ const auto={...options,run:{...run,artifacts:[{kind:'PDF'}]},automatic:true};
+ assert.equal(buildReviewGuide(auto).headline,'Resume prepared');
+ assert.equal(buildReviewGuide({...auto,attempt:{status:'RUNNING',summary:'Filling known fields'}}).headline,'Application in progress');
+ const blocked=buildReviewGuide({...auto,attempt:{status:'BLOCKED',summary:'CAPTCHA required'}});assert.equal(blocked.headline,'Application parked');assert.match(blocked.copy,/CAPTCHA/);
+ assert.match(buildReviewGuide({...auto,attempt:{status:'UNKNOWN',summary:'No receipt'}}).copy,/before retrying/);
+ assert.notEqual(buildReviewGuide({...auto,historical:true,attempt:{status:'RUNNING',summary:'Current attempt'}}).headline,'Application in progress');
+ assert.equal(buildReviewGuide({...auto,run:{...run,status:'FAILED'}}).tone,'danger');
+});
+
+
+test('application readiness requires a validated PDF while DOCX remains downloadable', () => {
+  assert.equal(hasValidatedResume(run), true);
+  assert.equal(hasValidatedApplicationPdf(run), false);
+  assert.match(buildReviewGuide({...options, automatic:true}).headline, /PDF required/);
+  const pdf = {...run, artifacts:[{kind:'PDF'}]};
+  assert.equal(hasValidatedApplicationPdf(pdf), true);
+  for (const invalid of [{...pdf,status:'FAILED'}, {...pdf,validationPassed:false}, {...pdf,validationPassed:null}]) {
+    assert.equal(hasValidatedApplicationPdf(invalid), false);
+  }
+  const prepared = buildReviewGuide({...options,run:pdf,automatic:true});
+  const queued = buildReviewGuide({...options,run:pdf,automatic:true,attempt:{status:'QUEUED',summary:'Queued'}});
+  assert.doesNotMatch(prepared.copy + queued.headline, /Windows|desktop/);
 });

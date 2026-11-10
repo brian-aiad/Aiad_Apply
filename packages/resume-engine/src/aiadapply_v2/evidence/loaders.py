@@ -174,20 +174,31 @@ TRANSFER_BRIDGES: dict[str, tuple[str, ...]] = {
 # These are descriptions of documented work, not new implementations or credentials.
 # They still require a bridge in a real experience/project paragraph; a job request,
 # generic Skills list, or high embedding score alone is insufficient.
-AUTOMATIC_CONTEXT_TERMS = frozenset({
-    "critical thinking", "problem-solving", "communication skills", "written communication",
-    "written and verbal communication skills", "verbal communication",
-    "cross-functional collaboration", "interpersonal skills", "fast-paced environment",
-    "task prioritization", "organizational skills", "case management", "automation",
-    "technical writing", "enterprise software",
-})
+AUTOMATIC_CONTEXT_TERMS = frozenset(
+    {
+        "critical thinking",
+        "problem-solving",
+        "communication skills",
+        "written communication",
+        "written and verbal communication skills",
+        "verbal communication",
+        "cross-functional collaboration",
+        "interpersonal skills",
+        "fast-paced environment",
+        "task prioritization",
+        "organizational skills",
+        "case management",
+        "automation",
+        "technical writing",
+        "enterprise software",
+    }
+)
 
 
 def supports_automatic_context(term: str, source_text: str) -> bool:
     normalized = term.casefold().strip()
     return normalized in AUTOMATIC_CONTEXT_TERMS and any(
-        contains_term(source_text, bridge)
-        for bridge in TRANSFER_BRIDGES.get(normalized, ())
+        contains_term(source_text, bridge) for bridge in TRANSFER_BRIDGES.get(normalized, ())
     )
 
 

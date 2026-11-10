@@ -1,3 +1,36 @@
+# Autonomous application preference (October 20, latest)
+
+Brian explicitly removed the individual resume review/approval wait and requested
+fully automatic applications, including qualifying existing ready jobs. This
+supersedes the older October 6 per-resume manual approval instructions below.
+
+- With standing automatic mode enabled, select the latest successfully validated,
+  factual one-page job-specific PDF automatically. Bind each attempt to job, run,
+  artifact hash, destination and the current standing authorization identity.
+- Preserve saved full-time, starting-base-pay, confirmed-worksite/radius and
+  realistic support/IT experience criteria; use only free tools and the existing
+  subscription. RTX/Collins remain referral-only. No automatic outreach.
+- Verify current live employment, pay and worksite before entering application
+  data, and recheck authorization and exact attachment before submission.
+- Park login/CAPTCHA, missing facts, unsupported forms and uncertain submissions;
+  continue other jobs. Never invent answers or automatically retry an uncertain
+  final click. Only an explicit employer receipt establishes Applied.
+- Pausing automatic mode must revoke automatic submission authorization. Manual
+  selection remains optional, not a prerequisite for enabled automatic mode.
+
+# Listing age and automatic queue policy (October 20)
+
+Prioritize original posting age 0–7 days, then 8–14 days; use 15–30 days as a
+fallback among otherwise qualifying roles. Exclude over-30-day listings from new
+automatic tailoring/applications and the default recommended view. Official
+CalCareers/EDJOIN postings may remain eligible with a collector-confirmed future
+closing date. All normal pay/worksite/full-time/factual-fit rules still apply.
+Never reset original age from observation or reposting. Undated active employer
+boards retain their existing narrow freshness rules and are never labelled new.
+Historical applications/artifacts stay intact. Access/eligibility-only parked
+attempts without live verification, upload or submission do not consume the daily
+application budget; they remain parked and must not auto-retry.
+
 # Cross-device session startup and handoff (October 19, 2026)
 
 At the beginning of every new task/session, before editing or starting services:
@@ -228,6 +261,31 @@ Recommend only full-time postings with confirmed starting base pay at or above t
 
 # Aiad_Apply agent guidance
 
+## Product decisions — October 20, 2026
+
+- Paste a full posting and tailor is the primary daily entry. Keep assisted and
+  automatic discovery as supplements. Search the preferred LinkedIn search first,
+  then the support-role searches within the same bounded access budget.
+- Use one LinkedIn ordering everywhere: documented exact fit first, Premium as
+  tie-breaker, freshness next. Also surface Premium picks separately within the
+  strongest comparable fit band, without overriding the exact-fit queue order.
+- Today prioritizes urgent dated commitments, ready applications, resume review,
+  then a bounded follow-up batch rather than allowing old reminders to dominate.
+- Reuse dedicated-browser sign-ins. Do not add password storage or account creation.
+- Offer explicit Save for future applications on reusable factual answers;
+  employer consents and job-specific commitments must remain scoped.
+- Share all confirmed candidate facts/evidence and supplemental onboarding in
+  the secured workspace database. Do not sync passwords, OAuth tokens, one-time
+  codes, browser sessions, locks or pending browser journals.
+- Windows is the primary always-on browser/discovery automation computer. Mac
+  remains a full capture, tailoring, review and application-authorization client.
+  Queue authorizations through the shared database; do not run competing browser
+  workers or retry uncertain submissions during device handoff.
+- Login startup launches dashboard/tailoring. Browser automation starts explicitly
+  when needed; an already running Windows worker can continue approved work.
+- Research fixes with primary documentation, preserve existing safeguards, and
+  verify with isolated fixtures before claiming live Windows/provider success.
+
 Read `README.md` before changing this repository. Preserve existing user changes and keep
 credentials, pasted job descriptions, candidate data, and generated artifacts out of Git.
 
@@ -266,3 +324,29 @@ change the requested outcome or an external/destructive action requires authoriz
 
 Avoid parallel writers in the same checkout. Use a separate Git worktree for any explicitly
 requested parallel coding run.
+
+
+## Local realistic-fit discovery clarification (October 20, 2026)
+
+Prioritize local on-site and hybrid support/IT and credible adjacent implementation,
+application and business-systems jobs. Do not interpret realistic fit as guaranteed
+hiring or require a perfect match. Tailoring should reveal supported transferable
+duties; it cannot invent required years, credentials or specialized implementations.
+Preserve full-time, confirmed starting-pay and30-mile worksite constraints.
+Scheduled collection belongs to the always-on Windows desktop and runs every12hours
+across supported sources. Disclose unsupported/manual directories and source errors.
+Automatic preparation may retain disclosed schedule/travel cautions for later review;
+it is not acceptance of those conditions. Missing material facts/credentials remain
+review blockers. Local employer auto-tailoring can use a65 minimum fit score, aligned
+with LinkedIn's existing65 gate, with substantive duty evidence and existing caps.
+Scores rank evidence and do not represent hiring probability. Remote-only discovery
+is not the goal; retain saved includeRemote preference and prioritize nearby work.
+
+## Overall-fit application clarification (October 26, latest)
+
+Do not demand a perfect checklist match. A limited trainable skill gap, including
+computer imaging, does not automatically prevent applying to an otherwise realistic
+local support/IT role. Keep the gap honest in resume and screening answers. Preserve
+full-time/pay/worksite criteria, legal eligibility, required licenses/clearance,
+substantial seniority and primary-profession boundaries. Never falsely certify all
+qualifications, change a truthful No to Yes, or bypass employer screening rejection.

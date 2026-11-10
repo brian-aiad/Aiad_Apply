@@ -1,5 +1,5 @@
+import { discoveryEvidence } from "./discovery/profile-evidence";
 import type { ParsedCapture } from "./job-parser";
-import evidence from "./discovery/candidate-evidence.json";
 import { localDistance, roleFamily } from "./discovery/matching";
 import {
   DEFAULT_DISCOVERY_PREFERENCES,
@@ -29,10 +29,7 @@ const namedTools = [
   "Alteryx", "Airflow", "Harness", "AWS S3", "AWS SNS", "AWS ECR",
   "Docker", "Redis", "MongoDB", "React", "Node.js", "TypeScript",
 ];
-const candidateEvidence = evidence.evidence.join("\n");
-const confirmedExposure = evidence.confirmedExposure.map((item) =>
-  item.toLocaleLowerCase(),
-);
+
 
 const escapePattern = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const mentions = (text: string, term: string) =>
@@ -76,7 +73,11 @@ function isExperienceRequirement(line: string) {
 export function captureIntelligence(
   job: ParsedCapture,
   preferences: DiscoveryPreferences = DEFAULT_DISCOVERY_PREFERENCES,
+  profile?: Record<string, unknown>,
 ) {
+  const evidence = discoveryEvidence(profile);
+  const candidateEvidence = evidence.evidence.join("\n");
+  const confirmedExposure = evidence.confirmedExposure.map(item => item.toLowerCase());
   const requiredText = job.requiredQualifications.join("\n");
   const responsibilityText = job.responsibilities.join("\n");
   const requirements = `${requiredText}\n${responsibilityText}`;

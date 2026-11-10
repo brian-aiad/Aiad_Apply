@@ -33,10 +33,12 @@ export async function DELETE(request: Request, context: { params: Promise<{ id: 
 class ApplicationConflict extends Error {}
 
 const updateSchema = z.object({
+  updatedAt: z.string().datetime().optional(),
   status: z
     .enum(["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED"])
     .optional(),
   notes: z.string().max(10000).optional(),
+  commitmentAt: z.string().datetime().nullable().optional(),
   sourceUrl: webUrl.nullable().optional().or(z.literal("")),
   followUpAt: z.string().datetime().nullable().optional().or(z.literal("")),
 });
@@ -65,12 +67,17 @@ export async function PATCH(
   if (!current) {
     return NextResponse.json({ error: "Application not found." }, { status: 404 });
   }
+  if (input.data.updatedAt && input.data.updatedAt !== current.updatedAt.toISOString()) return NextResponse.json({ error: "This application changed on another device. Reload before saving; your draft has not overwritten it." }, { status: 409 });
   if (input.data.status === "READY" || input.data.status === "REVIEW") {
     const validRun = await db.tailoringRun.findFirst({
       where: { applicationId: id, status: "SUCCEEDED", validationPassed: true, pageCount: 1, artifacts: { some: { kind: { in: ["DOCX", "PDF"] } } } },
       select: { id: true },
     });
     if (!validRun) return NextResponse.json({ error: "Generate a validated resume before marking it ready for review or submission." }, { status: 409 });
+  }
+
+  if (input.data.status === "APPLIED" && current.status !== "APPLIED") {
+    return NextResponse.json({ error: "Record the employer confirmation in Apply, or use verified Auto apply. Status editing cannot establish a submission." }, { status: 409 });
   }
 
   const now = new Date();
@@ -141,12 +148,14 @@ export async function PATCH(
         toValue: requestedFollowUpAt?.toISOString() ?? null,
       } });
     }
+    if (input.data.commitmentAt !== undefined) await transaction.applicationEvent.create({ data: { applicationId: id, eventType: "commitment_scheduled", toValue: input.data.commitmentAt } });
     return updated;
   });
 
   return NextResponse.json({
     id: application.id,
     status: application.status,
+    updatedAt: application.updatedAt.toISOString(),
     appliedAt: application.appliedAt?.toISOString() ?? null,
     followUpAt: application.followUpAt?.toISOString() ?? null,
     automaticallyScheduledFollowUp: reminder.automaticallyScheduled,

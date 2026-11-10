@@ -70,7 +70,7 @@ process.stdin.on('end', () => {
     assert.deepEqual(Object.keys(usage).sort(), ['cachedInputTokens', 'elapsedMs', 'inputTokens', 'model', 'outputTokens', 'success'].sort());
     assert.deepEqual({ ...usage, elapsedMs: 0 }, { inputTokens: 50, cachedInputTokens: 20, outputTokens: 8, model: 'usage-test-model', elapsedMs: 0, success: mode === 'valid' });
     assert.ok(Number.isSafeInteger(usage.elapsedMs) && usage.elapsedMs >= 0);
-    assert.equal((await stat(usagePath)).mode & 0o777, 0o600);
+    if (process.platform !== 'win32') assert.equal((await stat(usagePath)).mode & 0o777, 0o600); // Windows uses ACLs rather than POSIX permission bits.
   }
   process.env.AIADAPPLY_CODEX_EXECUTABLE = path.join(directory, 'missing-executable');
   await assert.rejects(decideApplicationStep({}, directory, 'missing'));

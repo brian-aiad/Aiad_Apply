@@ -85,3 +85,11 @@ test('Gmail lookup reads a new matching message and returns the code only to the
   assert.match(searched, /after:/);
   assert.equal(includesSpamTrash, true);
 });
+
+test('a code received between the requesting action and page detection is eligible, but pre-request mail is not', () => {
+  const requestedAt = Date.parse('2026-10-20T10:00:00Z');
+  const message = { internalDate: String(requestedAt + 1000), payload: { mimeType: 'text/plain', headers: [{ name:'To', value:'fixture@example.test' }, { name:'Subject', value:'Fixture Employer verification' }], body:{ data:Buffer.from('Your verification code is 123456').toString('base64url') } } };
+  const result = selectNewestVerificationMessage([message], {company:'Fixture Employer',recipient:'fixture@example.test',requestedAt});
+  assert.ok(result);
+  assert.equal(selectNewestVerificationMessage([{...message,internalDate:String(requestedAt-1)}], {company:'Fixture Employer',recipient:'fixture@example.test',requestedAt}), null);
+});

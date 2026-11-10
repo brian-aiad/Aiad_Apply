@@ -75,7 +75,10 @@ def paragraph_priorities(
                 transferable,
                 match.semantic_score if match.evidence_id == source.evidence_id else 0.0,
             )
-            if local_strength not in {EvidenceStrength.direct, EvidenceStrength.strongly_transferable}:
+            if local_strength not in {
+                EvidenceStrength.direct,
+                EvidenceStrength.strongly_transferable,
+            }:
                 continue
             strength = 1.0 if direct else 0.7
             missing[match.target_term] = importance * strength

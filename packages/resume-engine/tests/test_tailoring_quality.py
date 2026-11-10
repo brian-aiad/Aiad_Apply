@@ -11,30 +11,35 @@ from aiadapply_v2.semantic.matcher import LexicalSemanticEncoder, build_transfer
 
 
 def test_existing_deployment_and_live_operations_do_not_require_cosmetic_rewrites():
-    source = 'Built, tested, and deployed Loavenly for staff across three locations.'
-    assert demonstrates_ordinary_capability('deployment', source, source)
-    assert not demonstrates_ordinary_capability('deployment', source, 'Supported staff.')
-    operations = 'Resolved API and permission issues during live production operations.'
-    assert demonstrates_ordinary_capability('product operations', operations, operations)
-    assert not demonstrates_ordinary_capability('product operations', 'Wrote documentation.', operations)
-    support = 'Resolved 200+ production support tickets across agency management SaaS.'
-    assert demonstrates_ordinary_capability('product support', support, support)
-    assert not demonstrates_ordinary_capability('product support', 'Managed inventory.', support)
+    source = "Built, tested, and deployed Loavenly for staff across three locations."
+    assert demonstrates_ordinary_capability("deployment", source, source)
+    assert not demonstrates_ordinary_capability("deployment", source, "Supported staff.")
+    operations = "Resolved API and permission issues during live production operations."
+    assert demonstrates_ordinary_capability("product operations", operations, operations)
+    assert not demonstrates_ordinary_capability(
+        "product operations", "Wrote documentation.", operations
+    )
+    support = "Resolved 200+ production support tickets across agency management SaaS."
+    assert demonstrates_ordinary_capability("product support", support, support)
+    assert not demonstrates_ordinary_capability("product support", "Managed inventory.", support)
 
-    base = parse_resume_docx(Path('data/resumes/Brian_Aiad_BASE.docx'))
+    base = parse_resume_docx(Path("data/resumes/Brian_Aiad_BASE.docx"))
     job = parse_linkedin_simplify(
-        'Example\nProduct Operations Specialist\nRemote\nAbout the job\n'
-        'Responsibilities\nSupport deployment and product operations.\n'
-        'Required Qualifications\nExperience with deployment and product operations.\n'
-        + 'Support production applications and document incidents. ' * 10
+        "Example\nProduct Operations Specialist\nRemote\nAbout the job\n"
+        "Responsibilities\nSupport deployment and product operations.\n"
+        "Required Qualifications\nExperience with deployment and product operations.\n"
+        + "Support production applications and document incidents. "
+        * 10
     )
     keywords = grade_job_keywords(job)
     graph = build_evidence_graph(base, keywords)
     matches = build_transferability_map(
-        build_target_role_profile(job, keywords), keywords, graph, LexicalSemanticEncoder())
-    feedback = tailoring_feedback(base, {p.paragraph_id: p.text for p in base.paragraphs},
-                                  keywords, graph, matches)
-    assert not any('deployment' in item or 'product operations' in item for item in feedback)
+        build_target_role_profile(job, keywords), keywords, graph, LexicalSemanticEncoder()
+    )
+    feedback = tailoring_feedback(
+        base, {p.paragraph_id: p.text for p in base.paragraphs}, keywords, graph, matches
+    )
+    assert not any("deployment" in item or "product operations" in item for item in feedback)
 
 
 def test_plan_and_final_quality_accept_configuration_and_script_inflections():
@@ -42,12 +47,14 @@ def test_plan_and_final_quality_accept_configuration_and_script_inflections():
 
     from .helpers import identity_plan
 
-    base = parse_resume_docx(Path('data/resumes/Brian_Aiad_BASE.docx'))
+    base = parse_resume_docx(Path("data/resumes/Brian_Aiad_BASE.docx"))
     job = parse_linkedin_simplify(
-        'Example\nSystems Engineer\nRemote\nAbout the job\n'
-        'Required Qualifications\nExperience with configuration and scripts.\n'
-        + 'Support production applications and document incidents. ' * 10)
-    keywords = [k for k in grade_job_keywords(job) if k.term in {'configuration', 'scripts'}]
+        "Example\nSystems Engineer\nRemote\nAbout the job\n"
+        "Required Qualifications\nExperience with configuration and scripts.\n"
+        + "Support production applications and document incidents. "
+        * 10
+    )
+    keywords = [k for k in grade_job_keywords(job) if k.term in {"configuration", "scripts"}]
     assert len(keywords) == 2
     for keyword in keywords:
         keyword.hiring_importance = 50
@@ -56,16 +63,22 @@ def test_plan_and_final_quality_accept_configuration_and_script_inflections():
     matches = build_transferability_map(profile, keywords, graph, LexicalSemanticEncoder())
     plan = identity_plan(base)
     result = validate_rewrite_plan(base, plan, keywords, profile)
-    assert not any(issue.code == 'important_keyword_missing' for issue in result.issues)
-    assert not tailoring_feedback(base, {p.paragraph_id: p.text for p in base.paragraphs},
-                                  keywords, graph, matches)
+    assert not any(issue.code == "important_keyword_missing" for issue in result.issues)
+    assert not tailoring_feedback(
+        base, {p.paragraph_id: p.text for p in base.paragraphs}, keywords, graph, matches
+    )
     for bullet in plan.bullets:
-        bullet.text = (bullet.text.replace('configurations', 'settings')
-                       .replace('Configured', 'Managed').replace('script', 'program'))
+        bullet.text = (
+            bullet.text.replace("configurations", "settings")
+            .replace("Configured", "Managed")
+            .replace("script", "program")
+        )
     result = validate_rewrite_plan(base, plan, keywords, profile)
-    assert {issue.message for issue in result.issues if issue.code == 'important_keyword_missing'} == {
-        'Important accepted keyword is absent: configuration.',
-        'Important accepted keyword is absent: scripts.',
+    assert {
+        issue.message for issue in result.issues if issue.code == "important_keyword_missing"
+    } == {
+        "Important accepted keyword is absent: configuration.",
+        "Important accepted keyword is absent: scripts.",
     }
 
 
@@ -125,7 +138,10 @@ def test_skills_only_keyword_dump_cannot_pass_substantive_tailoring_review():
     texts = {p.paragraph_id: p.text for p in base.paragraphs}
     texts["skills.tools"] += ", " + ", ".join(k.term for k in keywords if k.accepted)
     feedback = tailoring_feedback(base, texts, keywords, graph, matches)
-    assert any("Supported role requirements still need natural evidenced bullet placement" in item for item in feedback)
+    assert any(
+        "Supported role requirements still need natural evidenced bullet placement" in item
+        for item in feedback
+    )
 
 
 def test_supported_terms_must_survive_in_actual_bullets_and_final_document():
@@ -162,6 +178,7 @@ def test_supported_terms_must_survive_in_actual_bullets_and_final_document():
     # the remaining exact terms at their strongest evidence-backed placement.
     covered = " ".join(text for pid, text in texts.items() if ".bullet." in pid)
     from aiadapply_v2.text import contains_term
+
     for row in paragraph_priorities(base, keywords, graph, matches):
         if ".bullet." not in row["paragraph_id"]:
             continue
@@ -170,13 +187,18 @@ def test_supported_terms_must_survive_in_actual_bullets_and_final_document():
                 texts[row["paragraph_id"]] += " " + term
                 covered += " " + term
     feedback = tailoring_feedback(base, texts, keywords, graph, matches)
-    assert not any("Supported role requirements still need natural evidenced bullet placement" in item for item in feedback)
+    assert not any(
+        "Supported role requirements still need natural evidenced bullet placement" in item
+        for item in feedback
+    )
     assert not any("Too few substantive bullet rewrites" in item for item in feedback)
     # Remove the capability everywhere, including the equivalent "Configured RBAC".
     # One remaining factual configuration action still demonstrates the skill.
     for pid in texts:
         if ".bullet." in pid:
-            texts[pid] = texts[pid].replace("configuration", "settings").replace("Configured", "Managed")
+            texts[pid] = (
+                texts[pid].replace("configuration", "settings").replace("Configured", "Managed")
+            )
     assert any(
         "configuration" in item
         for item in tailoring_feedback(base, texts, keywords, graph, matches)
@@ -265,11 +287,19 @@ def test_existing_keywords_are_opportunities_for_substantial_reframing():
 def test_substantive_reframe_ignores_cosmetic_and_word_order_changes():
     from aiadapply_v2.planning.quality import substantive_reframe
 
-    before = "Investigated production incidents using SQL queries and API logs to isolate root causes."
+    before = (
+        "Investigated production incidents using SQL queries and API logs to isolate root causes."
+    )
     assert not substantive_reframe(before, before.upper())
     assert not substantive_reframe(before, before.replace("Investigated", "Examined"))
-    assert not substantive_reframe(before, "Using SQL queries and API logs, investigated production incidents to isolate root causes.")
-    assert substantive_reframe(before, "Isolated root causes of production incidents by correlating API logs with SQL query results and tracing failed requests.")
+    assert not substantive_reframe(
+        before,
+        "Using SQL queries and API logs, investigated production incidents to isolate root causes.",
+    )
+    assert substantive_reframe(
+        before,
+        "Isolated root causes of production incidents by correlating API logs with SQL query results and tracing failed requests.",
+    )
 
 
 def test_sparse_posting_does_not_force_every_bullet_to_change():
@@ -277,27 +307,36 @@ def test_sparse_posting_does_not_force_every_bullet_to_change():
 
     base, keywords, graph, matches = inputs()
     keywords = [k for k in keywords if k.term == "SQL"]
-    breadth = tailoring_breadth(base, {p.paragraph_id: p.text for p in base.paragraphs}, keywords, graph, matches)
+    breadth = tailoring_breadth(
+        base, {p.paragraph_id: p.text for p in base.paragraphs}, keywords, graph, matches
+    )
     assert breadth["minimum"] == 0
 
 
 def test_generic_confirmed_knowledge_base_cannot_become_employer_work():
     from aiadapply_v2.schemas import ResumeEvidence
+
     base, keywords, graph, matches = inputs()
-    graph.evidence.append(ResumeEvidence(
-        evidence_id="evidence.candidate_profile.knowledge_base",
-        paragraph_id="skills.additional", section="candidate_profile",
-        source_text="Candidate confirmed knowledge base exposure.",
-        claim_scope="general_exposure",
-    ))
+    graph.evidence.append(
+        ResumeEvidence(
+            evidence_id="evidence.candidate_profile.knowledge_base",
+            paragraph_id="skills.additional",
+            section="candidate_profile",
+            source_text="Candidate confirmed knowledge base exposure.",
+            claim_scope="general_exposure",
+        )
+    )
     texts = {p.paragraph_id: p.text for p in base.paragraphs}
     texts["experience.csulb.bullet.3"] += " Wrote knowledge base articles."
     feedback = tailoring_feedback(base, texts, keywords, graph, matches)
-    assert any("knowledge base needs evidence for this employer/project" in item for item in feedback)
+    assert any(
+        "knowledge base needs evidence for this employer/project" in item for item in feedback
+    )
 
 
 def test_soft_skill_appendix_does_not_count_as_meaningful_breadth():
     from aiadapply_v2.planning.quality import tailoring_breadth
+
     base, keywords, graph, matches = inputs()
     texts = {p.paragraph_id: p.text for p in base.paragraphs}
     pid = "experience.original_insurance.bullet.2"
@@ -307,15 +346,22 @@ def test_soft_skill_appendix_does_not_count_as_meaningful_breadth():
 
 def test_ordinary_capabilities_are_covered_by_same_source_final_actions():
     from aiadapply_v2.planning.quality import demonstrates_ordinary_capability
+
     base, _, _, _ = inputs()
     source = {p.paragraph_id: p.text for p in base.paragraphs}
     tickets = source["experience.original_insurance.bullet.1"]
     automation = source["experience.original_insurance.bullet.3"]
     assert demonstrates_ordinary_capability("case management", tickets, tickets)
     assert demonstrates_ordinary_capability("automation", automation, automation)
-    assert not demonstrates_ordinary_capability("case management", tickets, "Familiar with support tickets.")
-    assert not demonstrates_ordinary_capability("automation", automation, "Used Python for support.")
-    assert not demonstrates_ordinary_capability("automation", source["experience.csulb.bullet.2"], automation)
+    assert not demonstrates_ordinary_capability(
+        "case management", tickets, "Familiar with support tickets."
+    )
+    assert not demonstrates_ordinary_capability(
+        "automation", automation, "Used Python for support."
+    )
+    assert not demonstrates_ordinary_capability(
+        "automation", source["experience.csulb.bullet.2"], automation
+    )
     for term in ("Python", "AI", "CRUD", "knowledge base", "B2B SaaS"):
         assert not demonstrates_ordinary_capability(term, tickets, tickets)
 
@@ -324,47 +370,66 @@ def test_ordinary_duties_do_not_require_cosmetic_exact_nouns():
     from aiadapply_v2.pipeline import _build_keyword_decisions
     from aiadapply_v2.planning.quality import tailoring_feedback
     from aiadapply_v2.schemas import EvidenceStrength
+
     base, _, _, _ = inputs()
     # Both terms are ordinary role capabilities established by the existing work.
     job = parse_linkedin_simplify(
-        Path("data/fixtures/floqast_full.txt").read_text().replace(
-            "case management.", "case management and automation."
-        )
+        Path("data/fixtures/floqast_full.txt")
+        .read_text()
+        .replace("case management.", "case management and automation.")
     )
-    keywords = [k for k in grade_job_keywords(job) if k.normalized in {"case management", "automation"}]
+    keywords = [
+        k for k in grade_job_keywords(job) if k.normalized in {"case management", "automation"}
+    ]
     assert len(keywords) == 2
     for keyword in keywords:
         keyword.hiring_importance = 50
     graph = build_evidence_graph(base, keywords)
-    matches = build_transferability_map(build_target_role_profile(job, keywords), keywords, graph, LexicalSemanticEncoder())
+    matches = build_transferability_map(
+        build_target_role_profile(job, keywords), keywords, graph, LexicalSemanticEncoder()
+    )
     # Also exercise the direct-evidence missing-term branch, e.g. a saved profile.
-    matches.matches = [item.model_copy(update={"strength": EvidenceStrength.direct}) for item in matches.matches]
+    matches.matches = [
+        item.model_copy(update={"strength": EvidenceStrength.direct}) for item in matches.matches
+    ]
     texts = {p.paragraph_id: p.text for p in base.paragraphs}
     assert tailoring_feedback(base, texts, keywords, graph, matches) == []
     decisions = _build_keyword_decisions(keywords, matches, base, base_document=base)
     assert all(not item.used and item.placements == [] for item in decisions)
-    assert all(item.explanation.startswith("Demonstrated by documented work in ") for item in decisions)
+    assert all(
+        item.explanation.startswith("Demonstrated by documented work in ") for item in decisions
+    )
     assert all("exact phrase not added" in item.explanation for item in decisions)
     for pid in texts:
         if ".bullet." in pid:
             texts[pid] = "Performed support work."
-    assert any("Supported role requirements" in item for item in tailoring_feedback(base, texts, keywords, graph, matches))
+    assert any(
+        "Supported role requirements" in item
+        for item in tailoring_feedback(base, texts, keywords, graph, matches)
+    )
 
 
 def test_existing_full_build_test_deploy_ownership_and_ticket_support_are_demonstrated():
     from aiadapply_v2.planning.quality import demonstrates_ordinary_capability
+
     source = "Independently built, tested, and deployed the application."
     assert demonstrates_ordinary_capability("end-to-end", source, source)
     assert not demonstrates_ordinary_capability("end-to-end", source, "Supported an integration.")
-    assert demonstrates_ordinary_capability("service desk", "Resolved production support tickets.",
-                                           "Resolved production tickets across application systems.")
+    assert demonstrates_ordinary_capability(
+        "service desk",
+        "Resolved production support tickets.",
+        "Resolved production tickets across application systems.",
+    )
 
 
 def test_full_delivery_ownership_accepts_verb_inflection_without_rewrite_pressure():
     from aiadapply_v2.planning.quality import demonstrates_ordinary_capability
+
     assert demonstrates_ordinary_capability(
-        "end-to-end", "Independently built, tested, and deployed the application.",
-        "Centralized tracking by independently building, testing and deploying the application.")
+        "end-to-end",
+        "Independently built, tested, and deployed the application.",
+        "Centralized tracking by independently building, testing and deploying the application.",
+    )
 
 
 def test_preserved_monitoring_duty_does_not_require_a_cosmetic_inflection_change():

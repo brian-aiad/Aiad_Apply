@@ -1,3 +1,5 @@
+import { workerPosting } from "@/lib/worker-posting";
+import { workspaceMaterial } from "@/lib/workspace-material";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -9,6 +11,7 @@ import {
 } from "@/lib/worker-security";
 
 const requestSchema = z.object({
+  platform: z.enum(["win32", "darwin", "linux"]).optional(),
   workerId: z.string().trim().regex(WORKER_ID_PATTERN),
 });
 
@@ -62,7 +65,7 @@ export async function POST(request: Request) {
 
   const cutoff = staleWorkerCutoff();
   let [, queued] = await Promise.all([
-    recordWorkerHeartbeat(parsed.data.workerId),
+    recordWorkerHeartbeat(parsed.data.workerId, parsed.data.platform),
     db.tailoringRun.findFirst({
       where: { status: "QUEUED" },
       orderBy: { queuedAt: "asc" },
@@ -81,6 +84,7 @@ export async function POST(request: Request) {
   }
   if (!queued) return new NextResponse(null, { status: 204 });
 
+  const material = await workspaceMaterial();
   const claimed = await db.tailoringRun.updateMany({
     where: { id: queued.id, status: "QUEUED" },
     data: {
@@ -92,9 +96,10 @@ export async function POST(request: Request) {
   if (claimed.count !== 1) return new NextResponse(null, { status: 204 });
 
   return NextResponse.json({
+    material,
     runId: queued.id,
     applicationId: queued.applicationId,
-    rawPaste: queued.application.job.rawPaste,
+    rawPaste: workerPosting(queued.application.job),
     company: queued.application.job.company,
     title: queued.application.job.title,
   });

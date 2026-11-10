@@ -81,25 +81,44 @@ def build_keyword_coverage(
         sources = [s for s in graph.evidence if _direct_match(keyword.term, s)]
         eligible = sorted({pid for source in sources for pid in _bullet_scope(source, base)})
         groups: dict[str, list[str]] = {}
-        required = {pid for source in sources if not source.routine_tool_context and not source.established_technical_context
-                    for pid in _bullet_scope(source, base)}
+        required = {
+            pid
+            for source in sources
+            if not source.routine_tool_context and not source.established_technical_context
+            for pid in _bullet_scope(source, base)
+        }
         for pid in sorted(required):
             group = pid.rsplit(".bullet.", 1)[0]
             groups.setdefault(group, []).append(pid)
-        routine_ids = {pid for source in sources if source.routine_tool_context
-                       for pid in _bullet_scope(source, base)}
-        technical_ids = {pid for source in sources if source.established_technical_context
-                         for pid in _bullet_scope(source, base)}
+        routine_ids = {
+            pid
+            for source in sources
+            if source.routine_tool_context
+            for pid in _bullet_scope(source, base)
+        }
+        technical_ids = {
+            pid
+            for source in sources
+            if source.established_technical_context
+            for pid in _bullet_scope(source, base)
+        }
         if technical_ids:
             # One meaningful placement, not one per possible employer/project.
             groups["established_technical_use"] = sorted(technical_ids)
         # Routine knowledge authorizes useful placements; it is not an edit quota.
         # Only actual source-specific usage creates mandatory coverage groups.
-        placements = [pid for pid, text in texts.items() if preserves_source_term(text, keyword.term)]
-        contextual_placements = [pid for pid in placements
-                                 if (pid not in routine_ids or routine_usage_in_context(keyword.term, texts[pid]))
-                                 and (pid not in technical_ids or technical_usage_in_context(keyword.term, texts[pid]))]
-        missing_groups = [ids for ids in groups.values() if not set(ids).intersection(contextual_placements)]
+        placements = [
+            pid for pid, text in texts.items() if preserves_source_term(text, keyword.term)
+        ]
+        contextual_placements = [
+            pid
+            for pid in placements
+            if (pid not in routine_ids or routine_usage_in_context(keyword.term, texts[pid]))
+            and (pid not in technical_ids or technical_usage_in_context(keyword.term, texts[pid]))
+        ]
+        missing_groups = [
+            ids for ids in groups.values() if not set(ids).intersection(contextual_placements)
+        ]
         credentials_only = bool(sources) and all(s.section == "certifications" for s in sources)
         if keyword.term in drafts:
             eligible = sorted(set(eligible + drafts[keyword.term].paragraph_ids))
@@ -120,11 +139,12 @@ def build_keyword_coverage(
             explanation = keyword.rejection_reason or "Not requested in a relevant posting context."
         elif missing_groups:
             status = "missing_supported"
-            explanation = ("Established basic technology needs one natural placement in a matching work/project duty."
-                           if technical_ids and not technical_ids.intersection(contextual_placements)
-                           else "Supported technology is missing from " + ", ".join(
-                ids[0].rsplit(".bullet.", 1)[0] for ids in missing_groups
-            ))
+            explanation = (
+                "Established basic technology needs one natural placement in a matching work/project duty."
+                if technical_ids and not technical_ids.intersection(contextual_placements)
+                else "Supported technology is missing from "
+                + ", ".join(ids[0].rsplit(".bullet.", 1)[0] for ids in missing_groups)
+            )
         elif keyword.term in drafts:
             draft = drafts[keyword.term]
             if placements and (
@@ -179,10 +199,13 @@ def build_keyword_coverage(
             explanation = "Represented by the existing credential; this does not establish hands-on project use."
         elif set(eligible).intersection(contextual_placements):
             status = "in_context"
-            explanation = ("Established technical skill applied to a matching documented duty."
-                           if technical_ids else "Everyday tool knowledge applied to a relevant documented duty."
-                           if any(s.routine_tool_context for s in sources)
-                           else "Present in a relevant bullet for each evidenced employer or project.")
+            explanation = (
+                "Established technical skill applied to a matching documented duty."
+                if technical_ids
+                else "Everyday tool knowledge applied to a relevant documented duty."
+                if any(s.routine_tool_context for s in sources)
+                else "Present in a relevant bullet for each evidenced employer or project."
+            )
         elif all(pid.startswith("skills.") for pid in placements):
             status = "skills_only"
             explanation = (
@@ -228,14 +251,14 @@ def coverage_feedback(
         if not row.accepted:
             if row.term in rejected_experience:
                 for pid in row.placements:
-                    if not contains_term(originals.get(pid, ""), row.term):
+                    if not preserves_source_term(originals.get(pid, ""), row.term):
                         feedback.append(
                             f"{pid}: {row.term} was explicitly rejected as candidate experience; "
                             "remove this new claim. A posting requirement does not override that rejection."
                         )
             continue
         for pid in row.placements:
-            if contains_term(originals.get(pid, ""), row.term):
+            if preserves_source_term(originals.get(pid, ""), row.term):
                 continue
             if ".bullet." in pid and pid not in row.eligible_bullet_ids:
                 feedback.append(

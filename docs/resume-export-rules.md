@@ -3,6 +3,14 @@
 These rules apply to dashboard, Discover, and terminal tailoring through
 `transform_resume`. They are export requirements, not optional visual polish.
 
+## Shared source material (October 20)
+
+The initialized secured workspace base/profile is authoritative across devices.
+Each queued run receives its own verified base hash and confirmed evidence snapshot.
+Local configured files are used only before initialization or explicit offline/
+terminal overrides; disclose unavailable sync. Never replace an approved PDF with
+an updated source or mutate historical artifacts.
+
 ## Content
 
 The user's latest correction supersedes the previous aggressive project policy.

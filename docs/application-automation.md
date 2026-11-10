@@ -1,4 +1,26 @@
+## Latest mode — October 20
+
+The user authorized standing automatic applications without per-resume review.
+Settings exposes a pause control and a bounded daily application limit. The
+Windows browser lane selects supported local full-time jobs with qualifying base
+pay and a validated factual one-page PDF. Its authorization identity, exact run,
+PDF hash and destination are persisted per attempt; live page evidence confirms
+employment, starting pay and worksite before personal-data actions. The server
+rechecks standing authorization and proof before the final submission boundary.
+Pausing revokes it. Missing facts/access and unsupported forms are parked; uncertain
+submissions are never automatically retried. Referral holds and employer receipts
+remain enforced. Older manual-approval workflow notes below describe optional
+manual mode and are superseded where they require a review wait in automatic mode.
+
 # Approved resume to application
+
+October 20: Windows is the primary application-browser computer. Mac approvals use
+the shared queue; confirmed facts and evidence are shared. Dashboard/tailoring
+start at login; Windows launches its locked browser worker on approved demand.
+Use `powershell -File scripts/application-worker.ps1 start` for explicit Windows
+startup and `bash scripts/application-worker.sh start` only for deliberate local
+maintenance. The selected workspace platform fences actual browser claims.
+
 
 The Apply tab binds explicit submission authorization to a job, run, PDF artifact,
 SHA-256 fingerprint and exact employer destination. Old review-only acknowledgments
@@ -9,8 +31,7 @@ The free local application worker starts with `scripts/start-local.sh`. It uses
 the existing signed-in Codex CLI for structured decisions and installed Playwright
 to operate a dedicated, persistent Chrome profile. There is no paid API fallback,
 browser SaaS, extension import or separate MCP installation required for this path.
-Codex account usage limits still apply. Login startup is a separate, still pending
-macOS setup; the Desktop permission issue has not been resolved.
+Codex account usage limits still apply. Login startup is configured separately for dashboard/tailoring; browser work starts on demand.
 
 ## States and verification
 
@@ -51,7 +72,8 @@ bash scripts/application-worker.sh stop
 Logs: `.runtime/application-worker.log`.
 Private attempt data and screenshots: `.runtime/application-attempts/<attempt-id>`.
 Persistent Chrome profile: `.runtime/application-browser-profile`.
-Additional candidate setup facts: `.runtime/application-onboarding.json`.
+Additional confirmed candidate setup facts: shared `workspace:onboarding`; the ignored
+`.runtime/application-onboarding.json` is the initial import/offline legacy source.
 Do not commit these private files. A paused login leaves the dedicated Chrome
 window available for the user. Saved login state is reused by a later attempt.
 
@@ -81,7 +103,7 @@ separately authorized Gmail OAuth connection above instead of inheriting
 arbitrary plugin tools or mail-write permissions.
 
 For an active, explicitly approved application only, the worker searches after
-the verification prompt was observed. Gmail query results are rechecked locally
+the action that requested verification, before the resulting page was observed. Gmail query results are rechecked locally
 for the exact saved recipient, employer name, and message receive time. It uses
 the newest matching message only, preserves code capitalization, and makes one
 attempt in the existing application tab using a uniquely identified code field
@@ -371,3 +393,24 @@ Page snapshots retry transient navigation/detached-frame read failures up to
 three times, discarding partial references and answers from an interrupted read.
 They do not replay the preceding click, upload, or submission action. Unrelated
 errors and repeated navigation failures still stop the attempt.
+
+
+### Windows Gmail setup checkpoint (October 20, 2026)
+
+The Windows automation device has a separate local read-only Gmail OAuth grant.
+Token refresh, profile access, mailbox identity and message-list access were
+verified on October20. Secrets stay in ignored .runtime and are not shared through
+Git or the database. Mac review/approval does not require a second mailbox grant.
+Google testing-mode tokens can expire after seven days; rerun `npm run gmail:connect`
+from apps/web on Windows when required. A private credential-bound verification
+stamp supplies health.lastVerifiedAt; freshness lasts24hours, not a promise of
+future access. The health endpoint never returns tokens, message text or email.
+
+## Fresh listings and blocked portals — October 20
+
+Automatic queues prioritize 0–7-day listings, then 8–14 days, then 15–30 days.
+Over-30-day listings are excluded except official state/school postings with a
+verified future closing date. Observation timestamps never reset original age.
+Access/eligibility-only stops remain parked without consuming the daily verified
+application budget; they cannot loop or retry an uncertain submission. Missing
+facts and CAPTCHA are surfaced while other qualifying jobs continue.

@@ -1,7 +1,7 @@
 /** Read qualifications in their section context, without treating company copy as requirements. */
 export function requiredQualifications(description: string): string[] {
-  const required = /^(?:the essential requirements of the job include|the experience you bring|education and experience|technical competencies(?: \(knowledge, skills & abilities\))?|required qualifications|minimum qualifications|basic qualifications|qualifications you must have|qualifications we require|what you(?:’|')?ll bring|what you bring|what you need|what we're looking for|what we’re looking for|what we are looking for|requirements|qualifications|your qualifications|who you are|here(?:’|')s what you(?:’|')ll need)\s*:?$/i;
-  const optional = /^(?:what makes you stand out|it would be a plus if you also possess previous experience in|preferred qualifications|qualifications we prefer|qualifications you prefer|nice to haves?(?:\/other)?|bonus points(?: if you have)?|preferred skills|desirable qualifications)\s*:?$/i;
+  const required = /^(?:the essential requirements of the job include|the experience you bring|education and experience|experience and education|technical competencies(?: \(knowledge, skills & abilities\))?|required knowledge\/skills|minimum experience|required qualifications|minimum qualifications|basic qualifications|qualifications you must have|qualifications we require|what you(?:’|')?ll bring|what you bring|what you need|what we're looking for|what we’re looking for|what we are looking for|requirements|qualifications|your qualifications|who you are|here(?:’|')s what you(?:’|')ll need)\s*:?$/i;
+  const optional = /^(?:what makes you stand out|it would be a plus if you also possess previous experience in|preferred qualifications|qualifications we prefer|qualifications you prefer|nice to haves?(?:\/other)?|bonus points(?: if you have)?|bonus skills|preferred knowledge, skills and abilities|preferred skills|desirable qualifications)\s*:?$/i;
   const other = /^(?:what you(?:’|')?ll do|responsibilities|benefits|compensation|us salary range|salary range|about (?:us|the company)|equal opportunity|what we offer)\s*:?$/i;
   let section: "required" | "optional" | "other" = "other";
   const result: string[] = [];
@@ -10,7 +10,7 @@ export function requiredQualifications(description: string): string[] {
     if (!line) continue;
     if (required.test(line)) { section = "required"; continue; }
     if (optional.test(line)) { section = "optional"; continue; }
-    if (other.test(line)) { section = "other"; continue; }
+    if (other.test(line) || /^(?:additional information|notice of non-discrimination|employment equity|(?:[\w’ .-]+ is an equal opportunity employer)|if you are a current .+ employee)/i.test(line)) { section = "other"; continue; }
     // Separate an explicit heading on one line from its qualification text.
     const colon = line.indexOf(":");
     if (colon > 0 && required.test(line.slice(0, colon))) {
@@ -58,5 +58,31 @@ export function roleConditions(description: string): string[] {
   if (/\b(?:2nd|second|evening) shift\b/i.test(description)) conditions.push("Evening / second shift");
   if (/\b(?:3rd|third|overnight|night) shift\b/i.test(description)) conditions.push("Overnight / third shift");
   if (/\bon[ -]call (?:rotation|schedule|support|duty)|participate in[^.\n]{0,45}on[ -]call/i.test(description)) conditions.push("On-call rotation");
+  const scheduleLines = description.split(/[.;\n]|\bbut\b|,\s*(?=no\b)/i).filter(line =>
+    /\b(?:must|require[ds]?|available|availability|flexible schedule)\b/i.test(line)
+    && !/\b(?:not required|no weekends|no holidays)\b/i.test(line));
+  if (scheduleLines.some(line => /\bweeknights?\b/i.test(line))) conditions.push("Weeknight availability");
+  if (scheduleLines.some(line => /\bweekends?\b/i.test(line))) conditions.push("Weekend availability");
+  if (scheduleLines.some(line => /\bholidays?\b/i.test(line) && !/paid holidays/i.test(line))) conditions.push("Holiday availability");
   return conditions;
+}
+
+/** Domain experience is distinct from generic support or familiarity with a tool. */
+export function requiredHrDomains(lines: string[]): string[] {
+  const domains = new Set<string>();
+  for (const line of lines) {
+    if (!/\b(?:experience|background|proficiency|expertise)\b/i.test(line)) continue;
+    for (const clause of line.split(/;|\band\b/i)) {
+      const branches = clause.split(/,|\bor\b/i);
+      const hr = /\b(?:HRIS|payroll|human resources administration)\b/i;
+      const support = /\b(?:technical support|application support|systems? administration)\b/i;
+      // OR must connect distinct qualifying paths, not tools within an HR duty.
+      const alternative = /\bor\b/i.test(clause) && branches.some(part => hr.test(part) && !support.test(part)) && branches.some(part => support.test(part) && !hr.test(part));
+      if (alternative) continue;
+      if (/\bHRIS\b/i.test(clause)) domains.add("HRIS");
+      if (/\bpayroll(?: administration| processing)?\b/i.test(clause)) domains.add("payroll");
+      if (/\bhuman resources administration\b/i.test(clause)) domains.add("human resources administration");
+    }
+  }
+  return [...domains];
 }

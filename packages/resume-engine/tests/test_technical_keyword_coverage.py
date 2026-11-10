@@ -10,30 +10,33 @@ def test_rocket_name_and_legal_citations_are_not_programming_requirements():
         "Required Qualifications\nMaintain documentation and support users.\n"
         "A U.S. Person is defined in 8 U.S.C. 1101(a)(20). "
         "See https://www.ecfr.gov/current/title-22/subpart-C/section-120.62.\n"
-        + "Provide technical support and investigate production incidents. " * 8
+        + "Provide technical support and investigate production incidents. "
+        * 8
     )
     job = parse_linkedin_simplify(raw)
-    assert not {'r', 'c'} & {
-        k.normalized for k in grade_job_keywords(job, additional_technologies=['R', 'C'])
+    assert not {"r", "c"} & {
+        k.normalized
+        for k in grade_job_keywords(job, additional_technologies=["R", "C"])
         if k.accepted
     }
     # Genuine language requirements still count even beside the same boilerplate.
-    job.required_qualifications.append('Experience programming in R and C.')
-    job.job_description += '\nExperience programming in R and C.'
-    assert {'r', 'c'} <= {k.normalized for k in grade_job_keywords(job) if k.accepted}
+    job.required_qualifications.append("Experience programming in R and C.")
+    job.job_description += "\nExperience programming in R and C."
+    assert {"r", "c"} <= {k.normalized for k in grade_job_keywords(job) if k.accepted}
 
 
 def test_domains_and_generic_tooling_are_not_named_software_products():
     job = parse_linkedin_simplify(
-        'Example\nIT Systems Engineer\nRemote\nAbout the job\nRequired Qualifications\n'
-        '3+ years of experience in IT Engineering.\n'
-        'Familiarity with air defense systems, Integrated Air and Missile Defense concepts.\n'
-        'Experience with observability tooling such as DataDog, Grafana, or Palantir Foundry.\n'
-        + 'Support production applications and document incidents. ' * 10
+        "Example\nIT Systems Engineer\nRemote\nAbout the job\nRequired Qualifications\n"
+        "3+ years of experience in IT Engineering.\n"
+        "Familiarity with air defense systems, Integrated Air and Missile Defense concepts.\n"
+        "Experience with observability tooling such as DataDog, Grafana, or Palantir Foundry.\n"
+        + "Support production applications and document incidents. "
+        * 10
     )
-    products = {k.term for k in grade_job_keywords(job) if k.accepted and k.kind.value == 'system'}
-    assert not {'Integrated Air', 'IT Engineering', 'tooling'} & products
-    assert {'Grafana', 'Palantir Foundry'} <= products
+    products = {k.term for k in grade_job_keywords(job) if k.accepted and k.kind.value == "system"}
+    assert not {"Integrated Air", "IT Engineering", "tooling"} & products
+    assert {"Grafana", "Palantir Foundry"} <= products
 
 
 def test_unfamiliar_standalone_and_multiword_stack_names_are_extracted():

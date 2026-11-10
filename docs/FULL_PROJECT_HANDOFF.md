@@ -1,4 +1,9 @@
-# AiadApply — full project and continuation handoff
+# AiadApply — historical full project and continuation handoff
+
+**Current implementation and decisions:** read [CURRENT_HANDOFF.md](CURRENT_HANDOFF.md),
+AGENTS.md and [improvement-plan.md](improvement-plan.md). The October 13 snapshot below
+predates shared candidate sources, native Windows worker support and the approved
+October 20 improvements. Its runtime counts and implementation gaps are historical.
 
 **Start here on Windows:** [October 13 Windows continuation](WINDOWS_CONTINUATION.md).
 It records the latest 25-card assisted capture, three completed Review resumes,

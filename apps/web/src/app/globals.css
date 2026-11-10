@@ -2103,3 +2103,24 @@ kbd {
 .linkedin-diagnostics { overflow-wrap: anywhere; }
 .linkedin-diagnostics > * + * { margin-top: 10px; }
 @media (max-width: 480px) { .linkedin-discovery-panel { padding: 16px; } }
+
+/* Parked applications remain visible without eclipsing work that can continue. */
+.automation-attention { display: grid; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 10px; background: var(--panel); }
+.automation-attention h2 { margin: 0; font-family: var(--font-display); font-size: 15px; font-weight: 650; }
+.automation-attention p { margin: 5px 0 0; color: var(--text-muted); font-size: 12px; }
+.attention-links { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; }
+.attention-links a { display: grid; gap: 4px; padding: 11px 12px; background: var(--canvas); border: 1px solid var(--line); border-radius: 7px; min-width: 0; }
+.attention-links a:hover { border-color: var(--violet); }
+.attention-links span { font-size: 12px; color: var(--text-secondary); overflow-wrap: anywhere; }
+.attention-links strong { font-size: 11px; font-weight: 550; color: var(--amber); }
+.system-status-details { position: relative; }
+.system-status-details > summary { cursor: pointer; list-style: none; }
+.system-status-details > summary::-webkit-details-marker { display: none; }
+.system-status-details > summary:focus-visible { outline: 2px solid var(--violet-bright); outline-offset: 3px; }
+.system-status-popover { position: absolute; top: calc(100% + 10px); right: 0; width: min(320px,calc(100vw - 32px)); z-index: 60; padding: 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-raised); box-shadow: 0 12px 32px #0006; }
+.system-status-popover dl { margin: 0; }
+.system-status-popover dl > div { padding: 9px 0; border-bottom: 1px solid var(--line); }
+.system-status-popover dt { font-size: 12px; font-weight: 650; }
+.system-status-popover dd { margin: 4px 0 0; font-size: 12px; color: var(--text-secondary); }
+.system-status-popover p { font-size: 11px; color: var(--text-muted); margin: 12px 0 0; }
+@media(max-width:640px) { .attention-links { grid-template-columns: 1fr; } .automation-attention { padding: 16px; } .attention-links a { grid-template-columns: minmax(0,1fr) auto; align-items:center; } }

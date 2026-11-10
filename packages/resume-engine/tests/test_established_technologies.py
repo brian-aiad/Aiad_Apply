@@ -10,8 +10,9 @@ from .test_everyday_tools import scenario
 
 
 def profile(*terms, rejected=()):
-    return CandidateProfile(candidate_name="Brian", established_technologies=list(terms),
-                            rejected_terms=list(rejected))
+    return CandidateProfile(
+        candidate_name="Brian", established_technologies=list(terms), rejected_terms=list(rejected)
+    )
 
 
 @pytest.mark.parametrize("term", ["AWS", "CI/CD", "REST APIs", "APIs"])
@@ -24,11 +25,18 @@ def test_requested_established_skill_cannot_stay_only_in_skills(term):
     assert any(term in issue for issue in coverage_feedback(base, keywords, graph, texts))
 
 
-@pytest.mark.parametrize(("term", "pid", "addition"), [
-    ("AWS", "experience.wehelp.bullet.1", " Checked deployments using AWS."),
-    ("CI/CD", "experience.wehelp.bullet.1", " Used CI/CD to test and deploy updates."),
-    ("REST APIs", "experience.original_insurance.bullet.2", " Debugged REST APIs with Postman."),
-])
+@pytest.mark.parametrize(
+    ("term", "pid", "addition"),
+    [
+        ("AWS", "experience.wehelp.bullet.1", " Checked deployments using AWS."),
+        ("CI/CD", "experience.wehelp.bullet.1", " Used CI/CD to test and deploy updates."),
+        (
+            "REST APIs",
+            "experience.original_insurance.bullet.2",
+            " Debugged REST APIs with Postman.",
+        ),
+    ],
+)
 def test_one_matching_duty_satisfies_basic_technical_use_and_loss_is_detected(term, pid, addition):
     base, keywords, graph, texts = scenario([term], profile(term))
     original = texts[pid]
@@ -46,8 +54,11 @@ def test_technical_permission_does_not_rewrite_unrelated_employers_or_languages(
     errors = coverage_feedback(base, keywords, graph, texts)
     assert any("experience.csulb.bullet.3" in e and "no evidence" in e for e in errors)
     rows = build_keyword_coverage(base, keywords, graph, texts)
-    assert all(r.status == "needs_confirmation" and not r.eligible_bullet_ids
-               for r in rows if r.term in {"Go", "Rust", "Salesforce"})
+    assert all(
+        r.status == "needs_confirmation" and not r.eligible_bullet_ids
+        for r in rows
+        if r.term in {"Go", "Rust", "Salesforce"}
+    )
 
 
 def test_no_degree_based_default_and_rejection_overrides_alias():
@@ -69,7 +80,9 @@ def test_detached_lists_or_classroom_qualifiers_do_not_count_as_work_coverage():
 
 
 @pytest.mark.parametrize("lose_during_render", [False, True])
-def test_real_export_preserves_required_technical_bullet_or_fails(tmp_path, monkeypatch, lose_during_render):
+def test_real_export_preserves_required_technical_bullet_or_fails(
+    tmp_path, monkeypatch, lose_during_render
+):
     import fitz
     from aiadapply_v2 import pipeline
     from aiadapply_v2.documents.model import parse_resume_docx
@@ -94,21 +107,32 @@ def test_real_export_preserves_required_technical_bullet_or_fails(tmp_path, monk
         writer = pipeline.write_resume_candidate
 
         def lose(base, plan, output_path, **kwargs):
-            kwargs["reverted_paragraph_ids"] = {*(kwargs.get("reverted_paragraph_ids") or set()), pid}
+            kwargs["reverted_paragraph_ids"] = {
+                *(kwargs.get("reverted_paragraph_ids") or set()),
+                pid,
+            }
             return writer(base, plan, output_path, **kwargs)
 
         monkeypatch.setattr(pipeline, "write_resume_candidate", lose)
 
     profile_path = tmp_path / "profile.json"
     profile_path.write_text(profile("CI/CD").model_dump_json())
-    raw = ("Example Systems\nApplication Support Engineer\nRemote\nAbout the job\n"
-           "Responsibilities\nUse CI/CD to test and deploy application updates.\n"
-           "Required Qualifications\nExperience with CI/CD.\n"
-           + "Support production applications and investigate incidents. " * 12)
-    args = dict(raw_paste=raw, base_resume="data/resumes/Brian_Aiad_BASE.docx",
-                output_dir=tmp_path / "result", reasoner=TechnicalReasoner(),
-                candidate_profile=profile_path)
+    raw = (
+        "Example Systems\nApplication Support Engineer\nRemote\nAbout the job\n"
+        "Responsibilities\nUse CI/CD to test and deploy application updates.\n"
+        "Required Qualifications\nExperience with CI/CD.\n"
+        + "Support production applications and investigate incidents. "
+        * 12
+    )
+    args = dict(
+        raw_paste=raw,
+        base_resume="data/resumes/Brian_Aiad_BASE.docx",
+        output_dir=tmp_path / "result",
+        reasoner=TechnicalReasoner(),
+        candidate_profile=profile_path,
+    )
     from aiadapply_v2.semantic.matcher import LexicalSemanticEncoder
+
     args["semantic_encoder"] = LexicalSemanticEncoder()
     if lose_during_render:
         with pytest.raises(pipeline.TransformationError, match="CI/CD"):
@@ -140,7 +164,9 @@ def test_specialized_or_advanced_products_do_not_become_basic_from_profile_name_
 
 
 def test_aws_support_wording_preserves_the_work_without_exact_duty_phrase():
-    assert technical_usage_in_context("AWS", "Resolved production tickets across AWS and Microsoft 365.")
+    assert technical_usage_in_context(
+        "AWS", "Resolved production tickets across AWS and Microsoft 365."
+    )
     assert not technical_usage_in_context("AWS", "Tools: AWS, Microsoft 365.")
 
 
@@ -149,12 +175,75 @@ def test_administration_is_actual_technical_use_not_a_skills_list():
         "O365", "Administered Microsoft 365 (O365), Entra ID, MFA, RBAC, and license management."
     )
     assert not technical_usage_in_context("O365", "Skills: Microsoft 365 (O365), Entra ID.")
-    assert not technical_usage_in_context("O365", "Familiar with administering Microsoft 365 (O365).")
+    assert not technical_usage_in_context(
+        "O365", "Familiar with administering Microsoft 365 (O365)."
+    )
 
 
 def test_r_data_troubleshooting_is_valid_without_borrowing_the_next_clause_action():
     assert technical_usage_in_context(
-        "R", "Performed nightly ETL monitoring of vendor feeds, triaging failures with R; built a Python reconciliation script."
+        "R",
+        "Performed nightly ETL monitoring of vendor feeds, triaging failures with R; built a Python reconciliation script.",
     )
     assert not technical_usage_in_context("R", "Handled customer correspondence with R.")
     assert not technical_usage_in_context("R", "Skills: R, ETL, SQL.")
+
+
+@pytest.mark.parametrize(
+    ("term", "text"),
+    [
+        ("Java", "Developed Java applications for staff."),
+        ("React", "Created React applications for staff."),
+        ("Go", "Implemented Go APIs for staff."),
+        ("SQL", "Wrote SQL queries for reconciliation."),
+        ("AWS", "Deployed applications using AWS without downtime."),
+        ("AWS", "Not only deployed applications using AWS but also monitored production."),
+    ],
+)
+def test_completed_matching_work_actions_count(term, text):
+    assert technical_usage_in_context(term, text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Plan to deploy AWS applications next year.",
+        "Did not deploy applications using AWS.",
+        "Never deployed applications using AWS.",
+        "Didn't deploy applications using AWS.",
+        "Would deploy applications using AWS.",
+        "Proposed AWS deployment for future implementation.",
+        "Built applications without using AWS.",
+    ],
+)
+def test_proposed_or_negated_technology_use_does_not_satisfy_coverage(text):
+    assert not technical_usage_in_context("AWS", text)
+    base, keywords, graph, texts = scenario(["AWS"], profile("AWS"))
+    texts["experience.wehelp.bullet.1"] += " " + text
+    assert build_keyword_coverage(base, keywords, graph, texts)[0].status != "in_context"
+    assert coverage_feedback(base, keywords, graph, texts)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Will configure AWS deployments.",
+        "May test AWS deployments.",
+        "Supported production deployments without AWS.",
+        "Supported deployments, but never with AWS.",
+        "Did not deploy AWS applications and monitored production logs.",
+    ],
+)
+def test_target_specific_negation_and_future_actions(text):
+    assert not technical_usage_in_context("AWS", text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Used AWS to support deployments, not to develop new applications.",
+        "Administered AWS deployments without user support interruptions.",
+    ],
+)
+def test_negated_unrelated_action_does_not_erase_affirmed_tool_use(text):
+    assert technical_usage_in_context("AWS", text)

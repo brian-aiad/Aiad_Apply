@@ -6,8 +6,35 @@ import { verificationState } from './verification.mjs';
 
 export const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const normalize = text => text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-export const isReceipt = text => !/\b(not|never|no application|unable|failed)\b/i.test(text) && text.split(/[.!?\n]+/).some(sentence => !/\b(if|once|when|will be)\b/i.test(sentence) && /application (?:has been |was )?(?:successfully )?(?:submitted|received)|thank you for (?:applying|your application)|we(?:'ve| have) received your application/i.test(sentence));
+export function sameIcimsJobFlow(destination, urls, previouslyVerified) {
+  if (!previouslyVerified || !urls.length) return false;
+  try {
+    const bound = new URL(destination);
+    const job = bound.pathname.match(/^\/jobs\/(\d+)\//)?.[1];
+    if (bound.protocol !== 'https:' || !bound.hostname.endsWith('.icims.com') || !job) return false;
+    return urls.every(value => {
+      const url = new URL(value);
+      return url.origin === bound.origin && url.pathname.match(/^\/jobs\/(\d+)\//)?.[1] === job;
+    });
+  } catch { return false; }
+}
+export const isReceipt = text => !/\b(not|never|no application|unable|failed)\b/i.test(text) && text.split(/[.!?\n]+/).some(sentence => !/\b(if|once|when|will be)\b/i.test(sentence) && /application (?:has been |was )?(?:successfully )?(?:submitted|received)|(?:thank you|thanks) for (?:applying|your application)|we(?:'ve| have) received your application|we look forward to reviewing your application/i.test(sentence));
 const equivalentInput = (control, left, right) => left === right || (control.type === 'tel' && left.replace(/\D/g, '').length >= 7 && left.replace(/\D/g, '') === right.replace(/\D/g, ''));
+export const confirmedZeroSalaryReplacement = (control, value, answers = []) => {
+  const label = String(control.label || '').trim();
+  if (!/salary (?:requirements|expectations)|desired salary/i.test(label) || !/^\s*\$?\s*0(?:\.0+)?\s*$/.test(String(control.value))) return false;
+  if (!/^\s*\$?\s*[\d,]+(?:\.\d+)?\s*$/.test(String(value))) return false;
+  const amount = Number(String(value).replace(/[$,\s]/g, ''));
+  return amount > 0 && answers.some(a => normalize(a.question) === normalize(label) && /replace/i.test(a.answer) && Number((String(a.answer).match(/\$?([\d,]+(?:\.\d+)?)/)?.[1] || '').replace(/,/g, '')) === amount);
+};
+export const repairImmediateDate = (control, value) => {
+  if (!/date|start|availability/i.test([control.label, control.name, control.id].join(' '))) return false;
+  const match = String(control.value).match(/^(\d{1,2}\/\d{1,2}\/\d{4})Immediately$/i);
+  if (!match || value !== match[1]) return false;
+  const [month, day, year] = match[1].split('/').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+};
 const finalAction = text => /\b(submit|send application|complete application|finish application|confirm application)\b/i.test(text);
 const verificationControl = control => /(?:verification|security|authentication)\s*(?:code|password)|one[- ]time[- ]?(?:code|password)|\botp\b/i.test(`${control.label || ''} ${control.autocomplete || ''} ${control.name || ''} ${control.id || ''}`)
   || /^(?:code|enter your code)$/i.test(String(control.label || '').trim());
@@ -22,15 +49,20 @@ export class ApplicationBrowser {
     this.uploadToken = ''; this.uploadReceiptLinks = new Set();
     this.unresolved = []; this.beforeText = ''; this.lastSnapshot = null;
   }
-  static async launch({ job, resumePath, outputDirectory, profileDirectory, checkpoint, beforeSubmit, headless = false }) {
+  static async launch({ existingContext, existingPage, job, resumePath, outputDirectory, profileDirectory, checkpoint, beforeSubmit, headless = false }) {
     await mkdir(profileDirectory, { recursive: true, mode: 0o700 });
-    const context = await chromium.launchPersistentContext(profileDirectory, { channel: 'chrome', headless, viewport: { width: 1280, height: 960 }, acceptDownloads: false });
+    const context = existingContext || await chromium.launchPersistentContext(profileDirectory, { channel: 'chrome', headless, viewport: { width: 1280, height: 960 }, acceptDownloads: false });
     const driver = new ApplicationBrowser(context, job, resumePath, outputDirectory, checkpoint, beforeSubmit);
-    driver.page = context.pages()[0] || await context.newPage();
-    context.on('page', async page => { if (await page.opener() === driver.page) { driver.page = page; driver.identityVerified = false; } });
-    try { await driver.page.goto(job.destination, { waitUntil: 'domcontentloaded', timeout: 45000 }); } catch (error) { await context.close(); throw error; }
+    driver.page = existingPage && !existingPage.isClosed() && existingPage.context() === context ? existingPage : existingContext ? await context.newPage() : context.pages()[0] || await context.newPage();
+    driver.pageListener = async page => { if (await page.opener() === driver.page) { driver.page = page; driver.identityVerified = false; } };
+    context.on('page', driver.pageListener);
+    driver.lastRequestAt = Date.now();
+    // Reuse the signed-in context/tab, but always return to the exact bound job.
+    // A user may have navigated a parked tab to another requisition or origin.
+    try { await driver.page.goto(job.destination, { waitUntil: 'domcontentloaded', timeout: 45000 }); } catch (error) { driver.detach(); if (existingContext) await driver.page.close(); else await context.close(); throw error; }
     return driver;
   }
+  detach() { if (this.pageListener) this.context.off('page', this.pageListener); }
   async snapshot() {
     const questionsBeforeRead = this.questions.map(question => ({ ...question }));
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -51,10 +83,19 @@ export class ApplicationBrowser {
     const frames = [];
     for (const [frameIndex, frame] of this.page.frames().entries()) {
       if (frame.isDetached()) continue;
+      // A hidden iframe can expose fallback/error text through body.innerText.
+      // Observe only displayed frames, including visible CAPTCHA challenges.
+      let displayed = true;
+      for (let child = frame; child.parentFrame(); child = child.parentFrame()) {
+        const element = await child.frameElement();
+        try { if (!await element.isVisible()) { displayed = false; break; } }
+        finally { await element.dispose(); }
+      }
+      if (!displayed) continue;
       const prefix = `s${++this.sequence}f${frameIndex}`;
       const data = await frame.evaluate(({ prefix }) => {
         const visible = el => Boolean(el.getClientRects().length) && getComputedStyle(el).visibility !== 'hidden';
-        const label = el => el.getAttribute('aria-label') || (el.getAttribute('aria-labelledby') || '').split(/\s+/).map(id => document.getElementById(id)?.innerText || '').join(' ').trim() || [...(el.labels || [])].map(l => l.innerText).join(' ') || el.closest('[data-field], .field, .form-field, .input-wrapper')?.querySelector('label')?.innerText || el.getAttribute('placeholder') || el.innerText || el.getAttribute('name') || el.id || '';
+        const label = el => el.getAttribute('aria-label') || (el.getAttribute('aria-labelledby') || '').split(/\s+/).map(id => document.getElementById(id)?.innerText || '').join(' ').trim() || [...(el.labels || [])].map(l => l.innerText).join(' ') || el.closest('[data-field], .field, .form-field, .input-wrapper')?.querySelector('label')?.innerText || (el.tagName === 'INPUT' && ['submit', 'button', 'reset'].includes(el.type) ? el.value : '') || el.getAttribute('placeholder') || el.innerText || el.getAttribute('name') || el.id || '';
         const isVerificationControl = el => /(?:verification|security|authentication)\s*(?:code|password)|one[- ]time[- ]?(?:code|password)|\botp\b/i.test(`${label(el)} ${el.autocomplete || ''} ${el.name || ''} ${el.id || ''}`)
           || /^(?:code|enter your code)$/i.test(label(el).trim());
         const questionContext = el => {
@@ -63,18 +104,23 @@ export class ApplicationBrowser {
             const combo = listId && [...document.querySelectorAll('[role="combobox"]')].find(input => [input.getAttribute('aria-controls'), input.getAttribute('aria-owns')].some(ids => ids?.split(/\s+/).includes(listId)));
             if (combo) return label(combo);
           }
-          return el.closest('fieldset')?.querySelector('legend')?.innerText || '';
+          return el.closest('fieldset')?.querySelector('legend')?.innerText || el.closest('.gnewtonQuestionWrapper')?.innerText.replace(/\s*Yes\s*No\s*$/,'').trim() || '';
         };
         const selectedValue = el => el.closest('[class*=control], [data-select]')?.querySelector('[class*=singleValue], [class*=single-value], [data-selected-value]')?.textContent?.trim() || '';
-        const controls = [...document.querySelectorAll('input, textarea, select, button, a[href], [role="button"], [role="combobox"], [role="option"], [role="checkbox"], [role="radio"]')]
-          .filter(el => visible(el) || el.type === 'file').sort((a,b) => Number(a.getAttribute('role') === 'option') - Number(b.getAttribute('role') === 'option')).slice(0, 400).map((el, index) => {
+        const controls = [...document.querySelectorAll('input, textarea, select, button, a[href], [onclick], [role="link"], [role="button"], [role="combobox"], [role="option"], [role="checkbox"], [role="radio"], .chosen-container .chosen-single')]
+          .filter(el => (visible(el) || el.type === 'file') && !el.matches('.chosen-search-input')).sort((a,b) => Number(a.getAttribute('role') === 'option') - Number(b.getAttribute('role') === 'option')).slice(0, 400).map((el, index) => {
+            const chosen = el.matches('.chosen-single') ? el.closest('.chosen-container') : null;
+            const chosenSelect = chosen?.previousElementSibling?.tagName === 'SELECT' ? chosen.previousElementSibling : null;
+            const additionalCover = el.type === 'file' && /DocUploadfile\d+$/.test(el.id) && /cover letters/i.test(el.closest('[id$="_divDocUpload"]')?.innerText || '');
             const ref = `${prefix}-${index}`; el.setAttribute('data-aiad-ref', ref);
-            return { ref, tag: el.tagName.toLowerCase(), type: el.type || '', role: el.getAttribute('role') || '',
-              label: (el.type === 'file' && !/resume|résumé|\bcv\b|curriculum|cover.?letter/i.test(label(el)) ? [label(el), el.id, el.getAttribute('name')].filter(Boolean).join(' ') : label(el)).trim().slice(0, 1200), context: questionContext(el).slice(0, 1200),
-              value: el.type === 'password' || isVerificationControl(el) ? '[private]' : String(el.getAttribute('role') === 'combobox' ? (selectedValue(el) || el.getAttribute('aria-valuetext') || '') : (el.value || '')).slice(0, 12000),
-              autocomplete: el.autocomplete || '', name: el.name || '', id: el.id || '',
+            const choiceGroup=/^[yn]_/.test(el.id)&&el.matches('.gnewtonYes,.gnewtonNo')&&el.closest('.gnewtonQuestionWrapper')&&document.getElementById(el.id.slice(2))?el.id.slice(2):'';
+            const customChecked=choiceGroup?document.getElementById(choiceGroup).value===(el.id.startsWith('y_')?'true':'false')&&el.classList.contains('isSelected'):null;
+            return { ref, tag: el.tagName.toLowerCase(), type: el.type || '', role: chosenSelect?'combobox':choiceGroup?'radio':el.getAttribute('role') || '', choiceGroup, chosen: Boolean(chosenSelect),
+              label: additionalCover ? 'Additional documents (cover letter)' : chosenSelect ? (chosenSelect.getAttribute('data-placeholder') || [...chosenSelect.labels].map(l=>l.innerText).join(' ') || chosenSelect.name) : (el.type === 'file' && !/resume|résumé|\bcv\b|curriculum|cover.?letter/i.test(label(el)) ? [label(el), el.id, el.getAttribute('name')].filter(Boolean).join(' ') : label(el)).trim().slice(0, 1200), context: questionContext(el).slice(0, 1200),
+              value: chosenSelect ? (chosenSelect.value ? chosenSelect.selectedOptions[0]?.text || '' : '') : el.type === 'password' || isVerificationControl(el) ? '[private]' : String(el.getAttribute('role') === 'combobox' ? (selectedValue(el) || el.getAttribute('aria-valuetext') || '') : (el.value || '')).slice(0, 12000),
+              maxLength: el.maxLength > 0 ? el.maxLength : null, autocomplete: el.autocomplete || '', name: el.name || '', id: chosen?.id || el.id || '',
               searchText: el.getAttribute('role') === 'combobox' ? String(el.value || '').slice(0, 2000) : '', expanded: el.getAttribute('aria-expanded') === 'true',
-              checked: el.checked ?? (el.hasAttribute('aria-checked') ? el.getAttribute('aria-checked') === 'true' : null), selected: el.hasAttribute('aria-selected') ? el.getAttribute('aria-selected') === 'true' : null, group: el.name || el.getAttribute('aria-controls') || '', required: Boolean(el.required || el.getAttribute('aria-required') === 'true'),
+              checked: choiceGroup?customChecked:el.checked ?? (el.hasAttribute('aria-checked') ? el.getAttribute('aria-checked') === 'true' : null), selected: el.hasAttribute('aria-selected') ? el.getAttribute('aria-selected') === 'true' : null, group: el.name || el.getAttribute('aria-controls') || '', required: Boolean(el.required || el.getAttribute('aria-required') === 'true'),
               disabled: Boolean(el.disabled || el.getAttribute('aria-disabled') === 'true'), href: el.getAttribute('href') || '',
               options: el.tagName === 'SELECT' ? [...el.options].map(o => ({ label: o.text, value: o.value })) : [],
               files: el.type === 'file' ? [...(el.files || [])].map(f => f.name) : [],
@@ -94,7 +140,8 @@ export class ApplicationBrowser {
       frames.push({ url: frame.url(), ...data });
     }
     const text = frames.map(f => f.text).join('\n');
-    this.identityVerified = normalize(text).includes(normalize(this.job.company)) && normalize(text).includes(normalize(this.job.title));
+    this.identityVerified = (normalize(text).includes(normalize(this.job.company)) && normalize(text).includes(normalize(this.job.title)))
+      || sameIcimsJobFlow(this.job.destination, [this.page.url()], this.identityEverVerified);
     if (this.identityVerified) this.identityEverVerified = true;
     this.snapshotUrl = this.page.url();
     this.lastSnapshot = { url: this.page.url(), identityVerified: this.identityVerified, resumeUploaded: this.uploadVerified, attachmentPresent: await this.attachmentPresent(), submissionStarted: this.submissionStarted, frames };
@@ -155,6 +202,7 @@ export class ApplicationBrowser {
     return verified;
   }
   async act(action) {
+    if (["click", "submit"].includes(action.kind)) this.lastRequestAt = Date.now();
     if (this.submissionStarted) throw new Error('Final submission was already attempted. Only inspect the result; never click again.');
     await this.checkpoint({ summary: action.explanation || 'Filling application', questions: this.questions, unresolved: this.unresolved });
     if (action.kind === 'wait') { await new Promise(resolve => setTimeout(resolve, 1000)); return; }
@@ -176,7 +224,9 @@ export class ApplicationBrowser {
     const allowedSource = ['saved_profile', 'approved_resume', 'job_policy', 'existing_answer'].includes(action.source);
     if (action.kind !== 'click' || answerControl) {
       const currentText = (await Promise.all(this.page.frames().filter(frame => !frame.isDetached()).map(frame => frame.locator('body').innerText().catch(() => '')))).join(' ');
-      if (!this.identityVerified || this.page.url() !== this.snapshotUrl || !normalize(currentText).includes(normalize(this.job.company)) || !normalize(currentText).includes(normalize(this.job.title))) throw new Error('The page has not shown the approved company and job title. No candidate data will be entered.');
+      const visibleIdentity = normalize(currentText).includes(normalize(this.job.company)) && normalize(currentText).includes(normalize(this.job.title));
+      const boundFlow = sameIcimsJobFlow(this.job.destination, [this.page.url(), target.frame.url()], this.identityEverVerified);
+      if (!this.identityVerified || this.page.url() !== this.snapshotUrl || (!visibleIdentity && !boundFlow)) throw new Error('The page has not shown the approved company and job title. No candidate data will be entered.');
     }
     if (answerControl && (!allowedSource || !action.value)) throw new Error('Every selected answer requires an identified source and value.');
     if (action.kind === 'click' && ['checkbox', 'radio'].includes(control.type)) throw new Error('Use the guarded check action for checkbox and radio answers.');
@@ -187,6 +237,26 @@ export class ApplicationBrowser {
       const clean = value => String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
       if (control.value) {
         if (clean(control.value) !== clean(expected)) throw new Error(`Existing selection needs review: ${control.label}`);
+        return;
+      }
+      if (control.chosen) {
+        const scope = locator.locator('..');
+        const selected = () => locator.evaluate(el => {
+          const select = el.closest('.chosen-container')?.previousElementSibling;
+          if (select?.tagName !== 'SELECT') throw new Error('Chosen source control changed.');
+          return select.value ? select.selectedOptions[0]?.text || '' : '';
+        });
+        const prior = await selected();
+        if (prior && clean(prior) !== clean(expected)) throw new Error(`Existing selection needs review: ${control.label}`);
+        if (!await scope.evaluate(el=>el.classList.contains('chosen-with-drop'))) await locator.click({timeout:10000});
+        const candidates = [];
+        for (const option of await scope.locator('.chosen-results li.active-result').all()) {
+          if (await option.isVisible() && clean(await option.innerText()) === clean(expected)) candidates.push(option);
+        }
+        if (candidates.length !== 1) throw new Error('No unique exact Chosen option for this question.');
+        await candidates[0].click({timeout:10000});
+        if (clean(await selected()) !== clean(expected)) throw new Error('Chosen did not retain the selected answer.');
+        this.recordQuestion(target,expected,action.source);
         return;
       }
       const originalFrame = target.frame;
@@ -248,21 +318,44 @@ export class ApplicationBrowser {
     }
     if (!this.identityVerified) throw new Error('The page has not shown the approved company and job title. No candidate data will be entered.');
     if (action.kind === 'upload') {
-      if (control.type !== 'file' || !/resume|résumé|\bcv\b|curriculum/i.test(control.label)) throw new Error('Could not identify an unambiguous resume upload.');
-      const bytes = await readFile(this.resumePath);
-      if (sha256(bytes) !== this.job.resumeSha256) throw new Error('Approved resume bytes changed. Upload refused.');
+      const cover = /cover[ -]?letter/i.test(control.label) && !/resume|résumé|\bcv\b/i.test(control.label);
+      const uploadPath = cover ? this.job.coverLetter?.path : this.resumePath;
+      const uploadHash = cover ? this.job.coverLetter?.sha256 : this.job.resumeSha256;
+      if (cover && !uploadPath) throw new Error('No authorized cover letter for this application.');
+      if (control.type !== 'file' || (!cover && !/resume|résumé|\bcv\b|curriculum/i.test(control.label))) throw new Error('Could not identify an unambiguous resume upload.');
+      const bytes = await readFile(uploadPath);
+      if (sha256(bytes) !== uploadHash) throw new Error('Approved document bytes changed. Upload refused.');
       // React ATS forms may remove the input as soon as change fires. Capture
       // the actual browser File before rerender, then hash those retained bytes.
       const proofKey = `__aiadUpload_${randomUUID().replaceAll('-', '')}`;
       await locator.evaluate((input, key) => {
-        const container = input.closest('.file-upload, [data-attachment], [data-testid*=resume], .resume-upload, .attachment, .field, .form-field') || input.parentElement;
-        const state = { generation: 0, container, promise: null };
+        const hirebridgeSection = input.id === 'uploadedresume' && input.closest('[id$="_resumeUploadHtml"]');
+        const scopedResumeSection = hirebridgeSection && /Upload Your Resume/i.test(hirebridgeSection.innerText) ? hirebridgeSection : null;
+        const container = scopedResumeSection || input.closest('.file-upload, [data-attachment], [data-testid*=resume], .resume-upload, .attachment, .field, .form-field') || input.parentElement;
+        const state = { generation: 0, container, promise: null, verified: false, name: '' };
+        // Hirebridge replaces its upload region during asynchronous parsing.
+        // Carry the byte-bound marker only inside the same unique upload region
+        // in this document, and revoke it on any subsequent resume selection.
+        if (scopedResumeSection?.id) {
+          const regionId = scopedResumeSection.id;
+          state.rebind = () => {
+            if (!state.verified || state.generation !== 1) return;
+            const region = document.getElementById(regionId);
+            if (region && region !== state.container && /Upload Your Resume/i.test(region.innerText) && region.innerText.includes(state.name)) {
+              region.setAttribute('data-aiad-upload-token', key);
+              region.setAttribute('data-aiad-upload-valid', 'true');
+              state.container = region;
+            }
+          };
+          state.observer = new MutationObserver(state.rebind);
+          state.observer.observe(document.documentElement, {childList:true,subtree:true,characterData:true});
+        }
         // A later replacement, even with the same filename, revokes this proof.
         document.addEventListener('change', event => {
           const el = event.target;
           if (el?.type === 'file' && (container.contains(el) || /resume|résumé|\bcv\b/i.test([el.id, el.name, el.getAttribute('aria-label')].join(' ')))) {
             state.generation++;
-            if (state.generation > 1) container.setAttribute('data-aiad-upload-valid', 'false');
+            if (state.generation > 1) { state.container.setAttribute('data-aiad-upload-valid', 'false'); state.observer?.disconnect(); }
           }
         }, true);
         state.promise = new Promise(resolve => input.addEventListener('change', async () => {
@@ -276,20 +369,26 @@ export class ApplicationBrowser {
         window[key] = state;
       }, proofKey);
       try {
-        await locator.setInputFiles(this.resumePath, { timeout: 15000 });
+        await locator.setInputFiles(uploadPath, { timeout: 15000 });
         const proof = await target.frame.evaluate(async key => {
           let timer;
           try {
             const state = window[key];
             const proof = await Promise.race([state.promise, new Promise(resolve => { timer = setTimeout(() => resolve(null), 10000); })]);
             if (state.generation !== 1) return null;
+            state.verified = true; state.name = proof?.name || ''; state.rebind?.();
             state.container.setAttribute('data-aiad-upload-token', key);
             state.container.setAttribute('data-aiad-upload-valid', 'true');
             return proof;
           }
           finally { clearTimeout(timer); delete window[key]; }
         }, proofKey);
-        if (proof?.hash !== this.job.resumeSha256 || proof.name !== path.basename(this.resumePath)) throw new Error('Uploaded file did not match the approved resume.');
+        if (proof?.hash !== uploadHash || proof.name !== path.basename(uploadPath)) throw new Error('Uploaded file did not match the approved resume.');
+        if (cover) {
+          this.coverLetterToken = proofKey;
+          await this.checkpoint({ summary: 'Uploaded the bound cover letter; browser file bytes verified.', questions: this.questions, unresolved: this.unresolved });
+          return;
+        }
         this.uploadVerified = true;
         this.uploadToken = proofKey; this.uploadReceiptLinks.clear();
         await this.checkpoint({ summary: 'Uploaded the exact approved resume; browser file bytes verified.', uploadedResumeVerified: true, resumeSha256: this.job.resumeSha256, questions: this.questions, unresolved: this.unresolved });
@@ -299,6 +398,13 @@ export class ApplicationBrowser {
     if (action.kind === 'submit') {
       if (!finalAction(control.label) && !/^(apply|apply now)$/i.test(control.label)) throw new Error('Could not identify an explicit final application submission button.');
       if (this.unresolved.length) throw new Error('Unresolved questions remain before submission.');
+      if (this.job.coverLetter) {
+        let coverPresent = false;
+        for (const frame of this.page.frames()) {
+          if (this.coverLetterToken && await frame.locator(`[data-aiad-upload-token="${this.coverLetterToken}"][data-aiad-upload-valid="true"]`).count() === 1) coverPresent = true;
+        }
+        if (!coverPresent) throw new Error('The bound cover letter attachment is not verified.');
+      }
       if (!await this.attachmentPresent()) throw new Error('The final page does not verify the correct approved attachment. Submission refused.');
       for (const frame of this.page.frames()) {
         const invalid = await frame.evaluate(() => {
@@ -331,9 +437,47 @@ export class ApplicationBrowser {
     if (!['saved_profile', 'approved_resume', 'job_policy', 'existing_answer'].includes(action.source)) throw new Error('Every answer requires an identified source.');
     if (control.type === 'password') throw new Error('Sign-in requires the user in the application browser.');
     const value = String(action.value);
+    // Correct only a parsed current-employer flag with explicit dated history.
+    // Keep all other nonempty-answer and consent conflict guards intact.
+    const confirmedFormerEmployer = async () => {
+      if(action.source !== 'saved_profile')return false;
+      const ownFlag=/\b(?:current employer|currently employed|currently work here)\b/i.test(control.label);
+      const technicalLabel=/^gnewton_section_\d+_question_\d+_answer$/.test(control.label);
+      if(!ownFlag&&!technicalLabel)return false;
+      if(/certif|accurac|agree|accept|consent|privacy|authoriz|terms/i.test(control.label))return false;
+      const history=Object.values(this.job.onboarding?.employmentHistory || {}).filter(h=>h && h.employer && h.confirmedAt && h.source);
+      if(!history.length)return false;
+      return locator.evaluate((el,{history,ownFlag})=>{
+        if(!ownFlag){
+          const question=el.closest('.gnewtonQuestionWrapper');
+          if(!question || question.querySelectorAll('input[type=checkbox]').length!==1 || !/\b(?:current employer|currently employed|currently work here)\b/i.test(question.innerText) || /certif|accurac|agree|accept|consent|privacy|authoriz|terms/i.test(question.innerText))return false;
+        }
+        const clean=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+        let row=el.parentElement;
+        for(let level=0;row&&level<6;level++,row=row.parentElement){
+          if(['FORM','BODY','HTML'].includes(row.tagName))break;
+          const values=[...row.querySelectorAll('input:not([type=checkbox]):not([type=radio]),textarea')].map(input=>clean(input.value)).filter(Boolean);
+          const matching=history.filter(h=>[h.employer,...(h.aliases||[])].some(name=>values.includes(clean(name))));
+          if(matching.length===1)return matching[0].currentEmployer===false && /^\d{4}-\d{2}-\d{2}$/.test(matching[0].endDate||'');
+          if(matching.length>1)return false;
+        }
+        return false;
+      },{history,ownFlag});
+    };
     if (action.kind === 'fill') {
-      if (control.value && !equivalentInput(control, control.value, value)) throw new Error(`Existing answer needs review: ${control.label}`);
+      if (control.maxLength && value.length > control.maxLength) throw new Error(`Answer exceeds ${control.maxLength} characters for ${control.label}; shorten the supported answer before entering it.`);
+      const contactKey = `${control.id}|${control.name}|${control.label}`;
+      const contactLabel = normalize(control.label);
+      const simpleContact = /^(?:(?:current|primary|residence|home|mailing|postal) )*(?:city|zip|zip code|postal code|street address|address)$/.test(contactLabel);
+      const repairMalformedEmail = action.source === 'saved_profile' && /^e ?mail(?: address)?$/.test(contactLabel) && value === this.job.profile?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && control.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(control.value);
+      const confirmedCityCorrection = action.source === 'saved_profile' && simpleContact && /city$/.test(contactLabel) && value === this.job.profile?.city && this.job.confirmedAnswers?.some(answer => normalize(answer.question) === contactLabel && answer.answer.trim() === value);
+      const restoreParsedContact = action.source === 'saved_profile' && this.uploadVerified && simpleContact && this.filledContacts?.some(item => item.frame === target.frame && item.key === contactKey && item.value === value);
+      if (control.value && !equivalentInput(control, control.value, value) && !confirmedZeroSalaryReplacement(control, value, this.job.confirmedAnswers) && !repairImmediateDate(control, value) && !restoreParsedContact && !repairMalformedEmail && !confirmedCityCorrection) throw new Error(`Existing answer needs review: ${control.label}`);
       await locator.fill(value, { timeout: 10000 });
+      if (!this.uploadVerified && simpleContact && action.source === 'saved_profile') {
+        this.filledContacts ||= [];
+        this.filledContacts.push({ frame: target.frame, key: contactKey, value });
+      }
       if (!equivalentInput(control, await locator.inputValue(), value)) throw new Error('The form did not retain the entered answer.');
     } else if (action.kind === 'select') {
       if (control.value && !/^select|choose|please|--/i.test(control.options.find(o => o.value === control.value)?.label || '') && control.value !== value) throw new Error(`Existing selection needs review: ${control.label}`);
@@ -341,7 +485,17 @@ export class ApplicationBrowser {
       if (await locator.inputValue() !== value) throw new Error('The form did not retain the selected answer.');
     } else if (action.kind === 'check') {
       if (!['true', 'false'].includes(value)) throw new Error('A check answer must be true or false.');
-      if (control.checked === true && value === 'false') throw new Error(`Existing selection needs review: ${control.label}`);
+      if (control.checked === true && value === 'false' && !await confirmedFormerEmployer()) throw new Error(`Existing selection needs review: ${control.label}`);
+      if(control.choiceGroup){
+        if(value!=='true')throw new Error('Choose a confirmed answer rather than deselecting a screening question.');
+        const expected=control.id.startsWith('y_')?'true':'false';
+        const current=await locator.evaluate(el=>document.getElementById(el.id.slice(2))?.value||'');
+        if(current&&current!==expected)throw new Error(`Existing selection needs review: ${control.context}`);
+        await locator.click({timeout:10000});
+        const retained=await locator.evaluate(el=>document.getElementById(el.id.slice(2))?.value===(el.id.startsWith('y_')?'true':'false')&&el.classList.contains('isSelected'));
+        if(!retained)throw new Error('The screening control did not retain the selected answer.');
+        this.recordQuestion(target,control.label,action.source);return;
+      }
       if (control.role === 'radio' && value === 'true') {
         const conflict = await locator.evaluate(el => [...(el.closest('[role="radiogroup"]')?.querySelectorAll('[role="radio"][aria-checked="true"]') || [])].some(other => other !== el));
         if (conflict) throw new Error(`Existing selection needs review: ${control.label}`);

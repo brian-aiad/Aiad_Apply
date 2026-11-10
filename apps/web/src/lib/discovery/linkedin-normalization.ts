@@ -34,11 +34,11 @@ export function linkedInBasePay(text: string) {
   // Exact rates and explicit starting rates establish a lower bound; "up to" does not.
   text = text.split("\n").map(line => {
     if (/up to|maximum|bonus|equity|OTE/i.test(line) || /[-–—]\s*\$?\d|\bto\s*\$?\d/i.test(line)) return line;
-    return line.replace(/\$\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?(?=\s*(?:\/(?:hr|hour|yr|year|mo|month)\b|per\s+(?:hour|year|month)\b|annually\b))/i,
+    return line.replace(/\$\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?(?=\s*(?:\/\s*(?:hr|hour|yr|year|mo|month)\b|per\s+(?:hour|year|month)\b|annually\b))/i,
       (_, value, suffix) => `$${value}${suffix || ""}–$${value}${suffix || ""}`);
   }).join("\n");
   const amount = String.raw`\$\s*(\d[\d,]*(?:\.\d+)?)\s*([kK])?`;
-  const unit = String.raw`(?:\s*(?:\/|per\s+)(hour|hr|year|yr|month|mo)\b)?`;
+  const unit = String.raw`(?:\s*(?:\/\s*|per\s+)(hour|hr|year|yr|month|mo)\b)?`;
   const range = new RegExp(`${amount}${unit}\\s*(?:USD)?\\s*(?:[-–—]|to)\\s*\\$?\\s*(\\d[\\d,]*(?:\\.\\d+)?)\\s*([kK])?${unit}`, "gi");
   const values: { salaryMin: number; salaryMax: number; salaryText: string }[] = [];
   for (const match of text.matchAll(range)) {

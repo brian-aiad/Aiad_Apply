@@ -1,3 +1,4 @@
+import { AUTOMATION_EVENT, readAttempt, attemptWithReceipt } from "@/lib/application-automation";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -46,6 +47,8 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
         const receipt = await tx.applicationEvent.findFirst({ where: { applicationId: id, eventType: "application_submitted" }, orderBy: { occurredAt: "desc" } });
         const detail = receipt?.detail as { runId?: string } | null;
         if (detail?.runId !== command.runId) throw new ApplyError("A different submission is already recorded. Review the application history.");
+        const reconciled = attemptWithReceipt(automation?.detail ?? null, receipt?.detail);
+        if (reconciled && automation) await saveAttempt(tx, automation.id, reconciled);
         return { submitted: true, alreadyRecorded: true };
       }
       const blockers = handoffBlockers(application.status, run, application.tailoringRuns.some(r => ["RUNNING", "QUEUED"].includes(r.status)), destination);
@@ -53,17 +56,23 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       const pdf = run!.artifacts.find(a => a.kind === "PDF" && a.sha256)!;
       if (command.action === "submitted") {
         const prepared = await tx.applicationEvent.findFirst({ where: { applicationId: id, eventType: "application_prepared" }, orderBy: { occurredAt: "desc" } });
-        if (!reviewedArtifactMatches(prepared?.detail, run!.id, pdf.sha256!)) throw new ApplyError("Prepare and review this resume version before recording a submission.");
         const preparedDetail = prepared?.detail as { destination?: string } | null;
-        if (preparedDetail?.destination !== destination) throw new ApplyError("The employer link changed. Prepare this version again before recording submission.");
+        const manuallyPrepared = reviewedArtifactMatches(prepared?.detail, run!.id, pdf.sha256!) && preparedDetail?.destination === destination;
+        // A candidate can finish a parked automatic form. Recording the employer
+        // receipt must honor its verified exact PDF without requiring old review UI.
+        const attempts = manuallyPrepared ? [] : await tx.applicationEvent.findMany({where:{applicationId:id,eventType:AUTOMATION_EVENT}});
+        const automaticallyPrepared = attempts.some(event => {
+          const attempt=readAttempt(event.detail);
+          return attempt?.authorizationMode === "automatic" && Boolean(attempt.authorizationId) && attempt.uploadedResumeVerified === true && attempt.destination === destination && reviewedArtifactMatches(attempt,run!.id,pdf.sha256!);
+        });
+        if (!manuallyPrepared && !automaticallyPrepared) throw new ApplyError("Prepare this exact resume and employer destination before recording a submission.");
         const setting = await tx.setting.findUnique({ where: { key: "product" } });
         const now = new Date();
         const reminder = resolveFollowUpUpdate({ currentStatus: application.status, nextStatus: "APPLIED", currentFollowUpAt: application.followUpAt, requestedFollowUpAt: undefined, now, followUpDays: readProductSettings(setting?.value).followUpDays });
         await tx.application.update({ where: { id }, data: { status: "APPLIED", appliedAt: application.appliedAt ?? now, followUpAt: reminder.followUpAt } });
         await tx.applicationEvent.create({ data: { applicationId: id, eventType: "application_submitted", fromValue: application.status, toValue: "APPLIED", detail: { runId: run!.id, runNumber: run!.runNumber, resumeSha256: pdf.sha256, confirmation: command.confirmation, method: "candidate_confirmation", destination } } });
-        if (automation?.detail?.status === "UNKNOWN" && reviewedArtifactMatches(automation.detail, run!.id, pdf.sha256!)) {
-          await saveAttempt(tx, automation.id, { ...automation.detail, status: "SUBMITTED", summary: "You confirmed submission after checking the employer site.", confirmation: command.confirmation });
-        }
+        const reconciled = attemptWithReceipt(automation?.detail ?? null, { runId: run!.id, resumeSha256: pdf.sha256, destination, confirmation: command.confirmation });
+        if (reconciled && automation) await saveAttempt(tx, automation.id, reconciled);
         return { submitted: true, alreadyRecorded: false };
       }
       const setting = await tx.setting.findUnique({ where: { key: "application-profile" } });

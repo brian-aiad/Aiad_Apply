@@ -225,7 +225,7 @@ def _transform_resume_attempt(
     destination = Path(output_dir).resolve()
     destination.mkdir(parents=True, exist_ok=True)
     job = parse_linkedin_simplify(raw_paste)
-    output_basename = resume_basename(job.company, job.title)
+    output_basename = resume_basename(job.company, job.title, output_directory=destination)
     loaded_candidate_profile = load_candidate_profile(candidate_profile)
     base = parse_resume_docx(base_resume)
     keywords = grade_job_keywords(
@@ -295,21 +295,28 @@ def _transform_resume_attempt(
                 # lexical catalog. Require literal posting presence, then grade
                 # it using the same importance/context rules as every other term.
                 discovered_technologies.update(
-                    item.term.strip() for item in reasoning.technology_assessments
+                    item.term.strip()
+                    for item in reasoning.technology_assessments
                     if 1 < len(item.term.strip()) <= 80
                     and contains_term(job.job_description, item.term.strip())
                 )
                 if discovered_technologies:
-                    keywords = grade_job_keywords(job, additional_technologies=[
-                        *candidate_technologies(base, loaded_candidate_profile),
-                        *sorted(discovered_technologies),
-                    ])
+                    keywords = grade_job_keywords(
+                        job,
+                        additional_technologies=[
+                            *candidate_technologies(base, loaded_candidate_profile),
+                            *sorted(discovered_technologies),
+                        ],
+                    )
                     apply_candidate_profile_to_keywords(keywords, loaded_candidate_profile)
                     graph = build_evidence_graph(base, keywords)
                     add_candidate_profile_evidence(graph, loaded_candidate_profile, keywords)
                     profile = build_target_role_profile(job, keywords)
             assessment_feedback = apply_technology_assessments(
-                base, keywords, graph, reasoning.technology_assessments,
+                base,
+                keywords,
+                graph,
+                reasoning.technology_assessments,
             )
             if graph.automatic_technical_policy:
                 # Previously unseen common tools now have candidate-authorized
@@ -396,17 +403,27 @@ def _transform_resume_attempt(
             )
             proposal_texts["summary"] = reasoning.rewrite_plan.summary.text
             shorter_texts = dict(proposal_texts)
-            shorter_texts.update({b.paragraph_id: b.shorter_text for b in reasoning.rewrite_plan.bullets})
-            shorter_texts.update({line.paragraph_id: ", ".join(line.shorter_skills)
-                                  for line in reasoning.rewrite_plan.skills.lines})
+            shorter_texts.update(
+                {b.paragraph_id: b.shorter_text for b in reasoning.rewrite_plan.bullets}
+            )
+            shorter_texts.update(
+                {
+                    line.paragraph_id: ", ".join(line.shorter_skills)
+                    for line in reasoning.rewrite_plan.skills.lines
+                }
+            )
             shorter_texts["summary"] = reasoning.rewrite_plan.summary.shorter_text
             for message in [
                 *assessment_feedback,
                 *coverage_feedback(base, keywords, graph, proposal_texts),
-                *(f"Shorter variant: {message}" for message in
-                  coverage_feedback(base, keywords, graph, shorter_texts)),
+                *(
+                    f"Shorter variant: {message}"
+                    for message in coverage_feedback(base, keywords, graph, shorter_texts)
+                ),
                 *draft_distribution_feedback(graph.draft_technologies, proposal_texts),
-                *tailoring_feedback(base, proposal_texts, keywords, graph, reasoning.transferability_map),
+                *tailoring_feedback(
+                    base, proposal_texts, keywords, graph, reasoning.transferability_map
+                ),
             ]:
                 plan_validation.issues.append(
                     ValidationIssue(code="keyword_coverage_or_scope", message=message)
@@ -421,13 +438,17 @@ def _transform_resume_attempt(
             # review-only JSON files are never application-ready resume artifacts.
             call_number = len(getattr(reasoner, "usage", [])) or generation_attempt
             (destination / f"rejected-plan-{call_number}.json").write_text(
-                json.dumps({
-                    "status": "rejected",
-                    "raw_reasoning": raw_reasoning.model_dump(mode="json"),
-                    "normalized_reasoning": reasoning.model_dump(mode="json"),
-                    "validation": plan_validation.model_dump(mode="json"),
-                    "restoration_feedback": restoration_feedback,
-                }, indent=2), encoding="utf-8",
+                json.dumps(
+                    {
+                        "status": "rejected",
+                        "raw_reasoning": raw_reasoning.model_dump(mode="json"),
+                        "normalized_reasoning": reasoning.model_dump(mode="json"),
+                        "validation": plan_validation.model_dump(mode="json"),
+                        "restoration_feedback": restoration_feedback,
+                    },
+                    indent=2,
+                ),
+                encoding="utf-8",
             )
             revision_feedback = [
                 *quality_feedback,
@@ -833,7 +854,13 @@ def _transform_resume_attempt(
         for item in supported_keywords
         if item.accepted and contains_term(final_full_text, item.term)
     ]
-    breadth = tailoring_breadth(base, {p.paragraph_id: p.text for p in final_document.paragraphs}, keywords, graph, preliminary_map)
+    breadth = tailoring_breadth(
+        base,
+        {p.paragraph_id: p.text for p in final_document.paragraphs},
+        keywords,
+        graph,
+        preliminary_map,
+    )
     report = TransformationReport(
         job=job,
         keywords=keywords,
@@ -920,7 +947,11 @@ def _build_keyword_decisions(
     }
     match_by_term = {match.target_term.casefold(): match for match in transferability.matches}
     drafts = {normalized_term(item.term): item for item in draft_technologies or []}
-    source_by_id = {paragraph.paragraph_id: paragraph.text for paragraph in base_document.paragraphs} if base_document else {}
+    source_by_id = (
+        {paragraph.paragraph_id: paragraph.text for paragraph in base_document.paragraphs}
+        if base_document
+        else {}
+    )
     decisions: list[KeywordDecisionRecord] = []
     for keyword in keywords:
         placements = [
@@ -928,8 +959,12 @@ def _build_keyword_decisions(
             for paragraph_id, text in final_by_id.items()
             if contains_term(text, keyword.term)
         ]
-        demonstrated = [pid for pid, text in final_by_id.items() if ".bullet." in pid
-                        and demonstrates_ordinary_capability(keyword.term, source_by_id.get(pid, ""), text)]
+        demonstrated = [
+            pid
+            for pid, text in final_by_id.items()
+            if ".bullet." in pid
+            and demonstrates_ordinary_capability(keyword.term, source_by_id.get(pid, ""), text)
+        ]
         match = match_by_term.get(keyword.normalized)
         evidence_level = match.strength if match is not None else EvidenceStrength.unsupported
         draft = drafts.get(keyword.normalized)
@@ -954,7 +989,11 @@ def _build_keyword_decisions(
         elif not keyword.accepted:
             explanation = keyword.rejection_reason or "Rejected as low-value scanner noise."
         elif demonstrated:
-            explanation = "Demonstrated by documented work in " + ", ".join(demonstrated) + "; exact phrase not added."
+            explanation = (
+                "Demonstrated by documented work in "
+                + ", ".join(demonstrated)
+                + "; exact phrase not added."
+            )
         elif evidence_level == EvidenceStrength.unsupported:
             explanation = "Not placed because candidate evidence does not substantiate it."
         elif (
@@ -1293,7 +1332,8 @@ def _direct_keywords(
     return [
         keyword
         for keyword in keywords
-        if keyword.normalized in direct and keyword.normalized not in SUMMARY_STRENGTH_TERMS | AUTOMATIC_CONTEXT_TERMS
+        if keyword.normalized in direct
+        and keyword.normalized not in SUMMARY_STRENGTH_TERMS | AUTOMATIC_CONTEXT_TERMS
     ]
 
 
@@ -1307,21 +1347,32 @@ def _certification_only_terms(transferability: TransferabilityMap) -> set[str]:
 
 
 def _prune_direct_evidence_risks(
-    reasoning: ReasoningResult, graph: ResumeEvidenceGraph | None = None,
+    reasoning: ReasoningResult,
+    graph: ResumeEvidenceGraph | None = None,
 ) -> None:
     """Dismiss a caution only when evidence supports this exact claim's context."""
-    direct = [match for match in reasoning.transferability_map.matches if match.strength == EvidenceStrength.direct]
+    direct = [
+        match
+        for match in reasoning.transferability_map.matches
+        if match.strength == EvidenceStrength.direct
+    ]
     evidence = {item.evidence_id: item for item in graph.evidence} if graph else {}
 
     def substantiated(risk: ClaimRisk, paragraph_id: str = "") -> bool:
-        placement_match = re.search(r"(?:summary|skills\.[\w.]+|(?:experience|projects)\.[\w.]+\.bullet\.\d+)", risk.selected_placement)
+        placement_match = re.search(
+            r"(?:summary|skills\.[\w.]+|(?:experience|projects)\.[\w.]+\.bullet\.\d+)",
+            risk.selected_placement,
+        )
         placement = paragraph_id or (placement_match.group(0) if placement_match else "")
         if not placement:
             return False
         section = placement.rsplit(".bullet.", 1)[0]
         for match in reasoning.transferability_map.matches:
             term = match.target_term
-            if not (contains_term(risk.claim, term) or normalized_term(risk.target_requirement) == normalized_term(term)):
+            if not (
+                contains_term(risk.claim, term)
+                or normalized_term(risk.target_requirement) == normalized_term(term)
+            ):
                 continue
             # Standard capabilities such as ticket case management can be inferred
             # from actual work, even when a model adds an unnecessary review risk.
@@ -1350,13 +1401,19 @@ def _prune_direct_evidence_risks(
             source = (match.evidence_id or "").removeprefix("evidence.")
             if source.startswith("candidate_profile."):
                 continue
-            if source == placement or (".bullet." in source and source.rsplit(".bullet.", 1)[0] == section):
+            if source == placement or (
+                ".bullet." in source and source.rsplit(".bullet.", 1)[0] == section
+            ):
                 return True
         return False
 
-    reasoning.rewrite_plan.claim_risks = [risk for risk in reasoning.rewrite_plan.claim_risks if not substantiated(risk)]
+    reasoning.rewrite_plan.claim_risks = [
+        risk for risk in reasoning.rewrite_plan.claim_risks if not substantiated(risk)
+    ]
     for bullet in reasoning.rewrite_plan.bullets:
-        bullet.claim_risks = [risk for risk in bullet.claim_risks if not substantiated(risk, bullet.paragraph_id)]
+        bullet.claim_risks = [
+            risk for risk in bullet.claim_risks if not substantiated(risk, bullet.paragraph_id)
+        ]
 
 
 def _ensure_important_keyword_placement(
@@ -1866,9 +1923,13 @@ def _fuse_skill_inventory(
             if any(_same_skill(value, base_value) for base_value in all_base_skills):
                 continue
             keyword = next(
-                (item for item in credible_new if _matches_any_keyword(value, [item])
-                 # Generic AI familiarity does not authorize a named-tool bundle.
-                 and (item.normalized != "ai" or normalized_term(value) == "ai")),
+                (
+                    item
+                    for item in credible_new
+                    if _matches_any_keyword(value, [item])
+                    # Generic AI familiarity does not authorize a named-tool bundle.
+                    and (item.normalized != "ai" or normalized_term(value) == "ai")
+                ),
                 None,
             )
             if keyword is None:
@@ -1883,10 +1944,20 @@ def _fuse_skill_inventory(
             if any(_same_skill(value, base_value) for base_value in original)
         ]
         retained = [
-            next((value for value in proposed if _same_skill(value, base_value) and any(
-                keyword.accepted and contains_term(value, keyword.term)
-                and not contains_term(base_value, keyword.term) for keyword in keywords
-            )), base_value)
+            next(
+                (
+                    value
+                    for value in proposed
+                    if _same_skill(value, base_value)
+                    and any(
+                        keyword.accepted
+                        and contains_term(value, keyword.term)
+                        and not contains_term(base_value, keyword.term)
+                        for keyword in keywords
+                    )
+                ),
+                base_value,
+            )
             for base_value in original
         ]
         candidates = _dedupe_skills([*retained, *relocated.get(line.paragraph_id, [])])
@@ -1921,9 +1992,12 @@ def _rank_skill_lines(
         # Rank only for selection. Display retained skills in their protected order.
         values = [
             next(item for item in proposed if _same_skill(value, item))
-            for value in original if any(_same_skill(value, item) for item in proposed)
+            for value in original
+            if any(_same_skill(value, item) for item in proposed)
         ]
-        values.extend(value for value in proposed if not any(_same_skill(value, item) for item in original))
+        values.extend(
+            value for value in proposed if not any(_same_skill(value, item) for item in original)
+        )
         ranked = sorted(
             enumerate(values),
             key=lambda item: (-_skill_resume_value(item[1], keywords), item[0]),
@@ -2104,11 +2178,21 @@ def _trim_skill_lines_to_character_budgets(
         # A model's long alias must not make an established skill disappear.
         # Reuse the protected shorter spelling before dropping any inventory.
         originals = split_skill_values(original_after_label)
-        for values, budget in ((line.skills, full_budget), (line.shorter_skills, paragraph.character_budget)):
+        for values, budget in (
+            (line.skills, full_budget),
+            (line.shorter_skills, paragraph.character_budget),
+        ):
             if len(f"{fixed_prefix}{', '.join(values)}") <= budget:
                 continue
             for index, value in enumerate(values):
-                shorter = next((item for item in originals if _same_skill(item, value) and len(item) < len(value)), None)
+                shorter = next(
+                    (
+                        item
+                        for item in originals
+                        if _same_skill(item, value) and len(item) < len(value)
+                    ),
+                    None,
+                )
                 if shorter and not any(
                     contains_term(value, keyword.term) and not contains_term(shorter, keyword.term)
                     for keyword in required
@@ -2356,8 +2440,68 @@ def _remove_unproven_reproduction(plan: RewritePlan, document: ResumeDocument) -
 
 def _content_words(text: str) -> set[str]:
     """Conservative lexical screen, not a claim that word count measures quality."""
-    filler = set(["a", "an", "the", "and", "or", "by", "to", "for", "of", "in", "on", "with", "from", "through", "while", "then", "as", "at", "during", "into", "across", "alongside", "hands", "own", "ready", "further", "technical", "production", "support", "supported", "enabled", "keep", "kept", "maintained", "maintaining", "built", "building", "operate", "operating", "deployed", "deploying", "resolved", "resolving", "investigated", "investigating", "isolated", "isolating", "performed", "performing", "provided", "providing", "used", "using", "work", "working"])
-    return {word.rstrip("s") for word in re.findall(r"[a-z]+", text.casefold()) if word not in filler}
+    filler = set(
+        [
+            "a",
+            "an",
+            "the",
+            "and",
+            "or",
+            "by",
+            "to",
+            "for",
+            "of",
+            "in",
+            "on",
+            "with",
+            "from",
+            "through",
+            "while",
+            "then",
+            "as",
+            "at",
+            "during",
+            "into",
+            "across",
+            "alongside",
+            "hands",
+            "own",
+            "ready",
+            "further",
+            "technical",
+            "production",
+            "support",
+            "supported",
+            "enabled",
+            "keep",
+            "kept",
+            "maintained",
+            "maintaining",
+            "built",
+            "building",
+            "operate",
+            "operating",
+            "deployed",
+            "deploying",
+            "resolved",
+            "resolving",
+            "investigated",
+            "investigating",
+            "isolated",
+            "isolating",
+            "performed",
+            "performing",
+            "provided",
+            "providing",
+            "used",
+            "using",
+            "work",
+            "working",
+        ]
+    )
+    return {
+        word.rstrip("s") for word in re.findall(r"[a-z]+", text.casefold()) if word not in filler
+    }
 
 
 def _new_concrete_detail(before: str, after: str) -> set[str]:
@@ -2366,10 +2510,14 @@ def _new_concrete_detail(before: str, after: str) -> set[str]:
 
 def _same_role_concept(text: str, term: str) -> bool:
     """Recognize a narrow set of inflections, never adjacent technologies."""
+
     def normalize(value: str) -> str:
         value = re.sub(r"\bconfigur(?:ation|ations|e|ed|ing)\b", "configuration", value.casefold())
-        return " ".join(word[:-1] if word.endswith("s") and not word.endswith("ss") else word
-                        for word in re.findall(r"[a-z0-9+#]+", value))
+        return " ".join(
+            word[:-1] if word.endswith("s") and not word.endswith("ss") else word
+            for word in re.findall(r"[a-z0-9+#]+", value)
+        )
+
     return contains_term(normalize(text), normalize(term))
 
 
@@ -2379,8 +2527,12 @@ def _minimal_inflection_alignment(source: str, terms: list[JobKeyword]) -> str:
         # Same-part-of-speech plural to singular is safe; turning "Configured"
         # into "configuration" would break grammar and is deliberately excluded.
         if not keyword.term.endswith("s"):
-            result = re.sub(r"(?<![\w])" + re.escape(keyword.term) + r"s(?![\w])",
-                            keyword.term, result, flags=re.IGNORECASE)
+            result = re.sub(
+                r"(?<![\w])" + re.escape(keyword.term) + r"s(?![\w])",
+                keyword.term,
+                result,
+                flags=re.IGNORECASE,
+            )
     return result
 
 
@@ -2388,13 +2540,27 @@ def _soft_skill_appendix(source: str, candidate: str) -> bool:
     prefix = source.rstrip(" .;")
     if not candidate.startswith(prefix):
         return False
-    suffix = candidate[len(prefix):]
+    suffix = candidate[len(prefix) :]
     found = False
     for term in sorted(SOFT_TERMS, key=len, reverse=True):
         if contains_term(suffix, term):
             found = True
             suffix = re.sub(re.escape(term), "", suffix, flags=re.IGNORECASE)
-    filler = {"demonstrating", "showing", "showcasing", "using", "with", "strong", "excellent", "and", "through", "applying", "leveraging", "skills", "abilities"}
+    filler = {
+        "demonstrating",
+        "showing",
+        "showcasing",
+        "using",
+        "with",
+        "strong",
+        "excellent",
+        "and",
+        "through",
+        "applying",
+        "leveraging",
+        "skills",
+        "abilities",
+    }
     return found and set(re.findall(r"[a-z]+", suffix.casefold())) <= filler
 
 
@@ -2412,7 +2578,8 @@ def _restore_unjustified_shortening(
     summary_source = source_by_id.get("summary", "")
     if summary_source:
         summary_missing_systems = any(
-            contains_term(summary_source, term) and not preserves_source_term(plan.summary.text, term)
+            contains_term(summary_source, term)
+            and not preserves_source_term(plan.summary.text, term)
             for term in SYSTEM_TERMS
         )
         if len(plan.summary.text) < (0.90 * len(summary_source)) or summary_missing_systems:
@@ -2434,13 +2601,21 @@ def _restore_unjustified_shortening(
             bullet.text = source
             new_terms = []
         accepted_new_terms = [keyword for keyword in new_terms if keyword.accepted]
-        if accepted_new_terms and all(_same_role_concept(source, keyword.term) for keyword in accepted_new_terms):
+        if accepted_new_terms and all(
+            _same_role_concept(source, keyword.term) for keyword in accepted_new_terms
+        ):
             # Exact scanner spelling can justify a small wording correction, not
             # replacing the sentence with a rearranged version of the same work.
             bullet.text = _minimal_inflection_alignment(source, accepted_new_terms)
             bullet.shorter_text = bullet.text
-            bullet.target_terms = [term for term in bullet.target_terms if contains_term(bullet.text, term)]
-            new_terms = [keyword for keyword in accepted_new_terms if contains_term(bullet.text, keyword.term)]
+            bullet.target_terms = [
+                term for term in bullet.target_terms if contains_term(bullet.text, term)
+            ]
+            new_terms = [
+                keyword
+                for keyword in accepted_new_terms
+                if contains_term(bullet.text, keyword.term)
+            ]
         missing_systems = [
             term
             for term in SYSTEM_TERMS
@@ -2467,40 +2642,63 @@ def _restore_unjustified_shortening(
         grounded_detail = len(added_detail) >= 2 and all(
             word in _content_words(source_context) for word in added_detail
         )
-        existing_target_reframe = grounded_detail and substantive_reframe(source, bullet.text) and any(
-            keyword.accepted and keyword.normalized not in SOFT_TERMS
-            and contains_term(source, keyword.term) and contains_term(bullet.text, keyword.term)
-            for keyword in keywords
+        existing_target_reframe = (
+            grounded_detail
+            and substantive_reframe(source, bullet.text)
+            and any(
+                keyword.accepted
+                and keyword.normalized not in SOFT_TERMS
+                and contains_term(source, keyword.term)
+                and contains_term(bullet.text, keyword.term)
+                for keyword in keywords
+            )
         )
         new_terms = [keyword for keyword in new_terms if keyword.accepted]
-        no_target_value = bullet.text != source and not new_terms and not existing_target_reframe and not draft_project
+        no_target_value = (
+            bullet.text != source
+            and not new_terms
+            and not existing_target_reframe
+            and not draft_project
+        )
         if severe_shortening or no_target_value or missing_systems or missing_context:
             reasons = []
             if severe_shortening:
-                reasons.append(f"retained only {len(bullet.text)} of {len(source)} source characters")
+                reasons.append(
+                    f"retained only {len(bullet.text)} of {len(source)} source characters"
+                )
             if no_target_value:
                 reasons.append("did not add or substantively reframe a relevant responsibility")
             if missing_systems or missing_context:
-                reasons.append("dropped protected phrases: " + ", ".join(missing_systems + missing_context))
-            feedback.append(f"{bullet.paragraph_id} was restored before validation because it "
-                            + "; ".join(reasons)
-                            + ". Rewrite the full source with these constraints preserved; merely repeating the rejected wording will be restored again.")
+                reasons.append(
+                    "dropped protected phrases: " + ", ".join(missing_systems + missing_context)
+                )
+            feedback.append(
+                f"{bullet.paragraph_id} was restored before validation because it "
+                + "; ".join(reasons)
+                + ". Rewrite the full source with these constraints preserved; merely repeating the rejected wording will be restored again."
+            )
             bullet.text = source
             if no_target_value:
                 bullet.shorter_text = source
-                bullet.target_terms = [term for term in bullet.target_terms if contains_term(source, term)]
+                bullet.target_terms = [
+                    term for term in bullet.target_terms if contains_term(source, term)
+                ]
         if bullet.text == source and len(bullet.shorter_text) >= len(source):
             bullet.shorter_text = source
     if _check_shorter:
         fallback = plan.model_copy(deep=True)
         for bullet in fallback.bullets:
             bullet.text = bullet.shorter_text
-        _restore_unjustified_shortening(fallback, document, keywords, draft_terms=draft_terms, _check_shorter=False)
+        _restore_unjustified_shortening(
+            fallback, document, keywords, draft_terms=draft_terms, _check_shorter=False
+        )
         for primary, checked in zip(plan.bullets, fallback.bullets, strict=True):
             # Restoring a cosmetic fallback may recover a source longer than a
             # legitimate concise primary. Identical fallback is safe and avoids
             # rejecting the useful primary or manufacturing another rewrite.
-            primary.shorter_text = checked.text if len(checked.text) <= len(primary.text) else primary.text
+            primary.shorter_text = (
+                checked.text if len(checked.text) <= len(primary.text) else primary.text
+            )
     return feedback
 
 
@@ -2658,17 +2856,24 @@ def _normalize_claim_risk_placements(
     for bullet in reasoning.rewrite_plan.bullets:
         risks.extend(bullet.claim_risks)
     for risk in risks:
-        keyword = next(
-            (item for item in keywords if item.normalized in {
-                normalized_term(risk.claim), normalized_term(risk.target_requirement)
-            }),
-            None,
-        ) or next(
-            (item for item in keywords if contains_term(risk.claim, item.term)),
-            None,
-        ) or next(
-            (item for item in keywords if contains_term(risk.target_requirement, item.term)),
-            None,
+        keyword = (
+            next(
+                (
+                    item
+                    for item in keywords
+                    if item.normalized
+                    in {normalized_term(risk.claim), normalized_term(risk.target_requirement)}
+                ),
+                None,
+            )
+            or next(
+                (item for item in keywords if contains_term(risk.claim, item.term)),
+                None,
+            )
+            or next(
+                (item for item in keywords if contains_term(risk.target_requirement, item.term)),
+                None,
+            )
         )
         if keyword is None:
             continue

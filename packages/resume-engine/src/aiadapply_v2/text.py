@@ -33,9 +33,21 @@ def preserves_source_term(text: str, term: str) -> bool:
         "api": ("APIs",),
         "webhooks": ("webhook",),
         "continuous integration": ("CI/CD",),
+        "microsoft entra": ("Entra ID", "Microsoft Entra ID"),
     }
     return contains_term(text, term) or any(
-        contains_term(text, alias) for alias in aliases.get(normalized_term(term), ())
+        contains_term(text, alias)
+        for alias in (*aliases.get(normalized_term(term), ()), *equivalent_tool_names(term))
+    )
+
+
+def equivalent_tool_names(term: str) -> tuple[str, ...]:
+    """Narrow suite-name equivalence, never broader product-family inference."""
+    google_suite = ("Google Workspace", "G Suite", "Google Suite")
+    return (
+        google_suite
+        if normalized_term(term) in {normalized_term(t) for t in google_suite}
+        else (term,)
     )
 
 

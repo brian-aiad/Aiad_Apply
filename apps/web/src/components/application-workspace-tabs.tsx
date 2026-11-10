@@ -15,11 +15,11 @@ export function ApplicationWorkspaceTabs({
   showStretchLab: boolean;
 }) {
   const available: { id: WorkspaceTab; label: string }[] = useMemo(() => [
-    { id: "changes", label: showKeywords ? "Review" : "Resume changes" },
-    { id: "role", label: "Posting" },
-    { id: "apply", label: "Apply" },
+    { id: "changes", label: "Resume" },
+    { id: "role", label: "Job details" },
+    { id: "apply", label: "Application" },
     ...(showStretchLab ? [{ id: "stretch-lab" as const, label: "Stretch Lab" }] : []),
-  ], [showKeywords, showStretchLab]);
+  ], [showStretchLab]);
   const searchParams = useSearchParams();
   const requested = searchParams.get("tab");
   const normalized = requested === "keywords" ? "changes" : requested;

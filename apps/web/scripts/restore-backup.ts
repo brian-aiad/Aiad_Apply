@@ -1,3 +1,4 @@
+import { portableSettingKey, restoredEvent } from "../src/lib/workspace-backup";
 import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -35,12 +36,13 @@ async function main() {
       await tx.resumeChange.createMany({ data: value.changes as Prisma.ResumeChangeCreateManyInput[] });
       await tx.artifact.createMany({ data: value.artifacts as Prisma.ArtifactCreateManyInput[] });
       await tx.artifactBackup.createMany({ data: backups });
-      await tx.applicationEvent.createMany({ data: value.events as Prisma.ApplicationEventCreateManyInput[] });
+      await tx.applicationEvent.createMany({ data: value.events.map((event: Record<string, unknown>) => JSON.parse(JSON.stringify(restoredEvent(event)))) as Prisma.ApplicationEventCreateManyInput[] });
       await tx.dailyGoal.createMany({ data: value.dailyGoals as Prisma.DailyGoalCreateManyInput[], skipDuplicates: true });
       await tx.discoveryPosting.createMany({ data: value.discoveries as Prisma.DiscoveryPostingCreateManyInput[] });
       for (const setting of value.settings as Prisma.SettingCreateManyInput[]) {
-        if (!["product", "discovery:preferences", "application-profile"].includes(setting.key)) continue;
-        await tx.setting.upsert({ where: { key: setting.key }, create: setting, update: { value: setting.value } });
+        if (!portableSettingKey(setting.key)) continue;
+        const restoredValue = setting.key === "discovery:linkedin:config" ? { ...(setting.value as Record<string, Prisma.InputJsonValue>), collectorId: null } : setting.value;
+        await tx.setting.upsert({ where: { key: setting.key }, create: { ...setting, value: restoredValue }, update: { value: restoredValue } });
       }
     }, { timeout: 60_000 });
     console.log(JSON.stringify({ restored: true, ...result }));

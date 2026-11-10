@@ -166,8 +166,8 @@ test("parses the five-role RTX manufacturing, quality, semiconductor, and RF str
 
 test("parses the dated live LinkedIn corpus consistently", () => {
   const cases = [
-    ["linkedin_4215127819_coreweave_technical_support_engineer_bare_metal.txt", 83_000, 145_000, 13, 13, 0],
-    ["linkedin_4369610709_infinite_giving_client_operations_specialist.txt", null, null, 3, 7, 3],
+    ["linkedin_4215127819_coreweave_technical_support_engineer_bare_metal.txt", 83_000, 145_000, 14, 13, 0],
+    ["linkedin_4369610709_infinite_giving_client_operations_specialist.txt", null, null, 4, 7, 3],
     ["linkedin_4401508206_liveramp_technical_support_engineer.txt", 75_000, 109_000, 5, 15, 3],
     ["linkedin_4431436073_crossover_technical_support_engineer_trilogy_remote_60_000_y.txt", 60_000, null, 1, 6, 4],
     ["linkedin_4432540287_kapsch_group_technical_support_engineer.txt", 62_000, 110_000, 10, 7, 0],
@@ -216,7 +216,7 @@ test("parses Greenhouse banner navigation and custom application-support heading
   assert.equal(parsed.company, "Inspire Home Loans");
   assert.equal(parsed.title, "Technology Operations Engineer");
   assert.equal(parsed.location, "Newport Beach, CA");
-  assert.equal(parsed.responsibilities.length, 20);
+  assert.equal(parsed.responsibilities.length, 21);
   assert.equal(parsed.requiredQualifications.length, 11);
   assert.equal(parsed.preferredQualifications.length, 2);
   assert.ok(!parsed.cleanDescription.includes("Apply for this job"));
@@ -249,4 +249,26 @@ test("Workday competency and education headings preserve required versus preferr
   assert.ok(job.requiredQualifications.some((text) => text.includes("SQL")));
   assert.ok(job.requiredQualifications.some((text) => text.includes("2-4 years")));
   assert.ok(job.preferredQualifications.some((text) => text.includes("SPSS")));
+});
+
+test("monthly school pay honors the actual paid work year rather than raw monthly dollars", () => {
+ const posting=(months:number)=>`Company logo for, Local School\nLocal School\nApplication Support Specialist\nIrvine, CA · On-site\nFull-time\nSalary: $5,148 - $6,414 per month\nAbout the job\nProvide software support to users, resolve help desk tickets and validate database reports.\nWork year: 40 hours/week; ${months} months/year`;
+ assert.equal(parseCapture(posting(12)).salaryMin,61776);
+ assert.equal(parseCapture(posting(11)).salaryMin,56628);
+});
+
+ test("public employer Experience and Education heading retains minimum qualifications",()=>{
+ const parsed=parseCapture("Example City\nSystems Analyst I\nAnaheim, CA\nQualifications\nExperience and Education:\nOne (1) year of technical support experience and a bachelor's degree in computer science.\nKnowledge of:\nSQL and database concepts.");
+ assert.ok(parsed.requiredQualifications.some(line=>line.includes("One (1) year")));
+ });
+
+
+test("public qualification paragraphs survive long lines and stop before benefits", () => {
+  const knowledge = "Database concepts, data validation and integrity; " .repeat(14) + "HR administration knowledge is required.";
+  const ability = "Troubleshoot application errors and train end users; ".repeat(12) + "maintain confidential records.";
+  const parsed = parseCapture(`Example City\nSystems Analyst I\nAnaheim, CA\nDescription\nQualifications\nKnowledge of:\n${knowledge}\nAbility to:\n${ability}\nLicense/Certification Required\nA valid California driver's license is required.\nBenefits\nEmployer provides medical insurance and paid holidays.`);
+  assert.ok(parsed.requiredQualifications.includes(knowledge));
+  assert.ok(parsed.requiredQualifications.includes(ability));
+  assert.ok(parsed.requiredQualifications.some(line => line.includes("driver's license")));
+  assert.ok(!parsed.requiredQualifications.some(line => line.includes("paid holidays")));
 });

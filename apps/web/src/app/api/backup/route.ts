@@ -1,3 +1,4 @@
+import { PORTABLE_SETTING_KEYS } from "@/lib/workspace-backup";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 export const runtime = "nodejs";
@@ -8,7 +9,7 @@ export async function GET() {
     const [jobs, applications, tailoringRuns, keywordDecisions, changes, artifacts, events, dailyGoals, settings, discoveries, backups] = await Promise.all([
       tx.job.findMany(), tx.application.findMany(), tx.tailoringRun.findMany(), tx.keywordDecision.findMany(), tx.resumeChange.findMany(), tx.artifact.findMany(), tx.applicationEvent.findMany(), tx.dailyGoal.findMany(),
       // Never export worker secrets, heartbeat state, or arbitrary settings.
-      tx.setting.findMany({ where: { key: { in: ["product", "discovery:preferences", "application-profile"] } } }), tx.discoveryPosting.findMany(), tx.artifactBackup.findMany(),
+      tx.setting.findMany({ where: { OR: [{ key: { in: PORTABLE_SETTING_KEYS } }, { key: { startsWith: "discovery:linkedin:job:" } }] } }), tx.discoveryPosting.findMany(), tx.artifactBackup.findMany(),
     ]);
     return { jobs, applications, tailoringRuns, keywordDecisions, changes, artifacts, events, dailyGoals, settings, discoveries, backups: backups.map((b) => ({ artifactId: b.artifactId, contentBase64: Buffer.from(b.content).toString("base64") })) };
   }, { isolationLevel: "RepeatableRead", timeout: 30_000 });

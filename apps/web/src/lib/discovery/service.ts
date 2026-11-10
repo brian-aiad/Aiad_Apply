@@ -1,10 +1,16 @@
+import { currentDiscoveryEvidence } from "./current-evidence";
+import { completeDesktopRefresh, readRefreshRequest, refreshRequestFinished, REFRESH_REQUEST_KEY } from "./refresh-request";
+import { settledConcurrentMap, serialPublisher } from './concurrent-map';
+import {listingAgePriority} from './listing-age';
+import { candidateProfile } from "../workspace-material";
 import { sameKnownJob } from "./linkedin";
 import { requiredQualifications } from "./requirements";
 import { LINKEDIN_STATE, LINKEDIN_META, LINKEDIN_CONFIG, LINKEDIN_QUEUE, LINKEDIN_SESSION, TAILORING_CAPACITY, linkedInConfig, linkedInEligibility, object } from "./linkedin-policy";
 import { postedWithin } from "./freshness";
+import { discoveryScanDue, discoverySourceDue } from "./scan-policy";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { externalSources, integrationStatus } from "./external-providers";
-import { eligibleForAutoTailoring } from "./automation-policy";
+import { autoTailoringBlockers, eligibleForAutoTailoring } from "./automation-policy";
 import { createHash, randomUUID } from "node:crypto";
 import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
@@ -22,26 +28,30 @@ export const json = (v: unknown) => JSON.parse(JSON.stringify(v)) as Prisma.Inpu
 export const postingId = (sourceKey: string, externalId: string) => createHash("sha256").update(`${sourceKey}:${externalId}`).digest("hex");
 
 export async function discoverySnapshot() {
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
   const [postings, settings] = await Promise.all([
     db.discoveryPosting.findMany({ orderBy: [{ score: "desc" }, { firstSeenAt: "desc" }], take: 2000 }),
-    db.setting.findMany({ where: { OR: [{ key: { in: ["discovery:linkedin:assisted-capture", SCAN_KEY, PREFS_KEY, AUTOMATION_KEY, AUTOMATION_STATE_KEY, LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_QUEUE, LINKEDIN_SESSION] } }, { key: { startsWith: LINKEDIN_META } }] } }),
+    db.setting.findMany({ where: { OR: [{ key: { in: [REFRESH_REQUEST_KEY, "discovery:linkedin:assisted-capture", SCAN_KEY, PREFS_KEY, AUTOMATION_KEY, AUTOMATION_STATE_KEY, LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_QUEUE, LINKEDIN_SESSION] } }, { key: { startsWith: LINKEDIN_META } }] } }),
   ]);
   const preferences = readDiscoveryPreferences(settings.find((s) => s.key === PREFS_KEY)?.value);
+  const automation = readAutomationPreferences(settings.find(s => s.key === AUTOMATION_KEY)?.value);
   const applications = await db.application.findMany({ where: { id: { in: postings.flatMap(p => p.approvedApplicationId ? [p.approvedApplicationId] : []) } }, select: { id: true, status: true, tailoringRuns: { orderBy: { runNumber: "desc" }, take: 1, select: { status: true } } } });
   const queue = object(settings.find(s => s.key === LINKEDIN_QUEUE)?.value);
   const queueItems = Array.isArray(queue.items) ? queue.items.map(object) : [];
   return {
     postings: postings.map(posting => {
       const linkedin = settings.find(s => s.key === LINKEDIN_META + posting.id)?.value ?? null;
-      const fit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, preferences);
+      const fit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, preferences, profile, evidence);
       const app = applications.find(a => a.id === posting.approvedApplicationId);
       const eligibility = linkedInEligibility({ ...posting, ...fit }, linkedin);
       const queuedState = queueItems.find(i => i.postingId === posting.id);
       return { ...posting, ...fit, description: posting.description.slice(0, 1600), requiredExcerpt: requiredQualifications(posting.description).slice(0, 4), linkedin,
         ...(app ? { application: { id: app.id, status: app.status, tailoringStatus: app.tailoringRuns[0]?.status } } : {}),
-        ...(posting.sourceKey.startsWith("linkedin:") ? { pipeline: eligibility.status === "eligible" && queuedState ? { status: String(queuedState.status), reason: String(queuedState.reason) } : eligibility } : {}),
+        ...(posting.sourceKey.startsWith("linkedin:") ? { pipeline: eligibility.status === "eligible" && queuedState ? { status: String(queuedState.status), reason: String(queuedState.reason) } : eligibility } : { pipeline: { status: eligibleForAutoTailoring({ ...posting, ...fit }, automation) ? "Ready for automatic tailoring" : "Not queued automatically", reason: autoTailoringBlockers({ ...posting, ...fit }, automation).join(" ") || "Waiting for the next worker check and available daily capacity." } }),
       };
     }),
+    refreshRequest: readRefreshRequest(settings.find(s => s.key === REFRESH_REQUEST_KEY)?.value),
     linkedinCapture: settings.find(s => s.key === "discovery:linkedin:assisted-capture")?.value ?? null,
     linkedinConfig: linkedInConfig(settings.find(s => s.key === LINKEDIN_CONFIG)?.value),
     linkedinQueue: queue,
@@ -56,6 +66,8 @@ export async function discoverySnapshot() {
 }
 
 export async function refreshDiscovery(force = false) {
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
   const automation = readAutomationPreferences((await db.setting.findUnique({ where: { key: AUTOMATION_KEY } }))?.value);
   // Short transaction serializes claims across browsers, processes, and devices.
   // Network calls run outside the transaction. A dead process's lease expires.
@@ -65,33 +77,41 @@ export async function refreshDiscovery(force = false) {
     const previous = current?.value as ScanSummary | null;
     const age = previous ? Date.now() - new Date(previous.startedAt).getTime() : Infinity;
     if (previous?.status === "running" && age < 180_000) return { claimed: false as const, scan: previous, reason: "running" };
-    if (previous?.status !== "running" && age < (force ? 60_000 : previous?.status === "failed" ? 15 * 60_000 : automation.intervalHours * 60 * 60 * 1000)) return { claimed: false as const, scan: previous, reason: "fresh" };
+    if (!discoveryScanDue(previous, automation.intervalHours, force)) return { claimed: false as const, scan: previous, reason: "fresh" };
     const scan: ScanSummary = { id: randomUUID(), status: "running", startedAt: new Date().toISOString(), sources: [], found: 0 };
     await tx.setting.upsert({ where: { key: SCAN_KEY }, create: { key: SCAN_KEY, value: json(scan) }, update: { value: json(scan) } });
-    return { claimed: true as const, scan, reason: "started" };
+    return { claimed: true as const, scan, previous, reason: "started" };
   });
   if (!claim.claimed) return claim;
   const pref = await db.setting.findUnique({ where: { key: PREFS_KEY } });
   const preferences = readDiscoveryPreferences(pref?.value);
-  const registry = [...DISCOVERY_SOURCES, ...externalSources(preferences)];
-  const sources: SourceResult[] = [];
+  const allSources = [...DISCOVERY_SOURCES, ...externalSources(preferences)];
+  const registry = allSources.filter(s => discoverySourceDue(s.key, claim.previous, automation.intervalHours, force));
+  const sources: SourceResult[] = (claim.previous?.sources || [])
+    .filter(s => allSources.some(current => current.key === s.sourceKey) && !registry.some(current => current.key === s.sourceKey))
+    .map(s => ({ ...s, checkedAt: s.checkedAt || claim.previous?.completedAt || claim.previous?.startedAt }));
   let found = 0;
   const signal = AbortSignal.timeout(90_000);
+  const publish = serialPublisher();
   try {
-    for (let offset = 0; offset < registry.length; offset += 4) {
-      const batch = await Promise.allSettled(registry.slice(offset, offset + 4).map(async (source) => {
-        const result = await collectSource(source, preferences, signal);
+    const batch = await settledConcurrentMap(registry,4,async (source) => {
+        const progressKey = `discovery:collector-state:${source.key}`;
+        const progress = ["edjoin", "calcareers"].includes(source.provider) ? await db.setting.findUnique({ where: { key: progressKey } }) : null;
+        const result = await collectSource(source, preferences, signal, progress?.value);
         const now = new Date();
         let matches = 0;
-        await db.$transaction(async (tx) => {
+        await publish(() => db.$transaction(async (tx) => {
+          // Serialize publication with lease replacement, not just a stale read.
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock(9074030)`;
           // Only the lease owner may publish a result. Never erase approvals.
           const lease = await tx.setting.findUnique({ where: { key: SCAN_KEY } });
           if ((lease?.value as ScanSummary | null)?.id !== claim.scan.id) throw new Error("Refresh lease changed; retry the search.");
+          if ("nextState" in result) await tx.setting.upsert({ where: { key: progressKey }, create: { key: progressKey, value: json(result.nextState ?? {}) }, update: { value: json(result.nextState ?? {}) } });
           for (const opening of result.openings) {
-            const { excluded, ...assessment } = assessOpening(opening, preferences);
+            const { excluded, ...assessment } = assessOpening(opening, preferences, profile, evidence);
             const id = postingId(source.key, opening.externalId);
             if (excluded) {
-              await tx.discoveryPosting.updateMany({ where: { id }, data: { ...assessment, active: true, lastSeenAt: now } });
+              await tx.discoveryPosting.updateMany({ where: { id }, data: { ...opening, ...assessment, active: true, lastSeenAt: now } });
               continue;
             }
             const data = { ...opening, ...assessment, active: true, lastSeenAt: now };
@@ -102,16 +122,16 @@ export async function refreshDiscovery(force = false) {
           if (result.complete && result.authoritative) await tx.discoveryPosting.updateMany({
             where: { sourceKey: source.key, active: true, externalId: { notIn: result.liveIds } }, data: { active: false },
           });
-        }, { timeout: 20_000 });
-        return { sourceKey: source.key, company: source.company, status: result.complete ? "ok" as const : "partial" as const, checked: result.checked, found: matches, ...(!result.complete ? { message: ("message" in result && typeof result.message === "string" ? result.message : "Collection was incomplete; previous listings were preserved.") } : {}) };
-      }));
+        }, { maxWait: 20_000, timeout: 20_000 }));
+        return { ...("continuationPending" in result && typeof result.continuationPending === "boolean" ? { continuationPending: result.continuationPending } : {}), sourceKey: source.key, company: source.company, status: result.complete ? "ok" as const : "partial" as const, checkedAt: now.toISOString(), checked: result.checked, found: matches, ...(!result.complete ? { message: ("message" in result && typeof result.message === "string" ? result.message : "Collection was incomplete; previous listings were preserved.") } : {}) };
+      });
       for (let i = 0; i < batch.length; i++) {
         const item = batch[i];
         if (item.status === "fulfilled") { sources.push(item.value); found += item.value.found; }
-        else sources.push({ sourceKey: registry[offset + i].key, company: registry[offset + i].company, status: "failed", checked: 0, found: 0, message: item.reason instanceof Error ? item.reason.message : "Source unavailable. Try again later." });
+        else sources.push({ sourceKey: registry[i].key, company: registry[i].company, status: "failed", checkedAt: new Date().toISOString(), checked: 0, found: 0, message: item.reason instanceof Error ? item.reason.message : "Source unavailable. Try again later." });
       }
-    }
   } finally {
+    found = sources.reduce((total, source) => total + source.found, 0);
     const summary: ScanSummary = { ...claim.scan, completedAt: new Date().toISOString(), status: sources.some((s) => s.status !== "failed") ? "completed" : "failed", sources, found };
     await db.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT pg_advisory_xact_lock(9074030)`;
@@ -123,6 +143,8 @@ export async function refreshDiscovery(force = false) {
 }
 
 export async function approvePosting(id: string, tailor: boolean, automatic: boolean | "linkedin" = false) {
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(9074031)`;
     const posting = await tx.discoveryPosting.findUnique({ where: { id } });
@@ -134,7 +156,7 @@ export async function approvePosting(id: string, tailor: boolean, automatic: boo
       const settings = await tx.setting.findMany({ where: { key: { in: [AUTOMATION_KEY, PREFS_KEY] } } });
       const automation = readAutomationPreferences(settings.find((s) => s.key === AUTOMATION_KEY)?.value);
       const preferences = readDiscoveryPreferences(settings.find((s) => s.key === PREFS_KEY)?.value);
-      const assessment = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, preferences);
+      const assessment = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, preferences, profile, evidence);
       if (!automation.autoTailor || !tailor || !eligibleForAutoTailoring({ ...posting, ...assessment }, automation)) throw new Error("This opening does not meet your automatic tailoring rules.");
       const start = fromZonedTime(`${formatInTimeZone(new Date(), "America/Los_Angeles", "yyyy-MM-dd")}T00:00:00`, "America/Los_Angeles");
       const used = await tx.applicationEvent.count({ where: { eventType: "automatic_tailoring_queued", occurredAt: { gte: start } } });
@@ -146,7 +168,7 @@ export async function approvePosting(id: string, tailor: boolean, automatic: boo
       if (existing) return { id: existing.id, duplicate: true };
     }
     const currentPreferences = readDiscoveryPreferences((await tx.setting.findUnique({ where: { key: PREFS_KEY } }))?.value);
-    const currentFit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, currentPreferences);
+    const currentFit = assessOpening({ ...posting, employmentType: posting.employmentType as "Full-time", workArrangement: posting.workArrangement as "On-site" }, currentPreferences, profile, evidence);
     if (currentFit.excluded) throw new Error("This opening does not meet your current role, confirmed pay or commute requirements. Refresh Discover.");
     if (!posting.active) throw new Error("This posting is no longer listed. Refresh the search before approving it.");
     if (Date.now() - posting.lastSeenAt.getTime() > 48 * 60 * 60 * 1000) throw new Error("This listing has not been checked in two days. Refresh the search before approving it.");
@@ -208,20 +230,29 @@ export async function approvePosting(id: string, tailor: boolean, automatic: boo
 }
 
 export async function runDiscoveryAutomation() {
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
   const settings = readAutomationPreferences((await db.setting.findUnique({ where: { key: AUTOMATION_KEY } }))?.value);
-  if (!settings.scheduledSearch) return { enabled: false, queued: 0 };
-  const scan = await refreshDiscovery(false);
+  const requested = readRefreshRequest((await db.setting.findUnique({ where: { key: REFRESH_REQUEST_KEY } }))?.value);
+  if (!settings.scheduledSearch && !requested) return { enabled: false, queued: 0 };
+  const scan = await refreshDiscovery(!!requested);
+  if (requested && refreshRequestFinished(scan)) await completeDesktopRefresh(requested);
   if (scan.reason === "running" || scan.scan?.status === "failed") return { enabled: true, queued: 0, reason: scan.reason };
   const prefs = readDiscoveryPreferences((await db.setting.findUnique({ where: { key: PREFS_KEY } }))?.value);
   const rows = await db.discoveryPosting.findMany({ where: { active: true, sourceKey: { not: { startsWith: "linkedin:" } } } });
-  const snapshot = { postings: rows.map(p => ({ ...p, ...assessOpening({ ...p, employmentType: p.employmentType as "Full-time", workArrangement: p.workArrangement as "On-site" }, prefs) })) };
+  const snapshot = { postings: rows.map(p => ({ ...p, ...assessOpening({ ...p, employmentType: p.employmentType as "Full-time", workArrangement: p.workArrangement as "On-site" }, prefs, profile, evidence) })) };
   let queued = 0;
   const messages: string[] = [];
   if (settings.autoTailor) {
-    const candidates = snapshot.postings.filter((p) => !p.sourceKey.startsWith("linkedin:") && eligibleForAutoTailoring(p, settings)).sort((a, b) => b.score - a.score || b.firstSeenAt.getTime() - a.firstSeenAt.getTime());
-    for (const posting of candidates.slice(0, settings.dailyLimit)) {
+    const candidates = snapshot.postings.filter((p) => !p.sourceKey.startsWith("linkedin:") && eligibleForAutoTailoring(p, settings)).sort((a, b) => listingAgePriority(a)-listingAgePriority(b) || b.score - a.score || (b.postedAt?.getTime()||0)-(a.postedAt?.getTime()||0) || b.firstSeenAt.getTime()-a.firstSeenAt.getTime());
+    for (const posting of candidates) {
+      if (queued >= settings.dailyLimit) break;
       try { const result = await approvePosting(posting.id, true, true); if (!result.duplicate) queued++; }
-      catch (error) { messages.push(error instanceof Error ? error.message : "Could not queue this opening."); }
+      catch (error) {
+        const message = error instanceof Error ? error.message : "Could not queue this opening.";
+        messages.push(message);
+        if (message.includes("Daily automatic tailoring limit or queue capacity reached")) break;
+      }
     }
   }
   const state = { checkedAt: new Date().toISOString(), queued, messages };

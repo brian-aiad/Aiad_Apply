@@ -19,6 +19,38 @@ The standing editable-draft preference is also recorded in [AGENTS.md](AGENTS.md
 for future coding sessions and embedded in the runtime prompt and export checks.
 MATLAB is an example of the general rule, not a skill automatically added to all jobs.
 
+## Current workflow — October 20, 2026
+
+Paste a complete posting in Capture and choose **Save and tailor**. With automatic
+applications enabled in Settings, the selected application computer chooses the validated job-specific PDF,
+checks the live job and exact attachment, and submits without a resume-review wait.
+Missing facts and blocked portals are parked while other jobs continue. Pause the
+mode in Settings at any time. Individual resume review and manual Auto apply remain
+optional. Discovery keeps its saved 12-hour collection and tailoring schedule.
+
+Windows is the primary scheduled-discovery computer. Application automation can
+be assigned independently to Mac for visible development or Windows for unattended
+work in Settings → Application computer. See [device commands and handoff](docs/MAC_WINDOWS_WORKFLOW.md). Either Mac or Windows can
+capture, tailor, review, download and approve work through the shared database.
+The Windows tailoring worker starts the application browser when approved work
+needs it. Sign into employer portals once in its dedicated Chrome window.
+
+Confirmed candidate facts, evidence decisions, supplemental onboarding and the
+protected base resume now live in secured shared workspace storage. New runs use
+private hash-verified source snapshots; historical artifacts remain unchanged.
+One-time initialization is `cd apps/web && npx tsx scripts/sync-workspace.ts` on the
+confirmed source installation. It preserves existing shared values. Browser
+sessions, OAuth tokens, locks and journals remain local, never candidate data.
+
+Use `scripts/install-login-startup.ps1` on Windows or
+`python3 scripts/install-login-startup.py` on Mac for dashboard/tailoring login
+startup. Browser work requires standing automatic authorization or exact per-application approval. Windows must
+be awake and logged into its interactive session for visible browser automation.
+
+See [the current plan](docs/improvement-plan.md) and
+[the current handoff](docs/CURRENT_HANDOFF.md) for verification and remaining access
+requirements. Older dated notes below are historical where superseded.
+
 ## Daily Use
 
 Existing hosted dashboard: https://aiadapply-web.vercel.app (local changes are not
@@ -88,7 +120,7 @@ runs, saved jobs, active tailoring, and curated openings. It shows actual daily
 submissions against your adjustable goal, a Monday–Sunday ledger, your streak,
 and follow-ups due. Saving or tailoring a job does not count as applying.
 
-**Discover** checks 15 curated employer/staffing boards through public
+**Discover** checks 35 curated employer/staffing boards through public
 Greenhouse, Lever, Ashby, SmartRecruiters, and RTX Workday feeds. It targets application
 support, technical support, IT operations, systems support, and software
 integrations using evidence from the protected base resume. Defaults are Seal
@@ -101,21 +133,33 @@ Remote roles are off by default and can be enabled in Preferences.
   refreshes every six hours by default, including while the browser is closed.
   The computer and local app/worker must remain running. Today and Discover also
   check for due searches; manual refresh has a one-minute cooldown.
+  Brian's saved Windows schedule is every 12 hours with automatic tailoring enabled.
+  Incomplete public scans retry transient failures after 15 minutes without
+  re-fetching successful boards. Access restrictions retain the normal interval;
+  LinkedIn keeps its separate cooldown. Existing listings and history are preserved.
 - Automatic tailoring is optional and off by default. Preferences exposes a daily
   limit (default two) and minimum score (default 80). Only recently verified,
-  dated openings with no fit cautions qualify; automatic submission is not implemented.
-- Local discovery defaults to postings within 21 days; separate first-found
+  dated openings with no material fit cautions qualify. Balboa TriNet and Luxus
+  public boards omit original dates; freshly confirmed active listings from those
+  two boards can qualify without an invented date. All other fit and 12-hour
+  freshness checks remain. Application submission requires approval of the exact
+  PDF and a separate Auto apply action.
+- Local discovery defaults to recently verified active postings; separate first-found
   filters and an unknown-date option preserve that distinction. Employer feeds
   usually do not expose applicant counts, so competition remains unknown.
 - Distances are approximate city-centre radius measurements, not driving miles
   or verified street addresses. Check the worksite before approving.
-- Missing salary/full-time information, clearance, seniority, and specialist
-  requirements appear under **Needs closer look**, never as confirmed matches.
+- Unknown pay, unconfirmed full-time status and unconfirmed/distant worksites are
+  **Excluded**. Seniority and specialist concerns remain visible for review.
   Matching is a screening aid, not a determination that you meet every requirement.
 - **Approve & save** adds a normal captured application. **Approve & tailor**
   queues the existing validated tailoring engine. Neither submits an application.
 - Duplicate approvals are transaction-locked. Partial/failed source checks retain
   earlier results and disclose the issue instead of pretending coverage is complete.
+- Balboa Technologies' TriNet board and Luxus Group's complete public careers
+  feed are recurring collectors, including future postings. Conflicting pay bands
+  use the lower published starting pay; contracts and unknown full-time terms do
+  not qualify. Existing captured applications are linked without duplicate runs.
 - The local government, university, healthcare, and additional staffing directory
   links are clearly manual sources; they are not claimed as automated feeds.
 
@@ -584,7 +628,7 @@ new worker only after configuration and authentication are ready.
 
 Native Windows: the PowerShell launcher supports dashboard and tailoring. The
 new application browser worker currently uses Unix fcntl locking and a shell
-launcher; native Windows auto-apply is not yet supported or verified. Do not
+launcher; native Windows Auto Apply now uses a cross-platform launcher; see the current handoff for actual runtime verification. Do not
 assume WSL is fully tested. Mac auto-start/LaunchAgent setup is machine-specific.
 
 Latest outcome: IT Systems Engineer and Product Operations Specialist, Air Defense

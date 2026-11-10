@@ -278,11 +278,17 @@ test("partial refresh preserves old jobs and dismissal; parallel scans have one 
   const p = await posting("failed-source");
   await db.discoveryPosting.update({ where: { id: p.id }, data: { sourceKey: "greenhouse:rocketlab", dismissedAt: new Date() } });
   await db.setting.upsert({ where: { key: SCAN_KEY }, create: { key: SCAN_KEY, value: { id: "expired-lease", status: "running", startedAt: new Date(Date.now() - 600000).toISOString(), sources: [], found: 0 } }, update: { value: { id: "expired-lease", status: "running", startedAt: new Date(Date.now() - 600000).toISOString(), sources: [], found: 0 } } });
+  const { postingId } = await import("../../src/lib/discovery/service");
+  const stale = await posting("changed-employer-pay");
+  const staleId = postingId("lever:floqast", "changed-pay-fixture");
+  postingIds.push(staleId);
+  await db.discoveryPosting.update({ where: { id: stale.id }, data: { id: staleId, sourceKey: "lever:floqast", externalId: "changed-pay-fixture" } });
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input) => {
     const url = String(input);
     if (url.includes("rocketlab")) return new Response("unavailable", { status: 503 });
     if (url.includes("greenhouse")) return Response.json({ jobs: [] });
+    if (url.includes("lever.co") && url.includes("floqast")) return Response.json([{ id: "changed-pay-fixture", text: stale.title, hostedUrl: stale.sourceUrl, categories: { location: "Long Beach, CA", commitment: "Full-time" }, workplaceType: "onsite", descriptionPlain: stale.description, createdAt: Date.now(), salaryRange: { min: 50000, max: 55000, currency: "USD", interval: "year" } }]);
     if (url.includes("lever.co")) return Response.json([]);
     if (url.includes("ashbyhq")) return Response.json({ jobs: [] });
     return Response.json({ content: [], totalFound: 0 });
@@ -292,11 +298,50 @@ test("partial refresh preserves old jobs and dismissal; parallel scans have one 
     assert.equal(results.filter((r) => r.claimed).length, 1);
     const preserved = await db.discoveryPosting.findUniqueOrThrow({ where: { id: p.id } });
     assert.equal(preserved.active, true); assert.ok(preserved.dismissedAt);
+    const updated = await db.discoveryPosting.findUniqueOrThrow({ where: { id: staleId } });
+    assert.equal(updated.salaryMin, 50000, "New exclusion must replace stale previously qualifying pay.");
+    assert.equal(updated.qualified, false);
+    const { discoverySnapshot } = await import("../../src/lib/discovery/service");
+    assert.equal((await discoverySnapshot()).postings.find(p => p.id === staleId)?.excluded, true);
     const lease = await db.setting.findUniqueOrThrow({ where: { key: SCAN_KEY } });
     assert.match(JSON.stringify(lease.value), /failed/);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalScan) await db.setting.update({ where: { key: SCAN_KEY }, data: { value: originalScan.value! } });
+    else await db.setting.deleteMany({ where: { key: SCAN_KEY } });
+  }
+});
+
+test("automatic retry resumes only timed-out sources and retains successful scan evidence", async () => {
+  const { refreshDiscovery, SCAN_KEY } = await import("../../src/lib/discovery/service");
+  const { DISCOVERY_SOURCES } = await import("../../src/lib/discovery/sources");
+  const original = await db.setting.findUnique({ where: { key: SCAN_KEY } });
+  const at = new Date(Date.now() - 16 * 60_000).toISOString();
+  const sources = DISCOVERY_SOURCES.map(s => ({ sourceKey: s.key, company: s.company,
+    status: s.key === "greenhouse:rocketlab" ? "failed" : "ok", checked: 10,
+    found: s.key === "lever:waremalcomb" ? 2 : 0, checkedAt: at,
+    ...(s.key === "greenhouse:rocketlab" ? { message: "The operation was aborted due to timeout" } : {}),
+  }));
+  const value = { id: "partial-cycle", status: "completed", startedAt: at, completedAt: at, sources, found: 2 };
+  await db.setting.upsert({ where: { key: SCAN_KEY }, create: { key: SCAN_KEY, value }, update: { value } });
+  const originalFetch = globalThis.fetch;
+  const requests: string[] = [];
+  globalThis.fetch = async input => { requests.push(String(input)); return Response.json({ jobs: [] }); };
+  try {
+    const result = await refreshDiscovery(false);
+    assert.equal(result.claimed, true);
+    assert.equal(requests.length, 1);
+    assert.ok(requests[0].includes("rocketlab"));
+    assert.equal(result.scan?.sources.length, DISCOVERY_SOURCES.length);
+    const preserved = result.scan?.sources.find(s => s.sourceKey === "lever:waremalcomb");
+    assert.equal(preserved?.checkedAt, at);
+    assert.equal(preserved?.found, 2);
+    assert.equal(result.scan?.found, 2);
+    assert.ok(result.scan?.sources.every(s => s.status === "ok"));
+    assert.equal((await refreshDiscovery(false)).claimed, false);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (original) await db.setting.update({ where: { key: SCAN_KEY }, data: { value: original.value! } });
     else await db.setting.deleteMany({ where: { key: SCAN_KEY } });
   }
 });
@@ -386,4 +431,46 @@ test("batch tailoring preserves partial success and deduplicates retries", async
   assert.equal(retry.results[0].duplicate, true);
   assert.equal(await db.tailoringRun.count({ where: { applicationId: app.id } }), 1);
   assert.equal((await invoke(Array.from({ length: 11 }, () => p.id))).status, 400);
+});
+
+test("public detail progress persists across scans but a lost lease cannot advance it", async () => {
+  const { refreshDiscovery, SCAN_KEY } = await import("../../src/lib/discovery/service");
+  const { DISCOVERY_SOURCES } = await import("../../src/lib/discovery/sources");
+  const key = "discovery:collector-state:edjoin:orange-schools";
+  const original = await db.setting.findUnique({ where: { key: SCAN_KEY } });
+  const oldProgress = await db.setting.findUnique({ where: { key } });
+  const originalFetch = globalThis.fetch;
+  const attempted: string[] = [];
+  let stealLease = false;
+  async function due() {
+    const at = new Date(Date.now() - 16 * 60_000).toISOString();
+    const value = { id: "detail-cycle", status: "completed", startedAt: at, completedAt: at, found: 0, sources: DISCOVERY_SOURCES.map(s => ({ sourceKey: s.key, company: s.company, status: s.provider === "edjoin" ? "partial" : "ok", checked: 0, found: 0, checkedAt: at })) };
+    await db.setting.upsert({ where: { key: SCAN_KEY }, create: { key: SCAN_KEY, value }, update: { value } });
+  }
+  globalThis.fetch = async input => {
+    const url = String(input);
+    if (url.includes("LoadJobsPortalList")) return Response.json({ data: Array.from({ length: 25 }, (_, i) => ({ postingID: i + 1, positionTitle: "Application Support Specialist" })), totalRecords: 25, totalPages: 1 });
+    attempted.push(url.split("/").at(-1)!);
+    if (stealLease) {
+      stealLease = false;
+      await db.setting.update({ where: { key: SCAN_KEY }, data: { value: { id: "replacement-lease" } } });
+    }
+    return new Response("Expired posting");
+  };
+  try {
+    await db.setting.deleteMany({ where: { key } });
+    await due(); await refreshDiscovery(false);
+    assert.deepEqual((await db.setting.findUniqueOrThrow({ where: { key } })).value, { version: 1, lastId: "12" });
+    await due(); await refreshDiscovery(false);
+    assert.deepEqual((await db.setting.findUniqueOrThrow({ where: { key } })).value, { version: 1, lastId: "24" });
+    assert.equal(new Set(attempted).size, 24);
+    await due(); stealLease = true; await refreshDiscovery(false);
+    assert.deepEqual((await db.setting.findUniqueOrThrow({ where: { key } })).value, { version: 1, lastId: "24" });
+  } finally {
+    globalThis.fetch = originalFetch;
+    for (const [k, saved] of [[SCAN_KEY, original], [key, oldProgress]] as const) {
+      if (saved) await db.setting.upsert({ where: { key: k }, create: { key: k, value: saved.value! }, update: { value: saved.value! } });
+      else await db.setting.deleteMany({ where: { key: k } });
+    }
+  }
 });

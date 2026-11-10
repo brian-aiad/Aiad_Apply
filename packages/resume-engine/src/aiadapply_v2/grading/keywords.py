@@ -3,6 +3,11 @@ from __future__ import annotations
 import re
 from collections import Counter
 
+from aiadapply_v2.parsers.linkedin_simplify import (
+    HEADINGS,
+    QUALIFICATION_SUBHEADINGS,
+    RESPONSIBILITY_SUBHEADINGS,
+)
 from aiadapply_v2.schemas import (
     JobKeyword,
     KeywordContext,
@@ -671,6 +676,45 @@ def important_keywords(keywords: list[JobKeyword]) -> list[JobKeyword]:
     return [keyword for keyword in keywords if keyword.accepted and keyword.hiring_importance >= 35]
 
 
+def _company_context_only(job: ParsedJob, term: str) -> bool:
+    """Exclude explicit employer marketing, without blacklisting its technologies."""
+    company_headings = {
+        "company overview",
+        "department overview",
+        "about the company",
+        "about us",
+        "who we are",
+    }
+    if job.company:
+        company_headings.add(f"about {job.company.lower()}")
+    role_headings = {
+        "job description",
+        "description",
+        "about the role",
+        "about this role",
+        "the opportunity",
+        "the role",
+        "role overview",
+        "position summary",
+        "role and responsibilities",
+    }
+    role_headings.update(heading for group in HEADINGS.values() for heading in group)
+    role_headings.update(QUALIFICATION_SUBHEADINGS | RESPONSIBILITY_SUBHEADINGS)
+    company_lines: list[str] = []
+    role_lines: list[str] = []
+    in_company = False
+    for line in job.job_description.splitlines():
+        heading = line.strip().strip("#*: ").lower().replace("’", "'")
+        if heading in company_headings:
+            in_company = True
+        elif heading in role_headings:
+            in_company = False
+        (company_lines if in_company else role_lines).append(line)
+    return bool(_count_job_term("\n".join(company_lines), term)) and not _count_job_term(
+        "\n".join(role_lines), term
+    )
+
+
 def _grade_one(
     job: ParsedJob,
     term: str,
@@ -744,6 +788,16 @@ def _grade_one(
         factors["posting_repetition"] += min(8, total_occurrences * 2)
 
     rejection = ""
+    if not (
+        title_occurrences
+        or required_occurrences
+        or responsibility_occurrences
+        or preferred_occurrences
+    ) and _company_context_only(job, term):
+        factors["company_marketing_only"] -= 50
+        rejection = (
+            "Term describes the company or its products, not this role's duties or requirements."
+        )
     if (
         normalized == "saas"
         and total_occurrences

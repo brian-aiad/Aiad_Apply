@@ -725,7 +725,7 @@ def test_current_linkedin_posts_preserve_identity_and_hiring_section_boundaries(
             "Technical Support Engineer (Bare Metal)",
             "",
             "$83,000 to $145,000",
-            (13, 13, 0),
+            (14, 13, 0),
         ),
         (
             "linkedin_4369610709_infinite_giving_client_operations_specialist.txt",
@@ -733,7 +733,7 @@ def test_current_linkedin_posts_preserve_identity_and_hiring_section_boundaries(
             "Client Operations Specialist",
             "Remote",
             "",
-            (3, 7, 3),
+            (4, 7, 3),
         ),
         (
             "linkedin_4401508206_liveramp_technical_support_engineer.txt",
@@ -914,3 +914,65 @@ Experience with SPSS.
     assert any("SQL" in x for x in job.required_qualifications)
     assert any("2-4 years" in x for x in job.required_qualifications)
     assert any("SPSS" in x for x in job.preferred_qualifications)
+
+
+def test_public_employer_description_and_experience_heading() -> None:
+    raw = """Example City
+Systems Analyst I
+Anaheim, CA
+Full Time
+$70,000 - $90,000 Annually
+Description
+Provide application support and maintain accurate business records.
+Responsibilities
+Troubleshoot application issues, document resolutions, and train end users.
+Validate data and develop SQL queries and routine reports for business users.
+Qualifications
+Experience and Education:
+One year of technical support experience and a bachelor's degree in computer science.
+Knowledge of relational databases, software testing, documentation, and confidentiality.
+"""
+    job = parse_linkedin_simplify(raw)
+    assert job.title == "Systems Analyst I"
+    assert any("One year" in q for q in job.required_qualifications)
+    assert any("SQL" in q for q in job.responsibilities)
+
+
+def test_public_employer_metadata_does_not_replace_role_identity() -> None:
+    raw = (
+        "Example City\nSystems Analyst I\nSalary\n$70,000 - $90,000 Annually\nLocation\nCity of Anaheim, CA\nJob Type\nFull Time\nJob Number\n2026-001\nClosing Date\n11/2/2026\nDescription\nResponsibilities\n"
+        + "Troubleshoot systems and document user support resolutions.\n" * 10
+        + "Qualifications\nExperience and Education:\nOne year technical support and a computer science degree."
+    )
+    job = parse_linkedin_simplify(raw)
+    assert job.company == "Example City"
+    assert job.title == "Systems Analyst I"
+
+
+def test_long_public_qualification_paragraphs_preserve_requirements_and_boundary():
+    knowledge = (
+        "Database concepts, data validation and integrity; " * 14
+        + "HR administration knowledge is required."
+    )
+    ability = (
+        "Troubleshoot application errors and train end users; " * 12
+        + "maintain confidential records."
+    )
+    job = parse_linkedin_simplify(f"""Example City
+Systems Analyst I
+Anaheim, CA
+Description
+Qualifications
+Knowledge of:
+{knowledge}
+Ability to:
+{ability}
+License/Certification Required
+A valid California driver's license is required.
+Benefits
+Employer provides medical insurance and paid holidays.
+""")
+    assert knowledge in job.required_qualifications
+    assert ability in job.required_qualifications
+    assert any("driver's license" in line for line in job.required_qualifications)
+    assert not any("paid holidays" in line for line in job.required_qualifications)

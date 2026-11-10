@@ -10,7 +10,7 @@ const statuses = ["CAPTURED", "REVIEW", "READY", "APPLIED", "INTERVIEW", "CLOSED
 const statusHelp: Record<string, string> = {
   CAPTURED: "Posting saved; resume not yet reviewed.",
   TAILORING: "The local worker is preparing this resume.",
-  REVIEW: "Tailoring finished; inspect changes and flags.",
+  REVIEW: "Resume prepared. Changes and validation remain available to inspect.",
   READY: "You reviewed the resume and it is ready to submit.",
   APPLIED: "Application submitted; a follow-up is scheduled automatically if this field is empty.",
   INTERVIEW: "Interview process is active.",
@@ -27,32 +27,39 @@ function toLocalInput(iso: string) {
 export function ApplicationControls({
   id,
   initialStatus,
+  initialUpdatedAt,
   initialUrl,
   initialNotes,
   initialFollowUpAt,
+  initialCommitmentAt = "",
   hasActiveRun,
   hasResumeFiles,
 }: {
   id: string;
   initialStatus: string;
+  initialUpdatedAt?: string;
   initialUrl: string;
   initialNotes: string;
   initialFollowUpAt: string;
+  initialCommitmentAt?: string;
   hasActiveRun: boolean;
   hasResumeFiles: boolean;
 }) {
   const router = useRouter();
+  const [version, setVersion] = useState(initialUpdatedAt);
   const [status, setStatus] = useState(initialStatus);
   const [sourceUrl, setSourceUrl] = useState(initialUrl);
   const [notes, setNotes] = useState(initialNotes);
   const [followUpAt, setFollowUpAt] = useState(toLocalInput(initialFollowUpAt));
+  const [commitmentAt, setCommitmentAt] = useState(toLocalInput(initialCommitmentAt));
+  const [savedCommitment, setSavedCommitment] = useState(toLocalInput(initialCommitmentAt));
   const [saved, setSaved] = useState({ status: initialStatus, sourceUrl: initialUrl, notes: initialNotes, followUpAt: toLocalInput(initialFollowUpAt) });
   const [busy, setBusy] = useState<"save" | "tailor" | "delete" | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const visibleStatuses = initialStatus === "TAILORING" ? (["TAILORING", ...statuses] as const) : statuses;
-  const dirty = status !== saved.status || sourceUrl !== saved.sourceUrl || notes !== saved.notes || followUpAt !== saved.followUpAt;
+  const dirty = commitmentAt !== savedCommitment || status !== saved.status || sourceUrl !== saved.sourceUrl || notes !== saved.notes || followUpAt !== saved.followUpAt;
 
   async function save() {
     setBusy("save");
@@ -63,9 +70,11 @@ export function ApplicationControls({
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          updatedAt: version,
           ...(status !== saved.status && status !== "TAILORING" ? { status } : {}),
           sourceUrl,
           notes,
+          ...(commitmentAt !== savedCommitment ? { commitmentAt: commitmentAt ? new Date(commitmentAt).toISOString() : null } : {}),
           followUpAt: followUpAt ? new Date(followUpAt).toISOString() : "",
         }),
       });
@@ -73,6 +82,8 @@ export function ApplicationControls({
       if (!response.ok) throw new Error(payload.error || "Unable to save changes.");
       const savedFollowUpAt = toLocalInput(payload.followUpAt || "");
       setFollowUpAt(savedFollowUpAt);
+      setVersion(payload.updatedAt);
+      setSavedCommitment(commitmentAt);
       setSaved({ status, sourceUrl, notes, followUpAt: savedFollowUpAt });
       window.dispatchEvent(new CustomEvent(APPLICATION_STATUS_EVENT, {
         detail: { applicationId: id, status: String(payload.status || status) },
@@ -132,13 +143,14 @@ export function ApplicationControls({
         {dirty ? <span className="status status-amber">Unsaved</span> : null}
       </div>
       <div className="controls-fields">
+        <label className="field-label">Interview / application deadline<input className="input" type="datetime-local" value={commitmentAt} onChange={event => setCommitmentAt(event.target.value)} /><span className="field-help">Due within 48 hours: prioritized on Today. Clear after handling it.</span></label>
         <div className="control-status-row">
           <div>
           <label className="field-label" htmlFor="application-status">Status</label>
           <select id="application-status" className="select" value={status} onChange={(event) => setStatus(event.target.value)} disabled={hasActiveRun}>
             {visibleStatuses.map((item) => (
-              <option key={item} value={item} disabled={item === "TAILORING" || (item === "READY" && !hasResumeFiles)}>
-                {item.toLocaleLowerCase().replace("_", " ")}
+              <option key={item} value={item} disabled={item === "APPLIED" && initialStatus !== "APPLIED" || item === "TAILORING" || (item === "READY" && !hasResumeFiles)}>
+                {item === "REVIEW" ? "prepared" : item === "CAPTURED" ? "saved" : item.toLocaleLowerCase().replace("_", " ")}
               </option>
             ))}
           </select>

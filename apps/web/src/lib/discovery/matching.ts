@@ -1,11 +1,11 @@
-import { clearanceRequirement, experienceRequirement, requiredQualifications, roleConditions } from "./requirements";
+import { discoveryEvidence } from "./profile-evidence";
+import { clearanceRequirement, experienceRequirement, requiredQualifications, requiredHrDomains, roleConditions } from "./requirements";
 import { rtxFit } from "./rtx-fit";
 import occupationTitles from "./occupation-titles.json";
-import resumeEvidence from "./candidate-evidence.json";
 import type { DiscoveryPreferences, Opening } from "./types";
 
 // The protected document's checked-in inspection, not generated resume prose.
-const baseEvidence = resumeEvidence.evidence.join("\n").toLowerCase();
+
 const skillDefinitions: [string, RegExp, string][] = [
   ["SQL & databases", /\b(?:SQL|PostgreSQL|MySQL|database queries)\b/i, "sql"],
   ["API troubleshooting", /\b(?:REST|APIs?|Postman|webhooks?)\b/i, "postman"],
@@ -20,11 +20,16 @@ const skillDefinitions: [string, RegExp, string][] = [
 ];
 
 export function excludedTitle(title: string) {
-  return /\b(?:director|head of|vice president|vp|intern|internship|principal|staff engineer|mechanical|electrical|aerospace|avionics|payload|fluid|environmental test|mission|manufacturing|weld|life support|logistics|subcontracts|field service|sales|RF|propulsion|weapons?|missiles?|maritime|flight|air vehicles|robotics|electronic warfare|precision engagement|advanced effects|edge compute)\b/i.test(title);
+  // Sales-system support is an IT role; sales quotas and enterprise requirements
+  // are still evaluated from the full duties below.
+  title = title.replace(/\bsales\s+systems?\s+analyst\b/gi, "Systems Analyst");
+  return /\b(?:director|head of|vice president|vp|scientist|intern|internship|principal|staff engineer|mechanical|electrical|aerospace|avionics|payload|fluid|environmental test|mission|manufacturing|weld|life support|logistics|subcontracts|field service|sales|RF|propulsion|weapons?|missiles?|maritime|flight|air vehicles|robotics|electronic warfare|precision engagement|advanced effects|edge compute)\b/i.test(title);
 }
 
 export function roleFamily(title: string): "core" | "adjacent" | null {
   if (excludedTitle(title)) return null;
+  if (/\b(?:technical\s+)?platform\s+operations\s+(?:specialist|analyst|coordinator)\b/i.test(title)) return "adjacent";
+  if (/^Computer Services Consultant(?:\s+(?:I|II|III|1|2|3))?$/i.test(title.trim())) return "core";
   if (/\b(?:computer|end[ -]user|helpdesk|service desk|desktop)\b.*\b(?:support|technician|analyst|specialist)\b|\b(?:IT|information technology|information systems|IS)\s+(?:technician|specialist)\b/i.test(title)) return "core";
   if (/\b(?:application|technical|technology|production|software|product|IT|IS|desktop|systems?)\s+support\b|\bsupport\s+(?:engineer|analyst|specialist|technician|representative|rep)\b|\b(?:service|help)[ -]?desk\b/i.test(title)) return "core";
   if (/\b(?:implementation|integration|integrations)\s+(?:analyst|specialist|engineer|consultant)\b|\b(?:business|IT|information)\s+systems\b|\bsystems?\s+administrator\b|\bIT\s+(?:operations|analyst|specialist|technician)\b/i.test(title)) return "adjacent";
@@ -96,7 +101,14 @@ const cities: [string, number, number][] = [
 ];
 
 export function localDistance(location: string): number | null {
-  const text = location.toLowerCase();
+  // A county label is not a confirmed city worksite (Los Angeles County spans
+  // far beyond the city). Keep it out of automatic commute qualification.
+  if (/\bcounty\b/i.test(location)) return null;
+  // Street names may themselves be local cities (East Carson Street in Long
+  // Beach). Remove numbered street segments, retaining the actual city and all
+  // separately listed offices so multiple-worksite ambiguity still blocks.
+  const cityText=location.replace(/\b\d{1,6}\s+[^,;\n]*?\b(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|way|court|ct|parkway|pkwy)\.?(?=\s|,|$)/gi,' ');
+  const text = cityText.toLowerCase();
   // Avoid e.g. Irvine, Scotland or Lakewood, Colorado.
   if (/\b(?:scotland|canada|australia|india|united kingdom|colorado|new jersey|new york|texas|florida|washington|CO|NJ|NY|TX|FL|WA)\b/i.test(location)) return null;
   const matches = cities.filter(([city]) => new RegExp(`\\b${city}\\b`).test(text));
@@ -117,7 +129,9 @@ export function hasLocalLocationOption(location: string, radiusMiles: number) {
   });
 }
 
-export function assessOpening(opening: Opening, preferences: DiscoveryPreferences) {
+export function assessOpening(opening: Opening, preferences: DiscoveryPreferences, profile?: Record<string, unknown>, verifiedEvidence?: ReturnType<typeof discoveryEvidence>) {
+  const current = verifiedEvidence ?? discoveryEvidence(profile);
+  const baseEvidence = current.evidence.join("\n").toLowerCase();
   let family = roleFamily(opening.title);
   const distanceMiles = localDistance(opening.location);
   const remote = opening.workArrangement === "Remote";
@@ -131,6 +145,22 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   if (supportSolutions) family = "core";
   const positiveText = text.split(/\n|(?<=[.!?])\s+/).filter((line) => !/\b(?:not required|no (?:prior )?experience (?:with|in)|does not require)\b/i.test(line)).join("\n");
   const matchReasons = skillDefinitions.filter(([, pattern, evidence]) => baseEvidence.includes(evidence) && pattern.test(positiveText)).map(([label]) => label);
+  if (family === "core") {
+    // Plain-language support duties count even when a school/small employer does
+    // not name a particular vendor. These map to existing documented duties.
+    if (/\b(?:data integrity|data management|data processing|reports?|reporting|queries)\b/i.test(positiveText) && /\b(?:sql|reporting|data integrity|database)\b/i.test(baseEvidence)) matchReasons.push("Data integrity & reporting duties");
+    if (/\b(?:train(?:ing|s)?|documentation|document(?:s|ing)?|procedures|knowledge base)\b/i.test(positiveText) && /\b(?:training|documentation|document)\b/i.test(baseEvidence)) matchReasons.push("User training & support documentation");
+    if (/\b(?:end[ -]user|desktop|help[ -]?desk|computer(?:s)?|user(?:s)?)\b/i.test(positiveText) && /\b(?:support|tickets|troubleshoot)\b/i.test(baseEvidence)) matchReasons.push("End-user troubleshooting duties");
+  }
+  if (family === "adjacent") {
+    // Adjacent roles need an explicit duty, not incidental words such as users,
+    // training benefits or reports. Keep matches within one sentence/line.
+    const duties = positiveText.split(/\n|(?<=[.!?])\s+/);
+    const hasDuty = (pattern: RegExp) => duties.some(line => pattern.test(line));
+    if (hasDuty(/\b(?:validat\w*|reconcil\w*|query\w*|analyz\w*)\b[^.!?\n]{0,100}\b(?:data|databases?|reports?|records)\b/i) && /\b(?:sql|reporting|data integrity|database)\b/i.test(baseEvidence)) matchReasons.push("Data integrity & reporting duties");
+    if (hasDuty(/\b(?:train\w*\s+(?:end[ -])?users|train\w*\s+(?:staff|employees)|(?:writ\w*|creat\w*|maintain\w*|develop\w*)\b[^.!?\n]{0,70}\b(?:user guides|support documentation|training materials))\b/i) && /\b(?:training|documentation|document)\b/i.test(baseEvidence)) matchReasons.push("User training & support documentation");
+    if (hasDuty(/\b(?:support\w*|troubleshoot\w*|resolv\w*)\b[^.!?\n]{0,80}\b(?:end[ -]users?|user issues|application issues|software issues|user access)\b/i) && /\b(?:support|tickets|troubleshoot)\b/i.test(baseEvidence)) matchReasons.push("End-user troubleshooting duties");
+  }
   const constraintGaps = [
     ...(opening.salaryMin === null || opening.salaryMin < preferences.minimumSalary ? [`Outside your pay criteria: confirmed starting base pay must be at least $${preferences.minimumSalary.toLocaleString("en-US")}/year.`] : []),
     ...(distanceMiles === null || distanceMiles > preferences.radiusMiles ? [`Outside your location criteria: a confirmed worksite within ${preferences.radiusMiles} miles of Seal Beach is required.`] : []),
@@ -181,6 +211,14 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
   const specialtyDomains = [...new Set(requiredLines.filter(line => /experience|background|proficien/i.test(line)).flatMap(line =>
     [...line.matchAll(/\b(?:IT engineering|embedded|radar|RF|hardware (?:design|test)|manufacturing|supply chain|defense logistics|financial analysis|business analytics|consumer insights|market research)\b/gi)].map(match => match[0].toLowerCase())
   ))];
+  // Generic SQL/support experience does not establish prior HR/payroll work.
+  specialtyDomains.push(...requiredHrDomains(requiredLines).filter(domain => {
+    const requiredYears = experienceRequirement(requiredLines.filter(line => line.toLowerCase().includes(domain.toLowerCase())))?.years;
+    return !baseEvidence.split(/\n|(?<=[.!?])\s+/).some(line =>
+      line.includes(domain.toLowerCase()) && /\b(?:administered|managed|supported|processed|implemented)\b/i.test(line) &&
+      !/\b(?:no|not|without|proposed|planned)\b/i.test(line) &&
+      (!requiredYears || (experienceRequirement([line])?.years ?? 0) >= requiredYears));
+  }));
   if (specialtyDomains.length) {
     cautions.push(`Required ${specialtyDomains.slice(0, 3).join(" / ")} experience is not established by your support/IT background.`);
   }
@@ -231,5 +269,5 @@ export function assessOpening(opening: Opening, preferences: DiscoveryPreference
     + (opening.salaryMin !== null && opening.salaryMin >= preferences.minimumSalary ? 5 : 0)
     + (opening.employmentType === "Full-time" ? 4 : 0)
     - (leadershipTitle ? 16 : 0) - (cautions.some((c) => c.startsWith("Required ")) ? 18 : 0)));
-  return { excluded, distanceMiles, score, matchReasons: [...(workplacePlatform ? ["Digital-workplace platform duties align: end-user services, access administration and guided automation"] : []), ...(family === "core" ? ["Support duties align with your IT / application support background"] : family === "adjacent" ? ["Adjacent systems, analyst or operations route"] : []), ...matchReasons], cautions, qualified: !excluded && cautions.length === 0 && matchReasons.length >= 3 && score >= 65 };
+  return { excluded, distanceMiles, score, matchReasons: [...(workplacePlatform ? ["Digital-workplace platform duties align: end-user services, access administration and guided automation"] : []), ...(family === "core" ? ["Support duties align with your IT / application support background"] : family === "adjacent" ? ["Adjacent systems, analyst or operations route"] : []), ...matchReasons], cautions, qualified: !excluded && cautions.every(c => c.startsWith("Work schedule:")) && matchReasons.length >= 3 && score >= 65 };
 }

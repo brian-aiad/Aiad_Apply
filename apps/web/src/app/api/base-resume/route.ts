@@ -1,16 +1,12 @@
-import { readFile, stat } from "node:fs/promises";
 import { NextResponse } from "next/server";
-import { baseResumePath } from "@/lib/base-resume";
+import { activeBase } from "@/lib/workspace-material";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const candidate = await baseResumePath();
-    const metadata = await stat(candidate);
-    if (!metadata.isFile()) throw new Error("Base resume is not a file.");
-    const content = await readFile(candidate);
-    return new NextResponse(content, {
+    const { bytes: content } = await activeBase();
+    return new NextResponse(new Uint8Array(content), {
       headers: {
         "Content-Disposition": 'attachment; filename="Brian_Aiad_BASE.docx"',
         "Content-Type":

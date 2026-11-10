@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { roleFamily, excludedTitle } from "../../src/lib/discovery/matching";
 import { linkedInEligibility, rankLinkedIn, scanGate, pacificDayStart, premiumSignal } from "../../src/lib/discovery/linkedin-policy";
 const now = new Date("2026-10-13T10:00:00Z");
 const candidate = { active:true, excluded:false, score:85, cautions:[], description:"Support incidents and access administration. ".repeat(10), postedAt:"2026-10-12T10:00:00Z", lastSeenAt:now };
@@ -23,4 +24,17 @@ test("manual scans obey rate limit and active lease; crashed lease expires",()=>
   assert.equal(scanGate({retryAfter:"2026-10-14T10:00:00Z"},true,now)?.status,"cooldown");
   assert.equal(scanGate({status:"running",startedAt:now.toISOString()},true,now)?.status,"running");
   assert.equal(scanGate({status:"running",startedAt:"2026-10-11T10:00:00Z"},false,now),null);
+});
+
+test("scheduled collection becomes due at twelve hours while cooldowns remain authoritative", () => {
+  const startedAt = new Date(now.getTime() - 12 * 3600000).toISOString();
+  assert.equal(scanGate({ startedAt }, false, now), null);
+  assert.equal(scanGate({ startedAt: new Date(now.getTime() - 11 * 3600000).toISOString() }, false, now)?.status, "not_due");
+  assert.equal(scanGate({ startedAt, retryAfter: new Date(now.getTime()+3600000).toISOString() }, false, now)?.status, "cooldown");
+});
+
+test("sales-system analyst remains a duty-screened adjacent role, not a blanket sales exclusion", () => {
+  assert.equal(roleFamily("Sales System Analyst"), "adjacent");
+  assert.equal(excludedTitle("Sales Representative"), true);
+  assert.equal(excludedTitle("Director, Sales Systems Analyst"), true);
 });

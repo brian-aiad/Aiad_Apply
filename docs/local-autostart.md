@@ -1,10 +1,17 @@
 # Local automatic startup on macOS
 
-Setup status: prepared but not enabled. macOS denied the LaunchAgent access to
-this Desktop repository. The failed agent was unloaded and its configuration
-saved as `.runtime/com.brianaiad.aiadapply.plist.pending`. Resolve the project
-location or macOS permission before installing it in `~/Library/LaunchAgents`.
-The regular local services remain running.
+Setup status (2026-10-20): enabled on the Mac at the current Code/Projects checkout.
+Windows has a per-user login task installed for its own checkout. Both start the
+local dashboard and tailoring worker; the dedicated application browser starts
+on demand for approved work on Windows. A due, enabled LinkedIn discovery cycle may also reopen
+its own dedicated browser after the shared cooldown check, using saved sign-in.
+Manual Open continues to use a blank page. Each computer must be awake and signed
+in. A real reboot/login cycle has not yet been observed.
+
+Windows setup: `powershell -File scripts/install-login-startup.ps1`.
+Its supervisor is `scripts/keep-local-running.ps1`; process ownership is checked
+before stopping services. Browser ownership uses a native exclusive lock.
+Mac setup: `python3 scripts/install-login-startup.py`.
 
 This installation uses the per-user LaunchAgent
 `~/Library/LaunchAgents/com.brianaiad.aiadapply.plist` to start

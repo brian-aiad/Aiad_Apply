@@ -1,3 +1,6 @@
+import { currentDiscoveryEvidence } from "./current-evidence";
+import { candidateProfile } from "../workspace-material";
+import { automationDeviceAllowed } from "../automation-device";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import path from "node:path";
@@ -10,7 +13,7 @@ import { readDiscoveryPreferences } from "./types";
 import { parseCapture } from "../job-parser";
 import { normalizeLinkedInSearch } from "./linkedin-search.mjs";
 import { normalizeLinkedInOpening, canonicalApplyUrl, sameRoleIdentity, employerRequisitionIdentity, type LinkedInRawOpening } from "./linkedin-normalization";
-import { LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_META, LINKEDIN_QUEUE, LINKEDIN_SESSION, TAILORING_CAPACITY, object, linkedInConfig, linkedInEligibility, premiumSignal, rankLinkedIn, pacificDayStart, scanGate } from "./linkedin-policy";
+import { LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_META, LINKEDIN_QUEUE, LINKEDIN_SESSION, TAILORING_CAPACITY, LINKEDIN_SCAN_INTERVAL_MS, object, linkedInConfig, linkedInEligibility, premiumSignal, rankLinkedIn, pacificDayStart, scanGate } from "./linkedin-policy";
 export { LINKEDIN_STATE, LINKEDIN_CONFIG, LINKEDIN_META } from "./linkedin-policy";
 const exec = promisify(execFile);
 const json = (v: unknown) => JSON.parse(JSON.stringify(v)) as Prisma.InputJsonValue;
@@ -23,6 +26,7 @@ async function collector(args: string[], timeout = 15000) {
   return JSON.parse(stdout);
 }
 export async function linkedInSession() {
+  if (!await automationDeviceAllowed(process.platform)) return { ...object((await db.setting.findUnique({ where: { key: LINKEDIN_SESSION } }))?.value), status: "other_device", message: "Check the dedicated LinkedIn session on the primary Windows computer. Saved session diagnostics have not been changed." };
   let result;
   const previous = object((await db.setting.findUnique({ where: { key: LINKEDIN_STATE } }))?.value);
   const args = ["--session-only"];
@@ -35,7 +39,7 @@ export async function linkedInSession() {
 }
 export async function configureLinkedIn(enabled: boolean) {
   const previous = object((await db.setting.findUnique({ where: { key: LINKEDIN_CONFIG } }))?.value);
-  await setting(LINKEDIN_CONFIG, { ...previous, enabled, collectorId: collectorIdentity() });
+  await setting(LINKEDIN_CONFIG, { ...previous, enabled, ...(await automationDeviceAllowed(process.platform) ? { collectorId: collectorIdentity() } : {}) });
   return { message: enabled ? "LinkedIn automation resumed on this device. Existing cooldowns still apply." : "LinkedIn automation paused. Saved jobs and resumes are retained." };
 }
 export async function configureLinkedInSearch(value: string) {
@@ -68,11 +72,12 @@ export async function captureLinkedInOpenSearch() {
   if (imported && !imported.duplicate) await queueLinkedIn();
   return { message: `${capture.cards.length} search cards captured. ${imported ? "The selected job's full description was saved and linked to existing work where found." : "The selected job's full description could not be verified."} Remaining cards need full descriptions before tailoring.`, count: capture.cards.length };
 }
-export async function openLinkedInBrowser() {
+export async function openLinkedInBrowser(forDiscovery = false) {
+  if (!await automationDeviceAllowed(process.platform)) return { status: "other_device", message: "Open the dedicated LinkedIn browser on the primary Windows computer. Paste and review remain available here." };
   const root = path.resolve(process.cwd(), "../..");
   const windows = process.platform === "win32";
   await exec(windows ? "powershell.exe" : "bash", windows
-    ? ["-NoProfile", "-File", path.join(root, "scripts/start-linkedin-review.ps1")]
+    ? ["-NoProfile", "-File", path.join(root, "scripts/start-linkedin-review.ps1"), ...(forDiscovery ? ["-ForDiscovery"] : [])]
     : [path.join(root, "scripts/start-linkedin-review.sh")], { timeout: 30000 });
   // Explicit local open establishes the collector device without changing pause preference.
   const config = object((await db.setting.findUnique({ where: { key: LINKEDIN_CONFIG } }))?.value);
@@ -97,7 +102,9 @@ export async function ingestLinkedIn(raw: LinkedInRawOpening & Record<string, un
   const old = await db.discoveryPosting.findUnique({ where: { sourceUrl: opening.sourceUrl } });
   // A relative date parsed on a later observation must not make the job newer.
   if (old?.postedAt && (!opening.postedAt || old.postedAt < opening.postedAt)) opening.postedAt = old.postedAt;
-  const fit = assessOpening(opening, prefs);
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
+  const fit = assessOpening(opening, prefs, profile, evidence);
   const { excluded: _excluded, ...storedFit } = fit; void _excluded;
   const id = createHash("sha256").update(`linkedin:premium:${opening.externalId}`).digest("hex");
   const previousMeta = object((await db.setting.findUnique({ where: { key: LINKEDIN_META + (old?.id || id) } }))?.value);
@@ -123,7 +130,9 @@ export async function queueLinkedIn() {
   const prefs = readDiscoveryPreferences((await db.setting.findUnique({ where: { key: "discovery:preferences" } }))?.value);
   const postings = await db.discoveryPosting.findMany({ where: { sourceKey: "linkedin:premium", active: true, approvedApplicationId: null, dismissedAt: null } });
   const metas = await db.setting.findMany({ where: { key: { startsWith: LINKEDIN_META } } });
-  const candidates = postings.map(p => ({ ...p, ...assessOpening({ ...p, employmentType: p.employmentType as "Full-time", workArrangement: p.workArrangement as "On-site" }, prefs), linkedin: metas.find(m => m.key === LINKEDIN_META + p.id)?.value }))
+  const profile = await candidateProfile();
+  const evidence = await currentDiscoveryEvidence(profile);
+  const candidates = postings.map(p => ({ ...p, ...assessOpening({ ...p, employmentType: p.employmentType as "Full-time", workArrangement: p.workArrangement as "On-site" }, prefs, profile, evidence), linkedin: metas.find(m => m.key === LINKEDIN_META + p.id)?.value }))
     .filter(p => linkedInEligibility(p, p.linkedin).status === "eligible").sort(rankLinkedIn);
   const errors: { postingId: string; code: string; message: string }[] = [], items: { postingId: string; status: string; reason: string }[] = [];
   let queued = 0;
@@ -164,9 +173,11 @@ export async function importLinkedInPaste(input: { text: string; sourceUrl: stri
   return { ...result, queue, message: `${result.imported ? "Job imported" : "Saved job updated"}. ${result.duplicate ? "Linked to its existing application." : result.pipeline.reason} No application was submitted.` };
 }
 export async function scanLinkedIn(window: "day" | "week" | "both", force = false, oneJob?: string) {
+  if (!await automationDeviceAllowed(process.platform)) return { status: "other_device", message: "LinkedIn collection runs on the primary Windows computer. Paste and review jobs here." };
   const config = linkedInConfig((await db.setting.findUnique({ where: { key: LINKEDIN_CONFIG } }))?.value);
   if (!force && !config.enabled) return { status: "paused", message: "LinkedIn automation is paused." };
-  if (!force && config.collectorId !== collectorIdentity()) return { status: "other_device", message: "Use the device selected to run LinkedIn collection." };
+  const policy = object((await db.setting.findUnique({ where: { key: "workspace:automation" } }))?.value);
+  if (!policy.browserPlatform && !force && config.collectorId && config.collectorId !== collectorIdentity()) return { status: "other_device", message: "Use the device selected to run LinkedIn collection." };
   const claim = await db.$transaction(async tx => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(9074032)`;
     const previous = object((await tx.setting.findUnique({ where: { key: LINKEDIN_STATE } }))?.value);
@@ -187,7 +198,18 @@ export async function scanLinkedIn(window: "day" | "week" | "both", force = fals
     if (current.id === state.id) await tx.setting.update({ where: { key: LINKEDIN_STATE }, data: { value: json(state) } });
   });
   try {
-    const session = await linkedInSession();
+    let session = await linkedInSession();
+    // This runs only after the shared enabled/due/cooldown claim above. A reboot
+    // may close Chrome while preserving the dedicated profile's signed-in state.
+    if (session.status === "browser_unavailable" && process.platform === "win32") {
+      try {
+        session = await openLinkedInBrowser(true);
+        for (let attempt = 0; session.status === "unknown" && attempt < 5; attempt++) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          session = await linkedInSession();
+        }
+      } catch { /* Preserve the browser/access blocker; never start a second profile. */ }
+    }
     if (session.status !== "ready") {
       state.status = "blocked"; state.blockCode = session.blockCode || session.status; state.message = session.message;
       if (session.blockCode === "rate_limited") state.retryAfter = new Date(Date.now() + 86400000).toISOString();
@@ -243,7 +265,7 @@ export async function scanLinkedIn(window: "day" | "week" | "both", force = fals
     state.message = "Collection stopped before completion. Saved jobs were retained. Check diagnostics or paste a job.";
   }
   state.completedAt = new Date().toISOString();
-  state.nextAllowedAt = state.retryAfter || new Date(new Date(String(state.startedAt)).getTime() + 86400000).toISOString();
+  state.nextAllowedAt = state.retryAfter || new Date(new Date(String(state.startedAt)).getTime() + LINKEDIN_SCAN_INTERVAL_MS).toISOString();
   await persist();
   return state;
 }

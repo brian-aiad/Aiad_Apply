@@ -17,7 +17,7 @@ test("next actions keep their label, destination, and button aligned", () => {
   });
   assert.deepEqual(
     { kind: result.kind, href: result.href, actionLabel: result.actionLabel },
-    { kind: "follow_up", href: "/applications/follow-up-id", actionLabel: "Open follow-up" },
+    { kind: "apply", href: "/applications/ready co-id?tab=apply", actionLabel: "Open ready application" },
   );
 });
 
@@ -55,4 +55,19 @@ test("next action explains a database-backed queue when the worker is offline", 
   assert.equal(result.kind, "wait");
   assert.match(result.label, /Waiting to tailor/);
   assert.match(result.note, /saved.*worker reconnects/i);
+});
+
+
+test("urgent commitments outrank ready work without letting old reminders monopolize Today", () => {
+  const now = new Date("2026-10-20T12:00:00Z");
+  const result = chooseNextAction({ followUps: [], applications: [application("READY", "Ready Co")], strongDiscoveries: 0, now,
+    commitments: [{ id: "interview", dueAt: new Date("2026-10-21T12:00:00Z"), job: { company: "Interview Co", title: "Support" } }] });
+  assert.equal(result.kind, "commitment");
+});
+
+test("a reviewed resume with an uncertain attempt is recovery work, never a fresh Apply recommendation", () => {
+  const result=chooseNextAction({ followUps:[], applications:[{...application("READY","Uncertain Co"),automationStatus:"UNKNOWN"}],strongDiscoveries:0 });
+  assert.equal(result.kind,"recovery");
+  const safe=chooseNextAction({followUps:[],applications:[{...application("READY","Uncertain Co"),automationStatus:"UNKNOWN"},application("REVIEW","New Co")],strongDiscoveries:0});
+  assert.equal(safe.kind,"review");
 });

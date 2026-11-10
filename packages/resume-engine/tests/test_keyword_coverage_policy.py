@@ -15,17 +15,26 @@ BASE = Path("data/resumes/Brian_Aiad_BASE.docx")
 
 def test_singular_webhook_satisfies_its_existing_employer_scope():
     base = parse_resume_docx(BASE)
-    keywords = [JobKeyword(term='Webhooks', normalized='webhooks', kind=KeywordKind.system,
-                           hiring_importance=50, placement_utility=50)]
+    keywords = [
+        JobKeyword(
+            term="Webhooks",
+            normalized="webhooks",
+            kind=KeywordKind.system,
+            hiring_importance=50,
+            placement_utility=50,
+        )
+    ]
     graph = build_evidence_graph(base, keywords)
     texts = {p.paragraph_id: p.text for p in base.paragraphs}
     row = build_keyword_coverage(base, keywords, graph, texts)[0]
-    assert row.status == 'in_context'
-    assert 'experience.original_insurance.bullet.5' in row.placements
+    assert row.status == "in_context"
+    assert "experience.original_insurance.bullet.5" in row.placements
     assert not coverage_feedback(base, keywords, graph, texts)
-    texts['experience.original_insurance.bullet.5'] = 'Supported carrier data feeds.'
-    assert any('Missing supported keyword Webhooks' in issue
-               for issue in coverage_feedback(base, keywords, graph, texts))
+    texts["experience.original_insurance.bullet.5"] = "Supported carrier data feeds."
+    assert any(
+        "Missing supported keyword Webhooks" in issue
+        for issue in coverage_feedback(base, keywords, graph, texts)
+    )
 
 
 def inputs(profile=None):
@@ -247,3 +256,48 @@ def test_single_letter_languages_are_not_malformed_or_confused_with_other_langua
     assert "C" not in {k.term for k in keywords("C++, C#") if k.accepted}
     assert not contains_term("Built a C++ and C# application", "C")
     assert count_term("C, C++, C#", "C") == 1
+
+
+def test_company_radio_marketing_is_not_an_it_support_requirement():
+    from aiadapply_v2.schemas import ParsedJob
+
+    description = """Company Overview
+We create communications products.
+Department Overview
+Our StreamCaster product uses MANET, MIMO and MN-MIMO technology.
+Job Description
+Provide desktop support and troubleshoot end-user accounts.
+Responsibilities
+Resolve service desk incidents."""
+    job = ParsedJob(
+        raw_paste_sha256="fixture-marketing",
+        company="Example Communications",
+        title="IT Support Specialist",
+        job_description=description,
+        responsibilities=["Resolve service desk incidents."],
+    )
+    terms = ["MANET", "MIMO", "MN-MIMO", "StreamCaster"]
+    keywords = {k.term: k for k in grade_job_keywords(job, additional_technologies=terms)}
+    assert all(not keywords[term].accepted for term in terms)
+    required = job.model_copy(
+        update={
+            "required_qualifications": ["Troubleshoot MANET networks."],
+            "job_description": description
+            + "\nRequired qualifications\nTroubleshoot MANET networks.",
+        }
+    )
+    assert next(
+        k
+        for k in grade_job_keywords(required, additional_technologies=["MANET"])
+        if k.term == "MANET"
+    ).accepted
+    unheaded = ParsedJob(
+        raw_paste_sha256="fixture-role",
+        title="Support Specialist",
+        job_description="Troubleshoot MANET networks for customers.",
+    )
+    assert next(
+        k
+        for k in grade_job_keywords(unheaded, additional_technologies=["MANET"])
+        if k.term == "MANET"
+    ).accepted

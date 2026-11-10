@@ -104,12 +104,12 @@ export default async function AnalyticsPage() {
           [
             "Interview rate",
             applied.length ? `${Math.round((interviews.length / applied.length) * 100)}%` : "—",
-            `${interviews.length} of ${applied.length} submissions reached interview; all time`,
+            `${interviews.length} of ${applied.length} submissions reached interview; all time. Includes recorded manual submissions`,
           ],
           [
             "Avg. evidence coverage",
             averageCoverage === null ? "—" : `${averageCoverage}%`,
-            "Latest successful tailoring runs",
+            "Latest successful tailoring runs; describes evidence, not employer outcomes",
           ],
           ["Last 30 days", lastThirty.length, "Jobs captured"],
         ].map(([label, value, note]) => (
